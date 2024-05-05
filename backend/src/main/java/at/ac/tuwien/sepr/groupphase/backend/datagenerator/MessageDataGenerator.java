@@ -1,7 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.datagenerator;
 
-import at.ac.tuwien.sepr.groupphase.backend.entity.Message;
-import at.ac.tuwien.sepr.groupphase.backend.repository.MessageRepository;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Message;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.MessageRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
