@@ -1,3 +1,9 @@
+<div *ngIf="createHelper">
+  <button (click)="createHelper.enable()" *ngIf="!createHelper.enabled">create section</button>
+  <button (click)="finishSection()" *ngIf="createHelper.enabled">finish section</button>
+  <button (click)="zoomIn()">zoom in</button>
+  <button (click)="zoomOut()">zoom out</button>
+</div>
 <canvas #hallplanCanvas width="800" height="600"
         (wheel)="onMouseScroll($event)"
         (mousemove)="onMouseMove($event)"
