@@ -3,10 +3,11 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "npm run api-gen && ng serve",
     "build": "ng build",
     "test": "ng test",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "api-gen": "openapi-generator-cli generate -i ../backend/docs/swagger/openapi.yaml -g typescript-angular -o src/app/services/openapi --additional-properties fileNaming=kebab-case,withInterfaces=true --generate-alias-as-model"
   },
   "private": true,
   "dependencies": {
@@ -59,6 +60,7 @@
     "karma-jasmine": "5.1.0",
     "karma-jasmine-html-reporter": "2.1.0",
     "ts-node": "10.9.2",
-    "typescript": "5.4.5"
+    "typescript": "5.4.5",
+    "@openapitools/openapi-generator-cli": "^2.13.4"
   }
 }
