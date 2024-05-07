@@ -23,8 +23,8 @@ import {BackgroundEntity, SeatEntity, SectionEntity} from "./entities";
 export class HallplanComponent {
   @ViewChild('hallplanCanvas') myCanvas: ElementRef<HTMLCanvasElement>;
   ctx: CanvasRenderingContext2D;
-  width = 800;
-  height = 600;
+  width = 1000;
+  height = 1000;
   widthInMeters = 800;
   heightInMeters = 600;
   backgroundImage: HTMLImageElement;
@@ -81,7 +81,7 @@ export class HallplanComponent {
     this.generateEntites();
 
     this.additionalHelpers.push(this.drawHelper = new DrawHelper());
-    this.additionalHelpers.push(this.moveHelper = new MoveHelper(this.drawHelper, canvas));
+    this.additionalHelpers.push(this.moveHelper = new MoveHelper(this.drawHelper, canvas, this.width, this.height));
     this.additionalHelpers.push(this.createHelper = new CreateHelper(this.drawHelper, canvas, this.sections, this.seats, this.ctx));
     const interactableEntities = this.entities.filter(entity => 'getActions' in entity).map(entity => entity as unknown as InteractableEntity);
     this.additionalHelpers.push(this.interactionHelper = new InteractionHelper(this.drawHelper, canvas, interactableEntities));

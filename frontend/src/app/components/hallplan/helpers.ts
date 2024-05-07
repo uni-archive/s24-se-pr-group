@@ -94,11 +94,18 @@ export class MoveHelper extends Helper {
   lastMousePos: Point2D = {x: 0, y: 0};
   drawHelper: DrawHelper;
   canvas: HTMLCanvasElement;
+  width: number;
+  height: number;
 
-  constructor(drawHelper: DrawHelper, canvas: HTMLCanvasElement) {
+  readonly minZoom: number;
+
+  constructor(drawHelper: DrawHelper, canvas: HTMLCanvasElement, width: number, height: number) {
     super();
     this.drawHelper = drawHelper;
     this.canvas = canvas;
+    this.width = width;
+    this.height = height;
+    this.minZoom = Math.max(canvas.width / width, canvas.height / height);
   }
 
   onMouseScroll(event: WheelEvent) {
@@ -114,12 +121,12 @@ export class MoveHelper extends Helper {
 
   zoomAtPoint(zoomFactor: number, point: Point2D) {
     const prevScale = this.drawHelper.scale;
-    const updatedScale = Math.floor(clamp(zoomFactor * prevScale, 1, 10) * 1000) / 1000;
+    const updatedScale = Math.floor(clamp(zoomFactor * prevScale, this.minZoom, 10) * 1000) / 1000;
     if (prevScale !== updatedScale) {
       const prevOffset = this.drawHelper.offset;
       const deltaX = - (point.x - prevOffset.x) * (zoomFactor - 1);
       const deltaY = - (point.y - prevOffset.y) * (zoomFactor - 1);
-      this.drawHelper.offset = { x: prevOffset.x + deltaX, y: prevOffset.y + deltaY };
+      this.updateOffset({ x: prevOffset.x + deltaX, y: prevOffset.y + deltaY })
       this.drawHelper.scale = updatedScale;
       this.setFrameHasChanged();
     }
@@ -136,7 +143,7 @@ export class MoveHelper extends Helper {
 
       // Update the canvas position
       const prevOffset = this.drawHelper.offset;
-      this.drawHelper.offset = { x: prevOffset.x + deltaX, y: prevOffset.y + deltaY };
+      this.updateOffset({ x: prevOffset.x + deltaX, y: prevOffset.y + deltaY });
 
       // Update the drag start position
       this.dragStart = {x: event.clientX, y: event.clientY};
@@ -159,6 +166,13 @@ export class MoveHelper extends Helper {
     this.isDragging = true;
     this.dragStart = {x: event.clientX, y: event.clientY};
     return false;
+  }
+
+  updateOffset(offset: Point2D) {
+    this.drawHelper.offset = {
+      x: clamp(offset.x, this.canvas.width - this.width * this.drawHelper.scale, 0),
+      y: clamp(offset.y, this.canvas.height - this.height * this.drawHelper.scale, 0)
+    }
   }
 }
 
