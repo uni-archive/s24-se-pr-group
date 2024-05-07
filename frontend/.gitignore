@@ -40,5 +40,4 @@ testem.log
 Thumbs.db
 
 # OpenAPI-Generator CLI
-src/app/services/openapi
 openapitools.json

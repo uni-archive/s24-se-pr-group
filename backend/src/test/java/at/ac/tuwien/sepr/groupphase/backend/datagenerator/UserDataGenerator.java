@@ -21,7 +21,7 @@ public class UserDataGenerator {
     @PostConstruct
     private void generateData() {
         ADMIN_USER.setPassword(passwordEncoder.encode("password"+ADMIN_USER.getSalt()));
-        CUSTOMER_USER.setPassword(passwordEncoder.encode("password"+ADMIN_USER.getSalt()));
+        CUSTOMER_USER.setPassword(passwordEncoder.encode("password"+CUSTOMER_USER.getSalt()));
         userRepository.save(ADMIN_USER);
         userRepository.save(CUSTOMER_USER);
     }

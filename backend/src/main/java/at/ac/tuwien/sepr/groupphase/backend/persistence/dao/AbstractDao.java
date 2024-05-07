@@ -18,6 +18,7 @@ public abstract class AbstractDao<T extends AbstractEntity, D extends AbstractDt
     }
 
     public D create(D createDto) {
+
         return mapper.toDto(repository.save(mapper.toEntity(createDto)));
     }
 
@@ -33,8 +34,8 @@ public abstract class AbstractDao<T extends AbstractEntity, D extends AbstractDt
     }
 
     public D update(D entity) throws EntityNotFoundException {
-        if (!repository.existsById(entity.id())) {
-            throw new EntityNotFoundException(entity.id());
+        if (!repository.existsById(entity.getId())) {
+            throw new EntityNotFoundException(entity.getId());
         }
         return mapper.toDto(repository.save(mapper.toEntity(entity)));
     }

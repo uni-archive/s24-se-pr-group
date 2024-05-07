@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "npm run api-gen && ng serve",
+    "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
@@ -22,10 +22,13 @@
     "@angular/router": "17.3.4",
     "@ng-bootstrap/ng-bootstrap": "16.0.0",
     "@popperjs/core": "2.11.8",
+    "angular-phone-number-input": "^1.0.6",
     "bootstrap": "5.3.3",
+    "bootstrap-icons": "^1.11.3",
     "core-js": "3.36.1",
     "jquery": "3.7.1",
     "jwt-decode": "4.0.0",
+    "libphonenumber-js": "^1.11.1",
     "lodash": "4.17.21",
     "rxjs": "7.8.1",
     "tslib": "2.6.2",
@@ -41,6 +44,7 @@
     "@angular/cli": "17.3.4",
     "@angular/compiler-cli": "17.3.4",
     "@angular/language-service": "17.3.4",
+    "@openapitools/openapi-generator-cli": "^2.13.4",
     "@types/jasmine": "5.1.4",
     "@types/jasminewd2": "2.0.13",
     "@types/jwt-decode": "3.1.0",
@@ -60,7 +64,6 @@
     "karma-jasmine": "5.1.0",
     "karma-jasmine-html-reporter": "2.1.0",
     "ts-node": "10.9.2",
-    "typescript": "5.4.5",
-    "@openapitools/openapi-generator-cli": "^2.13.4"
+    "typescript": "5.4.5"
   }
 }

@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.UniqueConstraint;
 
 import java.util.List;
 import java.util.Objects;
@@ -19,8 +20,9 @@ import java.util.Objects;
 @DiscriminatorColumn(discriminatorType = jakarta.persistence.DiscriminatorType.STRING)
 public class ApplicationUser extends AbstractEntity {
 
-    @Column(name = "EMAIL")
+    @Column(name = "EMAIL", unique = true)
     private String email;
+
     @Column(name = "PASSWORD")
     private String password;
 
@@ -169,6 +171,6 @@ public class ApplicationUser extends AbstractEntity {
     @Override
     public String toString() {
         return "ApplicationUserResponse{" + "email='" + email + '\'' + ", password='" + password + '\'' + ", firstName='" + firstName + '\'' + ", familyName='" + familyName + '\'' + ", phoneNumber='" + phoneNumber + '\'' + ", salt='" + salt
-            + '\'' + ", loginCount=" + loginCount + ", accountLocked=" + accountLocked + ", orders=" + orders + ", news=" + news + '}';
+            + '\'' + ", loginCount=" + loginCount + ", accountLocked=" + accountLocked + '}';
     }
 }

@@ -5,6 +5,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.UserDao;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
+import at.ac.tuwien.sepr.groupphase.backend.security.SecurityUtil;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.UserValidator;
@@ -43,9 +44,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         LOGGER.debug("Load all user by email");
-        try {
-            ApplicationUserDto applicationUser = findApplicationUserByEmail(email);
+        ApplicationUserDto applicationUser = findApplicationUserByEmail(email);
+        return getUserDetailsForUser(applicationUser);
+    }
 
+    private UserDetails getUserDetailsForUser(ApplicationUserDto applicationUser) {
+        try {
             List<GrantedAuthority> grantedAuthorities;
             if (applicationUser.isAdmin()) {
                 grantedAuthorities = AuthorityUtils.createAuthorityList("ROLE_ADMIN", "ROLE_USER");
@@ -71,12 +75,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String login(UserLoginDto userLoginDto) {
-        UserDetails userDetails = loadUserByUsername(userLoginDto.getEmail());
+        ApplicationUserDto applicationUserDto = findApplicationUserByEmail(userLoginDto.getEmail());
+        UserDetails userDetails = getUserDetailsForUser(applicationUserDto);
         if (userDetails != null
             && userDetails.isAccountNonExpired()
             && userDetails.isAccountNonLocked()
             && userDetails.isCredentialsNonExpired()
-            && passwordEncoder.matches(userLoginDto.getPassword(), userDetails.getPassword())
+            && passwordEncoder.matches(userLoginDto.getPassword().concat(applicationUserDto.getSalt()), userDetails.getPassword())
         ) {
             List<String> roles = userDetails.getAuthorities()
                 .stream()
@@ -90,6 +95,8 @@ public class UserServiceImpl implements UserService {
     public ApplicationUserDto createUser(ApplicationUserDto toCreate) throws ValidationException {
         LOGGER.debug("Create user");
         userValidator.validateForCreate(toCreate);
+        toCreate.setSalt(SecurityUtil.generateSalt(32));
+        toCreate.setPassword(passwordEncoder.encode(toCreate.getPassword() + toCreate.getSalt()));
         return userDao.create(toCreate);
     }
 }

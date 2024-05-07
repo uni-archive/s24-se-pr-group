@@ -15,10 +15,6 @@ public class ApplicationUserDto implements AbstractDto {
 
 
     @Override
-    public Long id() {
-        return id;
-    }
-
     public Long getId() {
         return id;
     }

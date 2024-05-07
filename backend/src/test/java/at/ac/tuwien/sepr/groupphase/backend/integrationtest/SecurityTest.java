@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 
 import at.ac.tuwien.sepr.groupphase.backend.BackendApplication;
+import at.ac.tuwien.sepr.groupphase.backend.DevelopmentApplication;
 import at.ac.tuwien.sepr.groupphase.backend.basetest.TestData;
 import at.ac.tuwien.sepr.groupphase.backend.config.properties.SecurityProperties;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.MessageInquiryDto;
@@ -128,7 +129,7 @@ public class SecurityTest implements TestData {
         assertThat(notSecured.size())
             .as("Most rest methods should be secured. If one is really intended for public use, explicitly state that with @PermitAll. "
                 + "The following are missing: \n" + notSecured.stream().map(pair -> "Class: " + pair.getLeft() + " Method: " + pair.getRight()).reduce("", (a, b) -> a + "\n" + b))
-            .isOne();
+            .isZero();
 
     }
 
