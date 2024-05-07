@@ -1,5 +1,17 @@
 import {HallSeat, HallSection, Point2D} from "./hallplan.component";
 
+interface ObjectConstructor {
+  /**
+   * Groups members of an iterable according to the return value of the passed callback.
+   * @param items An iterable.
+   * @param keySelector A callback which will be invoked for each item in items.
+   */
+  groupBy<K extends PropertyKey, T>(
+    items: Iterable<T>,
+    keySelector: (item: T, index: number) => K,
+  ): Partial<Record<K, T[]>>;
+}
+
 export class Helper {
   frameHasChanged = false;
   enabled = true;
@@ -20,7 +32,7 @@ export class Helper {
     this.frameHasChanged = true;
   }
 
-  onDrawCanvas(sections: HallSection[], seats: HallSeat[], ctx: CanvasRenderingContext2D) { }
+  onDrawCanvas(ctx: CanvasRenderingContext2D, entities: DrawableEntity[]) { }
 
   /**
    * Handle mouse move event
@@ -42,39 +54,17 @@ export class Helper {
 }
 
 export class DrawHelper extends Helper {
-  ctx: CanvasRenderingContext2D;
   scale: number;
   offset: Point2D = {x: 0, y: 0};
-  backgroundImage: HTMLImageElement;
-  width = 800;
-  height = 600;
   showSeats = true;
 
-  constructor(ctx: CanvasRenderingContext2D, backgroundImage: HTMLImageElement, initScale: number = 1) {
+  constructor(initScale: number = 1) {
     super();
-    this.ctx = ctx;
     this.scale = initScale;
-    this.backgroundImage = backgroundImage;
   }
 
   setShowSeats(showSeats: boolean) {
     this.showSeats = showSeats;
-  }
-
-  setOffset(pos: Point2D) {
-    this.offset = pos;
-  }
-
-  getOffset(): Point2D {
-    return this.offset;
-  }
-
-  setScale(scale: number) {
-    this.scale = scale;
-  }
-
-  getScale(): number {
-    return this.scale;
   }
 
   getScaledPos(pos: Point2D): Point2D {
@@ -85,55 +75,17 @@ export class DrawHelper extends Helper {
     return {x: (pos.x - this.offset.x) / this.scale, y: (pos.y - this.offset.y) / this.scale};
   }
 
-  onDrawCanvas(sections: HallSection[], seats: HallSeat[]) {
-    this.drawBackgroundImage();
-    this.drawAllSections(sections);
-    if (this.showSeats) {
-      this.drawAllSeats(seats);
-    }
+  onDrawCanvas(ctx: CanvasRenderingContext2D, entities: DrawableEntity[]) {
+    // @ts-ignore
+    const grouped = Object.groupBy(entities, entity => entity.constructor.name);
+    Object.entries(grouped)
+      .reduce((acc, [key, value]: [any, DrawableEntity[]]) => {
+        acc.push(...value);
+        return acc;
+      }, [])
+      .forEach((entity: DrawableEntity) => entity.draw(ctx, this.getScaledPos.bind(this), this.scale));
   }
 
-  drawBackgroundImage() {
-    this.ctx.drawImage(this.backgroundImage, this.offset.x, this.offset.y, this.width * this.scale, this.height * this.scale);
-  }
-
-  drawAllSections(sections: HallSection[]) {
-    sections.forEach(section => this.drawSection(section));
-  }
-
-  drawSection(section: HallSection) {
-    this.ctx.fillStyle = 'red';
-    this.ctx.beginPath();
-    section.points.forEach((point, index) => {
-      // move to points with respect to scale and pos
-      const x = point.x * this.scale + this.offset.x;
-      const y = point.y * this.scale + this.offset.y;
-      if (index === 0) {
-        this.ctx.moveTo(x, y);
-      } else {
-        this.ctx.lineTo(x, y);
-      }
-    });
-    this.ctx.closePath();
-    this.ctx.fill();
-  }
-
-  drawAllSeats(seats: HallSeat[]) {
-    var i = 0;
-    seats.forEach(seat => {
-      this.drawCircle(seat.pos.x, seat.pos.y);
-    });
-  }
-
-  drawCircle(x: number, y: number) {
-    // idk why but arc messes everything up
-    // this.ctx.fillStyle = 'rgba(0, 0, 255, 0.4)';
-    // this.ctx.arc(x * this.localScale + this.posX, y * this.localScale + this.offset.y, CreateHelper.SEAT_RADIUS * this.localScale / 2, 0, 2 * Math.PI);
-    // this.ctx.fill();
-    // this.ctx.closePath();
-    this.ctx.fillStyle = 'rgba(0, 0, 255, 0.4)';
-    this.ctx.fillRect(x * this.scale + this.offset.x, y * this.scale + this.offset.y, 10 * this.scale, 10 * this.scale);
-  }
 }
 
 export class MoveHelper extends Helper {
@@ -161,14 +113,14 @@ export class MoveHelper extends Helper {
   }
 
   zoomAtPoint(zoomFactor: number, point: Point2D) {
-    const prevScale = this.drawHelper.getScale();
+    const prevScale = this.drawHelper.scale;
     const updatedScale = Math.floor(clamp(zoomFactor * prevScale, 1, 10) * 1000) / 1000;
     if (prevScale !== updatedScale) {
-      const prevOffset = this.drawHelper.getOffset();
+      const prevOffset = this.drawHelper.offset;
       const deltaX = - (point.x - prevOffset.x) * (zoomFactor - 1);
       const deltaY = - (point.y - prevOffset.y) * (zoomFactor - 1);
-      this.drawHelper.setOffset({ x: prevOffset.x + deltaX, y: prevOffset.y + deltaY });
-      this.drawHelper.setScale(updatedScale);
+      this.drawHelper.offset = { x: prevOffset.x + deltaX, y: prevOffset.y + deltaY };
+      this.drawHelper.scale = updatedScale;
       this.setFrameHasChanged();
     }
   }
@@ -183,8 +135,8 @@ export class MoveHelper extends Helper {
       const deltaY = event.clientY - this.dragStart.y;
 
       // Update the canvas position
-      const prevOffset = this.drawHelper.getOffset();
-      this.drawHelper.setOffset({ x: prevOffset.x + deltaX, y: prevOffset.y + deltaY });
+      const prevOffset = this.drawHelper.offset;
+      this.drawHelper.offset = { x: prevOffset.x + deltaX, y: prevOffset.y + deltaY };
 
       // Update the drag start position
       this.dragStart = {x: event.clientX, y: event.clientY};
@@ -227,7 +179,7 @@ export class CreateHelper extends Helper {
     this.ctx = ctx;
   }
 
-  onDrawCanvas(sections: HallSection[], seats: HallSeat[], ctx: CanvasRenderingContext2D) {
+  onDrawCanvas(ctx: CanvasRenderingContext2D) {
     if (this.noDraw)
       return;
     ctx.fillStyle = 'red';
@@ -311,6 +263,74 @@ export class CreateHelper extends Helper {
 
 }
 
+export class InteractionHelper extends Helper {
+  entities: InteractableEntity[] = [];
+  drawHelper: DrawHelper;
+  canvas: HTMLCanvasElement;
+  highlightedEntities: InteractableEntity[] = [];
+
+  constructor(drawHelper: DrawHelper, canvas: HTMLCanvasElement, entities: InteractableEntity[]) {
+    super();
+    this.entities = entities;
+    this.canvas = canvas;
+    this.drawHelper = drawHelper;
+  }
+
+  setEntities(entities: InteractableEntity[]) {
+    this.entities = entities;
+  }
+
+  onMouseMove(event: MouseEvent) {
+    const rect = this.canvas.getBoundingClientRect();
+    const mousePos: Point2D = {x: event.clientX - rect.left, y: event.clientY - rect.top};
+    const mouseWorldPos = this.drawHelper.getUnscaledPos(mousePos);
+
+    const highlightedEntities = this.entities.filter(entity => entity.isInside(mouseWorldPos, this.canvas.getContext('2d')));
+    const newHighlightedEntities = highlightedEntities.filter(entity => !this.highlightedEntities.includes(entity));
+    const unhighlightedEntities = this.highlightedEntities.filter(entity => !highlightedEntities.includes(entity));
+
+    newHighlightedEntities.forEach(entity => entity.onHighlight());
+    unhighlightedEntities.forEach(entity => entity.onHighlightEnd());
+
+    if (newHighlightedEntities.length !== 0 || unhighlightedEntities.length !== 0) {
+      this.setFrameHasChanged();
+    }
+    this.highlightedEntities = highlightedEntities;
+    return false;
+  }
+}
+
 export function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
+}
+
+export interface CalculateScaledPoint {
+  (point: Point2D): Point2D;
+}
+
+export interface InteractableEntity {
+  isInside(point: Point2D, ctx: CanvasRenderingContext2D): boolean;
+  onHighlight(): void;
+  onHighlightEnd(): void;
+  getActions(): Action[];
+}
+
+export interface Action {
+  onInteract(): void;
+  name: string;
+}
+
+export class DrawableEntity {
+  pos: Point2D;
+  hidden = false;
+
+  constructor(pos: Point2D = {x: 0, y: 0}) {
+    this.pos = pos;
+  }
+
+  draw(ctx: CanvasRenderingContext2D, calculateViewportPoint: CalculateScaledPoint, scale: number) { }
+
+  isVisible(): boolean {
+    return !this.hidden;
+  }
 }

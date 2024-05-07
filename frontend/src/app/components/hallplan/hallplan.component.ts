@@ -1,6 +1,15 @@
 import {Component, ElementRef, ViewChild} from '@angular/core';
-import {CreateHelper, DrawHelper, Helper, MoveHelper} from "./helpers";
+import {
+  CreateHelper,
+  DrawableEntity,
+  DrawHelper,
+  Helper,
+  InteractableEntity,
+  InteractionHelper,
+  MoveHelper
+} from "./helpers";
 import {NgIf} from "@angular/common";
+import {BackgroundEntity, SeatEntity, SectionEntity} from "./entities";
 
 @Component({
   selector: 'app-hallplan',
@@ -34,17 +43,21 @@ export class HallplanComponent {
       ],
       name: 'Section 1',
       color: 'red',
-      price: 100
+      price: 100,
+      seats: []
     },
    ];
 
   drawHelper: DrawHelper;
   moveHelper: MoveHelper;
   createHelper: CreateHelper;
+  interactionHelper: InteractionHelper;
   additionalHelpers: Helper[] = [];
   additionalHelpersReversed: Helper[] = [];
 
   seats: HallSeat[] = [];
+
+  entities: DrawableEntity[] = [];
 
   async ngOnInit() {
     this.backgroundImageUrl = `https://placehold.co/${this.width}x${this.height}`;
@@ -63,15 +76,29 @@ export class HallplanComponent {
     // After the view has been initialized, you can access the canvas element here
     this.backgroundImage = await this.loadImage(this.backgroundImageUrl);
     const canvas: HTMLCanvasElement = this.myCanvas.nativeElement;
-    const ctx = this.ctx = canvas.getContext('2d');
-    this.additionalHelpers.push(this.drawHelper = new DrawHelper(ctx, this.backgroundImage));
+    this.ctx = canvas.getContext('2d');
+
+    this.generateEntites();
+
+    this.additionalHelpers.push(this.drawHelper = new DrawHelper());
     this.additionalHelpers.push(this.moveHelper = new MoveHelper(this.drawHelper, canvas));
     this.additionalHelpers.push(this.createHelper = new CreateHelper(this.drawHelper, canvas, this.sections, this.seats, this.ctx));
+    const interactableEntities = this.entities.filter(entity => 'getActions' in entity).map(entity => entity as unknown as InteractableEntity);
+    this.additionalHelpers.push(this.interactionHelper = new InteractionHelper(this.drawHelper, canvas, interactableEntities));
 
     this.additionalHelpersReversed = this.additionalHelpers.slice().reverse();
 
     this.refreshCanvas(true);
     this.setupCanvasRefresh();
+  }
+
+  generateEntites() {
+    this.entities.splice(0, this.entities.length);
+    this.entities.push(new BackgroundEntity(this.backgroundImage, this.width, this.height));
+    this.entities.push(...this.sections.map(section => new SectionEntity(section)));
+    this.entities.push(...this.sections.map(section => section.seats.map(seat => new SeatEntity(seat))).reduce((acc, val) => acc.concat(val), []));
+    const interactableEntities = this.entities.filter(entity => 'getActions' in entity).map(entity => entity as unknown as InteractableEntity);
+    this.interactionHelper?.setEntities(interactableEntities);
   }
 
   finishSection() {
@@ -81,10 +108,13 @@ export class HallplanComponent {
         points: sectionPolygon,
         name: 'Section ' + (this.sections.length + 1),
         color: 'blue',
-        price: 100
+        price: 100,
+
+        seats: this.createHelper.generateSeats().map(pos => ({ pos })),
       });
-      this.seats.push(...this.createHelper.generateSeats().map(pos => ({ pos })));
       this.createHelper.disable();
+      this.generateEntites();
+
       this.refreshCanvas(true);
     }
   }
@@ -96,7 +126,7 @@ export class HallplanComponent {
 
   refreshCanvas(forceRedraw = false) {
     if (forceRedraw || this.additionalHelpers.filter(helper => helper.enabled).map(helper => helper.frameHasChanged).some(val => val === true)) {
-      this.additionalHelpers.filter(helper => helper.enabled).forEach(helper => helper.onDrawCanvas(this.sections, this.seats, this.ctx));
+      this.additionalHelpers.filter(helper => helper.enabled).forEach(helper => helper.onDrawCanvas(this.ctx, this.entities));
       this.additionalHelpers.filter(helper => helper.enabled).forEach(helper => helper.resetFrameHasChanged());
     }
   }
@@ -109,18 +139,22 @@ export class HallplanComponent {
   }
 
   onMouseScroll(event: WheelEvent) {
+    event.preventDefault();
     this.additionalHelpersReversed.filter(helper => helper.enabled).some(helper => helper.onMouseScroll(event));
   }
 
   onMouseMove(event: MouseEvent) {
+    event.preventDefault();
     this.additionalHelpersReversed.filter(helper => helper.enabled).some(helper => helper.onMouseMove(event));
   }
 
   onMouseUp(event: MouseEvent) {
+    event.preventDefault();
     this.additionalHelpersReversed.filter(helper => helper.enabled).some(helper => helper.onMouseUp(event));
   }
 
   onMouseDown(event: MouseEvent) {
+    event.preventDefault();
     this.additionalHelpersReversed.filter(helper => helper.enabled).some(helper => helper.onMouseDown(event));
   }
 }
@@ -132,6 +166,8 @@ export type HallSection = {
   name: string;
   color: string;
   price: number;
+
+  seats: HallSeat[];
 }
 
 export type HallSeat = {
