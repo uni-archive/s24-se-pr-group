@@ -1,5 +1,11 @@
 import {HallSeat, HallSection, Point2D} from "./hallplan.component";
 
+const MouseButtonKey = {
+  LEFT: 0,
+  MIDDLE: 1,
+  RIGHT: 2
+}
+
 interface ObjectConstructor {
   /**
    * Groups members of an iterable according to the return value of the passed callback.
@@ -42,12 +48,30 @@ export class Helper {
   onMouseMove(event: MouseEvent): boolean {
     return false;
   }
+
+  /**
+   * Handle mouse move event
+   * @param event
+   * @returns false if event chain should continue, true if it should abort
+   */
   onMouseDown(event: MouseEvent): boolean {
     return false;
   }
+
+  /**
+   * Handle mouse move event
+   * @param event
+   * @returns false if event chain should continue, true if it should abort
+   */
   onMouseUp(event: MouseEvent): boolean {
     return false;
   }
+
+  /**
+   * Handle mouse move event
+   * @param event
+   * @returns false if event chain should continue, true if it should abort
+   */
   onMouseScroll(event: WheelEvent): boolean {
     return false;
   }
@@ -106,6 +130,7 @@ export class MoveHelper extends Helper {
     this.width = width;
     this.height = height;
     this.minZoom = Math.max(canvas.width / width, canvas.height / height);
+    drawHelper.scale = Math.max(this.minZoom, drawHelper.scale);
   }
 
   onMouseScroll(event: WheelEvent) {
@@ -210,7 +235,15 @@ export class CreateHelper extends Helper {
       }
     });
     ctx.fill();
-    ctx.stroke();
+    this.sectionPoints.forEach((point, index) => {
+      // move to points with respect to scale and pos
+      const {x, y} = this.drawHelper.getScaledPos(point);
+      // draw circle
+      ctx.beginPath();
+      ctx.arc(x, y, 5, 0, 2 * Math.PI);
+      ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+      ctx.fill();
+    });
   }
 
   onMouseDown(event: MouseEvent) {
@@ -282,6 +315,8 @@ export class InteractionHelper extends Helper {
   drawHelper: DrawHelper;
   canvas: HTMLCanvasElement;
   highlightedEntities: InteractableEntity[] = [];
+  selectedEntities: InteractableEntity[] = [];
+  onSelectionChange: ((entities: InteractableEntity[]) => void) | null = null;
 
   constructor(drawHelper: DrawHelper, canvas: HTMLCanvasElement, entities: InteractableEntity[]) {
     super();
@@ -300,10 +335,13 @@ export class InteractionHelper extends Helper {
     const mouseWorldPos = this.drawHelper.getUnscaledPos(mousePos);
 
     const highlightedEntities = this.entities.filter(entity => entity.isInside(mouseWorldPos, this.canvas.getContext('2d')));
-    const newHighlightedEntities = highlightedEntities.filter(entity => !this.highlightedEntities.includes(entity));
-    const unhighlightedEntities = this.highlightedEntities.filter(entity => !highlightedEntities.includes(entity));
+    // only highlight the last entity
+    highlightedEntities.splice(0, highlightedEntities.length - 1);
 
-    newHighlightedEntities.forEach(entity => entity.onHighlight());
+    const newHighlightedEntities = highlightedEntities.filter(entity => ! this.selectedEntities.includes(entity) && !this.highlightedEntities.includes(entity));
+    const unhighlightedEntities = this.highlightedEntities.filter(entity => ! this.selectedEntities.includes(entity) && ! highlightedEntities.includes(entity));
+
+    newHighlightedEntities.forEach(entity => entity.onHighlight(false));
     unhighlightedEntities.forEach(entity => entity.onHighlightEnd());
 
     if (newHighlightedEntities.length !== 0 || unhighlightedEntities.length !== 0) {
@@ -311,6 +349,33 @@ export class InteractionHelper extends Helper {
     }
     this.highlightedEntities = highlightedEntities;
     return false;
+  }
+
+  onMouseDown(event: MouseEvent) {
+    if (event.button !== MouseButtonKey.LEFT) {
+      return false;
+    }
+    const rect = this.canvas.getBoundingClientRect();
+    const mousePos: Point2D = {x: event.clientX - rect.left, y: event.clientY - rect.top};
+    const mouseWorldPos = this.drawHelper.getUnscaledPos(mousePos);
+
+    const newSelectedEntities = this.entities
+      .filter(entity =>
+        ! this.selectedEntities.includes(entity) &&
+        entity.isInside(mouseWorldPos, this.canvas.getContext('2d')));
+    // only select the last entity
+    newSelectedEntities.splice(0, newSelectedEntities.length - 1);
+    const unselectedEntities = this.selectedEntities.filter(entity => entity.isInside(mouseWorldPos, this.canvas.getContext('2d')));
+    newSelectedEntities.forEach(entity => entity.onHighlight(true));
+    unselectedEntities.forEach(entity => entity.onHighlightEnd());
+    this.selectedEntities = [...newSelectedEntities, ...this.selectedEntities.filter(entity => !unselectedEntities.includes(entity))];
+
+    const hasChanged = newSelectedEntities.length !== 0 || unselectedEntities.length !== 0
+    if (hasChanged) {
+      this.onSelectionChange?.(this.selectedEntities);
+      this.setFrameHasChanged();
+    }
+    return hasChanged;
   }
 }
 
@@ -324,7 +389,7 @@ export interface CalculateScaledPoint {
 
 export interface InteractableEntity {
   isInside(point: Point2D, ctx: CanvasRenderingContext2D): boolean;
-  onHighlight(): void;
+  onHighlight(selected: boolean): void;
   onHighlightEnd(): void;
   getActions(): Action[];
 }
@@ -337,9 +402,15 @@ export interface Action {
 export class DrawableEntity {
   pos: Point2D;
   hidden = false;
+  data: any;
 
   constructor(pos: Point2D = {x: 0, y: 0}) {
     this.pos = pos;
+  }
+
+  setData(data: any) {
+    this.data = data;
+    return this;
   }
 
   draw(ctx: CanvasRenderingContext2D, calculateViewportPoint: CalculateScaledPoint, scale: number) { }

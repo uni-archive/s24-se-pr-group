@@ -1,10 +1,11 @@
 import {Action, CalculateScaledPoint, DrawableEntity, InteractableEntity} from "./helpers";
 import {HallSeat, HallSection, Point2D} from "./hallplan.component";
-import index from "eslint-plugin-jsdoc";
 
 export class SectionEntity extends DrawableEntity implements InteractableEntity {
   points: Point2D[];
   isHighlighted = false;
+  isSelected = false;
+  data: HallSection;
 
   constructor(section: HallSection) {
     super();
@@ -26,7 +27,11 @@ export class SectionEntity extends DrawableEntity implements InteractableEntity 
     ctx.closePath();
     ctx.fill();
     if (this.isHighlighted) {
-      ctx.strokeStyle = 'yellow';
+      ctx.strokeStyle = 'rgb(255, 255, 255)';
+      console.log(this.isSelected)
+      if (this.isSelected) {
+        ctx.strokeStyle = 'yellow';
+      }
       ctx.lineWidth = 2;
       ctx.stroke();
     }
@@ -55,18 +60,23 @@ export class SectionEntity extends DrawableEntity implements InteractableEntity 
     return isInside;
   }
 
-  onHighlight(): void {
+  onHighlight(selected: boolean): void {
     this.isHighlighted = true;
+    this.isSelected = selected;
+    console.log("entite", selected)
   }
 
   onHighlightEnd(): void {
     this.isHighlighted = false;
+    this.isSelected = false;
   }
 }
 
 export class SeatEntity extends DrawableEntity implements InteractableEntity {
   pos: Point2D;
   isHighlighted = false;
+  isSelected = false;
+  data: HallSeat;
 
   constructor(seat: HallSeat) {
     super();
@@ -80,12 +90,14 @@ export class SeatEntity extends DrawableEntity implements InteractableEntity {
     return distance < 5;
   }
 
-  onHighlight(): void {
+  onHighlight(selected: boolean): void {
     this.isHighlighted = true;
+    this.isSelected = selected;
   }
 
   onHighlightEnd(): void {
     this.isHighlighted = false;
+    this.isSelected = false;
   }
 
   getActions(): Action[] {
@@ -99,7 +111,10 @@ export class SeatEntity extends DrawableEntity implements InteractableEntity {
     ctx.arc(x, y, 5 * scale, 0, 2 * Math.PI);
     ctx.fill();
     if (this.isHighlighted) {
-      ctx.strokeStyle = 'yellow';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+      if (this.isSelected) {
+        ctx.strokeStyle = 'yellow';
+      }
       ctx.lineWidth = 2;
       ctx.stroke();
     }

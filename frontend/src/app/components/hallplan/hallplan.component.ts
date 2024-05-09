@@ -76,9 +76,11 @@ export class HallplanComponent {
     // After the view has been initialized, you can access the canvas element here
     this.backgroundImage = await this.loadImage(this.backgroundImageUrl);
     const canvas: HTMLCanvasElement = this.myCanvas.nativeElement;
+    canvas.width = canvas.getBoundingClientRect().width;
+    canvas.height = canvas.getBoundingClientRect().height;
     this.ctx = canvas.getContext('2d');
 
-    this.generateEntites();
+    this.generateEntities();
 
     this.additionalHelpers.push(this.drawHelper = new DrawHelper());
     this.additionalHelpers.push(this.moveHelper = new MoveHelper(this.drawHelper, canvas, this.width, this.height));
@@ -90,15 +92,36 @@ export class HallplanComponent {
 
     this.refreshCanvas(true);
     this.setupCanvasRefresh();
+
+    window.addEventListener('resize', () => {
+      canvas.width = canvas.getBoundingClientRect().width;
+      canvas.height = canvas.getBoundingClientRect().height;
+      this.refreshCanvas(true);
+    });
   }
 
-  generateEntites() {
+  generateEntities() {
     this.entities.splice(0, this.entities.length);
     this.entities.push(new BackgroundEntity(this.backgroundImage, this.width, this.height));
-    this.entities.push(...this.sections.map(section => new SectionEntity(section)));
-    this.entities.push(...this.sections.map(section => section.seats.map(seat => new SeatEntity(seat))).reduce((acc, val) => acc.concat(val), []));
+    this.entities.push(...this.sections.map(section => new SectionEntity(section).setData(section)));
+    this.entities.push(...this.sections.map(section => section.seats.map(seat => new SeatEntity(seat).setData(seat))).reduce((acc, val) => acc.concat(val), []));
     const interactableEntities = this.entities.filter(entity => 'getActions' in entity).map(entity => entity as unknown as InteractableEntity);
     this.interactionHelper?.setEntities(interactableEntities);
+  }
+
+  deleteSelectedEntities() {
+    // group entities by constructor name
+    // @ts-ignore
+    const grouped = Object.groupBy(this.interactionHelper.selectedEntities, entity => entity.constructor.name);
+    const hallSections = grouped[SectionEntity.name]?.map((entity: SectionEntity) => entity.data);
+    if (hallSections?.length)
+      this.sections = this.sections.filter(section => ! hallSections.includes(section));
+    const hallSeats = grouped[SeatEntity.name]?.map((entity: SeatEntity) => entity.data);
+    if (hallSeats?.length)
+      this.sections.forEach(section => section.seats = section.seats.filter(seat => ! hallSeats.includes(seat)));
+
+    this.generateEntities();
+    this.refreshCanvas(true);
   }
 
   finishSection() {
@@ -113,7 +136,7 @@ export class HallplanComponent {
         seats: this.createHelper.generateSeats().map(pos => ({ pos })),
       });
       this.createHelper.disable();
-      this.generateEntites();
+      this.generateEntities();
 
       this.refreshCanvas(true);
     }
