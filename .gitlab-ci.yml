@@ -25,7 +25,7 @@ test-frontend:
   script:
     - cd frontend
     - npm ci --legacy-peer-deps
-    - npm run lint
+    - npm run lint --fix
     - npm run build
   artifacts:
     paths:
@@ -41,7 +41,7 @@ e2e-test:
     - npm run start &
     - cd ../backend
     - mvn -B clean install -DskipTests
-    - java -jar target/*.jar &
+    - mvn spring-boot:test-run -Dspring-boot.run.mainClass=at.ac.tuwien.sepr.groupphase.backend.DevelopmentApplication &
     - sleep 30
     - cd ../e2e
     - npm ci --legacy-peer-deps

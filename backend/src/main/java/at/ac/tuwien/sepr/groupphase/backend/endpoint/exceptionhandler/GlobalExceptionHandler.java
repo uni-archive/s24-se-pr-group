@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.exceptionhandler;
 
-import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -20,8 +21,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Register all your Java exceptions here to map them into meaningful HTTP exceptions
- * If you have special cases which are only important for specific endpoints, use ResponseStatusExceptions
+ * Register all your Java exceptions here to map them into meaningful HTTP exceptions If you have special cases which
+ * are only important for specific endpoints, use ResponseStatusExceptions
  * https://www.baeldung.com/exception-handling-for-rest-with-spring#responsestatusexception
  */
 @ControllerAdvice
@@ -39,13 +40,27 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
-     * Override methods from ResponseEntityExceptionHandler to send a customized HTTP response for a know exception
-     * from e.g. Spring
+     * Handle a ValidationException.
+     *
+     * @param ex      the exception
+     * @param request the request
+     * @return a HTTP response
+     */
+    @ExceptionHandler(value = {ValidationException.class})
+    protected ResponseEntity<Object> handleValidationException(RuntimeException ex, WebRequest request) {
+        LOGGER.warn(ex.getMessage());
+        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY,
+            request);
+    }
+
+    /**
+     * Override methods from ResponseEntityExceptionHandler to send a customized HTTP response for a know exception from
+     * e.g. Spring
      */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-        HttpHeaders headers,
-        HttpStatusCode status, WebRequest request) {
+                                                                  HttpHeaders headers,
+                                                                  HttpStatusCode status, WebRequest request) {
         Map<String, Object> body = new LinkedHashMap<>();
         //Get all errors
         List<String> errors = ex.getBindingResult()

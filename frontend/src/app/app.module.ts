@@ -12,6 +12,9 @@ import {LoginComponent} from './components/login/login.component';
 import {MessageComponent} from './components/message/message.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {httpInterceptorProviders} from './interceptors';
+import {RegistrationComponent} from "./components/user/registration/registration.component";
+import {GlobalMessageComponent} from "./global-message/global-message.component";
+import {AngularPhoneNumberInput} from "angular-phone-number-input";
 
 @NgModule({
   declarations: [
@@ -21,6 +24,8 @@ import {httpInterceptorProviders} from './interceptors';
     HomeComponent,
     LoginComponent,
     MessageComponent,
+    RegistrationComponent,
+    GlobalMessageComponent
   ],
   imports: [
     BrowserModule,
@@ -29,8 +34,13 @@ import {httpInterceptorProviders} from './interceptors';
     HttpClientModule,
     NgbModule,
     FormsModule,
+    AngularPhoneNumberInput
   ],
   providers: [httpInterceptorProviders],
+  exports: [
+    HeaderComponent,
+    FooterComponent
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {
