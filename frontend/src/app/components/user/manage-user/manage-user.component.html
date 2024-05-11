@@ -1,1 +1,57 @@
-<p>manage-user works!</p>
+<div class="mb-3">
+  <form class="d-flex flex-row w-auto" (submit)="searchUser()">
+    <div class="d-flex w-100">
+      <label for="searchUserEmail" class="col-form-label mr-2">Email: </label>
+      <input
+        type="text"
+        id="searchUserEmail"
+        name="searchUserEmail"
+        class="form-control flex-grow-1 mr-2"
+        [(ngModel)]="searchParams.email"
+      />
+      <button type="submit" class="btn btn-primary ml-auto">Search</button>
+    </div>
+  </form>
+</div>
+
+<table class="table table-sm" *ngIf="user">
+  <tbody>
+    <tr>
+      <th scope="row">Vorname:</th>
+      <td>{{ user.firstName }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Nachname:</th>
+      <td>{{ user.familyName }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Email:</th>
+      <td>{{ user.email }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Telefonnummer:</th>
+      <td>{{ user.phoneNumber }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Status:</th>
+      <td>{{ user.accountLocked }}</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="d-flex justify-content-end mt-2" *ngIf="user">
+  <button
+    class="btn btn-primary"
+    (click)="updateLockStatus(true)"
+    [disabled]="!user.accountLocked"
+  >
+    Lock User
+  </button>
+  <button
+    class="btn btn-primary"
+    (click)="updateLockStatus(false)"
+    [disabled]="user.accountLocked"
+  >
+    Unlock User
+  </button>
+</div>
