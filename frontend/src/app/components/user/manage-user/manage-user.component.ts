@@ -27,10 +27,8 @@ export class ManageUserComponent {
     this.userEndpointService
       .findUserByEmail(this.searchParams.email)
       .subscribe({
-        next: (user) => {
-          // Cast to ApplicationUserDto
-          console.log("User loaded successfully:", user);
-          this.user = user;
+        next: (response) => {
+          this.user = response;
           this.messagingService.setMessage("User loaded successfully.");
         },
         error: (error) => console.error("Error loading user:", error),
