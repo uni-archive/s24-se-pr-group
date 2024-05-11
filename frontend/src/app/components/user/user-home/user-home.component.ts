@@ -27,7 +27,12 @@ export class UserHomeComponent {
   }
 
   ngOnInit() {
-    this.isAdmin = this.authService.getUserRole() === Role.admin;
+    if (
+      this.authService.isLoggedIn() &&
+      this.authService.getUserRole() === Role.admin
+    ) {
+      this.isAdmin = true;
+    }
   }
 
   public get heading(): string {
