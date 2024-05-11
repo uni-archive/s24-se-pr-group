@@ -28,6 +28,13 @@ export interface UserEndpointServiceInterface {
     /**
      * 
      * 
+     * @param email 
+     */
+    findUserByEmail(email: string, extraHttpRequestParams?: any): Observable<ApplicationUserResponse>;
+
+    /**
+     * 
+     * 
      */
     getUser(extraHttpRequestParams?: any): Observable<ApplicationUserResponse>;
 
