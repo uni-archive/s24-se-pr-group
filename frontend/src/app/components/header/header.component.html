@@ -32,20 +32,19 @@
           >Login</a
         >
       </li>
-      <!-- Show user info and logout button when logged in -->
-      <li class="nav-item">
-        <a class="nav-link" routerLink="/user/home" routerLinkActive="active"
-          ><i class="bi bi-person-circle" aria-hidden="true"></i>Mein Profil</a
-        >
-      </li>
       <li
         class="nav-item d-flex align-items-center"
         *ngIf="authService.isLoggedIn()"
       >
-        <span class="navbar-text mr-3" *ngIf="getName()">
+        <a
+          class="nav-link"
+          *ngIf="getName()"
+          routerLink="/user/home"
+          routerLinkActive="ative"
+        >
           <i class="bi-person" aria-hidden="true"></i>
           {{ getName() }}
-        </span>
+        </a>
         <a class="nav-link" routerLink="/" (click)="authService.logoutUser()"
           >Logout</a
         >
