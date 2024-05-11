@@ -62,7 +62,7 @@ public class UserEndpoint {
     }
 
     @Secured("ROLE_ADMIN")
-    @GetMapping(path = "/get")
+    @GetMapping(path = "/get", produces = MediaType.APPLICATION_JSON_VALUE)
     public ApplicationUserResponse findUserByEmail(@RequestParam("email") String email) {
         return userMapper.toResponse(userService.findApplicationUserByEmail(email));
     }
