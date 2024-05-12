@@ -15,6 +15,7 @@ import {httpInterceptorProviders} from './interceptors';
 import {RegistrationComponent} from "./components/user/registration/registration.component";
 import {GlobalMessageComponent} from "./global-message/global-message.component";
 import {AngularPhoneNumberInput} from "angular-phone-number-input";
+import {PrintPurchaseInvoiceButtonComponent} from "./components/print-purchase-invoice-button/print-purchase-invoice-button.component";
 
 @NgModule({
   declarations: [
@@ -34,7 +35,8 @@ import {AngularPhoneNumberInput} from "angular-phone-number-input";
     HttpClientModule,
     NgbModule,
     FormsModule,
-    AngularPhoneNumberInput
+    AngularPhoneNumberInput,
+    PrintPurchaseInvoiceButtonComponent
   ],
   providers: [httpInterceptorProviders],
   exports: [
