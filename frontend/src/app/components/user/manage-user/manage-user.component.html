@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <div class="mb-3">
   <form class="d-flex flex-row w-auto" (submit)="searchUser()">
     <div class="d-flex w-100">
@@ -17,11 +18,11 @@
 <table class="table table-sm" *ngIf="user">
   <tbody>
     <tr>
-      <th scope="row">Vorname:</th>
+      <th scope="row">First name:</th>
       <td>{{ user.firstName }}</td>
     </tr>
     <tr>
-      <th scope="row">Nachname:</th>
+      <th scope="row">Family name:</th>
       <td>{{ user.familyName }}</td>
     </tr>
     <tr>
@@ -29,12 +30,14 @@
       <td>{{ user.email }}</td>
     </tr>
     <tr>
-      <th scope="row">Telefonnummer:</th>
+      <th scope="row">Phone nummer:</th>
       <td>{{ user.phoneNumber }}</td>
     </tr>
     <tr>
       <th scope="row">Status:</th>
-      <td>{{ user.accountLocked }}</td>
+      <td>
+        {{ user.accountLocked ? "Locked" : "Active" }}
+      </td>
     </tr>
   </tbody>
 </table>
@@ -42,16 +45,10 @@
 <div class="d-flex justify-content-end mt-2" *ngIf="user">
   <button
     class="btn btn-primary"
-    (click)="updateLockStatus(true)"
-    [disabled]="!user.accountLocked"
+    (click)="
+      user.accountLocked ? updateLockStatus(false) : updateLockStatus(true)
+    "
   >
-    Lock User
-  </button>
-  <button
-    class="btn btn-primary"
-    (click)="updateLockStatus(false)"
-    [disabled]="user.accountLocked"
-  >
-    Unlock User
+    {{ user.accountLocked ? "Activate" : "Lock" }}
   </button>
 </div>
