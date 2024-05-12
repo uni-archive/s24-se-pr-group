@@ -13,6 +13,7 @@ import { HttpHeaders }                                       from '@angular/comm
 
 import { Observable }                                        from 'rxjs';
 
+import { ApplicationUserDto } from '../model/models';
 import { ApplicationUserResponse } from '../model/models';
 import { UserCreateRequest } from '../model/models';
 
@@ -44,5 +45,12 @@ export interface UserEndpointServiceInterface {
      * @param userCreateRequest 
      */
     register(userCreateRequest: UserCreateRequest, extraHttpRequestParams?: any): Observable<object>;
+
+    /**
+     * 
+     * 
+     * @param applicationUserDto 
+     */
+    updateUserStatusByEmail(applicationUserDto: ApplicationUserDto, extraHttpRequestParams?: any): Observable<ApplicationUserResponse>;
 
 }
