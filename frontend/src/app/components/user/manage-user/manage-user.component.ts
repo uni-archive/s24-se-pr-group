@@ -1,6 +1,6 @@
 import { Component } from "@angular/core";
-import { EmailValidator } from "@angular/forms";
 import { UserSearch } from "src/app/dtos/user-search";
+import { AuthService } from "src/app/services/auth.service";
 import { MessagingService } from "src/app/services/messaging.service";
 import {
   ApplicationUserResponse,
@@ -20,7 +20,8 @@ export class ManageUserComponent {
 
   constructor(
     private userEndpointService: UserEndpointService,
-    private messagingService: MessagingService
+    private messagingService: MessagingService,
+    private authService: AuthService
   ) {}
 
   searchUser() {
@@ -35,5 +36,36 @@ export class ManageUserComponent {
       });
   }
 
-  updateLockStatus(status: boolean) {}
+  updateLockStatus(status: boolean) {
+    if (this.user == null) {
+      console.error("No user loaded.");
+      return;
+    }
+
+    this.userEndpointService.getUser().subscribe({
+      next: (currentUser) => {
+        if (currentUser == null) {
+          console.error("No current user loaded.");
+          return;
+        }
+
+        if (this.user.id != currentUser.id) {
+          this.user.accountLocked = status;
+          this.userEndpointService
+            .updateUserStatusByEmail(this.user)
+            .subscribe({
+              next: (response) => {
+                this.user = response;
+                this.messagingService.setMessage("User updated successfully.");
+              },
+              error: (error) => console.error("Error loading user:", error),
+            });
+        } else {
+          console.error("Cannot update own user.");
+          this.messagingService.setMessage("Cannot update own user.", "danger");
+        }
+      },
+      error: (error) => console.error("Error loading user:", error),
+    });
+  }
 }
