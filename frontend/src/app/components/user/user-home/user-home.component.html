@@ -5,6 +5,14 @@
     <div class="col-md-5 col-xl-4">
       <div class="list-group list-group-flush">
         <a
+          id="createUser"
+          class="list-group-item list-group-item-action"
+          [ngClass]="{ active: selectedLinkId === 'createUser' }"
+          (click)="toggleRegistration('createUser')"
+        >
+          Create User
+        </a>
+        <a
           id="manageUser"
           class="list-group-item list-group-item-action"
           [ngClass]="{ active: selectedLinkId === 'manageUser' }"
@@ -23,6 +31,10 @@
           aria-labelledby="account-tab"
         >
           <app-manage-user *ngIf="showManageUserForm"></app-manage-user>
+          <app-registration
+            *ngIf="showCreateUserForm"
+            [isAdminFlag]="isAdmin"
+          ></app-registration>
         </div>
       </div>
     </div>

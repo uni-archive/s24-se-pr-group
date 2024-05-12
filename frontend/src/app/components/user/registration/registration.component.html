@@ -1,45 +1,90 @@
-<form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="container mt-5">
+<form
+  [formGroup]="registrationForm"
+  (ngSubmit)="onSubmit()"
+  class="container mt-5"
+>
   <h2>Registration</h2>
   <div class="row">
     <div class="form-group col-12">
       <label for="email">Email:</label>
-      <input type="email" id="email" formControlName="email" class="form-control" placeholder="Enter your email">
-      <div *ngIf="registrationForm.get('email').invalid && registrationForm.get('email').touched"
-           class="invalid-feedback">
+      <input
+        type="email"
+        id="email"
+        formControlName="email"
+        class="form-control"
+        placeholder="Enter your email"
+      />
+      <div
+        *ngIf="
+          registrationForm.get('email').invalid &&
+          registrationForm.get('email').touched
+        "
+        class="invalid-feedback"
+      >
         Please enter a valid email.
       </div>
     </div>
 
     <div class="form-group col-12">
       <label for="password">Password:</label>
-      <input type="password" id="password" formControlName="password" class="form-control"
-             placeholder="Create a password">
-      <div *ngIf="registrationForm.get('password').invalid && registrationForm.get('password').touched"
-           class="invalid-feedback">
+      <input
+        type="password"
+        id="password"
+        formControlName="password"
+        class="form-control"
+        placeholder="Create a password"
+      />
+      <div
+        *ngIf="
+          registrationForm.get('password').invalid &&
+          registrationForm.get('password').touched
+        "
+        class="invalid-feedback"
+      >
         Your password must be at least 8 characters long.
       </div>
     </div>
 
     <div class="form-group col-12">
       <label for="password">Password:</label>
-      <input type="password" id="password-repeat" formControlName="password_repeat" class="form-control"
-             placeholder="Create a password">
-      <div *ngIf="registrationForm.get('password_repeat').invalid && registrationForm.get('password_repeat').touched"
-           class="invalid-feedback">
+      <input
+        type="password"
+        id="password-repeat"
+        formControlName="password_repeat"
+        class="form-control"
+        placeholder="Create a password"
+      />
+      <div
+        *ngIf="
+          registrationForm.get('password_repeat').invalid &&
+          registrationForm.get('password_repeat').touched
+        "
+        class="invalid-feedback"
+      >
         Passwords do not match.
       </div>
     </div>
 
     <div class="form-group col-12 col-xl-6">
       <label for="firstName">First Name:</label>
-      <input type="text" id="firstName" formControlName="firstName" class="form-control"
-             placeholder="Enter your first name">
+      <input
+        type="text"
+        id="firstName"
+        formControlName="firstName"
+        class="form-control"
+        placeholder="Enter your first name"
+      />
     </div>
 
     <div class="form-group col-12 col-xl-6">
       <label for="familyName">Family Name:</label>
-      <input type="text" id="familyName" formControlName="familyName" class="form-control"
-             placeholder="Enter your family name">
+      <input
+        type="text"
+        id="familyName"
+        formControlName="familyName"
+        class="form-control"
+        placeholder="Enter your family name"
+      />
     </div>
 
     <div class="form-group col-12">
@@ -49,19 +94,46 @@
         formControlName="phoneNumber"
         [defaultCountry]="'AT'"
         [preferredCountries]="['AT', 'DE', 'CH']"
-        [error]="registrationForm.get('phoneNumber')?.touched && registrationForm.get('phoneNumber')?.invalid"
+        [error]="
+          registrationForm.get('phoneNumber')?.touched &&
+          registrationForm.get('phoneNumber')?.invalid
+        "
       ></angular-phone-number-input>
-      <div *ngIf="registrationForm.get('phoneNumber').invalid && registrationForm.get('phoneNumber').touched"
-           class="invalid-feedback">
-        Please enter a valid phone number. {{ registrationForm.get('phoneNumber').errors | json }}
+      <div
+        *ngIf="
+          registrationForm.get('phoneNumber').invalid &&
+          registrationForm.get('phoneNumber').touched
+        "
+        class="invalid-feedback"
+      >
+        Please enter a valid phone number.
+        {{ registrationForm.get("phoneNumber").errors | json }}
       </div>
+    </div>
+
+    <div class="form-group col-12" *ngIf="isAdminFlag">
+      <label for="isAdmin">Account Role:</label>
+      <select
+        class="form-control"
+        id="isAdmin"
+        name="isAdmin"
+        formControlName="isAdmin"
+      >
+        <option value="true">Admin</option>
+        <option selected value="false">User</option>
+      </select>
     </div>
   </div>
 
   <div class="row">
     <div class="form-group">
-      <button type="submit" class="btn btn-primary" [disabled]="!registrationForm.valid">Register</button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="!registrationForm.valid"
+      >
+        Register
+      </button>
     </div>
   </div>
-
 </form>

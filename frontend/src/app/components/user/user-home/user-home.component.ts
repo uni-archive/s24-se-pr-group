@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, EventEmitter, Output } from "@angular/core";
 import { AuthService } from "src/app/services/auth.service";
 
 export enum Role {
@@ -13,16 +13,24 @@ export enum Role {
 })
 export class UserHomeComponent {
   isAdmin: boolean = false;
-  showManageUserForm: boolean = true;
-  constructor(private authService: AuthService) {}
+  showManageUserForm: boolean = false;
+  showCreateUserForm: boolean = true;
+  selectedLinkId: string = "";
+  @Output() isAdminChange = new EventEmitter<boolean>();
 
-  selectedLinkId = "manageUser"; // Initial active link ID
+  constructor(private authService: AuthService) {}
 
   toggleRegistration(id: string) {
     this.selectedLinkId = id;
     this.showManageUserForm = false;
+    this.showCreateUserForm = false;
+    this.isAdminChange.emit(false);
     if (id === "manageUser") {
       this.showManageUserForm = true;
+    }
+    if (id === "createUser") {
+      this.showCreateUserForm = true;
+      this.isAdminChange.emit(true);
     }
   }
 
@@ -31,6 +39,8 @@ export class UserHomeComponent {
       this.authService.isLoggedIn() &&
       this.authService.getUserRole() === Role.admin
     ) {
+      this.selectedLinkId = "createUser";
+      this.showCreateUserForm = true;
       this.isAdmin = true;
     }
   }
