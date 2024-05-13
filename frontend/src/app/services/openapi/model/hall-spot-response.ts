@@ -12,8 +12,12 @@
 import { HallSectorResponse } from './hall-sector-response';
 
 
+/**
+ * Generic Hall-Spot
+ */
 export interface HallSpotResponse { 
     id?: number;
     sector?: HallSectorResponse;
+    type: string;
 }
 

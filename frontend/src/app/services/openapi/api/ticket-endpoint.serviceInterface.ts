@@ -13,14 +13,14 @@ import { HttpHeaders }                                       from '@angular/comm
 
 import { Observable }                                        from 'rxjs';
 
-import { OrderDetailsResponse } from '../model/models';
+import { TicketDetailsResponse } from '../model/models';
 
 
 import { Configuration }                                     from '../configuration';
 
 
 
-export interface OrderEndpointServiceInterface {
+export interface TicketEndpointServiceInterface {
     defaultHeaders: HttpHeaders;
     configuration: Configuration;
 
@@ -29,6 +29,6 @@ export interface OrderEndpointServiceInterface {
      * 
      * @param id 
      */
-    findById1(id: number, extraHttpRequestParams?: any): Observable<OrderDetailsResponse>;
+    findById(id: number, extraHttpRequestParams?: any): Observable<TicketDetailsResponse>;
 
 }

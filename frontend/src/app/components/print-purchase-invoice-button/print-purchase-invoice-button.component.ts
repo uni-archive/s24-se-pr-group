@@ -3,7 +3,7 @@ import {PdfService} from "../../services/pdf.service";
 import {OrderEndpointService} from "../../services/openapi";
 
 @Component({
-  selector: 'app-print-receipt-button',
+  selector: 'app-print-purchase-invoice-button',
   standalone: true,
   imports: [],
   templateUrl: './print-purchase-invoice-button.component.html',
@@ -19,7 +19,7 @@ export class PrintPurchaseInvoiceButtonComponent {
   }
 
   public createPurchaseInvoicePDF(): void {
-    this.orderService.findById(this.orderId)
+    this.orderService.findById1(this.orderId)
       .subscribe({
         next: order => {
           this.pdfService.createPurchaseInvoicePDF(order);

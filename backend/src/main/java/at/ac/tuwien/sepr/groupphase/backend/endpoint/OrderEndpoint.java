@@ -17,18 +17,15 @@ import org.springframework.web.bind.annotation.RestController;
 import java.lang.invoke.MethodHandles;
 
 @RestController
-@RequestMapping(value = "/api/v1/order")
+@RequestMapping("/api/v1/order")
 public class OrderEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final OrderService orderService;
     private final OrderDetailsResponseMapper orderMapper;
 
-    private final HallSectorShowResponseMapper fuck;
-
     public OrderEndpoint(OrderService orderService, OrderDetailsResponseMapper orderMapper, HallSectorShowResponseMapper fuck) {
         this.orderService = orderService;
         this.orderMapper = orderMapper;
-        this.fuck = fuck;
     }
 
     @GetMapping(path = "/{id}", produces = "application/json")
