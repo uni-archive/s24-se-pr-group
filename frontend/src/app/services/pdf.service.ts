@@ -2,7 +2,14 @@ import {Injectable} from '@angular/core';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import {Content, Style, TableCell, TDocumentDefinitions} from "pdfmake/interfaces";
-import {ApplicationUserResponse, InvoiceResponse, OrderDetailsResponse, TicketDetailsResponse} from "./openapi";
+import {
+  ApplicationUserResponse,
+  EventResponse, HallSeatResponse,
+  InvoiceResponse,
+  OrderDetailsResponse,
+  ShowResponse,
+  TicketDetailsResponse,
+} from "./openapi";
 
 @Injectable({
   providedIn: 'root'
@@ -93,6 +100,121 @@ export class PdfService {
   private readonly mediumGap: Content = {text: '', marginBottom: 20};
   private readonly smallGap: Content = {text: '', marginBottom: 10};
 
+
+  public createTicketPDF(ticket: TicketDetailsResponse): void {
+    const docDefinition: TDocumentDefinitions = {
+      pageSize: "A6",
+      pageOrientation: "landscape",
+      watermark: {text: "Ticket-Line", opacity: 0.1},
+      content: [
+        {
+          alignment: "center",
+          columns: [
+            {
+              stack: [
+                {
+                  text: 'Ticket-Line - Ticket', style: this.headerStyle, noWrap: true,
+                },
+                {
+                  text: `Ticket Nr: ${ticket.id}`
+                },
+                this.smallGap,
+                this.eventInfoField(ticket.show.event),
+                this.smallGap,
+                this.showInfoField(ticket.show),
+                this.smallGap,
+                this.seatInfoField(ticket),
+              ],
+            },
+            this.ticketQRField(ticket),
+          ]
+        },
+      ]
+    };
+
+    const pdfName = `ticket-${ticket.show.event.title}-${this.formatDate(ticket.show.dateTime)}.pdf`;
+    pdfMake.createPdf(docDefinition, null, null, pdfFonts.pdfMake.vfs).download(pdfName);
+  }
+
+  private eventInfoField(event: EventResponse): Content {
+    return {
+      stack: [
+        {
+          text: "Veranstaltung",
+          style: this.subheaderStyle,
+        },
+        {
+          text: event.title,
+        },
+        {
+          text: event.description,
+        },
+      ]
+    };
+  }
+
+  private showInfoField(show: ShowResponse): Content {
+    return {
+      stack: [
+        {
+          text: "Start",
+          style: this.subheaderStyle,
+        },
+        {
+          text: this.formatDate(show.dateTime)
+        },
+        {
+          text: this.formatTime(show.dateTime)
+        }
+      ],
+    };
+  }
+
+  private seatInfoField(ticket: TicketDetailsResponse): Content {
+    const spot = ticket.hallSpot;
+    if(this.isHallSeat(spot)) {
+      return {
+        stack: [
+          {
+            text: "Sitzplatz",
+            style: this.subheaderStyle,
+          },
+          {
+            text: `Sektor: ${ticket.hallSpot.sector.id}, Sitzplatz Nr: ${spot.id}`,
+          }
+        ],
+      };
+    } else {
+      return {
+        stack: [
+          {
+            text: "Stehplatz",
+            style: this.subheaderStyle,
+          },
+          {
+            text: `Sektor: ${ticket.hallSpot.sector.id}`,
+          }
+        ],
+      };
+    }
+  }
+
+  private isHallSeat(hallSpot: any): hallSpot is HallSeatResponse {
+    return hallSpot && hallSpot.frontendCoordinates !== undefined;
+  }
+
+  private ticketQRField(ticket: TicketDetailsResponse): Content {
+    return {
+      stack: [
+        {
+          qr: `${ticket.id}:${ticket.hash}`,
+        },
+        { text: `${ticket.hash}`, fontSize: this.smallFontSize }
+      ],
+      alignment: "center",
+      marginTop: 50,
+    };
+  }
 
   public createCancellationInvoicePDF(order: OrderDetailsResponse): void {
     const cancellationInvoice = this.findCancellationInvoice(order);
@@ -400,6 +522,13 @@ export class PdfService {
     const month = String(d.getMonth() + 1).padStart(2, '0'); // Months are zero-based, so add 1 and pad with leading zeros if necessary
     const day = String(d.getDate()).padStart(2, '0'); // Pad with leading zeros if necessary
     return `${year}-${month}-${day}`;
+  }
+
+  private formatTime(date: Date | string): string {
+    const d = new Date(date);
+    const hours = d.getHours().toString().padStart(2, '0');
+    const minutes = d.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
   }
 
   private formatPrice(price: number): string {

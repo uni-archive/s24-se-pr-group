@@ -9,16 +9,14 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { ShowResponse } from './show-response';
-import { TicketDetailsResponseHallSpot } from './ticket-details-response-hall-spot';
+import { HallSeatResponse } from './hall-seat-response';
+import { HallSpotResponse } from './hall-spot-response';
+import { HallSectorResponse } from './hall-sector-response';
 
 
-export interface TicketDetailsResponse { 
-    id?: number;
-    hash?: string;
-    reserved?: boolean;
-    valid?: boolean;
-    hallSpot?: TicketDetailsResponseHallSpot;
-    show?: ShowResponse;
-}
+/**
+ * @type TicketDetailsResponseHallSpot
+ * @export
+ */
+export type TicketDetailsResponseHallSpot = HallSeatResponse | HallSpotResponse;
 

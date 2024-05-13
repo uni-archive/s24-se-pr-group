@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Customer;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Event;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.EventType;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallPlan;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSeat;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSector;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSectorShow;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSpot;
@@ -121,7 +122,7 @@ public class PdfPrintOrderDataGenerator {
         hallSectorRepository.saveAll(sectors);
 
         // creating hallspots
-        var hallspot1 = new HallSpot(sector1);
+        var hallspot1 = new HallSeat(sector1, "45;68");
         var hallspot2 = new HallSpot(sector1);
         var hallspot3 = new HallSpot(sector1);
         var hallspot4 = new HallSpot(sector1);

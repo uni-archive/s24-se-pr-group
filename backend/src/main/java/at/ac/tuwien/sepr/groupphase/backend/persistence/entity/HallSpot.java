@@ -1,12 +1,15 @@
 package at.ac.tuwien.sepr.groupphase.backend.persistence.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 import java.util.Objects;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public class HallSpot extends AbstractEntity {
 
     @ManyToOne

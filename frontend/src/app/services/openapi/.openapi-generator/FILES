@@ -10,6 +10,8 @@ api/message-endpoint.service.ts
 api/message-endpoint.serviceInterface.ts
 api/order-endpoint.service.ts
 api/order-endpoint.serviceInterface.ts
+api/ticket-endpoint.service.ts
+api/ticket-endpoint.serviceInterface.ts
 api/user-endpoint.service.ts
 api/user-endpoint.serviceInterface.ts
 configuration.ts
@@ -19,6 +21,7 @@ index.ts
 model/application-user-response.ts
 model/detailed-message-dto.ts
 model/event-response.ts
+model/hall-seat-response.ts
 model/hall-sector-response.ts
 model/hall-sector-show-response.ts
 model/hall-spot-response.ts
@@ -28,6 +31,7 @@ model/models.ts
 model/order-details-response.ts
 model/show-response.ts
 model/simple-message-dto.ts
+model/ticket-details-response-hall-spot.ts
 model/ticket-details-response.ts
 model/user-create-request.ts
 model/user-login-dto.ts
