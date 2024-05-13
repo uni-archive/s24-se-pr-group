@@ -6,18 +6,6 @@ const MouseButtonKey = {
   RIGHT: 2
 }
 
-interface ObjectConstructor {
-  /**
-   * Groups members of an iterable according to the return value of the passed callback.
-   * @param items An iterable.
-   * @param keySelector A callback which will be invoked for each item in items.
-   */
-  groupBy<K extends PropertyKey, T>(
-    items: Iterable<T>,
-    keySelector: (item: T, index: number) => K,
-  ): Partial<Record<K, T[]>>;
-}
-
 export class Helper {
   frameHasChanged = false;
   enabled = true;
@@ -247,6 +235,9 @@ export class CreateHelper extends Helper {
   }
 
   onMouseDown(event: MouseEvent) {
+    if (event.button !== MouseButtonKey.LEFT)
+      return false;
+
     // Handle mouse down event here
     const rect = this.canvas.getBoundingClientRect();
     const pos = {x: event.clientX - rect.left, y: event.clientY - rect.top};
@@ -260,13 +251,13 @@ export class CreateHelper extends Helper {
     return true;
   }
 
-  generateSeats(): Point2D[] {
+  static generateSeats(polygon: Point2D[], ctx: CanvasRenderingContext2D): Point2D[] {
     const seatPoints: Point2D[] = []
-    const { max, min} = this.getMinMaxPoints(this.sectionPoints);
+    const { max, min} = CreateHelper.getMinMaxPoints(polygon);
     const padding = 5;
 
     const sectionPath = new Path2D();
-    this.sectionPoints.forEach((point, index) => {
+    polygon.forEach((point, index) => {
       // move to points with respect to scale and pos
       const x = point.x;
       const y = point.y;
@@ -280,7 +271,8 @@ export class CreateHelper extends Helper {
     for (let x = min.x + CreateHelper.SEAT_RADIUS / 2 + padding; x < max.x - padding - CreateHelper.SEAT_RADIUS / 2; x += CreateHelper.SEAT_RADIUS + padding) {
       for (let y = min.y + CreateHelper.SEAT_RADIUS / 2 + padding; y < max.y - padding - CreateHelper.SEAT_RADIUS / 2; y += CreateHelper.SEAT_RADIUS + padding) {
         // console.log('Seat is inside section?', this.ctx.isPointInPath(sectionPath, x, y), x, y, 'section:', section.name, 'color:', section.color, 'price:', section.price);
-        if (this.ctx.isPointInPath(sectionPath, x, y)) {
+        if (ctx.isPointInPath(sectionPath, x - CreateHelper.SEAT_RADIUS / 2, y - CreateHelper.SEAT_RADIUS / 2) &&
+          ctx.isPointInPath(sectionPath, x + CreateHelper.SEAT_RADIUS / 2, y + CreateHelper.SEAT_RADIUS / 2)) {
           seatPoints.push({ x, y });
         }
       }
@@ -299,7 +291,7 @@ export class CreateHelper extends Helper {
     return this.sectionPoints;
   }
 
-  private getMinMaxPoints(points: Point2D[]): { min: Point2D, max: Point2D } {
+  private static getMinMaxPoints(points: Point2D[]): { min: Point2D, max: Point2D } {
     const xs = points.map(p => p.x);
     const ys = points.map(p => p.y);
     return {
@@ -365,7 +357,8 @@ export class InteractionHelper extends Helper {
         entity.isInside(mouseWorldPos, this.canvas.getContext('2d')));
     // only select the last entity
     newSelectedEntities.splice(0, newSelectedEntities.length - 1);
-    const unselectedEntities = this.selectedEntities.filter(entity => entity.isInside(mouseWorldPos, this.canvas.getContext('2d')));
+    // const unselectedEntities = this.selectedEntities.filter(entity => entity.isInside(mouseWorldPos, this.canvas.getContext('2d')));
+    const unselectedEntities = this.selectedEntities; // unselect all previous entities
     newSelectedEntities.forEach(entity => entity.onHighlight(true));
     unselectedEntities.forEach(entity => entity.onHighlightEnd());
     this.selectedEntities = [...newSelectedEntities, ...this.selectedEntities.filter(entity => !unselectedEntities.includes(entity))];

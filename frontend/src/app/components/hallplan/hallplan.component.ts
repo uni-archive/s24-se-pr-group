@@ -29,6 +29,7 @@ export class HallplanComponent {
   heightInMeters = 600;
   backgroundImage: HTMLImageElement;
   backgroundImageUrl: string;
+  entitiesSelected: boolean = false;
 
   sections: HallSection[] = [
     // generate 5 random sections
@@ -54,6 +55,7 @@ export class HallplanComponent {
   interactionHelper: InteractionHelper;
   additionalHelpers: Helper[] = [];
   additionalHelpersReversed: Helper[] = [];
+  onSelectedEntitiesChange: (selectedEntities: InteractableEntity[]) => void = () => {};
 
   seats: HallSeat[] = [];
 
@@ -61,6 +63,13 @@ export class HallplanComponent {
 
   async ngOnInit() {
     this.backgroundImageUrl = `https://placehold.co/${this.width}x${this.height}`;
+    this.sections.forEach(section => section.color = this.colorToHex(section.color));
+  }
+
+  private colorToHex(color: string): string {
+    var ctx = document.createElement('canvas').getContext('2d');
+    ctx.fillStyle = color;
+    return ctx.fillStyle;
   }
 
   loadImage(url: string): Promise<HTMLImageElement> {
@@ -87,6 +96,10 @@ export class HallplanComponent {
     this.additionalHelpers.push(this.createHelper = new CreateHelper(this.drawHelper, canvas, this.sections, this.seats, this.ctx));
     const interactableEntities = this.entities.filter(entity => 'getActions' in entity).map(entity => entity as unknown as InteractableEntity);
     this.additionalHelpers.push(this.interactionHelper = new InteractionHelper(this.drawHelper, canvas, interactableEntities));
+    this.interactionHelper.onSelectionChange = (selectedEntities) => {
+      this.onSelectedEntitiesChange?.(selectedEntities);
+      this.entitiesSelected = selectedEntities.length > 0;
+    };
 
     this.additionalHelpersReversed = this.additionalHelpers.slice().reverse();
 
@@ -98,6 +111,11 @@ export class HallplanComponent {
       canvas.height = canvas.getBoundingClientRect().height;
       this.refreshCanvas(true);
     });
+  }
+
+  async setBackgroundImage(url: string): Promise<void> {
+    this.backgroundImageUrl = url;
+    this.backgroundImage = await this.loadImage(this.backgroundImageUrl);
   }
 
   generateEntities() {
@@ -120,6 +138,7 @@ export class HallplanComponent {
     if (hallSeats?.length)
       this.sections.forEach(section => section.seats = section.seats.filter(seat => ! hallSeats.includes(seat)));
 
+    this.interactionHelper.selectedEntities = [];
     this.generateEntities();
     this.refreshCanvas(true);
   }
@@ -130,10 +149,10 @@ export class HallplanComponent {
       this.sections.push({
         points: sectionPolygon,
         name: 'Section ' + (this.sections.length + 1),
-        color: 'blue',
+        color: '#ff0000',
         price: 100,
 
-        seats: this.createHelper.generateSeats().map(pos => ({ pos })),
+        seats: CreateHelper.generateSeats(this.createHelper.getSectionPolygon(), this.ctx).map(pos => ({ pos })),
       });
       this.createHelper.disable();
       this.generateEntities();

@@ -7,7 +7,7 @@
       <div class="left btn-group">
         <button type="button" class="btn btn-primary" (click)="createHelper.enable()" *ngIf="!createHelper?.enabled"><i class="bi-plus"></i></button>
         <button type="button" class="btn btn-primary" (click)="finishSection()" *ngIf="createHelper?.enabled"><i class="bi-check-lg"></i></button>
-        <button type="button" class="btn btn-primary" (click)="deleteSelectedEntities()" [disabled]="! interactionHelper?.selectedEntities.length"><i class="bi-trash"></i></button>
+        <button type="button" class="btn btn-primary" (click)="deleteSelectedEntities()" [disabled]="! entitiesSelected"><i class="bi-trash"></i></button>
       </div>
       <div class="right btn-group">
         <button type="button" class="btn btn-primary" (click)="zoomIn()"><i class="bi-zoom-in"></i></button>

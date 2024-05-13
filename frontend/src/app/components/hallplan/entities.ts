@@ -13,7 +13,7 @@ export class SectionEntity extends DrawableEntity implements InteractableEntity 
   }
 
   draw(ctx: CanvasRenderingContext2D, calculateScaledPoint: CalculateScaledPoint) {
-    ctx.fillStyle = 'red';
+    ctx.fillStyle = this.data.color;
     ctx.beginPath();
     this.points.forEach((point, index) => {
       // move to points with respect to scale and pos
