@@ -11,7 +11,8 @@ import { FooterComponent } from "./components/footer/footer.component";
 import { HomeComponent } from "./components/home/home.component";
 import { LoginComponent } from "./components/login/login.component";
 import { MessageComponent } from "./components/message/message.component";
-import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
+import { NewsComponent} from './components/news/news.component';
+import {NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { httpInterceptorProviders } from "./interceptors";
 import {GlobalMessageComponent } from "./global-message/global-message.component";
 import { AngularPhoneNumberInput } from "angular-phone-number-input";
@@ -41,6 +42,7 @@ import {ArtistSearchComponent} from "./components/searchpage-components/artist-s
     HomeComponent,
     LoginComponent,
     MessageComponent,
+    NewsComponent,
     RegistrationComponent,
     GlobalMessageComponent,
     UserHomeComponent,

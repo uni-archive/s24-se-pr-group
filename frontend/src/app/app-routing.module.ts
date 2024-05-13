@@ -20,7 +20,7 @@ import {SearchpageComponent} from "./components/searchpage-components/searchpage
 import {CreateEventComponent} from "./components/administrative-tasks/create-event/create-event.component";
 import {CreateShowComponent} from "./components/administrative-tasks/create-show/create-show.component";
 import {EventDatailpageComponent} from "./components/event-datailpage/event-datailpage.component";
-
+import {NewsComponent} from "./components/news/news.component";
 
 const routes: Routes = [
   {path: "", component: HomeComponent},
@@ -59,7 +59,8 @@ const routes: Routes = [
   {path: "eventcreation", component: CreateEventComponent},
   {path: "showcreation", component: CreateShowComponent},
   {path: 'hallplan', component: HallplanComponent},
-  {path: 'hallplan/create', component: HallplanCreateComponent}
+  {path: 'hallplan/create', component: HallplanCreateComponent},
+  { path: 'news', canActivate: [AuthGuard], component: NewsComponent }
 ];
 
 @NgModule({

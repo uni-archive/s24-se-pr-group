@@ -97,3 +97,10 @@ spring:
     timeout-per-shutdown-phase: 30s
 server:
   shutdown: graceful
+
+---
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
