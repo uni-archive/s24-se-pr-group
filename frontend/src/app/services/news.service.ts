@@ -46,7 +46,7 @@ export class NewsService {
    */
 
 
-  createNews2(formData: FormData): Observable<News> {
+  createNews(formData: FormData): Observable<News> {
     console.log('Create news', formData);
     return this.httpClient.post<News>(this.newsBaseUri, formData);
   }
@@ -59,7 +59,7 @@ export class NewsService {
 
 
 
-  createNews(formData: FormData): Observable<News> {
+  createNews2(formData: FormData): Observable<News> {
     console.log('Create news');
 
     const headers = new HttpHeaders().set('Content-Type', 'multipart/form-data');

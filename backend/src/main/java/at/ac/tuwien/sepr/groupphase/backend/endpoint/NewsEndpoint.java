@@ -18,8 +18,11 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 
 import jakarta.validation.Valid;
+
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.util.LinkedMultiValueMap;
@@ -34,6 +37,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.sql.rowset.serial.SerialBlob;
 
 @RestController
 @RequestMapping(value = "/api/v1/news")
@@ -67,20 +72,21 @@ public class NewsEndpoint {
 
     @Secured("ROLE_ADMIN")
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(consumes = {"multipart/form-data"})
+    @PostMapping
     @Operation(summary = "Publish a new news", security = @SecurityRequirement(name = "apiKey"))
     public DetailedNewsDto create(@Valid @RequestParam("image") MultipartFile file,
                                   @Valid @RequestParam("title") String title,
                                   @Valid @RequestParam("summary") String summary,
-                                  @Valid @RequestParam("text") String text) {
+                                  @Valid @RequestParam("text") String text) throws IOException, SQLException {
 
         NewsInquiryDto newsInquiryDto = new NewsInquiryDto();
         newsInquiryDto.setTitle(title);
         newsInquiryDto.setSummary(summary);
         newsInquiryDto.setText(text);
 
-        //needs conversion to Blob
-       // newsInquiryDto.setImage(file);
+        Blob imageBlob = new SerialBlob(file.getBytes());
+
+        newsInquiryDto.setImage(imageBlob);
 
 
         LOGGER.info("POST /api/v1/news body: {}", newsInquiryDto);
