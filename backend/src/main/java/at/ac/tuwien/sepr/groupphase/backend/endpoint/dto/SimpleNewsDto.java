@@ -17,7 +17,8 @@ public class SimpleNewsDto {
     private String title;
 
     private String summary;
-    private Blob image;
+
+    private byte[] image;
 
 
     public Long getId() {
@@ -52,8 +53,11 @@ public class SimpleNewsDto {
         this.summary = summary;
     }
 
+    public byte[] getImage() {
+        return image;
+    }
 
-    public void setImage(Blob image) {
+    public void setImage(byte[] image) {
         this.image = image;
     }
 
@@ -92,7 +96,7 @@ public class SimpleNewsDto {
         private LocalDateTime publishedAt;
         private String title;
         private String summary;
-        private Blob image;
+        private byte[] image;
 
         private SimpleNewsDtoBuilder() {
         }
@@ -122,7 +126,7 @@ public class SimpleNewsDto {
         }
 
 
-        public SimpleNewsDtoBuilder withImage(Blob image) {
+        public SimpleNewsDtoBuilder withImage(byte[] image) {
             this.image = image;
             return this;
         }

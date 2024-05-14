@@ -55,7 +55,7 @@ public class NewsEndpoint {
     }
 
     @Secured("ROLE_USER")
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get list of news without details", security = @SecurityRequirement(name = "apiKey"))
     public List<SimpleNewsDto> findAll() {
         LOGGER.info("GET /api/v1/news");
@@ -63,7 +63,7 @@ public class NewsEndpoint {
     }
 
     @Secured("ROLE_USER")
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get detailed information about a specific news", security = @SecurityRequirement(name = "apiKey"))
     public DetailedNewsDto find(@PathVariable(name = "id") Long id) {
         LOGGER.info("GET /api/v1/news/{}", id);
@@ -72,7 +72,7 @@ public class NewsEndpoint {
 
     @Secured("ROLE_ADMIN")
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Publish a new news", security = @SecurityRequirement(name = "apiKey"))
     public DetailedNewsDto create(@Valid @RequestParam("image") MultipartFile file,
                                   @Valid @RequestParam("title") String title,
@@ -94,11 +94,6 @@ public class NewsEndpoint {
         return newsMapper.newsToDetailedNewsDto(
             newsService.publishNews(newsMapper.newsInquiryDtoToNews(newsInquiryDto)));
     }
-
-
-
-
-
 }
 
 

@@ -1,9 +1,8 @@
-import {ChangeDetectorRef, Component, OnInit, TemplateRef, ViewChild, ViewChildren} from '@angular/core';
-import {NewsService} from '../../services/news.service';
-import {News} from '../../dtos/news';
+import {ChangeDetectorRef, Component, OnInit, TemplateRef} from '@angular/core';
 import {NgbModal, NgbPaginationConfig} from '@ng-bootstrap/ng-bootstrap';
-import {UntypedFormBuilder, NgForm} from '@angular/forms';
+import {UntypedFormBuilder} from '@angular/forms';
 import {AuthService} from '../../services/auth.service';
+import {DetailedNewsDto, NewsEndpointService, SimpleNewsDto} from "../../services/openapi";
 
 @Component({
   selector: 'app-news',
@@ -17,19 +16,19 @@ export class NewsComponent implements OnInit {
   // After first submission attempt, form validation will start
   submitted = false;
 
-  currentNews: News;
+  currentNews: DetailedNewsDto;
 
-  private news: News[];
+  private news: SimpleNewsDto[];
 
   selectedFile: File;
 
 
-  constructor(private newsService: NewsService,
-              private ngbPaginationConfig: NgbPaginationConfig,
+  constructor(private ngbPaginationConfig: NgbPaginationConfig,
               private formBuilder: UntypedFormBuilder,
               private cd: ChangeDetectorRef,
               private authService: AuthService,
-              private modalService: NgbModal) {
+              private modalService: NgbModal,
+              private newsServiceNew: NewsEndpointService) {
   }
 
   ngOnInit() {
@@ -54,12 +53,12 @@ export class NewsComponent implements OnInit {
 
 
   openAddModal(newsAddModal: TemplateRef<any>) {
-    this.currentNews = new News();
+    this.currentNews = {} as DetailedNewsDto;
     this.modalService.open(newsAddModal, {ariaLabelledBy: 'modal-basic-title'});
   }
 
   openExistingNewsModal(id: number, newsAddModal: TemplateRef<any>) {
-    this.newsService.getNewsById(id).subscribe({
+    this.newsServiceNew.find(id).subscribe({
       next: res => {
         this.currentNews = res;
         this.modalService.open(newsAddModal, {ariaLabelledBy: 'modal-basic-title'});
@@ -78,13 +77,12 @@ export class NewsComponent implements OnInit {
     this.submitted = true;
 
     if (form.valid) {
-      this.currentNews.image = this.selectedFile;
       this.createNews(this.currentNews);
       this.clearForm();
     }
   }
 
-  getNews(): News[] {
+  getNews(): DetailedNewsDto[] {
     return this.news;
   }
 
@@ -100,24 +98,11 @@ export class NewsComponent implements OnInit {
    *
    * @param news the news which should be created
    */
-  private createNews(news: News) {
-
+  private createNews(news: DetailedNewsDto) {
     console.log('NewsDto1:', news);
 
 
-
-    const formData = new FormData();
-    formData.append('title', news.title);
-    formData.append('summary', news.summary);
-    formData.append('text', news.text);
-    formData.append('image', news.image);
-
-
-    formData.forEach((value, key) => {
-      console.log(key, value);
-    });
-
-    this.newsService.createNews(formData).subscribe({
+    this.newsServiceNew.create(news.title, news.summary, news.text, this.selectedFile).subscribe({
       next: () => {
         this.loadNews();
       },
@@ -128,14 +113,13 @@ export class NewsComponent implements OnInit {
   }
 
 
-
-
   /**
    * Loads the specified page of news from the backend
    */
   private loadNews() {
-    this.newsService.getNews().subscribe({
-      next: (news: News[]) => {
+    this.newsServiceNew.findAll()
+    .subscribe({
+      next: (news: SimpleNewsDto[]) => {
         this.news = news;
       },
       error: error => {
@@ -156,7 +140,7 @@ export class NewsComponent implements OnInit {
   }
 
   private clearForm() {
-    this.currentNews = new News();
+    this.currentNews = {} as DetailedNewsDto;
     this.submitted = false;
   }
 

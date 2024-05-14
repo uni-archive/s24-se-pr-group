@@ -51,7 +51,7 @@ public class DetailedNewsDto extends SimpleNewsDto {
         private String title;
         private String summary;
 
-        private Blob image;
+        private byte[] image;
 
 
 
@@ -87,7 +87,7 @@ public class DetailedNewsDto extends SimpleNewsDto {
             return this;
         }
 
-        public at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DetailedNewsDto.DetailedNewsDtoBuilder withImage(Blob image) {
+        public at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DetailedNewsDto.DetailedNewsDtoBuilder withImage(byte[] image) {
             this.image = image;
             return this;
         }

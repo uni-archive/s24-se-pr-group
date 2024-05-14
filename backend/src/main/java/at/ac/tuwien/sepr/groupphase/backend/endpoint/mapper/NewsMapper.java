@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DetailedNewsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsInquiryDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.SimpleNewsDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.News;
+import java.sql.Blob;
 import java.util.List;
 import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
@@ -30,4 +31,20 @@ public interface NewsMapper {
 
     NewsInquiryDto newsToNewsInquiryDto(News news);
 
+
+    default byte[] blobToByteArray(java.sql.Blob blob) {
+        try {
+            return blob.getBytes(1, (int) blob.length());
+        } catch (java.sql.SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    default Blob byteArrayToBlob(byte[] bytes) {
+        try {
+            return new javax.sql.rowset.serial.SerialBlob(bytes);
+        } catch (java.sql.SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
