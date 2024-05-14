@@ -75,19 +75,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String login(UserLoginDto userLoginDto) {
-        ApplicationUserDto applicationUserDto = findApplicationUserByEmail(userLoginDto.getEmail());
-        UserDetails userDetails = getUserDetailsForUser(applicationUserDto);
-        if (userDetails != null
-            && userDetails.isAccountNonExpired()
-            && userDetails.isAccountNonLocked()
-            && userDetails.isCredentialsNonExpired()
-            && passwordEncoder.matches(userLoginDto.getPassword().concat(applicationUserDto.getSalt()), userDetails.getPassword())
-        ) {
-            List<String> roles = userDetails.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
-            return jwtTokenizer.getAuthToken(userDetails.getUsername(), roles);
+        try {
+            ApplicationUserDto applicationUserDto = findApplicationUserByEmail(userLoginDto.getEmail());
+            UserDetails userDetails = getUserDetailsForUser(applicationUserDto);
+            if (userDetails != null
+                && userDetails.isAccountNonExpired()
+                && userDetails.isAccountNonLocked()
+                && userDetails.isCredentialsNonExpired()
+                && passwordEncoder.matches(userLoginDto.getPassword().concat(applicationUserDto.getSalt()), userDetails.getPassword())
+            ) {
+                List<String> roles = userDetails.getAuthorities()
+                    .stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .toList();
+                return jwtTokenizer.getAuthToken(userDetails.getUsername(), roles);
+            }
+        } catch (NotFoundException e) {
+            throw new BadCredentialsException("Username or password is incorrect or account is locked");
         }
         throw new BadCredentialsException("Username or password is incorrect or account is locked");
     }
