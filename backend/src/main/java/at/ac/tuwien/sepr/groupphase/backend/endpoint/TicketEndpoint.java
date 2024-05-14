@@ -8,6 +8,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundExcepti
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +29,7 @@ public class TicketEndpoint {
         this.ticketMapper = ticketMapper;
     }
 
+    @Secured("ROLE_USER")
     @GetMapping(path = "/{id}", produces = "application/json")
     public ResponseEntity<TicketDetailsResponse> findById(@PathVariable("id") long id) {
         try {
