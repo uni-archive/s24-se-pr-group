@@ -2,7 +2,7 @@ import {Component, ViewChild} from '@angular/core';
 import {HallplanComponent, HallSection} from "../hallplan.component";
 import {CreateHelper, DrawableEntity, InteractableEntity} from "../helpers";
 import {NgForOf, NgIf} from "@angular/common";
-import {FormBuilder, FormGroup, ReactiveFormsModule} from "@angular/forms";
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {Observable} from "rxjs";
 
 @Component({
@@ -20,20 +20,26 @@ import {Observable} from "rxjs";
 export class HallplanCreateComponent {
   @ViewChild('hallplan') hallplan: HallplanComponent;
   sectionForm: FormGroup;
+  mainForm: FormGroup;
   selectedSection: HallSection;
   isHidden$: Observable<boolean>;
 
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder) {
+    this.sectionForm = this.fb.group({
+      name: ['', Validators.required],
+      price: ['', Validators.required],
+      color: ['', Validators.required],
+      standingOnly: [false]
+    });
+    this.mainForm = this.fb.group({
+      hallname: ['', Validators.required],
+      backgroundImage: ['', Validators.required]
+    })
+  }
 
   ngAfterViewInit() {
     this.hallplan.onSelectedEntitiesChange = this.onSelectedEntitiesChange.bind(this);
-    this.sectionForm = this.fb.group({
-      name: [''],
-      price: [''],
-      color: [''],
-      standingOnly: [false]
-    });
   }
 
   onSelectedEntitiesChange(selectedEntities: InteractableEntity[]) {
@@ -45,9 +51,15 @@ export class HallplanCreateComponent {
         name: this.selectedSection.name,
         price: this.selectedSection.price.toString(),
         color: this.selectedSection.color,
-        standingOnly: false//this.selectedSection.standingOnly ?? false
+        standingOnly: this.selectedSection.isStandingOnly
       });
     }
+  }
+
+  onSubmit() {
+    if (! this.mainForm.valid)
+      return;
+    console.log(this.hallplan.sections);
   }
 
   previewFile(event) {
@@ -64,7 +76,7 @@ export class HallplanCreateComponent {
   }
 
   regenerateSeats() {
-    this.hallplan.sections.forEach(section => {
+    this.hallplan.sections.filter(section => ! section.isStandingOnly).forEach(section => {
       section.seats = CreateHelper.generateSeats(section.points, this.hallplan.ctx).map(pos => ({ pos }));
     });
     this.hallplan.generateEntities();
@@ -72,6 +84,8 @@ export class HallplanCreateComponent {
   }
 
   updateSection() {
+    if (! this.sectionForm.valid)
+      return;
     const name = this.sectionForm.value.name;
     const price = this.sectionForm.value.price;
     const color = this.sectionForm.value.color;
@@ -80,13 +94,12 @@ export class HallplanCreateComponent {
     this.selectedSection.name = name;
     this.selectedSection.price = Number(price);
     this.selectedSection.color = color;
-    // section.standingOnly = standingOnly;
+    this.selectedSection.isStandingOnly = standingOnly;
     if (standingOnly) {
       this.selectedSection.seats.splice(0, this.selectedSection.seats.length);
     }
     this.hallplan.generateEntities();
     this.hallplan.refreshCanvas(true);
-    console.log(this.sectionForm)
   }
 
 }

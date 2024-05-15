@@ -45,7 +45,8 @@ export class HallplanComponent {
       name: 'Section 1',
       color: 'red',
       price: 100,
-      seats: []
+      seats: [],
+      isStandingOnly: true
     },
    ];
 
@@ -153,6 +154,7 @@ export class HallplanComponent {
         price: 100,
 
         seats: CreateHelper.generateSeats(this.createHelper.getSectionPolygon(), this.ctx).map(pos => ({ pos })),
+        isStandingOnly: false
       });
       this.createHelper.disable();
       this.generateEntities();
@@ -210,6 +212,7 @@ export type HallSection = {
   price: number;
 
   seats: HallSeat[];
+  isStandingOnly: boolean;
 }
 
 export type HallSeat = {
