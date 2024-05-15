@@ -1,8 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {AuthService} from '../../services/auth.service';
 import {AuthRequest} from '../../dtos/auth-request';
+import {MessagingService} from "../../services/messaging.service";
 
 
 @Component({
@@ -18,11 +19,15 @@ export class LoginComponent implements OnInit {
   // Error flag
   error = false;
   errorMessage = '';
+  registered: boolean = false;
 
-  constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService, private router: Router) {
+  constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService, private router: Router, private route: ActivatedRoute, private messagingService: MessagingService) {
     this.loginForm = this.formBuilder.group({
       username: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(8)]]
+    });
+    this.route.queryParams.subscribe(params => {
+      this.loginForm.controls['username'].setValue(params['username']); // Capture and check the 'registered' query parameter
     });
   }
 
@@ -52,14 +57,12 @@ export class LoginComponent implements OnInit {
         this.router.navigate(['/message']);
       },
       error: error => {
-        console.log('Could not log in due to:');
-        console.log(error);
-        this.error = true;
         if (typeof error.error === 'object') {
           this.errorMessage = error.error.error;
         } else {
           this.errorMessage = error.error;
         }
+        this.messagingService.setMessage('Login failed: ' + this.errorMessage, 'danger')
       }
     });
   }

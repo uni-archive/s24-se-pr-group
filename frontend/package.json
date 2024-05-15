@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "api-gen": "openapi-generator-cli generate -i ../backend/docs/swagger/openapi.yaml -g typescript-angular -o src/app/services/openapi --additional-properties fileNaming=kebab-case,withInterfaces=true --generate-alias-as-model"
   },
   "private": true,
   "dependencies": {
@@ -21,14 +22,18 @@
     "@angular/router": "17.3.4",
     "@ng-bootstrap/ng-bootstrap": "16.0.0",
     "@popperjs/core": "2.11.8",
+    "angular-phone-number-input": "^1.0.6",
     "bootstrap": "5.3.3",
+    "bootstrap-icons": "^1.11.3",
     "core-js": "3.36.1",
     "jquery": "3.7.1",
     "jwt-decode": "4.0.0",
+    "libphonenumber-js": "^1.11.1",
     "lodash": "4.17.21",
     "rxjs": "7.8.1",
     "tslib": "2.6.2",
-    "zone.js": "0.14.4"
+    "zone.js": "0.14.4",
+    "pdfmake": "^0.2.10"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "17.3.4",
@@ -40,11 +45,13 @@
     "@angular/cli": "17.3.4",
     "@angular/compiler-cli": "17.3.4",
     "@angular/language-service": "17.3.4",
+    "@openapitools/openapi-generator-cli": "^2.13.4",
     "@types/jasmine": "5.1.4",
     "@types/jasminewd2": "2.0.13",
     "@types/jwt-decode": "3.1.0",
     "@types/lodash": "4.17.0",
     "@types/node": "20.12.7",
+    "@types/pdfmake": "^0.2.9",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "eslint": "^8.53.0",

@@ -1,56 +1,38 @@
-<div *ngIf="error" class="alert alert-warning alert-dismissible fade show" role="alert">
-  <strong>Authentication problems!</strong> {{ errorMessage }}
-  <button type="button" (click)="vanishError()" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
-</div>
-
 <div class="pt-5">
   <div class="row">
     <div class="col-md-6 mx-auto">
-      <span class="anchor" id="formLogin"></span>
-
       <div class="card rounded-0">
         <div class="card-header">
           <h3 class="mb-0">Login</h3>
         </div>
-
         <div class="card-body">
-          <form class="form" [formGroup]="loginForm" (ngSubmit)="loginUser()">
+          <form class="form" [formGroup]="loginForm" (ngSubmit)="loginUser()" novalidate>
 
-            <div class="form-group">
+            <div class="form-group" [class.is-invalid]="submitted && loginForm.get('username').invalid">
               <label for="inputUsername">Username</label>
-              <input type="text" name="username" formControlName="username" class="form-control" id="inputUsername"
+              <input type="text" class="form-control" id="inputUsername" formControlName="username"
                      aria-describedby="usernameHelp" placeholder="Enter username">
-              <div *ngIf="submitted && loginForm.controls.username.errors" class="error">
-                <small class="form-text text-warning" *ngIf="loginForm.controls.username.errors.required">Your username is
-                  required!
-                </small>
+              <div *ngIf="submitted && loginForm.get('username').errors" class="invalid-feedback">
+                <div *ngIf="loginForm.get('username').errors.required">Your username is required!</div>
               </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" [class.is-invalid]="submitted && loginForm.get('password').invalid">
               <label for="password">Password</label>
-              <input type="password" name="password" formControlName="password" class="form-control" id="password"
+              <input type="password" class="form-control" id="password" formControlName="password"
                      placeholder="Password">
-              <div *ngIf="submitted && loginForm.controls.password.errors" class="error">
-                <small class="form-text text-warning" *ngIf="loginForm.controls.password.errors.required">Your password
-                  is
-                  required!
-                </small>
-                <small class="form-text text-warning" *ngIf="loginForm.controls.password.errors.minlength">Your password
-                  must be at least 8 characters long!
-                </small>
+              <div *ngIf="submitted && loginForm.get('password').errors" class="invalid-feedback">
+                <div *ngIf="loginForm.get('password').errors.required">Your password is required!</div>
+                <div *ngIf="loginForm.get('password').errors.minlength">Your password must be at least 8 characters long!</div>
               </div>
             </div>
 
-            <button type="button" (click)="loginUser()" class="btn btn-success float-right">Login</button>
+            <button type="submit" class="btn btn-primary float-right">Login</button>
 
+            <button type="button" class="btn btn-link mt-2" routerLink="/register">No account yet? Register here!</button>
           </form>
         </div>
-
       </div>
-
     </div>
   </div>
 </div>

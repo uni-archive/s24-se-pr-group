@@ -1,6 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
-import at.ac.tuwien.sepr.groupphase.backend.entity.Message;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Message;
 
 import java.util.List;
 

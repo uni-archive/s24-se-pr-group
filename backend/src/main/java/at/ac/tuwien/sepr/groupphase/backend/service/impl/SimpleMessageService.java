@@ -1,8 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
-import at.ac.tuwien.sepr.groupphase.backend.entity.Message;
-import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.repository.MessageRepository;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Message;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.MessageRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.MessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -13,7 +13,7 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "cypress": "cypress run"
+    "cypress": "cypress run --browser chrome"
   },
   "author": "Heimo Stranner",
   "license": "ISC"

@@ -1,0 +1,23 @@
+.alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; // Ensures content and close button are spaced apart
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1050;
+  width: 300px;
+  padding-right: 10px; // Ensures padding from the right edge
+}
+
+.custom-close {
+  border: none;
+  background: transparent;
+  color: inherit; // Inherits the text color of the alert for consistency
+  opacity: 0.8;
+
+  &:hover {
+    opacity: 1;
+    color: #000; // Makes the button darker on hover for better visibility
+  }
+}

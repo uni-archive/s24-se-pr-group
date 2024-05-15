@@ -3,10 +3,9 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DetailedMessageDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.MessageInquiryDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.SimpleMessageDto;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Message;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Message;
 import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
 import java.util.List;
