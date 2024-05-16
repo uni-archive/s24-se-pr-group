@@ -31,4 +31,10 @@ export interface TicketEndpointServiceInterface {
      */
     findById(id: number, extraHttpRequestParams?: any): Observable<TicketDetailsResponse>;
 
+    /**
+     * 
+     * 
+     */
+    findForUser(extraHttpRequestParams?: any): Observable<Array<TicketDetailsResponse>>;
+
 }

@@ -17,6 +17,7 @@ import {GlobalMessageComponent} from "./global-message/global-message.component"
 import {AngularPhoneNumberInput} from "angular-phone-number-input";
 import {PrintPurchaseInvoiceButtonComponent} from "./components/print-purchase-invoice-button/print-purchase-invoice-button.component";
 import {PrintTicketButtonComponent} from "./components/print-ticket-button/print-ticket-button.component";
+import {TicketsTableComponent} from "./components/tickets/tickets-table/tickets-table.component";
 
 @NgModule({
   declarations: [
@@ -27,7 +28,7 @@ import {PrintTicketButtonComponent} from "./components/print-ticket-button/print
     LoginComponent,
     MessageComponent,
     RegistrationComponent,
-    GlobalMessageComponent
+    GlobalMessageComponent,
   ],
     imports: [
         BrowserModule,
@@ -38,7 +39,8 @@ import {PrintTicketButtonComponent} from "./components/print-ticket-button/print
         FormsModule,
         AngularPhoneNumberInput,
         PrintPurchaseInvoiceButtonComponent,
-        PrintTicketButtonComponent
+        PrintTicketButtonComponent,
+        TicketsTableComponent
     ],
   providers: [httpInterceptorProviders],
   exports: [
