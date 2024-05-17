@@ -14,13 +14,13 @@ spring:
     password: password
   jpa:
     # uncomment this to regenerate the init.sql script
-#    properties:
-#      jakarta:
-#        persistence:
-#          schema-generation:
-#            scripts:
-#              action: create
-#              create-target: backend/src/main/resources/init.sql
+    #    properties:
+    #      jakarta:
+    #        persistence:
+    #          schema-generation:
+    #            scripts:
+    #              action: create
+    #              create-target: backend/src/main/resources/init.sql
     # Set this property to true if you want to see the executed queries
     show-sql: true
     hibernate:
@@ -35,6 +35,17 @@ spring:
       path: /h2-console
       settings:
         web-allow-others: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ***REMOVED***@gmail.com
+    password: ***REMOVED***
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 security:
   auth:
