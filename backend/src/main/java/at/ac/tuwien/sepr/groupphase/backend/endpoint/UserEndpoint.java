@@ -1,11 +1,15 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserCreateRequest;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.mapper.UserMapper;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import jakarta.annotation.security.PermitAll;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,15 +18,20 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.lang.invoke.MethodHandles;
 
 @RestController
 @RequestMapping(value = "/api/v1/users")
 public class UserEndpoint {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final UserService userService;
     private final UserMapper userMapper;
 
@@ -56,4 +65,20 @@ public class UserEndpoint {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return userMapper.toResponse(userService.findApplicationUserByEmail(authentication.getName()));
     }
+
+    @Secured("ROLE_ADMIN")
+    @GetMapping(path = "/get", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ApplicationUserResponse findUserByEmail(@RequestParam("email") String email) {
+        return userMapper.toResponse(userService.findApplicationUserByEmail(email));
+    }
+
+    @Secured("ROLE_ADMIN")
+    @PutMapping(path = "/update/status", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ApplicationUserResponse updateUserStatusByEmail(@RequestBody ApplicationUserDto user) throws ValidationException,
+        NotFoundException {
+        LOGGER.info("Update user status by email: {}", user);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return userMapper.toResponse(userService.updateUserStatusByEmail(user, authentication.getName()));
+    }
+
 }

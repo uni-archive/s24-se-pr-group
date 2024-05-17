@@ -1,3 +1,4 @@
+export * from './application-user-dto';
 export * from './application-user-response';
 export * from './detailed-message-dto';
 export * from './event-response';
