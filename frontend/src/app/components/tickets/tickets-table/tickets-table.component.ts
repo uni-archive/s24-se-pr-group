@@ -5,6 +5,8 @@ import {TicketDetailsResponse, TicketEndpointService} from "../../../services/op
 import {NgbDatepicker} from "@ng-bootstrap/ng-bootstrap";
 import {FormsModule} from "@angular/forms";
 import {formatPrice} from "../../../../formatters/currencyFormatter";
+import {RouterLink} from "@angular/router";
+import {PdfService} from "../../../services/pdf.service";
 
 type TicketFilter = "bought" | "reserved" | "all";
 type ShowDateFilter = "previous" | "upcoming" | "specific" | "all";
@@ -17,13 +19,14 @@ type ShowDateFilter = "previous" | "upcoming" | "specific" | "all";
     DatePipe,
     NgIf,
     NgbDatepicker,
-    FormsModule
+    FormsModule,
+    RouterLink
   ],
   templateUrl: './tickets-table.component.html',
   styleUrl: './tickets-table.component.scss'
 })
 export class TicketsTableComponent implements OnInit {
-  constructor(public authService: AuthService, private ticketService: TicketEndpointService) { }
+  constructor(public authService: AuthService, private ticketService: TicketEndpointService, private pdfService: PdfService) { }
 
   protected tickets: TicketDetailsResponse[] = [];
   protected ticketsFiltered: TicketDetailsResponse[] = [];
@@ -46,6 +49,10 @@ export class TicketsTableComponent implements OnInit {
           console.error(err);
         }
       });
+  }
+
+  protected printTicketPDF(ticket: TicketDetailsResponse): void {
+    this.pdfService.createTicketPDF(ticket);
   }
 
   private sortTicketsByDateDesc(tickets: TicketDetailsResponse[]): TicketDetailsResponse[] {

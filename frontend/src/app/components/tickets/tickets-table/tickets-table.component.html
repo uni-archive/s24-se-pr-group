@@ -62,8 +62,10 @@
       <td>{{formatPrice(ticket?.hallSpot?.sector?.hallSectorShow?.price)}}</td>
       <td>
         <div class="btn-group">
-          <a class="btn btn-sm responsive-info-button">
-            <i class="bi bi-info-circle"></i>
+          <a class="btn btn-sm responsive-info-button"
+            (click)="this.printTicketPDF(ticket)"
+          >
+            <i class="bi bi-printer"></i>
           </a>
           <a *ngIf="ticket.reserved" class="btn btn-sm responsive-danger-button"
              data-bs-toggle="modal"
