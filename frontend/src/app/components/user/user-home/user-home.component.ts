@@ -14,23 +14,25 @@ export enum Role {
 export class UserHomeComponent {
   isAdmin: boolean = false;
   showManageUserForm: boolean = false;
-  showCreateUserForm: boolean = true;
+  showCreateUserForm: boolean = false;
   selectedLinkId: string = "";
   @Output() isAdminChange = new EventEmitter<boolean>();
 
   constructor(private authService: AuthService) {}
 
   toggleRegistration(id: string) {
-    this.selectedLinkId = id;
-    this.showManageUserForm = false;
-    this.showCreateUserForm = false;
-    this.isAdminChange.emit(false);
-    if (id === "manageUser") {
-      this.showManageUserForm = true;
-    }
-    if (id === "createUser") {
-      this.showCreateUserForm = true;
-      this.isAdminChange.emit(true);
+    if (this.isAdmin) {
+      this.selectedLinkId = id;
+      this.showManageUserForm = false;
+      this.showCreateUserForm = false;
+      this.isAdminChange.emit(false);
+      if (id === "manageUser") {
+        this.showManageUserForm = true;
+      }
+      if (id === "createUser") {
+        this.showCreateUserForm = true;
+        this.isAdminChange.emit(true);
+      }
     }
   }
 
