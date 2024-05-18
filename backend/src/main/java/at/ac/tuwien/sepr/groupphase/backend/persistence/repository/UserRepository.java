@@ -28,6 +28,6 @@ public interface UserRepository extends JpaRepository<ApplicationUser, Long> {
     List<ApplicationUser> findByParams(@Param("firstName") String firstName,
                                        @Param("familyName") String familyName,
                                        @Param("email") String email,
-                                       @Param("isLocked") Boolean isLocked);
+                                       @Param("isLocked") boolean isLocked);
 
 }
