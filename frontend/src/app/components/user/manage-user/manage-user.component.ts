@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { Subject, debounceTime } from "rxjs";
+import { debounceTime, Subject } from "rxjs";
 import { MessagingService } from "src/app/services/messaging.service";
 import {
   ApplicationUserDto,
@@ -20,7 +20,6 @@ export class ManageUserComponent {
     isLocked: null,
   };
   users: ApplicationUserDto[] = [];
-  user: ApplicationUserResponse = null;
   searchChangedObservable = new Subject<void>();
 
   // Pagination related properties
@@ -51,19 +50,20 @@ export class ManageUserComponent {
       this.searchParams.firstName === ""
     ) {
       delete this.searchParams.firstName;
-    } else if (
+    }
+    if (
       this.searchParams.familyName == null ||
       this.searchParams.familyName === ""
     ) {
       delete this.searchParams.familyName;
-    } else if (
-      this.searchParams.email == null ||
-      this.searchParams.email === ""
-    ) {
+    }
+    if (this.searchParams.email == null || this.searchParams.email === "") {
       delete this.searchParams.email;
-    } else if (this.searchParams.isLocked == null) {
+    }
+    if (this.searchParams.isLocked == null) {
       delete this.searchParams.isLocked;
     }
+    console.log("Searching users with params:", this.searchParams);
     this.userEndpointService
       .searchUsers(
         this.searchParams.firstName,
@@ -83,12 +83,7 @@ export class ManageUserComponent {
     this.currentPage = event;
   }
 
-  updateLockStatus(status: boolean) {
-    if (this.user == null) {
-      console.error("No user loaded.");
-      return;
-    }
-
+  updateLockStatus(user: ApplicationUserDto, status: boolean) {
     this.userEndpointService.getUser().subscribe({
       next: (currentUser) => {
         if (currentUser == null) {
@@ -96,17 +91,16 @@ export class ManageUserComponent {
           return;
         }
 
-        if (this.user.id != currentUser.id) {
-          this.user.accountLocked = status;
-          this.userEndpointService
-            .updateUserStatusByEmail(this.user)
-            .subscribe({
-              next: (response) => {
-                this.user = response;
-                this.messagingService.setMessage("User updated successfully.");
-              },
-              error: (error) => console.error("Error loading user:", error),
-            });
+        if (user.id != currentUser.id) {
+          user.accountLocked = status;
+          this.userEndpointService.updateUserStatusByEmail(user).subscribe({
+            next: (response) => {
+              user = response;
+              this.messagingService.setMessage("User updated successfully.");
+              this.searchUsers();
+            },
+            error: (error) => console.error("Error loading user:", error),
+          });
         } else {
           console.error("Cannot update own user.");
           this.messagingService.setMessage("Cannot update own user.", "danger");

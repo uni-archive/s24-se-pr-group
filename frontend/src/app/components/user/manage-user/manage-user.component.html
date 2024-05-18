@@ -42,7 +42,6 @@
       [(ngModel)]="searchParams.isLocked"
       (ngModelChange)="searchChanged()"
     >
-      <option [ngValue]="null"></option>
       <option [ngValue]="true">Gesperrt</option>
       <option [ngValue]="false">Entsperrt</option>
     </select>
@@ -81,8 +80,8 @@
             class="btn btn-primary"
             (click)="
               user.accountLocked
-                ? updateLockStatus(false)
-                : updateLockStatus(true)
+                ? updateLockStatus(user, false)
+                : updateLockStatus(user, true)
             "
           >
             {{ user.accountLocked ? "Entsperren" : "Sperren" }}
