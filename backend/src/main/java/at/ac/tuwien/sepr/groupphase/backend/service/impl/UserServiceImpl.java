@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.UserDao;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -103,6 +105,12 @@ public class UserServiceImpl implements UserService {
         toCreate.setSalt(SecurityUtil.generateSalt(32));
         toCreate.setPassword(passwordEncoder.encode(toCreate.getPassword() + toCreate.getSalt()));
         return userDao.create(toCreate);
+    }
+
+    @Override
+    public Stream<ApplicationUserDto> search(ApplicationUserSearchDto searchParameters) {
+        LOGGER.debug("Search for users: {}", searchParameters);
+        return userDao.search(searchParameters);
     }
 
     @Override

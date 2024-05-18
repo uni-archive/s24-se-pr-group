@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserResponse;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserCreateRequest;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.mapper.UserMapper;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/v1/users")
@@ -67,9 +69,14 @@ public class UserEndpoint {
     }
 
     @Secured("ROLE_ADMIN")
-    @GetMapping(path = "/get", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ApplicationUserResponse findUserByEmail(@RequestParam("email") String email) {
-        return userMapper.toResponse(userService.findApplicationUserByEmail(email));
+    @GetMapping(path = "/api/v1/users/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<ApplicationUserDto> searchUsers(
+        @RequestParam(name = "firstName", required = false) String firstName,
+        @RequestParam(name = "familyName", required = false) String familyName,
+        @RequestParam(name = "email", required = false) String email,
+        @RequestParam(name = "isLocked", required = false) boolean isLocked) {
+        ApplicationUserSearchDto searchParams = new ApplicationUserSearchDto(firstName, familyName, email, isLocked);
+        return userService.search(searchParams).toList();
     }
 
     @Secured("ROLE_ADMIN")
