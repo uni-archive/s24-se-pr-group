@@ -2,6 +2,7 @@ import { BrowserModule } from "@angular/platform-browser";
 import { NgModule } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { HttpClientModule } from "@angular/common/http";
+import { NgxPaginationModule } from "ngx-pagination";
 
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
@@ -34,18 +35,19 @@ import {TicketsTableComponent} from "./components/tickets/tickets-table/tickets-
     UserHomeComponent,
     ManageUserComponent,
   ],
-    imports: [
-        BrowserModule,
-        AppRoutingModule,
-        ReactiveFormsModule,
-        HttpClientModule,
-        NgbModule,
-        FormsModule,
-        AngularPhoneNumberInput,
-        PrintPurchaseInvoiceButtonComponent,
-        PrintTicketButtonComponent,
-        TicketsTableComponent
-    ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+    NgbModule,
+    FormsModule,
+    AngularPhoneNumberInput,
+    PrintPurchaseInvoiceButtonComponent,
+    PrintTicketButtonComponent,
+    TicketsTableComponent,
+    NgxPaginationModule
+  ],
   providers: [httpInterceptorProviders],
   exports: [HeaderComponent, FooterComponent],
   bootstrap: [AppComponent],
