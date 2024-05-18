@@ -29,13 +29,6 @@ export interface UserEndpointServiceInterface {
     /**
      * 
      * 
-     * @param email 
-     */
-    findUserByEmail(email: string, extraHttpRequestParams?: any): Observable<ApplicationUserResponse>;
-
-    /**
-     * 
-     * 
      */
     getUser(extraHttpRequestParams?: any): Observable<ApplicationUserResponse>;
 
@@ -45,6 +38,16 @@ export interface UserEndpointServiceInterface {
      * @param userCreateRequest 
      */
     register(userCreateRequest: UserCreateRequest, extraHttpRequestParams?: any): Observable<object>;
+
+    /**
+     * 
+     * 
+     * @param firstName 
+     * @param familyName 
+     * @param email 
+     * @param isLocked 
+     */
+    searchUsers(firstName?: string, familyName?: string, email?: string, isLocked?: boolean, extraHttpRequestParams?: any): Observable<Array<ApplicationUserDto>>;
 
     /**
      * 
