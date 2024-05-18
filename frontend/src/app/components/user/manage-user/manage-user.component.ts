@@ -1,4 +1,5 @@
 import { Component } from "@angular/core";
+import { Subject, debounceTime } from "rxjs";
 import { MessagingService } from "src/app/services/messaging.service";
 import {
   ApplicationUserDto,
@@ -13,14 +14,14 @@ import {
 })
 export class ManageUserComponent {
   searchParams = {
-    email: "",
     firstName: "",
     familyName: "",
-    isLocked: false,
+    email: "",
+    isLocked: null,
   };
   users: ApplicationUserDto[] = [];
-  paginatedUsers: ApplicationUserDto[] = [];
   user: ApplicationUserResponse = null;
+  searchChangedObservable = new Subject<void>();
 
   // Pagination related properties
   itemsPerPage = 10;
@@ -32,35 +33,50 @@ export class ManageUserComponent {
   ) {}
 
   ngOnInit() {
-    this.searchUser(); // Load initial data
+    this.searchChangedObservable
+      .pipe(debounceTime(300))
+      .subscribe({ next: () => this.searchUsers() });
+    // only display locked users by default
+    this.searchParams.isLocked = true;
+    this.searchUsers();
   }
 
-  searchUser() {
-    //insert 100 users into the users array
-    this.users = [];
-    for (let i = 0; i < 100; i++) {
-      this.users.push({
-        id: i,
-        email: "test" + i + "@test.com",
-        firstName: "Test",
-        familyName: "User",
-        accountLocked: i < 50 ? false : true,
-      });
-    }
+  searchChanged(): void {
+    this.searchChangedObservable.next();
+  }
 
-    // Uncomment this when using actual API
-    /*
+  searchUsers() {
+    if (
+      this.searchParams.firstName == null ||
+      this.searchParams.firstName === ""
+    ) {
+      delete this.searchParams.firstName;
+    } else if (
+      this.searchParams.familyName == null ||
+      this.searchParams.familyName === ""
+    ) {
+      delete this.searchParams.familyName;
+    } else if (
+      this.searchParams.email == null ||
+      this.searchParams.email === ""
+    ) {
+      delete this.searchParams.email;
+    } else if (this.searchParams.isLocked == null) {
+      delete this.searchParams.isLocked;
+    }
     this.userEndpointService
-      .findUserByEmail(this.searchParams.email)
+      .searchUsers(
+        this.searchParams.firstName,
+        this.searchParams.familyName,
+        this.searchParams.email,
+        this.searchParams.isLocked
+      )
       .subscribe({
-        next: (response) => {
-          this.user = response;
-          this.messagingService.setMessage("User loaded successfully.");
-          this.updatePagination();
+        next: (response: ApplicationUserDto[]) => {
+          this.users = response;
         },
-        error: (error) => console.error("Error loading user:", error),
+        error: (error) => console.error("Error loading users:", error),
       });
-    */
   }
 
   onTableDataChange(event: any): void {
