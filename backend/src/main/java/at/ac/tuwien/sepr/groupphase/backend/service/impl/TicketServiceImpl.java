@@ -7,6 +7,8 @@ import at.ac.tuwien.sepr.groupphase.backend.service.HallSectorShowService;
 import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.TicketNotCancellable;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
+import at.ac.tuwien.sepr.groupphase.backend.service.validator.TicketValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -20,10 +22,13 @@ public class TicketServiceImpl implements TicketService {
 
     private final TicketDao ticketDao;
 
+    private final TicketValidator ticketValidator;
+
     private final HallSectorShowService hallSectorShowService;
 
-    public TicketServiceImpl(TicketDao ticketDao, HallSectorShowService hallSectorShowService) {
+    public TicketServiceImpl(TicketDao ticketDao, TicketValidator ticketValidator, HallSectorShowService hallSectorShowService) {
         this.ticketDao = ticketDao;
+        this.ticketValidator = ticketValidator;
         this.hallSectorShowService = hallSectorShowService;
     }
 
@@ -60,17 +65,10 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public void cancelReservedTicket(long id) throws TicketNotCancellable, DtoNotFoundException {
+    public void cancelReservedTicket(long id) throws ValidationException, DtoNotFoundException {
         try {
             var ticket = ticketDao.findById(id);
-            if (!ticket.isValid()) {
-                throw new TicketNotCancellable("Cannot cancel invalid ticket.");
-            }
-
-            if (!ticket.isReserved()) {
-                throw new TicketNotCancellable("Cannot cancel non-reserved ticket.");
-            }
-
+            ticketValidator.validateForCancelReservation(ticket);
             ticketDao.cancelReservedTicket(id);
 
         } catch (EntityNotFoundException e) {

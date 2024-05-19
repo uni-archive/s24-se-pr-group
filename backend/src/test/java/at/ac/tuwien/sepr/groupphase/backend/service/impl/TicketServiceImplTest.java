@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.basetest.TestData;
+import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Event;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallPlan;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSector;
@@ -15,30 +16,40 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallSectorSho
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallSpotRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.ShowRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.TicketRepository;
-import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.service.exception.TicketNotCancellable;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
+import at.ac.tuwien.sepr.groupphase.backend.service.validator.TicketValidator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verify;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith({MockitoExtension.class})
 @SpringBootTest
 @ActiveProfiles("test")
 public class TicketServiceImplTest implements TestData {
+
+    @MockBean
+    private TicketValidator ticketValidator;
+
+    @Captor
+    private ArgumentCaptor<TicketDetailsDto> ticketDto;
+
     @Autowired
-    private TicketService ticketService;
+    private TicketServiceImpl ticketService;
 
     @Autowired
     private TicketRepository ticketRepository;
@@ -159,35 +170,20 @@ public class TicketServiceImplTest implements TestData {
     }
 
     @Test
-    void cancelling_aReservation_ShouldDeleteTheTicket() throws TicketNotCancellable, DtoNotFoundException {
+    void cancelling_aReservation_ShouldDeleteTheTicket() throws ValidationException, DtoNotFoundException {
         ticketService.cancelReservedTicket(testTicketValidReserved.getId());
         assertThat(ticketRepository.findById(testTicketValidReserved.getId())).isEmpty();
-    }
-
-    @Test
-    void aNonReservedTicket_ShouldNotBeCancellable() {
-        assertThatThrownBy(() -> ticketService.cancelReservedTicket(testTicketValidNonReserved.getId()))
-            .hasMessageContaining("Cannot cancel non-reserved ticket.")
-            .isInstanceOf(TicketNotCancellable.class);
-    }
-
-    @Test
-    void aReservedTicket_ThatIsInvalid_ShouldNotBeCancellable() {
-        assertThatThrownBy(() -> ticketService.cancelReservedTicket(testTicketInvalidReserved.getId()))
-            .hasMessageContaining("Cannot cancel invalid ticket.")
-            .isInstanceOf(TicketNotCancellable.class);
-    }
-
-    @Test
-    void ticketsShouldFirstBeCheckedForValidity() {
-        assertThatThrownBy(() -> ticketService.cancelReservedTicket(testTicketInvalidNonReserved.getId()))
-            .hasMessageContaining("Cannot cancel invalid ticket.")
-            .isInstanceOf(TicketNotCancellable.class);
     }
 
     @Test
     void cancelling_aNonExistentTicket_ThrowsNotFoundException() {
         assertThatThrownBy(() -> ticketService.cancelReservedTicket(-1L))
             .isInstanceOf(DtoNotFoundException.class);
+    }
+
+    @Test
+    void cancelling_aReservation_ShouldCallValidator() throws ValidationException, DtoNotFoundException {
+        ticketService.cancelReservedTicket(testTicketValidReserved.getId());
+        verify(ticketValidator).validateForCancelReservation(ticketDto.capture());
     }
 }

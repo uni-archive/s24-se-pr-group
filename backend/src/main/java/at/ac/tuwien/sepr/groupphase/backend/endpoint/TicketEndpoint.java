@@ -2,7 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.TicketDetailsResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.TicketNotCancellable;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.TicketResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
@@ -63,11 +63,11 @@ public class TicketEndpoint {
     @Secured("ROLE_USER")
     @DeleteMapping(path = "/ticket/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void cancelReservedTicket(@PathVariable("id") long id) throws NotFoundException, TicketNotCancellable {
+    public void cancelReservedTicket(@PathVariable("id") long id) throws NotFoundException, ValidationException {
         try {
             ticketService.cancelReservedTicket(id);
-        } catch (at.ac.tuwien.sepr.groupphase.backend.service.exception.TicketNotCancellable e) {
-            throw new TicketNotCancellable(e);
+        } catch (at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException e) {
+            throw new ValidationException(e);
         } catch (DtoNotFoundException e) {
             throw new NotFoundException(e);
         }

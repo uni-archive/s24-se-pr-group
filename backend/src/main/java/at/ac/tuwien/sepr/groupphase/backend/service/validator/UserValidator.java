@@ -12,7 +12,7 @@ import java.util.Objects;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserValidator {
+public class UserValidator extends BaseValidator {
 
     protected static final String EMAIL_REGEX = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
     private final UserDao userDao;
@@ -30,12 +30,6 @@ public class UserValidator {
         endValidation(errors);
     }
 
-    private void endValidation(List<String> errors) throws ValidationException {
-        if (!errors.isEmpty()) {
-            String message = "Validation Error: " + String.join(", ", errors);
-            throw new ValidationException(message);
-        }
-    }
 
     private List<String> validateBaseCases(ApplicationUserDto userDto) {
         List<String> errors = new ArrayList<>();
