@@ -7,6 +7,10 @@ import {FormsModule} from "@angular/forms";
 import {formatPrice} from "../../../../formatters/currencyFormatter";
 import {RouterLink} from "@angular/router";
 import {PdfService} from "../../../services/pdf.service";
+import {
+  ConfirmCancelTicketReservationDialogComponent
+} from "../../confirm-cancel-ticket-reservation-dialog/confirm-cancel-ticket-reservation-dialog.component";
+import {MessagingService} from "../../../services/messaging.service";
 
 type TicketFilter = "bought" | "reserved" | "all";
 type ShowDateFilter = "previous" | "upcoming" | "specific" | "all";
@@ -20,13 +24,20 @@ type ShowDateFilter = "previous" | "upcoming" | "specific" | "all";
     NgIf,
     NgbDatepicker,
     FormsModule,
-    RouterLink
+    RouterLink,
+    ConfirmCancelTicketReservationDialogComponent
   ],
   templateUrl: './tickets-table.component.html',
   styleUrl: './tickets-table.component.scss'
 })
 export class TicketsTableComponent implements OnInit {
-  constructor(public authService: AuthService, private ticketService: TicketEndpointService, private pdfService: PdfService) { }
+  constructor(
+    public authService: AuthService,
+    private ticketService: TicketEndpointService,
+    private pdfService: PdfService,
+    private messageService: MessagingService
+  ) {
+  }
 
   protected tickets: TicketDetailsResponse[] = [];
   protected ticketsFiltered: TicketDetailsResponse[] = [];
@@ -38,6 +49,10 @@ export class TicketsTableComponent implements OnInit {
   protected showDateFilterSpecificTo: string | null = null;
 
   ngOnInit(): void {
+    this.loadTickets();
+  }
+
+  private loadTickets(): void {
     this.ticketService.findForUser()
       .subscribe({
         next: ts => {
@@ -46,7 +61,7 @@ export class TicketsTableComponent implements OnInit {
           this.updateFilter();
         },
         error: err => {
-          console.error(err);
+          this.messageService.setMessage("Ihre Tickets konnten nicht geladen werden. Bitte versuchen Sie es später erneut.", 'error');
         }
       });
   }
@@ -98,16 +113,29 @@ export class TicketsTableComponent implements OnInit {
         return showDate > now;
       case "specific":
         let res = true;
-        if(this.showDateFilterSpecificFrom) {
+        if (this.showDateFilterSpecificFrom) {
           res = res && showDate >= new Date(this.showDateFilterSpecificFrom);
         }
 
-        if(this.showDateFilterSpecificTo) {
+        if (this.showDateFilterSpecificTo) {
           res = res && showDate <= new Date(this.showDateFilterSpecificTo);
         }
 
         return res;
     }
+  }
+
+  public cancelTicketReservation(ticketId: number): void {
+    this.ticketService.cancelReservedTicket(ticketId)
+      .subscribe({
+        next: () => {
+          this.loadTickets();
+          this.messageService.setMessage("Ihre Ticket-Reservierung wurde erfolgreich storniert.");
+        },
+        error: err => {
+          this.messageService.setMessage("Ihre Ticket-Reservierung konnte nicht storniert werden.", 'error');
+        }
+      })
   }
 
   protected readonly formatPrice = formatPrice;

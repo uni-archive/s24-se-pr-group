@@ -67,16 +67,17 @@
           >
             <i class="bi bi-printer"></i>
           </a>
-          <a *ngIf="ticket.reserved" class="btn btn-sm responsive-danger-button"
+          <a *ngIf="ticket.reserved && ticket.valid" class="btn btn-sm responsive-danger-button"
              data-bs-toggle="modal"
+             [attr.data-bs-target]="'#cancelTicketReservationModal' + ticket.id"
           >
             <i class="bi bi-x-circle"></i>
           </a>
-          <!--<app-confirm-delete-dialog
-            [id]="'deleteModal' + horse.id"
-            [deleteWhat]="horse.name"
-            (confirm)="deleteHorse(horse.id)"
-          />-->
+          <app-confirm-cancel-ticket-reservation-dialog
+            [ticket]="ticket"
+            (confirm)="cancelTicketReservation(ticket.id)"
+            [id]="'cancelTicketReservationModal' + ticket.id"
+          />
         </div>
       </td>
     </tr>

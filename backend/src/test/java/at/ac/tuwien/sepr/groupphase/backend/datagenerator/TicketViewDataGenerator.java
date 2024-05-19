@@ -81,7 +81,7 @@ public class TicketViewDataGenerator {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private static final int COUNT_FACTOR = 50;
+    private static final int COUNT_FACTOR = 1;
 
     private static final int EVENTS_COUNT = 10 * COUNT_FACTOR;
     private static final int ARTISTS_COUNT = 100 * COUNT_FACTOR;
