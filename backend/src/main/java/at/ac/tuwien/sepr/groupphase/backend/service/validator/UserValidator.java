@@ -6,10 +6,11 @@ import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationExceptio
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import org.springframework.stereotype.Component;
 
 @Component
 public class UserValidator extends BaseValidator {
@@ -75,6 +76,25 @@ public class UserValidator extends BaseValidator {
         if (!objectToUpdate.getEmail().equals(oldObject.getEmail())) {
             if (Objects.nonNull(objectToUpdate.getEmail()) && userDao.findByEmail(objectToUpdate.getEmail()) != null) {
                 errors.add("Email already in use");
+            }
+        }
+        endValidation(errors);
+    }
+
+    public void validateForUpdateStatus(ApplicationUserDto objectToUpdate, String adminEmail) throws ValidationException {
+        List<String> errors = new ArrayList<>();
+        if (objectToUpdate == null) {
+            errors.add("User must not be null");
+            endValidation(errors);
+        }
+        if (objectToUpdate.getEmail() == null || objectToUpdate.getEmail().isEmpty()) {
+            errors.add("Email must not be empty");
+        } else {
+            if (!objectToUpdate.getEmail().matches(EMAIL_REGEX)) {
+                errors.add("Email must be valid");
+            }
+            if (objectToUpdate.getEmail().equals(adminEmail)) {
+                //errors.add("Cannot update own status");
             }
         }
         endValidation(errors);

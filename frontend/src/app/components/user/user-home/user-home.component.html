@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<div class="container p-0">
+  <h1 class="h1 mb-3">{{ heading }}</h1>
+  <div class="row">
+    <div class="col-md-5 col-xl-4">
+      <div class="list-group list-group-flush">
+        <a
+          id="createUser"
+          class="list-group-item list-group-item-action"
+          [ngClass]="{ active: selectedLinkId === 'createUser' }"
+          (click)="toggleRegistration('createUser')"
+        >
+          Create User
+        </a>
+        <a
+          id="manageUser"
+          class="list-group-item list-group-item-action"
+          [ngClass]="{ active: selectedLinkId === 'manageUser' }"
+          (click)="toggleRegistration('manageUser')"
+        >
+          Manage User
+        </a>
+      </div>
+    </div>
+    <div class="col-md-7 col-xl-8">
+      <div class="tab-content">
+        <div
+          class="collapse show active"
+          id="account"
+          role="tabpanel"
+          aria-labelledby="account-tab"
+        >
+          <app-manage-user *ngIf="showManageUserForm"></app-manage-user>
+          <app-registration
+            *ngIf="showCreateUserForm"
+            [isAdminFlag]="isAdmin"
+          ></app-registration>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

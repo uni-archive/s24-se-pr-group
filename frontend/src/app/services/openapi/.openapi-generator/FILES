@@ -18,6 +18,7 @@ configuration.ts
 encoder.ts
 git_push.sh
 index.ts
+model/application-user-dto.ts
 model/application-user-response.ts
 model/detailed-message-dto.ts
 model/event-response.ts

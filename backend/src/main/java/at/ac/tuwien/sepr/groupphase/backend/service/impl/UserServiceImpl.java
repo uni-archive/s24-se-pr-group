@@ -9,8 +9,6 @@ import at.ac.tuwien.sepr.groupphase.backend.security.SecurityUtil;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.UserValidator;
-import java.lang.invoke.MethodHandles;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +21,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.lang.invoke.MethodHandles;
+import java.util.List;
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -34,7 +35,7 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     public UserServiceImpl(UserDao userDao, PasswordEncoder passwordEncoder, JwtTokenizer jwtTokenizer,
-        UserValidator userValidator) {
+                           UserValidator userValidator) {
         this.userDao = userDao;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
@@ -102,5 +103,15 @@ public class UserServiceImpl implements UserService {
         toCreate.setSalt(SecurityUtil.generateSalt(32));
         toCreate.setPassword(passwordEncoder.encode(toCreate.getPassword() + toCreate.getSalt()));
         return userDao.create(toCreate);
+    }
+
+    @Override
+    public ApplicationUserDto updateUserStatusByEmail(ApplicationUserDto toUpdate, String adminEmail) throws NotFoundException, ValidationException {
+        LOGGER.debug("Update user status: {}", toUpdate);
+        userValidator.validateForUpdateStatus(toUpdate, adminEmail);
+        if (userDao.findByEmail(toUpdate.getEmail()) == null) {
+            throw new NotFoundException("Could not update the user with the email address " + toUpdate.getEmail() + " because it does not exist");
+        }
+        return userDao.updateStatusByEmail(toUpdate.isAccountLocked(), toUpdate.getEmail());
     }
 }
