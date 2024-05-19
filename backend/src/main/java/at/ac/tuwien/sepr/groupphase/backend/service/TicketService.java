@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.TicketNotCancellable;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 

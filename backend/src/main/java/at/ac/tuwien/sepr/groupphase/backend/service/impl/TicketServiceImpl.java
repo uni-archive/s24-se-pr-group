@@ -11,6 +11,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationExceptio
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.TicketValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;

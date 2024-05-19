@@ -37,10 +37,6 @@
 
 </div>
 
-
-
-
-
 <div class="table-responsive">
   <table class="table ">
     <thead>
@@ -54,7 +50,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let ticket of ticketsFiltered">
+    <tr *ngFor="let ticket of ticketsPaged">
       <th scope="row">{{ticket.id}}</th>
       <td>{{ticket.show.event.title}}</td>
       <td>{{ticket.show.dateTime | date}}</td>
@@ -83,4 +79,37 @@
     </tr>
     </tbody>
   </table>
+</div>
+
+<div class="d-flex flex-row justify-content-end">
+  <ngb-pagination
+    [collectionSize]="this.ticketsFiltered.length"
+    [(page)]="page"
+    [boundaryLinks]="true"
+    [pageSize]="10"
+    (pageChange)="updatePaging()"
+  >
+    <ng-template ngbPaginationPages let-page let-pages="pages">
+      <li class="ngb-custom-pages-item">
+        <div class="mb-3 d-flex flex-nowrap px-2">
+          <label id="paginationInputLabel" for="paginationInput" class="col-form-label me-2 ms-1">Seite</label>
+          <input
+            #i
+            type="text"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            class="form-control custom-pages-input"
+            id="paginationInput"
+            [value]="page"
+            (keyup.enter)="selectPage(i.value)"
+            (blur)="selectPage(i.value)"
+            (input)="formatInput($any($event).target)"
+            aria-labelledby="paginationInputLabel paginationDescription"
+            style="width: 3rem"
+          />
+          <span id="paginationDescription" class="col-form-label text-nowrap px-2"> of {{ pages.length }}</span>
+				</div>
+			</li>
+    </ng-template>
+  </ngb-pagination>
 </div>

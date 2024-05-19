@@ -2,10 +2,10 @@ import {Component, OnInit} from '@angular/core';
 import {DatePipe, NgForOf, NgIf} from "@angular/common";
 import {AuthService} from "../../../services/auth.service";
 import {TicketDetailsResponse, TicketEndpointService} from "../../../services/openapi";
-import {NgbDatepicker} from "@ng-bootstrap/ng-bootstrap";
+import {NgbDatepicker, NgbPagination, NgbPaginationPages} from "@ng-bootstrap/ng-bootstrap";
 import {FormsModule} from "@angular/forms";
 import {formatPrice} from "../../../../formatters/currencyFormatter";
-import {RouterLink} from "@angular/router";
+import {ActivatedRoute, RouterLink} from "@angular/router";
 import {PdfService} from "../../../services/pdf.service";
 import {
   ConfirmCancelTicketReservationDialogComponent
@@ -25,28 +25,37 @@ type ShowDateFilter = "previous" | "upcoming" | "specific" | "all";
     NgbDatepicker,
     FormsModule,
     RouterLink,
-    ConfirmCancelTicketReservationDialogComponent
+    ConfirmCancelTicketReservationDialogComponent,
+    NgbPagination,
+    NgbPaginationPages
   ],
   templateUrl: './tickets-table.component.html',
   styleUrl: './tickets-table.component.scss'
 })
 export class TicketsTableComponent implements OnInit {
   constructor(
-    public authService: AuthService,
+    private authService: AuthService,
     private ticketService: TicketEndpointService,
     private pdfService: PdfService,
-    private messageService: MessagingService
+    private messageService: MessagingService,
+    private activatedRoute: ActivatedRoute
   ) {
   }
 
   protected tickets: TicketDetailsResponse[] = [];
   protected ticketsFiltered: TicketDetailsResponse[] = [];
+  protected ticketsPaged: TicketDetailsResponse[] = [];
 
   protected ticketFilter: TicketFilter = "all";
   protected eventFilter: string = "";
   protected showDateFilter: ShowDateFilter = "upcoming";
   protected showDateFilterSpecificFrom: string | null = null;
   protected showDateFilterSpecificTo: string | null = null;
+  protected page: number = 0;
+
+  private readonly defaultPage = 0;
+  private readonly defaultPageSize = 10;
+
 
   ngOnInit(): void {
     this.loadTickets();
@@ -83,6 +92,14 @@ export class TicketsTableComponent implements OnInit {
       .filter(t => this.applyTicketFilter(t))
       .filter(t => this.applyEventFilter(t))
       .filter(t => this.applyShowDateFilter(t));
+    this.updatePaging();
+  }
+
+  protected updatePaging(): void {
+    const origin = this.page - 1
+    const size = this.defaultPageSize;
+    this.ticketsPaged = this.ticketsFiltered
+      .slice(origin * size, (origin + 1) * size);
   }
 
   private applyTicketFilter(ticket: TicketDetailsResponse): boolean {
@@ -136,6 +153,15 @@ export class TicketsTableComponent implements OnInit {
           this.messageService.setMessage("Ihre Ticket-Reservierung konnte nicht storniert werden.", 'error');
         }
       })
+  }
+
+  selectPage(page: string) {
+    this.page = parseInt(page, 10) || 1;
+    this.updatePaging();
+  }
+
+  formatInput(input: HTMLInputElement) {
+    input.value = input.value.replace('/[^0-9]/g', '');
   }
 
   protected readonly formatPrice = formatPrice;
