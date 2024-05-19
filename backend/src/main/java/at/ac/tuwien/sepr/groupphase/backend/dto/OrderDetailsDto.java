@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class OrderDetailsDto implements AbstractDto {
@@ -10,6 +11,8 @@ public class OrderDetailsDto implements AbstractDto {
     private ApplicationUserDto customer;
 
     private List<InvoiceDto> invoices;
+
+    private LocalDateTime dateTime;
 
     @Override
     public Long getId() {
@@ -44,10 +47,19 @@ public class OrderDetailsDto implements AbstractDto {
         this.invoices = invoices;
     }
 
+    public LocalDateTime getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
+
     public class OrderDetailsDtoBuilder {
         private List<TicketDetailsDto> tickets;
         private ApplicationUserDto customer;
         private List<InvoiceDto> invoices;
+        private LocalDateTime dateTime;
 
         public OrderDetailsDtoBuilder withTickets(List<TicketDetailsDto> tickets) {
             this.tickets = tickets;
@@ -64,11 +76,17 @@ public class OrderDetailsDto implements AbstractDto {
             return this;
         }
 
+        public OrderDetailsDtoBuilder withDateTime(LocalDateTime dateTime) {
+            this.dateTime = dateTime;
+            return this;
+        }
+
         public OrderDetailsDto build() {
             var orderDetailsDto = new OrderDetailsDto();
             orderDetailsDto.setTickets(tickets);
             orderDetailsDto.setCustomer(customer);
             orderDetailsDto.setInvoices(invoices);
+            orderDetailsDto.setDateTime(dateTime);
             return orderDetailsDto;
         }
     }

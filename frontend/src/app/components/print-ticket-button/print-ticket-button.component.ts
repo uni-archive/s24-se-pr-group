@@ -22,7 +22,6 @@ export class PrintTicketButtonComponent {
     this.ticketService.findById(this.ticketId)
       .subscribe({
         next: ticket  => {
-          console.log(ticket);
           this.pdfService.createTicketPDF(ticket);
         },
         error: err => {

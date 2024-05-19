@@ -19,5 +19,6 @@ export interface OrderDetailsResponse {
     tickets?: Array<TicketDetailsResponse>;
     customer?: ApplicationUserResponse;
     invoices?: Array<InvoiceResponse>;
+    dateTime?: string;
 }
 

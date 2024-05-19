@@ -1,6 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.InvoiceDto;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 
 import java.util.List;
 
@@ -12,4 +14,13 @@ public interface InvoiceService {
      * @return List of {@link InvoiceDto}
      */
     List<InvoiceDto> findByOrderId(long id);
+
+
+    /**
+     * Creates a new cancellation invoice for an order.
+     *
+     * @param orderId the id of the order.
+     * @return the created invoice.
+     */
+    InvoiceDto createCancellationInvoiceForOrder(long orderId);
 }

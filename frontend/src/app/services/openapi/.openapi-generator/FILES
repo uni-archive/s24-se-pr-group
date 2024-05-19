@@ -30,6 +30,7 @@ model/invoice-response.ts
 model/message-inquiry-dto.ts
 model/models.ts
 model/order-details-response.ts
+model/order-summary-response.ts
 model/show-response.ts
 model/simple-message-dto.ts
 model/ticket-details-response-hall-spot.ts

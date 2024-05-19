@@ -1,5 +1,5 @@
 import {Component, EventEmitter, HostBinding, Input, OnInit, Output} from '@angular/core';
-import {TicketDetailsResponse} from "../../services/openapi";
+import {TicketDetailsResponse} from "../../../services/openapi";
 
 @Component({
   selector: 'app-confirm-cancel-ticket-reservation-dialog',

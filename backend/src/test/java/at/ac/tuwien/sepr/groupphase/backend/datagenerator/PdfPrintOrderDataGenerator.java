@@ -184,7 +184,8 @@ public class PdfPrintOrderDataGenerator {
         // creating order
         var order = new Order(
             tickets,
-            customer
+            customer,
+            null
         );
         orderRepository.save(order);
 

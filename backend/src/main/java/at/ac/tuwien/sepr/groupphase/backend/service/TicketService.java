@@ -2,9 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.service.exception.TicketNotCancellable;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -41,8 +39,17 @@ public interface TicketService {
      * Cancels a ticket if and only if it is reserved and valid.
      *
      * @param id the id of the ticket to cancel.
-     * @throws ValidationException when a ticket is not reserved or invalid.
+     * @throws ValidationException  when a ticket is not reserved or invalid.
      * @throws DtoNotFoundException when no ticket with the given id exists.
      */
     void cancelReservedTicket(long id) throws ValidationException, DtoNotFoundException;
+
+
+    /**
+     * Invalidates all tickets of an order.
+     * Does nothing if the order does not exist.
+     *
+     * @param orderId The id of the order.
+     */
+    void invalidateAllTicketsForOrder(long orderId);
 }
