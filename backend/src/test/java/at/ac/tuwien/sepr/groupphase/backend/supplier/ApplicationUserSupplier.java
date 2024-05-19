@@ -17,4 +17,16 @@ public class ApplicationUserSupplier {
         return applicationUserDto;
     }
 
+    public static ApplicationUserDto aCustomerUser() {
+        return new ApplicationUserDto()
+            .setEmail("user@email.com")
+            .setFirstName("John")
+            .setFamilyName("Doe")
+            .setPhoneNumber("+436642345678")
+            .setPassword("password")
+            .setAdmin(false)
+            .setAccountLocked(false)
+            .setLoginCount(0);
+    }
+
 }

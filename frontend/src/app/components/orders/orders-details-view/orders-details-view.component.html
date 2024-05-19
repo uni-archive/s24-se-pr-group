@@ -1,0 +1,20 @@
+<div class="jumbotron mt-5">
+  <h1 class="display-4">Meine Bestellungen (Bestell-Nr. {{order?.id}})</h1>
+  <app-tickets-table [ticketLoader]="loadTickets()">
+    <div class="d-flex flex-row justify-content-start gap-3" style="height: 40px;">
+      <button type="button" class="btn btn-primary" (click)="printPurchaseReceipt()">Bestellungs-Rechnung drucken</button>
+      <button *ngIf="order.invoices.length > 1" type="button" class="btn btn-primary" (click)="printCancellationReceipt()">Storno-Rechnung drucken</button>
+      <button
+        type="button"
+        class="btn btn-danger"
+        data-bs-toggle="modal"
+        data-bs-target="#cancelOrderModal"
+      >Bestellung stornieren</button>
+    </div>
+  </app-tickets-table>
+  <app-confirm-cancel-order-dialog
+    [order]="order"
+    (confirm)="cancelOrder()"
+    id="cancelOrderModal"
+  />
+</div>

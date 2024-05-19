@@ -2,9 +2,11 @@ package at.ac.tuwien.sepr.groupphase.backend.persistence.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 
@@ -24,6 +26,9 @@ public class Show extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "EVENT_ID")
     private Event event;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "show")
+    private List<HallSectorShow> hallSectorShows;
 
     public Show(LocalDateTime dateTime, List<Artist> artists, Event event) {
         this.dateTime = dateTime;

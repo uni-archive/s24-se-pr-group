@@ -76,4 +76,9 @@ public class TicketServiceImpl implements TicketService {
             throw new DtoNotFoundException(e);
         }
     }
+
+    @Override
+    public void invalidateAllTicketsForOrder(long orderId) {
+        ticketDao.invalidateAllTicketsForOrder(orderId);
+    }
 }

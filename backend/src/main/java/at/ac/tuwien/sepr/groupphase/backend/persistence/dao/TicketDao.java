@@ -34,4 +34,9 @@ public class TicketDao extends AbstractDao<Ticket, TicketDetailsDto> {
         TicketRepository r = (TicketRepository) repository;
         r.cancelReservedTicket(id);
     }
+
+    @Transactional
+    public void invalidateAllTicketsForOrder(long orderId) {
+        ((TicketRepository) repository).invalidateAllTicketsForOrder(orderId);
+    }
 }

@@ -9,6 +9,7 @@ export * from './hall-spot-response';
 export * from './invoice-response';
 export * from './message-inquiry-dto';
 export * from './order-details-response';
+export * from './order-summary-response';
 export * from './show-response';
 export * from './simple-message-dto';
 export * from './ticket-details-response';

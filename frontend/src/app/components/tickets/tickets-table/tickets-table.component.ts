@@ -1,7 +1,7 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {DatePipe, NgForOf, NgIf} from "@angular/common";
 import {AuthService} from "../../../services/auth.service";
-import {TicketDetailsResponse, TicketEndpointService} from "../../../services/openapi";
+import {OrderEndpointService, TicketDetailsResponse, TicketEndpointService} from "../../../services/openapi";
 import {NgbDatepicker, NgbPagination, NgbPaginationPages} from "@ng-bootstrap/ng-bootstrap";
 import {FormsModule} from "@angular/forms";
 import {formatPrice} from "../../../../formatters/currencyFormatter";
@@ -9,11 +9,14 @@ import {ActivatedRoute, RouterLink} from "@angular/router";
 import {PdfService} from "../../../services/pdf.service";
 import {
   ConfirmCancelTicketReservationDialogComponent
-} from "../../confirm-cancel-ticket-reservation-dialog/confirm-cancel-ticket-reservation-dialog.component";
+} from "../confirm-cancel-ticket-reservation-dialog/confirm-cancel-ticket-reservation-dialog.component";
 import {MessagingService} from "../../../services/messaging.service";
+import {Observable} from "rxjs";
+import {log} from "@angular-devkit/build-angular/src/builders/ssr-dev-server";
 
 type TicketFilter = "bought" | "reserved" | "all";
 type ShowDateFilter = "previous" | "upcoming" | "specific" | "all";
+type TicketLoader = Observable<TicketDetailsResponse[]>;
 
 @Component({
   selector: 'app-tickets-table',
@@ -33,12 +36,12 @@ type ShowDateFilter = "previous" | "upcoming" | "specific" | "all";
   styleUrl: './tickets-table.component.scss'
 })
 export class TicketsTableComponent implements OnInit {
+  @Input({ required: true }) ticketLoader: TicketLoader;
+
   constructor(
-    private authService: AuthService,
     private ticketService: TicketEndpointService,
     private pdfService: PdfService,
-    private messageService: MessagingService,
-    private activatedRoute: ActivatedRoute
+    private messagingService: MessagingService
   ) {
   }
 
@@ -53,16 +56,14 @@ export class TicketsTableComponent implements OnInit {
   protected showDateFilterSpecificTo: string | null = null;
   protected page: number = 0;
 
-  private readonly defaultPage = 0;
   private readonly defaultPageSize = 10;
 
 
   ngOnInit(): void {
     this.loadTickets();
   }
-
   private loadTickets(): void {
-    this.ticketService.findForUser()
+    this.ticketLoader
       .subscribe({
         next: ts => {
           this.tickets = this.sortTicketsByDateDesc(ts);
@@ -70,7 +71,8 @@ export class TicketsTableComponent implements OnInit {
           this.updateFilter();
         },
         error: err => {
-          this.messageService.setMessage("Ihre Tickets konnten nicht geladen werden. Bitte versuchen Sie es später erneut.", 'error');
+          console.log(err)
+          this.messagingService.setMessage("Ihre Tickets konnten nicht geladen werden. Bitte versuchen Sie es später erneut.", 'error');
         }
       });
   }
@@ -147,10 +149,10 @@ export class TicketsTableComponent implements OnInit {
       .subscribe({
         next: () => {
           this.loadTickets();
-          this.messageService.setMessage("Ihre Ticket-Reservierung wurde erfolgreich storniert.");
+          this.messagingService.setMessage("Ihre Ticket-Reservierung wurde erfolgreich storniert.");
         },
         error: err => {
-          this.messageService.setMessage("Ihre Ticket-Reservierung konnte nicht storniert werden.", 'error');
+          this.messagingService.setMessage("Ihre Ticket-Reservierung konnte nicht storniert werden.", 'error');
         }
       })
   }

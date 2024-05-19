@@ -41,9 +41,7 @@ export interface TicketEndpointServiceInterface {
     /**
      * 
      * 
-     * @param page 
-     * @param pageSize 
      */
-    findForUser(page?: number, pageSize?: number, extraHttpRequestParams?: any): Observable<Array<TicketDetailsResponse>>;
+    findForUser(extraHttpRequestParams?: any): Observable<Array<TicketDetailsResponse>>;
 
 }

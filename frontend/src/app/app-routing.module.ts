@@ -7,6 +7,8 @@ import { MessageComponent } from "./components/message/message.component";
 import { RegistrationComponent } from "./components/user/registration/registration.component";
 import { UserHomeComponent } from "./components/user/user-home/user-home.component";
 import { TicketsComponent } from "./components/tickets/tickets/tickets.component";
+import {OrdersViewComponent} from "./components/orders/orders-view/orders-view.component";
+import {OrdersDetailsViewComponent} from "./components/orders/orders-details-view/orders-details-view.component";
 
 
 const routes: Routes = [
@@ -20,7 +22,9 @@ const routes: Routes = [
   },
   {path: 'my', canActivate: mapToCanActivate([AuthGuard]), children:
       [
-        {path: 'tickets', component: TicketsComponent}
+        {path: 'tickets', component: TicketsComponent},
+        {path: 'orders', component: OrdersViewComponent},
+        {path: 'orders/:id', component: OrdersDetailsViewComponent}
       ]
   },
   { path: "user/home", component: UserHomeComponent },

@@ -1,6 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.exception;
 
-public class ValidationException extends Exception {
+public class ValidationException extends RuntimeException {
     public ValidationException(Throwable cause) {
         super(cause);
     }

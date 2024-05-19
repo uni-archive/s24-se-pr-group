@@ -19,4 +19,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     @Modifying
     @Query("DELETE Ticket t WHERE t.id = :id")
     void cancelReservedTicket(@Param("id") long id);
+
+    @Modifying
+    @Query("UPDATE Ticket t SET t.valid = false WHERE t.order.id = :orderId")
+    void invalidateAllTicketsForOrder(@Param("orderId") long orderId);
 }
