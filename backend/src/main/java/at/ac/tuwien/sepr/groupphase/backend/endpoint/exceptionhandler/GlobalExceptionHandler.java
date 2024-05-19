@@ -1,7 +1,13 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.exceptionhandler;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
+import java.lang.invoke.MethodHandles;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -13,12 +19,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-
-import java.lang.invoke.MethodHandles;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Register all your Java exceptions here to map them into meaningful HTTP exceptions If you have special cases which
@@ -34,7 +34,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      * Use the @ExceptionHandler annotation to write handler for custom exceptions.
      */
     @ExceptionHandler(value = {NotFoundException.class})
-    protected ResponseEntity<Object> handleNotFound(RuntimeException ex, WebRequest request) {
+    protected ResponseEntity<Object> handleNotFound(NotFoundException ex, WebRequest request) {
         LOGGER.warn(ex.getMessage());
         return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
@@ -47,9 +47,38 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      * @return a HTTP response
      */
     @ExceptionHandler(value = {ValidationException.class})
-    protected ResponseEntity<Object> handleValidationException(RuntimeException ex, WebRequest request) {
+    protected ResponseEntity<Object> handleValidationException(ValidationException ex, WebRequest request) {
         LOGGER.warn(ex.getMessage());
         return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY,
+            request);
+    }
+
+    /**
+     * Handle a ValidationException.
+     *
+     * @param ex      the exception
+     * @param request the request
+     * @return a HTTP response
+     */
+    @ExceptionHandler(value = {at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.ValidationException.class})
+    protected ResponseEntity<Object> handleEndpointValidationException(
+        at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.ValidationException ex, WebRequest request) {
+        LOGGER.warn(ex.getMessage());
+        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY,
+            request);
+    }
+
+    /**
+     * Handle a ForbiddenException.
+     *
+     * @param ex      the exception
+     * @param request the request
+     * @return a HTTP response
+     */
+    @ExceptionHandler(value = {ForbiddenException.class})
+    protected ResponseEntity<Object> handleForbiddenException(ForbiddenException ex, WebRequest request) {
+        LOGGER.warn(ex.getMessage());
+        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN,
             request);
     }
 
@@ -59,8 +88,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-                                                                  HttpHeaders headers,
-                                                                  HttpStatusCode status, WebRequest request) {
+        HttpHeaders headers,
+        HttpStatusCode status, WebRequest request) {
         Map<String, Object> body = new LinkedHashMap<>();
         //Get all errors
         List<String> errors = ex.getBindingResult()

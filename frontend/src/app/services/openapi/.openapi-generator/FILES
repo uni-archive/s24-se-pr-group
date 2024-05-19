@@ -1,9 +1,13 @@
 .gitignore
 README.md
 api.module.ts
+api/address-endpoint.service.ts
+api/address-endpoint.serviceInterface.ts
 api/api.ts
 api/custom-health-endpoint.service.ts
 api/custom-health-endpoint.serviceInterface.ts
+api/location-endpoint.service.ts
+api/location-endpoint.serviceInterface.ts
 api/login-endpoint.service.ts
 api/login-endpoint.serviceInterface.ts
 api/message-endpoint.service.ts
@@ -18,6 +22,9 @@ configuration.ts
 encoder.ts
 git_push.sh
 index.ts
+model/address-create-request.ts
+model/address-dto.ts
+model/address-response.ts
 model/application-user-dto.ts
 model/application-user-response.ts
 model/detailed-message-dto.ts
@@ -27,6 +34,8 @@ model/hall-sector-response.ts
 model/hall-sector-show-response.ts
 model/hall-spot-response.ts
 model/invoice-response.ts
+model/location-create-request.ts
+model/location-dto.ts
 model/message-inquiry-dto.ts
 model/models.ts
 model/order-details-response.ts

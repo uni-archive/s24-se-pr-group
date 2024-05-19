@@ -10,7 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class OrderValidator extends BaseValidator {
+public class OrderValidator extends AbstractValidator<OrderDetailsDto> {
+
     public void validateForFindById(OrderDetailsDto foundOrder, ApplicationUserDto user) throws ValidationException {
         List<String> errors = new ArrayList<>();
 

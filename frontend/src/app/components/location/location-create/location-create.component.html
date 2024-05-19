@@ -1,0 +1,56 @@
+<form [formGroup]="createForm" (ngSubmit)="onSubmit()" class="container mt-5">
+  <h2>Neuen Veranstaltungsort erstellen</h2>
+  <div class="row">
+    <div class="form-group col-12">
+      <label for="name">Name:</label>
+      <input
+        type="text"
+        id="name"
+        formControlName="name"
+        class="form-control"
+        placeholder="Name der Location"
+      />
+      <div *ngIf="createForm.get('name').invalid && createForm.get('name').touched" class="invalid-feedback">
+        Bitte geben Sie einen Namen ein.
+      </div>
+    </div>
+    <div class="form-group col-12">
+      <label for="street">Straße:</label>
+      <input
+        type="text"
+        id="street"
+        formControlName="street"
+        class="form-control"
+        placeholder="Straße"
+      />
+    </div>
+    <div class="form-group col-12 col-xl-6">
+      <label for="zip">PLZ:</label>
+      <input
+        type="number"
+        id="zip"
+        formControlName="zip"
+        class="form-control"
+        placeholder="PLZ"
+      />
+    </div>
+    <div class="form-group col-12 col-xl-6">
+      <label for="city">Stadt:</label>
+      <input
+        type="text"
+        id="city"
+        formControlName="city"
+        class="form-control"
+        placeholder="Stadt"
+      />
+    </div>
+    <div class="form-group col-12">
+      <country-dropdown formControlName="country"></country-dropdown>
+    </div>
+  </div>
+  <div class="row">
+    <div class="form-group">
+      <button type="submit" class="btn btn-primary" [disabled]="!createForm.valid">Erstellen</button>
+    </div>
+  </div>
+</form>

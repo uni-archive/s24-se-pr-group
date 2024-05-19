@@ -5,13 +5,14 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
-
+import jakarta.persistence.OneToOne;
 import java.util.List;
 import java.util.Objects;
 
@@ -54,15 +55,19 @@ public class ApplicationUser extends AbstractEntity {
     private List<Order> orders;
 
     @ManyToMany(cascade = CascadeType.REMOVE)
-    @JoinTable(name = "USER_NEWS", joinColumns = {@JoinColumn(name = "USER_ID")}, inverseJoinColumns = {@JoinColumn(name = "NEWS_ID")})
+    @JoinTable(name = "USER_NEWS", joinColumns = {@JoinColumn(name = "USER_ID")}, inverseJoinColumns = {
+        @JoinColumn(name = "NEWS_ID")})
     private List<News> news;
 
+    @OneToOne(fetch = FetchType.EAGER,  cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "ADDRESS_ID")
+    private Address address;
 
     public ApplicationUser() {
     }
 
     public ApplicationUser(String email, String password, String firstName, String familyName, String phoneNumber,
-                           String salt, int loginCount, boolean accountLocked, UserType type, boolean superAdmin) {
+        String salt, int loginCount, boolean accountLocked, UserType type, boolean superAdmin) {
         this.email = email;
         this.password = password;
         this.firstName = firstName;
@@ -73,6 +78,37 @@ public class ApplicationUser extends AbstractEntity {
         this.accountLocked = accountLocked;
         this.type = type;
         this.superAdmin = superAdmin;
+    }
+
+    @Override
+    public String toString() {
+        return "ApplicationUser{" + "accountLocked=" + accountLocked + ", loginCount=" + loginCount + ", salt='" + salt
+            + '\'' + ", phoneNumber='" + phoneNumber + '\'' + ", familyName='" + familyName + '\'' + ", firstName='"
+            + firstName + '\'' + ", password='" + password + '\'' + ", email='" + email + '\'' + "} "
+            + super.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ApplicationUser that = (ApplicationUser) o;
+        return getLoginCount() == that.getLoginCount() && isAccountLocked() == that.isAccountLocked() && Objects.equals(
+            getEmail(), that.getEmail()) && Objects.equals(getPassword(), that.getPassword()) && Objects.equals(
+            getFirstName(), that.getFirstName()) && Objects.equals(getFamilyName(), that.getFamilyName())
+            && Objects.equals(getPhoneNumber(), that.getPhoneNumber()) && Objects.equals(getSalt(), that.getSalt())
+            && Objects.equals(getOrders(), that.getOrders()) && Objects.equals(getNews(), that.getNews())
+            && Objects.equals(getAddress(), that.getAddress());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getEmail(), getPassword(), getFirstName(), getFamilyName(), getPhoneNumber(), getSalt(),
+            getLoginCount(), isAccountLocked(), getOrders(), getNews(), getAddress());
     }
 
     public String getEmail() {
@@ -174,8 +210,20 @@ public class ApplicationUser extends AbstractEntity {
         return this;
     }
 
+    public Address getAddress() {
+        return address;
+    }
+
     public boolean isAdmin() {
         return type.equals(UserType.ADMIN);
+    }
+
+    public boolean isSuperAdmin() {
+        return superAdmin;
+    }
+
+    public Address getAddress() {
+        return address;
     }
 
     public boolean isSuperAdmin() {
@@ -195,14 +243,9 @@ public class ApplicationUser extends AbstractEntity {
             && Objects.equals(familyName, that.familyName) && Objects.equals(phoneNumber, that.phoneNumber) && Objects.equals(salt, that.salt) && Objects.equals(orders, that.orders) && Objects.equals(news, that.news);
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(email, password, firstName, familyName, phoneNumber, salt, loginCount, accountLocked, orders, news);
+    public ApplicationUser setAddress(Address address) {
+        this.address = address;
+        return this;
     }
 
-    @Override
-    public String toString() {
-        return "ApplicationUserResponse{" + "email='" + email + '\'' + ", password='" + password + '\'' + ", firstName='" + firstName + '\'' + ", familyName='" + familyName + '\'' + ", phoneNumber='" + phoneNumber + '\'' + ", salt='" + salt
-            + '\'' + ", loginCount=" + loginCount + ", accountLocked=" + accountLocked + '}';
-    }
 }

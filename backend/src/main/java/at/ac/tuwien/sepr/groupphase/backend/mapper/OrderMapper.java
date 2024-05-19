@@ -8,6 +8,8 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
+import java.util.List;
+
 @Mapper(uses = UserMapper.class)
 public interface OrderMapper extends BaseEntityMapper<Order, OrderDetailsDto> {
 

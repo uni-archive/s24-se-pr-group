@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -50,7 +51,15 @@ public interface UserService extends UserDetailsService {
      * @return the created user
      * @throws ValidationException if the user is invalid
      */
-    public ApplicationUserDto createUser(ApplicationUserDto toCreate) throws ValidationException;
+    public ApplicationUserDto createUser(ApplicationUserDto toCreate) throws ValidationException, ForbiddenException;
+
+    /**
+     * Search for users in the persistent data store matching all provided fields.
+     *
+     * @param searchParameters the search parameters to use in filtering.
+     * @return the users where the given fields match.
+     */
+    Stream<ApplicationUserDto> search(ApplicationUserSearchDto searchParameters);
 
     /**
      * Search for users in the persistent data store matching all provided fields.

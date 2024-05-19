@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.TicketDetailsResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.TicketResponseMapper;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
 import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
@@ -39,7 +40,7 @@ public class TicketEndpoint {
         this.userService = userService;
     }
 
-    @Secured("ROLE_USER")
+    @Secured(Code.USER)
     @GetMapping(path = "/ticket/{id}", produces = "application/json")
     public ResponseEntity<TicketDetailsResponse> findById(@PathVariable("id") long id) {
         try {
@@ -50,7 +51,7 @@ public class TicketEndpoint {
         }
     }
 
-    @Secured("ROLE_USER")
+    @Secured(Code.USER)
     @GetMapping(path = "/mytickets", produces = "application/json")
     public ResponseEntity<List<TicketDetailsResponse>> findForUser() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -60,7 +61,7 @@ public class TicketEndpoint {
         return ResponseEntity.ok(ticketMapper.toResponseList(tickets));
     }
 
-    @Secured("ROLE_USER")
+    @Secured(Code.USER)
     @DeleteMapping(path = "/ticket/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void cancelReservedTicket(

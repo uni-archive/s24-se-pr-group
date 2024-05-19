@@ -6,6 +6,8 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.UserDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
+import at.ac.tuwien.sepr.groupphase.backend.service.AddressService;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.UserValidator;
 import at.ac.tuwien.sepr.groupphase.backend.supplier.ApplicationUserSupplier;
@@ -19,6 +21,14 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,6 +54,9 @@ class UserServiceImplTest {
     @Mock
     private UserValidator userValidator;
 
+    @Mock
+    private AddressService addressService;
+
     @InjectMocks
     private UserServiceImpl userService;
 
@@ -51,15 +64,17 @@ class UserServiceImplTest {
     private ArgumentCaptor<ApplicationUserDto> userDto;
 
     @Test
-    void createUserShouldCallValidateAndSetSalt() throws ValidationException {
+    void createUserShouldCallValidateAndSetSalt() throws ValidationException, ForbiddenException {
         ApplicationUserDto user = ApplicationUserSupplier.anAdminUser();
         doNothing().when(userValidator).validateForCreate(user);
         when(passwordEncoder.encode(Mockito.anyString())).thenReturn("encodedPassword");
+        when(addressService.create(user.getAddress())).thenReturn(user.getAddress());
 
         userService.createUser(user);
 
         verify(userValidator).validateForCreate(user);
         verify(userDao).create(userDto.capture());
+        verify(addressService).create(user.getAddress());
         Assertions.assertNotNull(userDto.getValue().getSalt());
         Assertions.assertNotNull(userDto.getValue().getPassword());
     }

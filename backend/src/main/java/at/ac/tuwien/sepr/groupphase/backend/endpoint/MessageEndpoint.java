@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DetailedMessageDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.MessageInquiryDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.SimpleMessageDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.MessageMapper;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
 import at.ac.tuwien.sepr.groupphase.backend.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -38,7 +39,7 @@ public class MessageEndpoint {
         this.messageMapper = messageMapper;
     }
 
-    @Secured("ROLE_USER")
+    @Secured(Code.USER)
     @GetMapping
     @Operation(summary = "Get list of messages without details", security = @SecurityRequirement(name = "apiKey"))
     public List<SimpleMessageDto> findAll() {
@@ -46,7 +47,7 @@ public class MessageEndpoint {
         return messageMapper.messageToSimpleMessageDto(messageService.findAll());
     }
 
-    @Secured("ROLE_USER")
+    @Secured(Code.USER)
     @GetMapping(value = "/{id}")
     @Operation(summary = "Get detailed information about a specific message", security = @SecurityRequirement(name = "apiKey"))
     public DetailedMessageDto find(@PathVariable(name = "id") Long id) {
@@ -54,7 +55,7 @@ public class MessageEndpoint {
         return messageMapper.messageToDetailedMessageDto(messageService.findOne(id));
     }
 
-    @Secured("ROLE_ADMIN")
+    @Secured(Code.ADMIN)
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     @Operation(summary = "Publish a new message", security = @SecurityRequirement(name = "apiKey"))

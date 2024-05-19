@@ -23,6 +23,9 @@
       <li class="nav-item">
         <a class="nav-link" *ngIf="authService.isLoggedIn()" routerLink="/my/orders" routerLinkActive="active">Meine Bestellungen</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" *ngIf="authService.isLoggedIn() && authService.isAdmin()" routerLink="/locations" routerLinkActive="active">Veranstaltungsorte</a>
+      </li>
     </ul>
     <!-- Right-aligned nav items -->
     <ul class="navbar-nav ms-auto">

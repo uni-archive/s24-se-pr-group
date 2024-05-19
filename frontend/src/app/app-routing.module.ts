@@ -9,29 +9,47 @@ import { UserHomeComponent } from "./components/user/user-home/user-home.compone
 import { TicketsComponent } from "./components/tickets/tickets/tickets.component";
 import {OrdersViewComponent} from "./components/orders/orders-view/orders-view.component";
 import {OrdersDetailsViewComponent} from "./components/orders/orders-details-view/orders-details-view.component";
+import {LocationOverviewComponent} from "./components/location/location-overview/location-overview.component";
+import {LocationCreateComponent} from "./components/location/location-create/location-create.component";
+import {AdminGuard} from "./guards/admin.guard";
+import {LocationEditComponent} from "./components/location/location-edit/location-edit.component";
+import {OrdersViewComponent} from "./components/orders/orders-view/orders-view.component";
+import {OrdersDetailsViewComponent} from "./components/orders/orders-details-view/orders-details-view.component";
+
 
 
 const routes: Routes = [
-  { path: "", component: HomeComponent },
-  { path: "register", component: RegistrationComponent },
-  { path: "login", component: LoginComponent },
+  {path: "", component: HomeComponent},
+  {path: "register", component: RegistrationComponent},
+  {path: "login", component: LoginComponent},
   {
     path: "message",
     canActivate: mapToCanActivate([AuthGuard]),
     component: MessageComponent,
   },
-  {path: 'my', canActivate: mapToCanActivate([AuthGuard]), children:
+  {
+    path: 'my', canActivate: mapToCanActivate([AuthGuard]), children:
       [
         {path: 'tickets', component: TicketsComponent},
         {path: 'orders', component: OrdersViewComponent},
         {path: 'orders/:id', component: OrdersDetailsViewComponent}
       ]
   },
-  { path: "user/home", component: UserHomeComponent },
+  {path: "user/home", component: UserHomeComponent},
+  {
+    path: "locations", canActivate: mapToCanActivate([AdminGuard]),
+    children:
+      [
+        {path: '', component: LocationOverviewComponent},
+        {path: 'create', component: LocationCreateComponent},
+        {path: 'edit/:id', component: LocationEditComponent}
+      ]
+  },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, { useHash: true })],
+  imports: [RouterModule.forRoot(routes, {useHash: true})],
   exports: [RouterModule],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule {
+}

@@ -1,3 +1,6 @@
+export * from './address-create-request';
+export * from './address-dto';
+export * from './address-response';
 export * from './application-user-dto';
 export * from './application-user-response';
 export * from './detailed-message-dto';
@@ -7,6 +10,8 @@ export * from './hall-sector-response';
 export * from './hall-sector-show-response';
 export * from './hall-spot-response';
 export * from './invoice-response';
+export * from './location-create-request';
+export * from './location-dto';
 export * from './message-inquiry-dto';
 export * from './order-details-response';
 export * from './order-summary-response';

@@ -6,14 +6,13 @@ import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationExceptio
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import org.springframework.stereotype.Component;
 
 @Component
-public class UserValidator extends BaseValidator {
+public class UserValidator extends AbstractValidator {
 
     protected static final String EMAIL_REGEX = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
     private final UserDao userDao;
@@ -67,6 +66,9 @@ public class UserValidator extends BaseValidator {
                 errors.add("Phone number must be valid");
             }
         }
+        if (userDto.getAddress() == null) {
+            errors.add("Address must not be empty");
+        }
         return errors;
     }
 
@@ -81,7 +83,8 @@ public class UserValidator extends BaseValidator {
         endValidation(errors);
     }
 
-    public void validateForUpdateStatus(ApplicationUserDto objectToUpdate, String adminEmail) throws ValidationException {
+    public void validateForUpdateStatus(ApplicationUserDto objectToUpdate, String adminEmail)
+        throws ValidationException {
         List<String> errors = new ArrayList<>();
         if (objectToUpdate == null) {
             errors.add("User must not be null");

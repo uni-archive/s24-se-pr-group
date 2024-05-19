@@ -5,8 +5,12 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserResponse
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserCreateRequest;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.AddressResponseMapper;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
 import at.ac.tuwien.sepr.groupphase.backend.mapper.UserMapper;
+import at.ac.tuwien.sepr.groupphase.backend.service.AddressService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
@@ -36,39 +40,47 @@ public class UserEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final UserService userService;
     private final UserMapper userMapper;
+    private final AddressResponseMapper addressMapper;
+    private final AddressService addressService;
 
-    public UserEndpoint(UserService userService, UserMapper userMapper) {
+    public UserEndpoint(UserService userService, UserMapper userMapper, AddressResponseMapper addressMapper,
+        AddressService addressService) {
         this.userService = userService;
         this.userMapper = userMapper;
+        this.addressMapper = addressMapper;
+        this.addressService = addressService;
     }
 
     @PermitAll
-    @PostMapping(path = "/registration")
+    @PostMapping(path = "/registration", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> register(@RequestBody UserCreateRequest userCreateRequest) throws ValidationException {
+    public ResponseEntity<?> register(@RequestBody UserCreateRequest userCreateRequest)
+        throws ValidationException, ForbiddenException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getAuthorities().stream()
-            .anyMatch(r -> r.getAuthority().equals("ROLE_USER")) && !authentication.getAuthorities().stream()
-            .anyMatch(r -> r.getAuthority().equals("ROLE_ADMIN"))) {
+            .anyMatch(r -> r.getAuthority().equals(Code.USER)) && !authentication.getAuthorities().stream()
+            .anyMatch(r -> r.getAuthority().equals(Code.ADMIN))) {
             return ResponseEntity.status(403).body("User is already logged in");
         }
         if (userCreateRequest.isAdmin()) {
-            if (!authentication.getAuthorities().stream().anyMatch(r -> r.getAuthority().equals("ROLE_ADMIN"))) {
+            if (!authentication.getAuthorities().stream().anyMatch(r -> r.getAuthority().equals(Code.ADMIN))) {
                 return ResponseEntity.status(403).body("User is not an admin");
             }
         }
+        ApplicationUserDto dto = userMapper.toDto(userCreateRequest);
+
         return ResponseEntity.status(201)
-            .body(userMapper.toResponse(userService.createUser(userMapper.toDto(userCreateRequest))));
+            .body(userMapper.toResponse(userService.createUser(dto)));
     }
 
-    @Secured("ROLE_USER")
+    @Secured(Code.USER)
     @GetMapping(path = "/current", produces = MediaType.APPLICATION_JSON_VALUE)
     public ApplicationUserResponse getUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return userMapper.toResponse(userService.findApplicationUserByEmail(authentication.getName()));
     }
 
-    @Secured("ROLE_ADMIN")
+    @Secured(Code.ADMIN)
     @GetMapping(path = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ApplicationUserDto> searchUsers(
         @RequestParam(name = "firstName", required = false) String firstName,
@@ -81,7 +93,7 @@ public class UserEndpoint {
         return userService.search(searchParams).toList();
     }
 
-    @Secured("ROLE_ADMIN")
+    @Secured(Code.ADMIN)
     @PutMapping(path = "/update/status", produces = MediaType.APPLICATION_JSON_VALUE)
     public ApplicationUserResponse updateUserStatusByEmail(@RequestBody ApplicationUserDto user) throws ValidationException,
         NotFoundException {
