@@ -27,7 +27,7 @@ public class Event extends AbstractEntity {
 
     @Override
     public String toString() {
-        return "Event{" + "title='" + title + '\'' + ", description='" + description + '\'' + ", eventType=" + eventType + ", duration=" + duration + ", shows=" + shows + '}';
+        return "Event{" + "title='" + title + '\'' + ", description='" + description + '\'' + ", eventType=" + eventType + ", duration=" + duration + '}';
     }
 
     public String getTitle() {

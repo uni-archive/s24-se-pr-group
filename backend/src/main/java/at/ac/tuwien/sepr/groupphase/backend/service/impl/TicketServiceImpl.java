@@ -6,6 +6,7 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFound
 import at.ac.tuwien.sepr.groupphase.backend.service.HallSectorShowService;
 import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.TicketNotCancellable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -55,6 +56,25 @@ public class TicketServiceImpl implements TicketService {
         } catch (EntityNotFoundException ex) {
             // invalid state
             throw new IllegalStateException("A ticket must be assigned to a hall-sector-show.");
+        }
+    }
+
+    @Override
+    public void cancelReservedTicket(long id) throws TicketNotCancellable, DtoNotFoundException {
+        try {
+            var ticket = ticketDao.findById(id);
+            if (!ticket.isValid()) {
+                throw new TicketNotCancellable("Cannot cancel invalid ticket.");
+            }
+
+            if (!ticket.isReserved()) {
+                throw new TicketNotCancellable("Cannot cancel non-reserved ticket.");
+            }
+
+            ticketDao.cancelReservedTicket(id);
+
+        } catch (EntityNotFoundException e) {
+            throw new DtoNotFoundException(e);
         }
     }
 }

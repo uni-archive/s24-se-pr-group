@@ -43,7 +43,7 @@ public class HallSector extends AbstractEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(hallPlan, name, frontendCoordinates, seats);
+        return Objects.hash(getId(), hallPlan, name, frontendCoordinates, seats);
     }
 
     public HallPlan getHallPlan() {

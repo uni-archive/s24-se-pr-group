@@ -1,11 +1,15 @@
 import {Component, OnInit} from '@angular/core';
 import {TicketsTableComponent} from "../tickets-table/tickets-table.component";
+import {
+  PrintPurchaseInvoiceButtonComponent
+} from "../../print-purchase-invoice-button/print-purchase-invoice-button.component";
 
 @Component({
   selector: 'app-tickets',
   standalone: true,
   imports: [
-    TicketsTableComponent
+    TicketsTableComponent,
+    PrintPurchaseInvoiceButtonComponent
   ],
   templateUrl: './tickets.component.html',
   styleUrl: './tickets.component.scss'

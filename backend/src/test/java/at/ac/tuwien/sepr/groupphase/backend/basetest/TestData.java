@@ -1,5 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.basetest;
 
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.EventType;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,5 +32,4 @@ public interface TestData {
             add("ROLE_USER");
         }
     };
-
 }

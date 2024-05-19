@@ -6,6 +6,7 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Ticket;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.TicketRepository;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -25,5 +26,11 @@ public class TicketDao extends AbstractDao<Ticket, TicketDetailsDto> {
     public List<TicketDetailsDto> findByUserId(long userId) {
         var tickets = ((TicketRepository) repository).findTicketsByUserId(userId);
         return mapper.toDto(tickets);
+    }
+
+    @Transactional
+    public void cancelReservedTicket(long id) {
+        TicketRepository r = (TicketRepository) repository;
+        r.cancelReservedTicket(id);
     }
 }
