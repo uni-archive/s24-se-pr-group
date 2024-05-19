@@ -7,6 +7,7 @@ public record ApplicationUserResponse(
     String familyName,
     String phoneNumber,
     boolean accountLocked,
-    boolean isAdmin
+    boolean isAdmin,
+    boolean isSuperAdmin
 ) {
 }

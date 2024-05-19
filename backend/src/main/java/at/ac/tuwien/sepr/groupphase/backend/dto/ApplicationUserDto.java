@@ -11,8 +11,27 @@ public class ApplicationUserDto implements AbstractDto {
     private String salt;
     private int loginCount;
     private boolean accountLocked;
-    private boolean  isAdmin;
+    private boolean isAdmin;
+    private boolean isSuperAdmin;
 
+
+    public ApplicationUserDto(Long id, String email, String password, String firstName, String familyName,
+                              String phoneNumber, String salt, int loginCount, boolean accountLocked, boolean isAdmin, boolean isSuperAdmin) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.firstName = firstName;
+        this.familyName = familyName;
+        this.phoneNumber = phoneNumber;
+        this.salt = salt;
+        this.loginCount = loginCount;
+        this.accountLocked = accountLocked;
+        this.isAdmin = isAdmin;
+        this.isSuperAdmin = isSuperAdmin;
+    }
+
+    public ApplicationUserDto() {
+    }
 
     @Override
     public Long getId() {
@@ -105,20 +124,12 @@ public class ApplicationUserDto implements AbstractDto {
         return this;
     }
 
-    public ApplicationUserDto(Long id, String email, String password, String firstName, String familyName,
-        String phoneNumber, String salt, int loginCount, boolean accountLocked, boolean isAdmin) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.firstName = firstName;
-        this.familyName = familyName;
-        this.phoneNumber = phoneNumber;
-        this.salt = salt;
-        this.loginCount = loginCount;
-        this.accountLocked = accountLocked;
-        this.isAdmin = isAdmin;
+    public boolean isSuperAdmin() {
+        return isSuperAdmin;
     }
 
-    public ApplicationUserDto() {
+    public ApplicationUserDto setSuperAdmin(boolean superAdmin) {
+        isSuperAdmin = superAdmin;
+        return this;
     }
 }

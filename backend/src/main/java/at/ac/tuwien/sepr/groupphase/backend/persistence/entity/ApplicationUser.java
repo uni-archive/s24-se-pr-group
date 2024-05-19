@@ -10,7 +10,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.UniqueConstraint;
 
 import java.util.List;
 import java.util.Objects;
@@ -147,6 +146,10 @@ public class ApplicationUser extends AbstractEntity {
     }
 
     public boolean isAdmin() {
+        return false;
+    }
+
+    public boolean isSuperAdmin() {
         return false;
     }
 

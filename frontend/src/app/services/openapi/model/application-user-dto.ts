@@ -22,5 +22,6 @@ export interface ApplicationUserDto {
     loginCount?: number;
     accountLocked?: boolean;
     admin?: boolean;
+    superAdmin?: boolean;
 }
 

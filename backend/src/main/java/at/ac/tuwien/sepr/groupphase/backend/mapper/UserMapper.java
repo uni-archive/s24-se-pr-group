@@ -11,5 +11,7 @@ import org.mapstruct.Mapper;
 public interface UserMapper extends BaseEntityMapper<ApplicationUser, ApplicationUserDto>,
     BaseResponseMapper<ApplicationUserDto, ApplicationUserResponse> {
 
+    ApplicationUserDto toDto(ApplicationUser user);
+
     ApplicationUserDto toDto(UserCreateRequest createRequest);
 }

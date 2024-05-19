@@ -19,5 +19,6 @@ export interface ApplicationUserResponse {
     phoneNumber?: string;
     accountLocked?: boolean;
     isAdmin?: boolean;
+    isSuperAdmin?: boolean;
 }
 
