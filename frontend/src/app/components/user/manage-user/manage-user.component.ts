@@ -3,7 +3,6 @@ import { debounceTime, Subject } from "rxjs";
 import { MessagingService } from "src/app/services/messaging.service";
 import {
   ApplicationUserDto,
-  ApplicationUserResponse,
   UserEndpointService,
 } from "src/app/services/openapi";
 
@@ -63,7 +62,6 @@ export class ManageUserComponent {
     if (this.searchParams.isLocked == null) {
       delete this.searchParams.isLocked;
     }
-    console.log("Searching users with params:", this.searchParams);
     this.userEndpointService
       .searchUsers(
         this.searchParams.firstName,
@@ -92,6 +90,15 @@ export class ManageUserComponent {
         }
 
         if (user.id != currentUser.id) {
+          if (user.superAdmin) {
+            console.error("Cannot lock super admin user.");
+            this.messagingService.setMessage(
+              "Cannot update super admin user.",
+              "danger"
+            );
+            return;
+          }
+
           user.accountLocked = status;
           this.userEndpointService.updateUserStatusByEmail(user).subscribe({
             next: (response) => {
@@ -103,7 +110,7 @@ export class ManageUserComponent {
           });
         } else {
           console.error("Cannot update own user.");
-          this.messagingService.setMessage("Cannot update own user.", "danger");
+          this.messagingService.setMessage("Cannot lock own user.", "danger");
         }
       },
       error: (error) => console.error("Error loading user:", error),
