@@ -8,7 +8,7 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("ADMIN")
 public class Admin extends ApplicationUser {
 
-    @Column(name = "SUPER_ADMIN")
+    @Column(name = "SUPER_ADMIN", updatable = false)
     private boolean superAdmin;
 
     public Admin(String email, String password, String firstName, String familyName,
