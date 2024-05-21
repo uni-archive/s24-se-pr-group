@@ -297,7 +297,7 @@ export class UserEndpointService implements UserEndpointServiceInterface {
             }
         }
 
-        let localVarPath = `/api/v1/users/api/v1/users/search`;
+        let localVarPath = `/api/v1/users/search`;
         return this.httpClient.request<Array<ApplicationUserDto>>('get', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
