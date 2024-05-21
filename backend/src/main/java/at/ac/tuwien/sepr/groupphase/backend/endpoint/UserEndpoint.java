@@ -69,12 +69,14 @@ public class UserEndpoint {
     }
 
     @Secured("ROLE_ADMIN")
-    @GetMapping(path = "/api/v1/users/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ApplicationUserDto> searchUsers(
         @RequestParam(name = "firstName", required = false) String firstName,
         @RequestParam(name = "familyName", required = false) String familyName,
         @RequestParam(name = "email", required = false) String email,
-        @RequestParam(name = "isLocked", required = false) boolean isLocked) {
+        @RequestParam(name = "isLocked", required = false) Boolean isLocked) {
+        LOGGER.info("Search users by first name: {}, family name: {}, email: {}, is locked: {}", firstName, familyName,
+            email, isLocked);
         ApplicationUserSearchDto searchParams = new ApplicationUserSearchDto(firstName, familyName, email, isLocked);
         return userService.search(searchParams).toList();
     }
