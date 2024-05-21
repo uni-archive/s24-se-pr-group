@@ -52,6 +52,12 @@ public interface UserService extends UserDetailsService {
      */
     public ApplicationUserDto createUser(ApplicationUserDto toCreate) throws ValidationException;
 
+    /**
+     * Search for users in the persistent data store matching all provided fields.
+     *
+     * @param searchParameters the search parameters to use in filtering.
+     * @return the users where the given fields match.
+     */
     Stream<ApplicationUserDto> search(ApplicationUserSearchDto searchParameters);
 
     /**
