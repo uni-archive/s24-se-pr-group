@@ -86,7 +86,7 @@
 
         <div class="card-body">
           <h5 class="card-title">{{news.title}}</h5>
-          <h6 class="card-subtitle mb-2 text-muted">{{news.publishedAt | date}}</h6>
+          <h6 class="card-subtitle mb-2 text-muted">{{news.publishedAt | date: 'dd.MM.yyyy HH:mm'}}</h6>
           <p class="card-text">{{news.summary}}</p>
           <div class="row">
             <div class="col">
@@ -119,7 +119,7 @@
               <!-- Modal Body für Details -->
               <div class="modal-body">
 
-                <p class="lead"><span class="font-italic">{{news.publishedAt | date}}</span> {{news.summary}}</p>
+                <p class="lead"><span class="font-italic">{{news.publishedAt | date: 'dd.MM.yyyy HH:mm'}}</span> {{news.summary}}</p>
                 <p class="mt-2"> {{news.text}} </p>
 
               </div>

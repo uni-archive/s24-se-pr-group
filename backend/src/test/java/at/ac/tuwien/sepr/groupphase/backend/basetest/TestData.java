@@ -14,10 +14,13 @@ public interface TestData {
     String TEST_NEWS_TEXT = "TestMessageText";
     LocalDateTime TEST_NEWS_PUBLISHED_AT =
         LocalDateTime.of(2019, 11, 13, 12, 15, 0, 0);
-
+    byte[] TEST_NEWS_IMAGE = "dummy image data".getBytes();
     String BASE_URI = "/api/v1";
     String MESSAGE_BASE_URI = BASE_URI + "/messages";
+
+    String NEWS_BASE_URI = BASE_URI + "/news";
     String USER_BASE_URI = BASE_URI + "/users";
+
 
     String ADMIN_USER = "admin@email.com";
     List<String> ADMIN_ROLES = new ArrayList<>() {

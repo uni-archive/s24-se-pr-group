@@ -42,6 +42,9 @@ public interface NewsMapper {
 
     default Blob byteArrayToBlob(byte[] bytes) {
         try {
+            if (bytes == null) {
+                return null;
+            }
             return new javax.sql.rowset.serial.SerialBlob(bytes);
         } catch (java.sql.SQLException e) {
             throw new RuntimeException(e);

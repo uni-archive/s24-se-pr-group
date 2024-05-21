@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Size;
 
 import java.sql.Blob;
 import java.util.Objects;
-import org.springframework.web.multipart.MultipartFile;
+
 public class NewsInquiryDto {
 
     @NotNull(message = "Title must not be null")
@@ -63,10 +63,7 @@ public class NewsInquiryDto {
         if (!(o instanceof NewsInquiryDto that)) {
             return false;
         }
-        return Objects.equals(title, that.title)
-            && Objects.equals(summary, that.summary)
-            && Objects.equals(text, that.text)
-            && Objects.equals(image, that.image);
+        return Objects.equals(title, that.title) && Objects.equals(summary, that.summary) && Objects.equals(text, that.text) && Objects.equals(image, that.image);
     }
 
     @Override
@@ -76,10 +73,6 @@ public class NewsInquiryDto {
 
     @Override
     public String toString() {
-        return "NewsInquiryDto{"
-            + "title='" + title + '\''
-            + ", summary='" + summary + '\''
-            + ", text='" + text + '\''
-                       + '}';
+        return "NewsInquiryDto{" + "title='" + title + '\'' + ", summary='" + summary + '\'' + ", text='" + text + '\'' + '}';
     }
 }

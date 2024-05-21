@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.sql.Blob;
 import java.time.LocalDateTime;
 import java.util.Objects;
+
 public class DetailedNewsDto extends SimpleNewsDto {
 
     private String text;
@@ -38,9 +39,7 @@ public class DetailedNewsDto extends SimpleNewsDto {
 
     @Override
     public String toString() {
-        return "DetailedMessageDto{"
-            + "text='" + text + '\''
-            + '}';
+        return "DetailedMessageDto{" + "text='" + text + '\'' + '}';
     }
 
 
@@ -54,11 +53,10 @@ public class DetailedNewsDto extends SimpleNewsDto {
         private byte[] image;
 
 
-
         private DetailedNewsDtoBuilder() {
         }
 
-        public static at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DetailedNewsDto.DetailedNewsDtoBuilder aDetailedNewsDDto() {
+        public static at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DetailedNewsDto.DetailedNewsDtoBuilder aDetailedNewsDto() {
             return new at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DetailedNewsDto.DetailedNewsDtoBuilder();
         }
 
@@ -94,8 +92,7 @@ public class DetailedNewsDto extends SimpleNewsDto {
 
 
         public at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DetailedNewsDto build() {
-            at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DetailedNewsDto
-                detailedNewsDto = new at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DetailedNewsDto();
+            at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DetailedNewsDto detailedNewsDto = new at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DetailedNewsDto();
             detailedNewsDto.setId(id);
             detailedNewsDto.setPublishedAt(publishedAt);
             detailedNewsDto.setText(text);

@@ -1,7 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DetailedNewsDto;
-
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsInquiryDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.SimpleNewsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.NewsMapper;
@@ -12,8 +11,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
@@ -73,37 +70,33 @@ public class NewsEndpoint {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Publish a new news", security = @SecurityRequirement(name = "apiKey"))
-    public DetailedNewsDto create(@Valid @RequestParam("image") MultipartFile file,
-                                  @Valid @RequestParam("title") String title,
-                                  @Valid @RequestParam("summary") String summary,
-                                  @Valid @RequestParam("text") String text)  {
+    public DetailedNewsDto create(@Valid @RequestParam("image") MultipartFile file, @Valid @RequestParam("title") String title, @Valid @RequestParam("summary") String summary, @Valid @RequestParam("text") String text) {
 
         NewsInquiryDto newsInquiryDto = new NewsInquiryDto();
         newsInquiryDto.setTitle(title);
         newsInquiryDto.setSummary(summary);
         newsInquiryDto.setText(text);
 
-      Blob imageBlob;
-      try {
-        imageBlob = new SerialBlob(file.getBytes());
-      } catch (SQLException | IOException e) {
-                  throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
-      }
+        Blob imageBlob;
+        try {
+            imageBlob = new SerialBlob(file.getBytes());
+        } catch (SQLException | IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+        }
 
-      newsInquiryDto.setImage(imageBlob);
+        newsInquiryDto.setImage(imageBlob);
 
 
         LOGGER.info("POST /api/v1/news body: {}", newsInquiryDto);
 
-      try {
-        return newsMapper.newsToDetailedNewsDto(
-            newsService.publishNews(newsMapper.newsInquiryDtoToNews(newsInquiryDto)));
-      } catch (ValidationException e) {
+        try {
+            return newsMapper.newsToDetailedNewsDto(newsService.publishNews(newsMapper.newsInquiryDtoToNews(newsInquiryDto)));
+        } catch (ValidationException e) {
 
-          throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, e.getMessage(), e);
 
 
-      }
+        }
     }
 }
 

@@ -26,7 +26,7 @@ public class NewsServiceImpl implements NewsService {
 
     public NewsServiceImpl(NewsRepository newsRepository, NewsValidator newsValidator) {
         this.newsRepository = newsRepository;
-      this.newsValidator = newsValidator;
+        this.newsValidator = newsValidator;
     }
 
     @Override
@@ -50,13 +50,19 @@ public class NewsServiceImpl implements NewsService {
     public News publishNews(News news) throws ValidationException {
         LOGGER.debug("Publish new news {}", news);
         news.setPublishedAt(LocalDateTime.now());
-        news.setTitle(news.getTitle().trim());
-        news.setSummary(news.getSummary().trim());
-        news.setText(news.getText().trim());
+
+        if (news.getTitle() != null) {
+            news.setTitle(news.getTitle().trim());
+        }
+        if (news.getSummary() != null) {
+            news.setSummary(news.getSummary().trim());
+        }
+        if (news.getText() != null) {
+            news.setText(news.getText().trim());
+        }
 
         newsValidator.validateForPublish(news);
         return newsRepository.save(news);
     }
-
 
 }

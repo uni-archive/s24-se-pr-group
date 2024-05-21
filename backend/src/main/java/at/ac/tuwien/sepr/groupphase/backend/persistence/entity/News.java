@@ -100,14 +100,8 @@ public class News extends AbstractEntity {
         if (!(o instanceof News news)) {
             return false;
         }
-        return Objects.equals(getId(), news.getId())
-            && Objects.equals(publishedAt, news.publishedAt)
-            && Objects.equals(title, news.title)
-            && Objects.equals(summary, news.summary)
-            && Objects.equals(text, news.text)
-            && Objects.equals(image, news.image)
-            && Objects.equals(users, news.users)
-            && Objects.equals(event, news.event);
+        return Objects.equals(getId(), news.getId()) && Objects.equals(publishedAt, news.publishedAt) && Objects.equals(title, news.title)
+            && Objects.equals(summary, news.summary) && Objects.equals(text, news.text) && Objects.equals(image, news.image) && Objects.equals(users, news.users) && Objects.equals(event, news.event);
     }
 
     @Override
@@ -117,14 +111,7 @@ public class News extends AbstractEntity {
 
     @Override
     public String toString() {
-        return "News{" +
-            "publishedAt=" + publishedAt +
-            ", title='" + title + '\'' +
-            ", summary='" + summary + '\'' +
-            ", text='" + text + '\'' +
-            ", users=" + users +
-            ", event=" + event +
-            '}';
+        return "News{" + "publishedAt=" + publishedAt + ", title='" + title + '\'' + ", summary='" + summary + '\'' + ", text='" + text + '\'' + ", users=" + users + ", event=" + event + '}';
     }
 
 
