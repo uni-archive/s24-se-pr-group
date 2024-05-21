@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.News;
 import java.util.List;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 
 public interface NewsService {
 
@@ -27,5 +28,5 @@ public interface NewsService {
      * @param news to publish
      * @return published news entry
      */
-    News publishNews(News news);
+    News publishNews(News news) throws ValidationException;;
 }

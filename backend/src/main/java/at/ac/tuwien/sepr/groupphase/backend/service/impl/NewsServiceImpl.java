@@ -4,15 +4,15 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.News;
 import at.ac.tuwien.sepr.groupphase.backend.repository.NewsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.NewsService;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
+import at.ac.tuwien.sepr.groupphase.backend.service.validator.NewsValidator;
+import at.ac.tuwien.sepr.groupphase.backend.service.validator.UserValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.sql.rowset.serial.SerialBlob;
-import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.sql.SQLException;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -23,8 +23,11 @@ public class NewsServiceImpl implements NewsService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final NewsRepository newsRepository;
 
-    public NewsServiceImpl(NewsRepository newsRepository) {
+    private final NewsValidator newsValidator;
+
+    public NewsServiceImpl(NewsRepository newsRepository, NewsValidator newsValidator) {
         this.newsRepository = newsRepository;
+      this.newsValidator = newsValidator;
     }
 
     @Override
@@ -45,12 +48,14 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
-    public News publishNews(News news) {
-        LOGGER.info("-----------------2---------------------");
+    public News publishNews(News news) throws ValidationException {
         LOGGER.debug("Publish new news {}", news);
         news.setPublishedAt(LocalDateTime.now());
-       // news.setImage(new SerialBlob(news.getImage.getBytes()));
+        news.setTitle(news.getTitle().trim());
+        news.setSummary(news.getSummary().trim());
+        news.setText(news.getText().trim());
 
+        newsValidator.validateForPublish(news);
         return newsRepository.save(news);
     }
 

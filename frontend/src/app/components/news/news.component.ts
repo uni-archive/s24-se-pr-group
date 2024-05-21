@@ -54,6 +54,7 @@ export class NewsComponent implements OnInit {
 
   openAddModal(newsAddModal: TemplateRef<any>) {
     this.currentNews = {} as DetailedNewsDto;
+    this.selectedFile = null;
     this.modalService.open(newsAddModal, {ariaLabelledBy: 'modal-basic-title'});
   }
 
@@ -61,6 +62,7 @@ export class NewsComponent implements OnInit {
     this.newsServiceNew.find(id).subscribe({
       next: res => {
         this.currentNews = res;
+        this.selectedFile = null;
         this.modalService.open(newsAddModal, {ariaLabelledBy: 'modal-basic-title'});
       },
       error: err => {
@@ -73,7 +75,7 @@ export class NewsComponent implements OnInit {
    * Starts form validation and builds a news dto for sending a creation request if the form is valid.
    * If the procedure was successful, the form will be cleared.
    */
-  addNews(form) {
+  addNewsAlt(form) {
     this.submitted = true;
 
     if (form.valid) {
@@ -82,6 +84,17 @@ export class NewsComponent implements OnInit {
     }
   }
 
+  addNews(form) {
+    this.submitted = true;
+
+    if (form.valid && this.selectedFile) {
+      this.createNews(this.currentNews);
+      this.clearForm();
+    } else {
+      this.errorMessage = 'Bitte fülle alle Felder aus und wähle ein Bild!';
+      this.error = true;
+    }
+  }
   getNews(): DetailedNewsDto[] {
     return this.news;
   }
