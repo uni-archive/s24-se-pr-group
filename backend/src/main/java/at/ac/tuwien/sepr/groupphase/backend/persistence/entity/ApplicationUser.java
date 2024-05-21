@@ -45,7 +45,7 @@ public class ApplicationUser extends AbstractEntity {
     private boolean accountLocked;
 
     @Column(name = "USER_TYPE")
-    private UserType type;
+    private UserType type = UserType.CUSTOMER;
 
     @Column(name = "SUPER_ADMIN", updatable = false)
     private boolean superAdmin;
@@ -176,6 +176,10 @@ public class ApplicationUser extends AbstractEntity {
 
     public boolean isAdmin() {
         return type.equals(UserType.ADMIN);
+    }
+
+    public boolean isSuperAdmin() {
+        return superAdmin;
     }
 
     @Override
