@@ -16,7 +16,7 @@ export class ManageUserComponent {
     firstName: "",
     familyName: "",
     email: "",
-    isLocked: null,
+    isLocked: false,
   };
   users: ApplicationUserDto[] = [];
   searchChangedObservable = new Subject<void>();
@@ -85,15 +85,14 @@ export class ManageUserComponent {
     this.userEndpointService.getUser().subscribe({
       next: (currentUser) => {
         if (currentUser == null) {
-          console.error("No current user loaded.");
+          console.error("Keine Benutzer geladen.");
           return;
         }
 
         if (user.id != currentUser.id) {
           if (user.superAdmin) {
-            console.error("Cannot lock super admin user.");
             this.messagingService.setMessage(
-              "Cannot update super admin user.",
+              "Super admin kann nicht aktualisiert werden.",
               "danger"
             );
             return;
@@ -103,17 +102,24 @@ export class ManageUserComponent {
           this.userEndpointService.updateUserStatusByEmail(user).subscribe({
             next: (response) => {
               user = response;
-              this.messagingService.setMessage("User updated successfully.");
+              this.messagingService.setMessage(
+                `Benutzer ${user.firstName} wurde ${
+                  user.accountLocked ? "gesperrt" : "entsperrt"
+                }.`
+              );
               this.searchUsers();
             },
-            error: (error) => console.error("Error loading user:", error),
+            error: (error) =>
+              console.error("Fehler beim Laden der Benutzer:", error),
           });
         } else {
-          console.error("Cannot update own user.");
-          this.messagingService.setMessage("Cannot lock own user.", "danger");
+          this.messagingService.setMessage(
+            "Aktualisierung des eigenen Benutzers kann nicht durchgeführt werden.",
+            "danger"
+          );
         }
       },
-      error: (error) => console.error("Error loading user:", error),
+      error: (error) => console.error("Fehler beim Laden der Benutzer:", error),
     });
   }
 }
