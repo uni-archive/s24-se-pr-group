@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.UserDao;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.UserValidator;
@@ -18,12 +19,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -52,7 +53,7 @@ class UserServiceImplTest {
     @Test
     void createUserShouldCallValidateAndSetSalt() throws ValidationException {
         ApplicationUserDto user = ApplicationUserSupplier.anAdminUser();
-        Mockito.doNothing().when(userValidator).validateForCreate(user);
+        doNothing().when(userValidator).validateForCreate(user);
         when(passwordEncoder.encode(Mockito.anyString())).thenReturn("encodedPassword");
 
         userService.createUser(user);
@@ -78,33 +79,53 @@ class UserServiceImplTest {
     }
 
     @Test
-    void updateUserStatusByEmailShouldUpdateUser() throws NotFoundException, ValidationException {
+    void updateUserStatusByEmailShouldUpdateUser() throws NotFoundException, ValidationException, EntityNotFoundException {
         ApplicationUserDto userToUpdate = ApplicationUserSupplier.anAdminUser();
-        userToUpdate.setEmail("userToUpdate@email.com");
+        userToUpdate.setEmail("update@email.com");
+        String adminEmail = "admin@email.com";
+
+        doNothing().when(userValidator).validateForUpdateStatus(userToUpdate, adminEmail);
         when(userDao.findByEmail(userToUpdate.getEmail())).thenReturn(userToUpdate);
-        when(userDao.updateStatusByEmail(userToUpdate.isAccountLocked(), userToUpdate.getEmail())).thenReturn(userToUpdate);
+        when(userDao.update(userToUpdate)).thenReturn(userToUpdate);
 
-        ApplicationUserDto result = userService.updateUserStatusByEmail(userToUpdate, "admin@email.com");
-
-        verify(userValidator).validateForUpdateStatus(userToUpdate, "admin@email.com");
-        verify(userDao).findByEmail(userToUpdate.getEmail());
-        verify(userDao).updateStatusByEmail(userToUpdate.isAccountLocked(), userToUpdate.getEmail());
-        Assertions.assertEquals(userToUpdate, result);
+        ApplicationUserDto updatedUser = userService.updateUserStatusByEmail(userToUpdate, adminEmail);
     }
 
     @Test
-    void updateUserStatusByEmailShouldThrowNotFoundException() throws ValidationException {
+    void updateUserStatusByEmailShouldThrowNotFoundExceptionIfUserDoesNotExist() throws ValidationException {
         ApplicationUserDto userToUpdate = ApplicationUserSupplier.anAdminUser();
-        userToUpdate.setEmail("userToUpdate@email.com");
+        userToUpdate.setEmail("nonexistent@email.com");
+        String adminEmail = "admin@email.com";
+
+        doNothing().when(userValidator).validateForUpdateStatus(userToUpdate, adminEmail);
         when(userDao.findByEmail(userToUpdate.getEmail())).thenReturn(null);
 
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> {
-            userService.updateUserStatusByEmail(userToUpdate, "admin@email.com");
+            userService.updateUserStatusByEmail(userToUpdate, adminEmail);
         });
 
-        Assertions.assertEquals("Could not update the user with the email address userToUpdate@email.com because it does not exist", exception.getMessage());
-        verify(userValidator).validateForUpdateStatus(userToUpdate, "admin@email.com");
+        verify(userValidator).validateForUpdateStatus(userToUpdate, adminEmail);
         verify(userDao).findByEmail(userToUpdate.getEmail());
+        Assertions.assertEquals("Could not update the user with the email address nonexistent@email.com because it does not exist", exception.getMessage());
     }
 
+    @Test
+    void updateUserStatusByEmailShouldThrowNotFoundExceptionOnEntityNotFoundException() throws NotFoundException, ValidationException, EntityNotFoundException {
+        ApplicationUserDto userToUpdate = ApplicationUserSupplier.anAdminUser();
+        userToUpdate.setEmail("update@email.com");
+        String adminEmail = "admin@email.com";
+
+        doNothing().when(userValidator).validateForUpdateStatus(userToUpdate, adminEmail);
+        when(userDao.findByEmail(userToUpdate.getEmail())).thenReturn(userToUpdate);
+        when(userDao.update(userToUpdate)).thenThrow(new EntityNotFoundException(1L));
+
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> {
+            userService.updateUserStatusByEmail(userToUpdate, adminEmail);
+        });
+
+        verify(userValidator).validateForUpdateStatus(userToUpdate, adminEmail);
+        verify(userDao).findByEmail(userToUpdate.getEmail());
+        verify(userDao).update(userToUpdate);
+        Assertions.assertTrue(exception.getCause() instanceof EntityNotFoundException);
+    }
 }

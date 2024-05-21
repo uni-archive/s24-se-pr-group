@@ -22,11 +22,6 @@ public class UserDao extends AbstractDao<ApplicationUser, ApplicationUserDto> {
         return (mapper).toDto(((UserRepository) repository).findByEmail(email));
     }
 
-    public ApplicationUserDto updateStatusByEmail(boolean status, String email) {
-        ((UserRepository) repository).updateStatusByEmail(status, email);
-        return findByEmail(email);
-    }
-
     public Stream<ApplicationUserDto> search(ApplicationUserSearchDto searchParameters) {
         List<ApplicationUser> users = ((UserRepository) repository).findByParams(
             searchParameters.firstName(),

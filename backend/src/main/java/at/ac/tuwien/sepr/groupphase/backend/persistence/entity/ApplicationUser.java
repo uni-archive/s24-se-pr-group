@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.persistence.entity;
 
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.type.UserType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
@@ -43,6 +44,12 @@ public class ApplicationUser extends AbstractEntity {
     @Column(name = "ACCOUNT_LOCKED")
     private boolean accountLocked;
 
+    @Column(name = "USER_TYPE")
+    private UserType type;
+
+    @Column(name = "SUPER_ADMIN", updatable = false)
+    private boolean superAdmin;
+
     @OneToMany(mappedBy = "customer")
     private List<Order> orders;
 
@@ -54,7 +61,8 @@ public class ApplicationUser extends AbstractEntity {
     public ApplicationUser() {
     }
 
-    public ApplicationUser(String email, String password, String firstName, String familyName, String phoneNumber, String salt, int loginCount, boolean accountLocked) {
+    public ApplicationUser(String email, String password, String firstName, String familyName, String phoneNumber,
+                           String salt, int loginCount, boolean accountLocked, UserType type, boolean superAdmin) {
         this.email = email;
         this.password = password;
         this.firstName = firstName;
@@ -63,94 +71,111 @@ public class ApplicationUser extends AbstractEntity {
         this.salt = salt;
         this.loginCount = loginCount;
         this.accountLocked = accountLocked;
+        this.type = type;
+        this.superAdmin = superAdmin;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
+    public ApplicationUser setEmail(String email) {
         this.email = email;
+        return this;
     }
 
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
+    public ApplicationUser setPassword(String password) {
         this.password = password;
+        return this;
     }
 
     public String getFirstName() {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
+    public ApplicationUser setFirstName(String firstName) {
         this.firstName = firstName;
+        return this;
     }
 
     public String getFamilyName() {
         return familyName;
     }
 
-    public void setFamilyName(String familyName) {
+    public ApplicationUser setFamilyName(String familyName) {
         this.familyName = familyName;
+        return this;
     }
 
     public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
+    public ApplicationUser setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+        return this;
     }
 
     public String getSalt() {
         return salt;
     }
 
-    public void setSalt(String salt) {
+    public ApplicationUser setSalt(String salt) {
         this.salt = salt;
+        return this;
     }
 
     public int getLoginCount() {
         return loginCount;
     }
 
-    public void setLoginCount(int loginCount) {
+    public ApplicationUser setLoginCount(int loginCount) {
         this.loginCount = loginCount;
+        return this;
     }
 
     public boolean isAccountLocked() {
         return accountLocked;
     }
 
-    public void setAccountLocked(boolean accountLocked) {
+    public ApplicationUser setAccountLocked(boolean accountLocked) {
         this.accountLocked = accountLocked;
+        return this;
+    }
+
+    public UserType getType() {
+        return type;
+    }
+
+    public ApplicationUser setType(UserType type) {
+        this.type = type;
+        return this;
     }
 
     public List<Order> getOrders() {
         return orders;
     }
 
-    public void setOrders(List<Order> orders) {
+    public ApplicationUser setOrders(List<Order> orders) {
         this.orders = orders;
+        return this;
     }
 
     public List<News> getNews() {
         return news;
     }
 
-    public void setNews(List<News> news) {
+    public ApplicationUser setNews(List<News> news) {
         this.news = news;
+        return this;
     }
 
     public boolean isAdmin() {
-        return false;
-    }
-
-    public boolean isSuperAdmin() {
-        return false;
+        return type.equals(UserType.ADMIN);
     }
 
     @Override

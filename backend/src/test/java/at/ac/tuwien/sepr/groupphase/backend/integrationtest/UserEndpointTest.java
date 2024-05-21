@@ -186,13 +186,14 @@ public class UserEndpointTest {
     @Test
     void updateUserStatusByEmailShouldUpdateStatus() throws Exception {
         // Create a new user DTO and set the email and account locked status
-        ApplicationUserDto userToUpdate = ApplicationUserSupplier.anAdminUser();
-        userToUpdate.setEmail("update@email.com");
+        ApplicationUser userToUpdate = ApplicationUserSupplier.anAdminUserEntity();
         userToUpdate.setAccountLocked(true);
 
         // Save the entity and retrieve it to get the generated ID
         ApplicationUser savedUser = userRepository.save(objectMapper.convertValue(userToUpdate, ApplicationUser.class));
         userToUpdate.setId(savedUser.getId());  // Set the ID back to the DTO
+
+        userToUpdate.setAccountLocked(false);  // Set the new account locked status (false)
 
         // Perform the PUT request with a admin token
         mockMvc.perform(put(TestData.USER_BASE_URI + "/update/status")
@@ -208,13 +209,14 @@ public class UserEndpointTest {
     @Test
     void updateUserStatusByEmailShouldReturnForbiddenForNonAdmin() throws Exception {
         // Create a new user DTO and set the email and account locked status
-        ApplicationUserDto userToUpdate = ApplicationUserSupplier.anAdminUser();
-        userToUpdate.setEmail("update@email.com");
+        ApplicationUser userToUpdate = ApplicationUserSupplier.anAdminUserEntity();
         userToUpdate.setAccountLocked(true);
 
         // Save the entity and retrieve it to get the generated ID
         ApplicationUser savedUser = userRepository.save(objectMapper.convertValue(userToUpdate, ApplicationUser.class));
         userToUpdate.setId(savedUser.getId());  // Set the ID back to the DTO
+
+        userToUpdate.setAccountLocked(false);  // Set the new account locked status (false)
 
         // Perform the PUT request with a non-admin token
         mockMvc.perform(put(TestData.USER_BASE_URI + "/update/status")

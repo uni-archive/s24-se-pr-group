@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper
+@Mapper(uses = UserMapper.class)
 public interface OrderMapper extends BaseEntityMapper<Order, OrderDetailsDto> {
 
     @Mapping(target = "tickets", ignore = true)
