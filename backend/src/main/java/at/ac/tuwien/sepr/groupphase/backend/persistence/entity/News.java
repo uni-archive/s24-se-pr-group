@@ -9,7 +9,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 
+import javax.sql.rowset.serial.SerialBlob;
 import java.sql.Blob;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -110,7 +112,7 @@ public class News extends AbstractEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), publishedAt, title, summary, text,image, users, event);
+        return Objects.hash(getId(), publishedAt, title, summary, text, image, users, event);
     }
 
     @Override
@@ -132,6 +134,7 @@ public class News extends AbstractEntity {
         private String title;
         private String summary;
         private String text;
+        private byte[] image;
 
         private NewsBuilder() {
         }
@@ -165,6 +168,11 @@ public class News extends AbstractEntity {
             return this;
         }
 
+        public NewsBuilder withImage(byte[] image) {
+            this.image = image;
+            return this;
+        }
+
         public News build() {
             News news = new News();
             news.setId(id);
@@ -172,6 +180,14 @@ public class News extends AbstractEntity {
             news.setTitle(title);
             news.setSummary(summary);
             news.setText(text);
+            if (image != null) {
+                try {
+                    Blob blob = new SerialBlob(image);
+                    news.setImage(blob);
+                } catch (SQLException e) {
+                    throw new RuntimeException("Fehler bei der Umwandlung von byte[] zu Blob", e);
+                }
+            }
             return news;
         }
     }

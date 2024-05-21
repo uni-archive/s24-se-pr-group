@@ -2,11 +2,10 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.News;
-import at.ac.tuwien.sepr.groupphase.backend.repository.NewsRepository;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.NewsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.NewsService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.NewsValidator;
-import at.ac.tuwien.sepr.groupphase.backend.service.validator.UserValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
