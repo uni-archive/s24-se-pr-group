@@ -1,54 +1,100 @@
 <!DOCTYPE html>
-<div class="mb-3">
-  <form class="d-flex flex-row w-auto" (submit)="searchUser()">
-    <div class="d-flex w-100">
-      <label for="searchUserEmail" class="col-form-label mr-2">Email: </label>
-      <input
-        type="text"
-        id="searchUserEmail"
-        name="searchUserEmail"
-        class="form-control flex-grow-1 mr-2"
-        [(ngModel)]="searchParams.email"
-      />
-      <button type="submit" class="btn btn-primary ml-auto">Search</button>
-    </div>
-  </form>
-</div>
+<form class="d-flex flex-row w-auto mb-3" (submit)="searchUsers()">
+  <div class="flex-grow-1 mr-2">
+    <label for="searchUserFirstName" class="col-form-label">Vorname:</label>
+    <input
+      type="text"
+      id="searchUserFirstName"
+      name="searchUserFirstName"
+      class="form-control"
+      [(ngModel)]="searchParams.firstName"
+      (ngModelChange)="searchChanged()"
+    />
+  </div>
+  <div class="flex-grow-1 mr-2">
+    <label for="searchUserSecondName" class="col-form-label">Nachname:</label>
+    <input
+      type="text"
+      id="searchUserSecondName"
+      name="searchUserSecondName"
+      class="form-control"
+      [(ngModel)]="searchParams.familyName"
+      (ngModelChange)="searchChanged()"
+    />
+  </div>
+  <div class="flex-grow-1 mr-2">
+    <label for="searchUserEmail" class="col-form-label">Email:</label>
+    <input
+      type="text"
+      id="searchUserEmail"
+      name="searchUserEmail"
+      class="form-control"
+      [(ngModel)]="searchParams.email"
+      (ngModelChange)="searchChanged()"
+    />
+  </div>
+  <div class="ms-1">
+    <label for="searchUserIsLocked" class="col-form-label">Status:</label>
+    <select
+      id="searchUserIsLocked"
+      name="searchUserIsLocked"
+      class="form-select"
+      [(ngModel)]="searchParams.isLocked"
+      (ngModelChange)="searchChanged()"
+    >
+      <option [ngValue]="true">Gesperrt</option>
+      <option [ngValue]="false">Aktiv</option>
+    </select>
+  </div>
+</form>
 
-<table class="table table-sm" *ngIf="user">
-  <tbody>
-    <tr>
-      <th scope="row">First name:</th>
-      <td>{{ user.firstName }}</td>
-    </tr>
-    <tr>
-      <th scope="row">Family name:</th>
-      <td>{{ user.familyName }}</td>
-    </tr>
-    <tr>
-      <th scope="row">Email:</th>
-      <td>{{ user.email }}</td>
-    </tr>
-    <tr>
-      <th scope="row">Phone nummer:</th>
-      <td>{{ user.phoneNumber }}</td>
-    </tr>
-    <tr>
-      <th scope="row">Status:</th>
-      <td>
-        {{ user.accountLocked ? "Locked" : "Active" }}
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-<div class="d-flex justify-content-end mt-2" *ngIf="user">
-  <button
-    class="btn btn-primary"
-    (click)="
-      user.accountLocked ? updateLockStatus(false) : updateLockStatus(true)
-    "
-  >
-    {{ user.accountLocked ? "Activate" : "Lock" }}
-  </button>
+<div class="mt-3">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Vorname</th>
+        <th>Nachname</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th class="min-width">Aktionen</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        *ngFor="
+          let user of users
+            | paginate
+              : {
+                  itemsPerPage: itemsPerPage,
+                  currentPage: currentPage
+                }
+        "
+        class="center-td"
+      >
+        <td>{{ user.firstName }}</td>
+        <td>{{ user.familyName }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.accountLocked ? "Gesperrt" : "Aktiv" }}</td>
+        <td>
+          <button
+            class="btn btn-primary"
+            (click)="
+              user.accountLocked
+                ? updateLockStatus(user, false)
+                : updateLockStatus(user, true)
+            "
+          >
+            {{ user.accountLocked ? "Entsperren" : "Sperren" }}
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="d-flex justify-content-center mt-3">
+    <pagination-controls
+      previousLabel="Zurück"
+      nextLabel="Weiter"
+      (pageChange)="onTableDataChange($event)"
+    ></pagination-controls>
+  </div>
 </div>

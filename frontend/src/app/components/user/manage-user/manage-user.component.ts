@@ -1,71 +1,125 @@
 import { Component } from "@angular/core";
-import { UserSearch } from "src/app/dtos/user-search";
-import { AuthService } from "src/app/services/auth.service";
+import { debounceTime, Subject } from "rxjs";
 import { MessagingService } from "src/app/services/messaging.service";
 import {
-  ApplicationUserResponse,
+  ApplicationUserDto,
   UserEndpointService,
 } from "src/app/services/openapi";
 
 @Component({
   selector: "app-manage-user",
   templateUrl: "./manage-user.component.html",
-  styleUrl: "./manage-user.component.scss",
+  styleUrls: ["./manage-user.component.scss"],
 })
 export class ManageUserComponent {
-  searchParams: UserSearch = {
+  searchParams = {
+    firstName: "",
+    familyName: "",
     email: "",
+    isLocked: false,
   };
-  user: ApplicationUserResponse = null;
+  users: ApplicationUserDto[] = [];
+  searchChangedObservable = new Subject<void>();
+
+  // Pagination related properties
+  itemsPerPage = 10;
+  currentPage = 1;
 
   constructor(
     private userEndpointService: UserEndpointService,
-    private messagingService: MessagingService,
-    private authService: AuthService
+    private messagingService: MessagingService
   ) {}
 
-  searchUser() {
+  ngOnInit() {
+    this.searchChangedObservable
+      .pipe(debounceTime(300))
+      .subscribe({ next: () => this.searchUsers() });
+    // only display locked users by default
+    this.searchParams.isLocked = true;
+    this.searchUsers();
+  }
+
+  searchChanged(): void {
+    this.searchChangedObservable.next();
+  }
+
+  searchUsers() {
+    if (
+      this.searchParams.firstName == null ||
+      this.searchParams.firstName === ""
+    ) {
+      delete this.searchParams.firstName;
+    }
+    if (
+      this.searchParams.familyName == null ||
+      this.searchParams.familyName === ""
+    ) {
+      delete this.searchParams.familyName;
+    }
+    if (this.searchParams.email == null || this.searchParams.email === "") {
+      delete this.searchParams.email;
+    }
+    if (this.searchParams.isLocked == null) {
+      delete this.searchParams.isLocked;
+    }
     this.userEndpointService
-      .findUserByEmail(this.searchParams.email)
+      .searchUsers(
+        this.searchParams.firstName,
+        this.searchParams.familyName,
+        this.searchParams.email,
+        this.searchParams.isLocked
+      )
       .subscribe({
-        next: (response) => {
-          this.user = response;
-          this.messagingService.setMessage("User loaded successfully.");
+        next: (response: ApplicationUserDto[]) => {
+          this.users = response;
         },
-        error: (error) => console.error("Error loading user:", error),
+        error: (error) => console.error("Error loading users:", error),
       });
   }
 
-  updateLockStatus(status: boolean) {
-    if (this.user == null) {
-      console.error("No user loaded.");
-      return;
-    }
+  onTableDataChange(event: any): void {
+    this.currentPage = event;
+  }
 
+  updateLockStatus(user: ApplicationUserDto, status: boolean) {
     this.userEndpointService.getUser().subscribe({
       next: (currentUser) => {
         if (currentUser == null) {
-          console.error("No current user loaded.");
+          console.error("Keine Benutzer geladen.");
           return;
         }
 
-        if (this.user.id != currentUser.id) {
-          this.user.accountLocked = status;
-          this.userEndpointService
-            .updateUserStatusByEmail(this.user)
-            .subscribe({
-              next: (response) => {
-                this.user = response;
-                this.messagingService.setMessage("User updated successfully.");
-              },
-              error: (error) => console.error("Error loading user:", error),
-            });
+        if (user.id != currentUser.id) {
+          if (user.superAdmin) {
+            this.messagingService.setMessage(
+              "Super admin kann nicht aktualisiert werden.",
+              "danger"
+            );
+            return;
+          }
+
+          user.accountLocked = status;
+          this.userEndpointService.updateUserStatusByEmail(user).subscribe({
+            next: (response) => {
+              user = response;
+              this.messagingService.setMessage(
+                `Benutzer ${user.firstName} wurde ${
+                  user.accountLocked ? "gesperrt" : "entsperrt"
+                }.`
+              );
+              this.searchUsers();
+            },
+            error: (error) =>
+              console.error("Fehler beim Laden der Benutzer:", error),
+          });
         } else {
-          console.error("Cannot update own user.");
-          this.messagingService.setMessage("Cannot update own user.", "danger");
+          this.messagingService.setMessage(
+            "Aktualisierung des eigenen Benutzers kann nicht durchgeführt werden.",
+            "danger"
+          );
         }
       },
-      error: (error) => console.error("Error loading user:", error),
+      error: (error) => console.error("Fehler beim Laden der Benutzer:", error),
     });
   }
 }

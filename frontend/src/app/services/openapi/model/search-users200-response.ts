@@ -11,14 +11,7 @@
  */
 
 
-export interface ApplicationUserResponse { 
-    id?: number;
-    email?: string;
-    firstName?: string;
-    familyName?: string;
-    phoneNumber?: string;
-    accountLocked?: boolean;
-    isAdmin?: boolean;
-    isSuperAdmin?: boolean;
+export interface SearchUsers200Response { 
+    parallel?: boolean;
 }
 

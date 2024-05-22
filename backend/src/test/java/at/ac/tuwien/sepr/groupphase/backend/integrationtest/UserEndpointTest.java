@@ -1,19 +1,14 @@
 package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 
-import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_ROLES;
-import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_USER;
-import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.DEFAULT_USER;
-import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.USER_ROLES;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import at.ac.tuwien.sepr.groupphase.backend.DevelopmentApplication;
 import at.ac.tuwien.sepr.groupphase.backend.basetest.TestData;
 import at.ac.tuwien.sepr.groupphase.backend.config.properties.SecurityProperties;
+import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserCreateRequest;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
+import at.ac.tuwien.sepr.groupphase.backend.supplier.ApplicationUserSupplier;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -27,6 +22,17 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+
+import java.util.List;
+
+import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_ROLES;
+import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_USER;
+import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.DEFAULT_USER;
+import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.USER_ROLES;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -142,5 +148,84 @@ public class UserEndpointTest {
             () -> Assertions.assertNotNull(user),
             () -> Assertions.assertEquals(201, response.getStatus())
         );
+    }
+
+    @Test
+    void searchUsersShouldReturnResultsForAdmin() throws Exception {
+        ApplicationUserSearchDto searchParams = new ApplicationUserSearchDto("Berta", "Muster", "admin@email.com", false);
+
+        MvcResult mvcResult = mockMvc.perform(get(TestData.USER_BASE_URI + "/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES))
+                .param("firstName", searchParams.firstName())
+                .param("familyName", searchParams.familyName())
+                .param("email", searchParams.email())
+                .param("isLocked", String.valueOf(searchParams.isLocked())))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        MockHttpServletResponse response = mvcResult.getResponse();
+        List<ApplicationUserDto> users = objectMapper.readValue(response.getContentAsString(), List.class);
+        Assertions.assertNotNull(users);
+    }
+
+    @Test
+    void searchUsersShouldReturnForbiddenForNonAdmin() throws Exception {
+        ApplicationUserSearchDto searchParams = new ApplicationUserSearchDto("Berta", "Muster", "admin@email.com", false);
+
+        mockMvc.perform(get(TestData.USER_BASE_URI + "/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(DEFAULT_USER, USER_ROLES))
+                .param("firstName", searchParams.firstName())
+                .param("familyName", searchParams.familyName())
+                .param("email", searchParams.email())
+                .param("isLocked", String.valueOf(searchParams.isLocked())))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void updateUserStatusByEmailShouldUpdateStatus() throws Exception {
+        // Create a new user DTO and set the email and account locked status
+        ApplicationUser userToUpdate = ApplicationUserSupplier.anAdminUserEntity();
+        userToUpdate.setAccountLocked(true);
+
+        // Save the entity and retrieve it to get the generated ID
+        ApplicationUser savedUser = userRepository.save(objectMapper.convertValue(userToUpdate, ApplicationUser.class));
+        userToUpdate.setId(savedUser.getId());  // Set the ID back to the DTO
+
+        userToUpdate.setAccountLocked(false);  // Set the new account locked status (false)
+
+        // Perform the PUT request with a admin token
+        mockMvc.perform(put(TestData.USER_BASE_URI + "/update/status")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES))
+                .content(objectMapper.writeValueAsString(userToUpdate)))
+            .andExpect(status().isOk());
+
+        // Delete the entity
+        userRepository.delete(objectMapper.convertValue(userToUpdate, ApplicationUser.class));
+    }
+
+    @Test
+    void updateUserStatusByEmailShouldReturnForbiddenForNonAdmin() throws Exception {
+        // Create a new user DTO and set the email and account locked status
+        ApplicationUser userToUpdate = ApplicationUserSupplier.anAdminUserEntity();
+        userToUpdate.setAccountLocked(true);
+
+        // Save the entity and retrieve it to get the generated ID
+        ApplicationUser savedUser = userRepository.save(objectMapper.convertValue(userToUpdate, ApplicationUser.class));
+        userToUpdate.setId(savedUser.getId());  // Set the ID back to the DTO
+
+        userToUpdate.setAccountLocked(false);  // Set the new account locked status (false)
+
+        // Perform the PUT request with a non-admin token
+        mockMvc.perform(put(TestData.USER_BASE_URI + "/update/status")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(DEFAULT_USER, USER_ROLES))
+                .content(objectMapper.writeValueAsString(userToUpdate)))
+            .andExpect(status().isForbidden());
+
+        // Delete the entity
+        userRepository.delete(objectMapper.convertValue(userToUpdate, ApplicationUser.class));
     }
 }

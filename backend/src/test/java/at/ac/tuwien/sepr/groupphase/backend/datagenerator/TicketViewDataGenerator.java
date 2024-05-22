@@ -1,7 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.datagenerator;
 
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Artist;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Customer;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Event;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.EventType;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallPlan;
@@ -14,6 +14,7 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Order;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Show;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Ticket;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.type.InvoiceType;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.type.UserType;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.EventRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallPlanRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallSectorRepository;
@@ -48,41 +49,7 @@ import java.util.stream.IntStream;
 @Component
 public class TicketViewDataGenerator {
 
-    @Autowired
-    private OrderRepository orderRepository;
-
-    @Autowired
-    private TicketRepository ticketRepository;
-
-    @Autowired
-    private ShowRepository showRepository;
-
-    @Autowired
-    private EventRepository eventRepository;
-
-    @Autowired
-    private HallSpotRepository hallSpotRepository;
-
-    @Autowired
-    private HallSectorRepository hallSectorRepository;
-
-    @Autowired
-    private HallSectorShowRepository hallSectorShowRepository;
-
-    @Autowired
-    private HallPlanRepository hallPlanRepository;
-
-    @Autowired
-    private InvoiceRepository invoiceRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
     private static final int COUNT_FACTOR = 1;
-
     private static final int EVENTS_COUNT = 10 * COUNT_FACTOR;
     private static final int ARTISTS_COUNT = 100 * COUNT_FACTOR;
     private static final int SHOWS_COUNT = 100 * COUNT_FACTOR;
@@ -90,14 +57,35 @@ public class TicketViewDataGenerator {
     private static final int HALLSPOTS_COUNT = 500 * COUNT_FACTOR;
     private static final int SECTORS_SHOWS_COUNT = 100 * COUNT_FACTOR;
     private static final int TICKETS_COUNT = 100 * COUNT_FACTOR;
-
     private static final Random rng = new Random();
     private static final Faker faker = new Faker();
+    @Autowired
+    private OrderRepository orderRepository;
+    @Autowired
+    private TicketRepository ticketRepository;
+    @Autowired
+    private ShowRepository showRepository;
+    @Autowired
+    private EventRepository eventRepository;
+    @Autowired
+    private HallSpotRepository hallSpotRepository;
+    @Autowired
+    private HallSectorRepository hallSectorRepository;
+    @Autowired
+    private HallSectorShowRepository hallSectorShowRepository;
+    @Autowired
+    private HallPlanRepository hallPlanRepository;
+    @Autowired
+    private InvoiceRepository invoiceRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @PostConstruct
     private void generateData() {
         // creating user for order
-        var customer = new Customer("ticketview-user-48@email.com", "", "tview", "tview", "+431234567890", "zyxwvutsrqponmlkjihgfedcba", 0, false);
+        var customer = new ApplicationUser("ticketview-user-48@email.com", "", "tview", "tview", "+431234567890", "zyxwvutsrqponmlkjihgfedcba", 0, false, UserType.CUSTOMER, false);
         customer.setPassword(passwordEncoder.encode("password" + customer.getSalt()));
 
         userRepository.save(customer);
@@ -135,7 +123,9 @@ public class TicketViewDataGenerator {
 
         var map = shows.stream().collect(Collectors.toMap(
             Show::getEvent,
-            s -> new ArrayList<Show>() {{ add(s); }},
+            s -> new ArrayList<Show>() {{
+                add(s);
+            }},
             (a, b) -> {
                 a.addAll(b);
                 return a;
@@ -180,7 +170,9 @@ public class TicketViewDataGenerator {
         // we need to guarantee that no duplicate (show, sector) tuple exists
         var sectorShowsChoiceMap = shows.stream().collect(Collectors.toConcurrentMap(
             s -> s,
-            s -> new CopyOnWriteArrayList<HallSector>() {{ addAll(sectors); }}
+            s -> new CopyOnWriteArrayList<HallSector>() {{
+                addAll(sectors);
+            }}
         ));
 
         var sectorShowsChosenMap = new ConcurrentHashMap<HallSector, List<Show>>();
@@ -276,7 +268,7 @@ public class TicketViewDataGenerator {
     }
 
     @SafeVarargs
-    private <T> Supplier<T> fakeOneOf(Supplier<T> ...generators) {
+    private <T> Supplier<T> fakeOneOf(Supplier<T>... generators) {
         var idx = rng.nextInt(generators.length);
         return () -> generators[idx].get();
     }

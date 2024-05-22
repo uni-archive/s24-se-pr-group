@@ -1,12 +1,15 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+import java.util.stream.Stream;
 
 public interface UserService extends UserDetailsService {
 
@@ -48,6 +51,14 @@ public interface UserService extends UserDetailsService {
      * @throws ValidationException if the user is invalid
      */
     public ApplicationUserDto createUser(ApplicationUserDto toCreate) throws ValidationException;
+
+    /**
+     * Search for users in the persistent data store matching all provided fields.
+     *
+     * @param searchParameters the search parameters to use in filtering.
+     * @return the users where the given fields match.
+     */
+    Stream<ApplicationUserDto> search(ApplicationUserSearchDto searchParameters);
 
     /**
      * Update the lock status of a user based on the email address.

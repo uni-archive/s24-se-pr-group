@@ -1,7 +1,5 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.validator;
 
-import static at.ac.tuwien.sepr.groupphase.backend.supplier.ApplicationUserSupplier.anAdminUser;
-
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.UserDao;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
@@ -12,6 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import static at.ac.tuwien.sepr.groupphase.backend.supplier.ApplicationUserSupplier.anAdminUser;
 
 @ExtendWith(MockitoExtension.class)
 class UserValidatorTest {
@@ -95,5 +95,50 @@ class UserValidatorTest {
         ValidationException validationException2 = Assertions.assertThrows(ValidationException.class,
             () -> userValidator.validateForCreate(user));
         Assertions.assertEquals("Validation Error: Phone number must be valid", validationException.getMessage());
+    }
+
+    @Test
+    void validateForUpdateStatusShouldThrowExceptionIfUserIsNull() {
+        ValidationException validationException = Assertions.assertThrows(ValidationException.class,
+            () -> userValidator.validateForUpdateStatus(null, "admin@email.com"));
+        Assertions.assertEquals("Validation Error: User must not be null", validationException.getMessage());
+    }
+
+    @Test
+    void validateForUpdateStatusShouldThrowExceptionIfEmailIsEmpty() {
+        ApplicationUserDto user = anAdminUser().setEmail("");
+        ValidationException validationException = Assertions.assertThrows(ValidationException.class,
+            () -> userValidator.validateForUpdateStatus(user, "admin@email.com"));
+        Assertions.assertEquals("Validation Error: Email must not be empty", validationException.getMessage());
+    }
+
+    @Test
+    void validateForUpdateStatusShouldThrowExceptionIfEmailIsNull() {
+        ApplicationUserDto user = anAdminUser().setEmail(null);
+        ValidationException validationException = Assertions.assertThrows(ValidationException.class,
+            () -> userValidator.validateForUpdateStatus(user, "admin@email.com"));
+        Assertions.assertEquals("Validation Error: Email must not be empty", validationException.getMessage());
+    }
+
+    @Test
+    void validateForUpdateStatusShouldThrowExceptionIfEmailIsInvalid() {
+        ApplicationUserDto user = anAdminUser().setEmail("@email.com");
+        ValidationException validationException = Assertions.assertThrows(ValidationException.class,
+            () -> userValidator.validateForUpdateStatus(user, "admin@email.com"));
+        Assertions.assertEquals("Validation Error: Email must be valid", validationException.getMessage());
+    }
+
+    @Test
+    void validateForUpdateStatusShouldThrowExceptionWhenUpdatingOwnStatus() {
+        ApplicationUserDto user = anAdminUser().setEmail("admin@email.com");
+        ValidationException validationException = Assertions.assertThrows(ValidationException.class,
+            () -> userValidator.validateForUpdateStatus(user, "admin@email.com"));
+        Assertions.assertEquals("Validation Error: Cannot update own status", validationException.getMessage());
+    }
+
+    @Test
+    void validateForUpdateStatusShouldNotThrowExceptionForValidUser() {
+        ApplicationUserDto user = anAdminUser();
+        Assertions.assertDoesNotThrow(() -> userValidator.validateForUpdateStatus(user, "admin2@email.com"));
     }
 }

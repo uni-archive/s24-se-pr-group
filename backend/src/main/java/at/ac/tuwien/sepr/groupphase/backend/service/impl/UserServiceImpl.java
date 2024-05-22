@@ -1,9 +1,12 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.mapper.UserMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.UserDao;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.security.SecurityUtil;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
@@ -23,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -32,14 +36,16 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenizer jwtTokenizer;
     private final UserValidator userValidator;
+    private final UserMapper userMapper;
 
     @Autowired
     public UserServiceImpl(UserDao userDao, PasswordEncoder passwordEncoder, JwtTokenizer jwtTokenizer,
-                           UserValidator userValidator) {
+                           UserValidator userValidator, UserMapper userMapper) {
         this.userDao = userDao;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
         this.userValidator = userValidator;
+        this.userMapper = userMapper;
     }
 
     @Override
@@ -106,12 +112,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Stream<ApplicationUserDto> search(ApplicationUserSearchDto searchParameters) {
+        LOGGER.debug("Search for users: {}", searchParameters);
+        return userDao.search(searchParameters);
+    }
+
+    @Override
     public ApplicationUserDto updateUserStatusByEmail(ApplicationUserDto toUpdate, String adminEmail) throws NotFoundException, ValidationException {
         LOGGER.debug("Update user status: {}", toUpdate);
         userValidator.validateForUpdateStatus(toUpdate, adminEmail);
-        if (userDao.findByEmail(toUpdate.getEmail()) == null) {
+        ApplicationUserDto user = userDao.findByEmail(toUpdate.getEmail());
+        if (user == null) {
             throw new NotFoundException("Could not update the user with the email address " + toUpdate.getEmail() + " because it does not exist");
         }
-        return userDao.updateStatusByEmail(toUpdate.isAccountLocked(), toUpdate.getEmail());
+        try {
+            user.setAccountLocked(toUpdate.isAccountLocked());
+            return userDao.update(user);
+        } catch (EntityNotFoundException e) {
+            throw new NotFoundException(e);
+        }
     }
 }

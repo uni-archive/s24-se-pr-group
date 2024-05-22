@@ -21,6 +21,7 @@ export interface ApplicationUserDto {
     salt?: string;
     loginCount?: number;
     accountLocked?: boolean;
+    superAdmin?: boolean;
     admin?: boolean;
 }
 

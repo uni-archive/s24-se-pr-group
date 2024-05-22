@@ -1,6 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.datagenerator;
 
-import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Customer;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Event;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.EventType;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallPlan;
@@ -13,6 +13,7 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Order;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Show;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Ticket;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.type.InvoiceType;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.type.UserType;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.EventRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallPlanRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallSectorRepository;
@@ -72,7 +73,7 @@ public class PdfPrintOrderDataGenerator {
     @PostConstruct
     private void generateData() {
         // creating user for order
-        var customer = new Customer("pdf-user-51@email.com", "", "pdf", "pdf", "+431234567890", "zyxwvutsrqponmlkjihgfedcba", 0, false);
+        var customer = new ApplicationUser("pdf-user-51@email.com", "", "pdf", "pdf", "+431234567890", "zyxwvutsrqponmlkjihgfedcba", 0, false, UserType.CUSTOMER, false);
         customer.setPassword(passwordEncoder.encode("password" + customer.getSalt()));
 
         userRepository.save(customer);

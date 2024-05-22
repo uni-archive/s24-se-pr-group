@@ -11,14 +11,10 @@
  */
 
 
-export interface ApplicationUserResponse { 
-    id?: number;
-    email?: string;
+export interface ApplicationUserSearchDto { 
     firstName?: string;
     familyName?: string;
-    phoneNumber?: string;
-    accountLocked?: boolean;
-    isAdmin?: boolean;
-    isSuperAdmin?: boolean;
+    email?: string;
+    isLocked?: boolean;
 }
 

@@ -94,7 +94,7 @@ public class UserValidator extends BaseValidator {
                 errors.add("Email must be valid");
             }
             if (objectToUpdate.getEmail().equals(adminEmail)) {
-                //errors.add("Cannot update own status");
+                errors.add("Cannot update own status");
             }
         }
         endValidation(errors);

@@ -4,7 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.InvoiceDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Customer;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Event;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallPlan;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSector;
@@ -26,7 +26,6 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.OrderReposito
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.ShowRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.TicketRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.UserRepository;
-import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.OrderValidator;
 import org.junit.jupiter.api.AfterEach;
@@ -42,7 +41,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 import static at.ac.tuwien.sepr.groupphase.backend.supplier.ApplicationUserSupplier.aCustomerUser;
 import static java.util.function.Predicate.not;
@@ -53,51 +51,38 @@ import static org.mockito.Mockito.verify;
 @SpringBootTest
 @ActiveProfiles("test")
 public class OrderServiceImplTest {
+    private static ApplicationUser testCustomer;
+    private static Order testOrder;
+    private static List<Ticket> testTickets;
+    private static List<Invoice> testInvoices;
     @MockBean
     private OrderValidator orderValidator;
     @Captor
     private ArgumentCaptor<OrderDetailsDto> orderDto;
     @Captor
     private ArgumentCaptor<ApplicationUserDto> applicationUserDto;
-
     @Autowired
     private OrderServiceImpl orderService;
-
     @Autowired
     private OrderRepository orderRepository;
-
     @Autowired
     private TicketRepository ticketRepository;
-
     @Autowired
     private ShowRepository showRepository;
-
     @Autowired
     private EventRepository eventRepository;
-
     @Autowired
     private HallSpotRepository hallSpotRepository;
-
     @Autowired
     private HallSectorRepository hallSectorRepository;
-
     @Autowired
     private HallSectorShowRepository hallSectorShowRepository;
-
     @Autowired
     private HallPlanRepository hallPlanRepository;
-
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private InvoiceRepository invoiceRepository;
-
-    private static Customer testCustomer;
-    private static Order testOrder;
-    private static List<Ticket> testTickets;
-
-    private static List<Invoice> testInvoices;
 
     @BeforeEach
     void setup() {
@@ -137,7 +122,7 @@ public class OrderServiceImplTest {
         sectorShow.setPrice(50);
         hallSectorShowRepository.save(sectorShow);
 
-        testCustomer = new Customer();
+        testCustomer = new ApplicationUser();
         userRepository.save(testCustomer);
 
         testOrder = new Order();
