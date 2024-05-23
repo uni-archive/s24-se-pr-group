@@ -18,6 +18,8 @@ public class Location extends AbstractEntity {
     @JoinColumn(name = "ADDRESS_ID")
     private Address address;
 
+
+
     public Location(String name, Address address) {
         this.name = name;
         this.address = address;

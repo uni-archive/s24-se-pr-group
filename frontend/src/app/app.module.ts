@@ -25,6 +25,7 @@ import {CountryDropdownComponent} from "./components/user/country-dropdown/count
 import {LocationOverviewComponent} from "./components/location/location-overview/location-overview.component";
 import {LocationCreateComponent} from "./components/location/location-create/location-create.component";
 import {LocationEditComponent} from "./components/location/location-edit/location-edit.component";
+import {PaginatedListComponent} from "./components/paginated-list/paginated-list.component";
 
 @NgModule({
   declarations: [
@@ -41,7 +42,8 @@ import {LocationEditComponent} from "./components/location/location-edit/locatio
     CountryDropdownComponent,
     LocationOverviewComponent,
     LocationCreateComponent,
-    LocationEditComponent
+    LocationEditComponent,
+    PaginatedListComponent
   ],
   imports: [
     BrowserModule,

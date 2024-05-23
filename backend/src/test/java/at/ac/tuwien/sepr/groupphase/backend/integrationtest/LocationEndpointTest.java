@@ -1,19 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 
-import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_ROLES;
-import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_USER;
-import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.DEFAULT_USER;
-import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.USER_ROLES;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import at.ac.tuwien.sepr.groupphase.backend.config.properties.SecurityProperties;
 import at.ac.tuwien.sepr.groupphase.backend.dto.AddressDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.LocationDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.LocationEndpoint;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AddressCreateRequest;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LocationCreateRequest;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LocationResponse;
@@ -23,20 +12,38 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.AddressReposi
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.LocationRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.supplier.AddressSupplier;
+import at.ac.tuwien.sepr.groupphase.backend.util.PageModule;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.List;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+
+import java.util.List;
+import java.util.Objects;
+
+import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_ROLES;
+import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_USER;
+import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.DEFAULT_USER;
+import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.USER_ROLES;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -61,10 +68,14 @@ public class LocationEndpointTest {
 
     @Autowired
     private AddressRepository addressRepository;
-    @Autowired
-    private LocationEndpoint locationEndpoint;
+
+    @BeforeEach
+    void setUp() {
+        objectMapper.registerModule(new PageModule());
+    }
 
     @Test
+    @Order(1)
     void createShouldCreateLocationAsAdmin() throws Exception {
         AddressCreateRequest addressCreateRequest = new AddressCreateRequest("123 Main St", "Vienna", "1010",
             "Austria");
@@ -91,6 +102,7 @@ public class LocationEndpointTest {
     }
 
     @Test
+    @Order(2)
     void updateShouldUpdateLocationAsUser() throws Exception {
         Address address = AddressSupplier.anAddressEntity();
         addressRepository.save(address);
@@ -102,7 +114,7 @@ public class LocationEndpointTest {
 
         MvcResult mvcResult = mockMvc.perform(put("/api/v1/location/" + oldLocation.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(DEFAULT_USER, USER_ROLES))
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES))
                 .content(objectMapper.writeValueAsString(updateRequest)))
             .andExpect(status().isOk())
             .andReturn();
@@ -117,6 +129,7 @@ public class LocationEndpointTest {
     }
 
     @Test
+    @Order(3)
     void deleteShouldDeleteLocationAsAdmin() throws Exception {
         Address address = AddressSupplier.anAddressEntity();
         addressRepository.save(address);
@@ -132,6 +145,7 @@ public class LocationEndpointTest {
     }
 
     @Test
+    @Order(4)
     void findByIdShouldReturnLocationAsUser() throws Exception {
         Address address = AddressSupplier.anAddressEntity();
         Address savedAddress = addressRepository.save(address);
@@ -158,6 +172,7 @@ public class LocationEndpointTest {
     }
 
     @Test
+    @Order(5)
     void findAllShouldReturnAllLocationsAsAdmin() throws Exception {
 
         locationRepository.deleteAll();
@@ -181,6 +196,7 @@ public class LocationEndpointTest {
     }
 
     @Test
+    @Order(6)
     void createInvalidLocationShouldReturnValidationErrors() throws Exception {
         LocationCreateRequest invalidCreateRequest = new LocationCreateRequest("", null);
 
@@ -201,6 +217,7 @@ public class LocationEndpointTest {
     }
 
     @Test
+    @Order(7)
     void createInvalidAddressShouldReturnValidationErrors() throws Exception {
         AddressCreateRequest invalidAddressCreateRequest = new AddressCreateRequest("", "", "not-a-number", "");
         LocationCreateRequest invalidCreateRequest = new LocationCreateRequest("locationname",
@@ -220,6 +237,177 @@ public class LocationEndpointTest {
             () -> Assertions.assertTrue(responseContent.contains("Street must not be empty")),
             () -> Assertions.assertTrue(responseContent.contains("City must not be empty")),
             () -> Assertions.assertTrue(responseContent.contains("Zip code must be a number"))
+        );
+    }
+
+    @Test
+    @Order(8)
+    @DirtiesContext
+    void searchForLocationsShouldReturnAllLocationsThatFitCriteria() throws Exception {
+        locationRepository.deleteAll();
+        for (int i = 0; i < 40; i++) {
+            Address address;
+            if (i % 2 == 0) {
+                address = new Address("Test Street 1", "1010", "Vienna", "Austria");
+            } else {
+                address = new Address("Bergzeile 87", "3970", "Weitra", "Tschechien");
+            }
+            addressRepository.save(address);
+            locationRepository.save(new Location("Location " + i, address));
+        }
+
+        MvcResult mvcResult = mockMvc.perform(get("/api/v1/location/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES))
+                .param("page", "0")
+                .param("size", "15")
+                .param("sort", "name"))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        MockHttpServletResponse response = mvcResult.getResponse();
+        Page<LocationResponse> locations = objectMapper.readValue(response.getContentAsString(), new TypeReference<Page<LocationResponse>>() {
+        });
+
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(15, locations.getNumberOfElements()),
+            () -> Assertions.assertTrue(locations.stream().allMatch(location -> location.name().startsWith("Location"))),
+            () -> Assertions.assertTrue(locations.stream().allMatch(location -> Objects.nonNull(location.address())))
+        );
+
+        MvcResult mvcResult2 = mockMvc.perform(get("/api/v1/location/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES))
+                .param("page", "2")
+                .param("size", "15")
+                .param("sort", "name"))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        MockHttpServletResponse response2 = mvcResult2.getResponse();
+        Page<LocationResponse> locations2 = objectMapper.readValue(response2.getContentAsString(), new TypeReference<Page<LocationResponse>>() {
+        });
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(10, locations2.getNumberOfElements()),
+            () -> Assertions.assertTrue(locations2.stream().allMatch(location -> location.name().startsWith("Location"))),
+            () -> Assertions.assertTrue(locations2.stream().allMatch(location -> Objects.nonNull(location.address())))
+        );
+    }
+
+    @Test
+    @Order(9)
+    @DirtiesContext
+    void searchForLocationsShouldOnlyReturnResultsThatMatchName() throws Exception {
+        for (int i = 0; i < 40; i++) {
+            Address address;
+            if (i % 2 == 0) {
+                address = new Address("Test Street 1", "1010", "Vienna", "Austria");
+            } else {
+                address = new Address("Bergzeile 87", "3970", "Weitra", "Tschechien");
+            }
+            addressRepository.save(address);
+            locationRepository.save(new Location("Location " + i, address));
+        }
+        MvcResult mvcResult = mockMvc.perform(get("/api/v1/location/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES))
+                .param("page", "0")
+                .param("size", "15")
+                .param("sort", "name")
+                .param("name", "Location 10"))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        MockHttpServletResponse response = mvcResult.getResponse();
+        Page<LocationResponse> locations = objectMapper.readValue(response.getContentAsString(), new TypeReference<Page<LocationResponse>>() {
+        });
+
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(1, locations.getNumberOfElements()),
+            () -> Assertions.assertTrue(locations.stream().allMatch(location -> location.name().equals("Location 10")))
+        );
+    }
+
+    @Test
+    @Order(10)
+    @DirtiesContext
+    void searchForLocationsShouldOnlyReturnResultsThatMatchAddress() throws Exception {
+        for (int i = 0; i < 40; i++) {
+            Address address;
+            if (i % 2 == 0) {
+                address = new Address("Test Street 1", "1010", "Vienna", "Austria");
+            } else {
+                address = new Address("Bergzeile 87", "3970", "Weitra", "Tschechien");
+            }
+            addressRepository.save(address);
+            locationRepository.save(new Location("Location " + i, address));
+        }
+        MvcResult mvcResult = mockMvc.perform(get("/api/v1/location/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES))
+                .param("page", "0")
+                .param("size", "15")
+                .param("sort", "name")
+                .param("street", "Bergzeile 87")
+                .param("postalCode", "3970")
+                .param("city", "Weitra")
+                .param("country", "Tschechien")
+            )
+            .andExpect(status().isOk())
+            .andReturn();
+
+        MockHttpServletResponse response = mvcResult.getResponse();
+        Page<LocationResponse> locations = objectMapper.readValue(response.getContentAsString(), new TypeReference<Page<LocationResponse>>() {
+        });
+
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(15, locations.getNumberOfElements()),
+            () -> Assertions.assertEquals(20, locations.getTotalElements())
+        );
+    }
+
+    @Test
+    @Order(10)
+    @DirtiesContext
+    void searchForLocationsShouldOnlyReturnResultsThatAreSorted() throws Exception {
+        for (int i = 40; i >= 1; i--) {
+            Address address;
+            if (i % 2 == 0) {
+                address = new Address("Test Street 1", "1010", "Vienna", "Austria");
+            } else {
+                address = new Address("Bergzeile 87", "3970", "Weitra", "Tschechien");
+            }
+            addressRepository.save(address);
+            locationRepository.save(new Location("Location " + i, address));
+        }
+        MvcResult mvcResult = mockMvc.perform(get("/api/v1/location/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES))
+                .param("page", "0")
+                .param("size", "15")
+                .param("sort", "name")
+                .param("name", "Location 1")
+            )
+            .andExpect(status().isOk())
+            .andReturn();
+
+        MockHttpServletResponse response = mvcResult.getResponse();
+        Page<LocationResponse> locations = objectMapper.readValue(response.getContentAsString(), new TypeReference<Page<LocationResponse>>() {
+        });
+
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(11, locations.getNumberOfElements()),
+            () -> Assertions.assertEquals("Location 1", locations.getContent().get(0).name()),
+            () -> Assertions.assertEquals("Location 10", locations.getContent().get(1).name()),
+            () -> Assertions.assertEquals("Location 11", locations.getContent().get(2).name()),
+            () -> Assertions.assertEquals("Location 12", locations.getContent().get(3).name()),
+            () -> Assertions.assertEquals("Location 13", locations.getContent().get(4).name()),
+            () -> Assertions.assertEquals("Location 14", locations.getContent().get(5).name()),
+            () -> Assertions.assertEquals("Location 15", locations.getContent().get(6).name()),
+            () -> Assertions.assertEquals("Location 16", locations.getContent().get(7).name()),
+            () -> Assertions.assertEquals("Location 17", locations.getContent().get(8).name()),
+            () -> Assertions.assertEquals("Location 18", locations.getContent().get(9).name()),
+            () -> Assertions.assertEquals("Location 19", locations.getContent().get(10).name())
         );
     }
 }

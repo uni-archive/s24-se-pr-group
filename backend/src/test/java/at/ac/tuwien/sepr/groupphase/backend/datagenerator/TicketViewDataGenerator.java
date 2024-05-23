@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.datagenerator;
 
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Address;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Artist;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Event;
@@ -15,6 +16,7 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Show;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Ticket;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.type.InvoiceType;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.type.UserType;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.AddressRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.EventRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallPlanRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallSectorRepository;
@@ -81,11 +83,15 @@ public class TicketViewDataGenerator {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private AddressRepository addressRepository;
 
     @PostConstruct
     private void generateData() {
         // creating user for order
-        var customer = new ApplicationUser("ticketview-user-48@email.com", "", "tview", "tview", "+431234567890", "zyxwvutsrqponmlkjihgfedcba", 0, false, UserType.CUSTOMER, false);
+        Address address = new Address("Test street", "1287", "Test City", "Austria");
+        addressRepository.save(address);
+        var customer = new ApplicationUser("ticketview-user-48@email.com", "", "tview", "tview", "+431234567890", "zyxwvutsrqponmlkjihgfedcba", 0, false, UserType.CUSTOMER, false, address);
         customer.setPassword(passwordEncoder.encode("password" + customer.getSalt()));
 
         userRepository.save(customer);

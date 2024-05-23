@@ -7,14 +7,12 @@ import { MessageComponent } from "./components/message/message.component";
 import { RegistrationComponent } from "./components/user/registration/registration.component";
 import { UserHomeComponent } from "./components/user/user-home/user-home.component";
 import { TicketsComponent } from "./components/tickets/tickets/tickets.component";
-import {OrdersViewComponent} from "./components/orders/orders-view/orders-view.component";
 import {OrdersDetailsViewComponent} from "./components/orders/orders-details-view/orders-details-view.component";
 import {LocationOverviewComponent} from "./components/location/location-overview/location-overview.component";
 import {LocationCreateComponent} from "./components/location/location-create/location-create.component";
 import {AdminGuard} from "./guards/admin.guard";
 import {LocationEditComponent} from "./components/location/location-edit/location-edit.component";
 import {OrdersViewComponent} from "./components/orders/orders-view/orders-view.component";
-import {OrdersDetailsViewComponent} from "./components/orders/orders-details-view/orders-details-view.component";
 
 
 

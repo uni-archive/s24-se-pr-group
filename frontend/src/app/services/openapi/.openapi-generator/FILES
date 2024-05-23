@@ -40,8 +40,11 @@ model/message-inquiry-dto.ts
 model/models.ts
 model/order-details-response.ts
 model/order-summary-response.ts
+model/page-location-dto.ts
+model/pageable-object.ts
 model/show-response.ts
 model/simple-message-dto.ts
+model/sort-object.ts
 model/ticket-details-response-hall-spot.ts
 model/ticket-details-response.ts
 model/user-create-request.ts

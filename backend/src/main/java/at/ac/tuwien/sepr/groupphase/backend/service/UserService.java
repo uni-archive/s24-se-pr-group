@@ -61,13 +61,6 @@ public interface UserService extends UserDetailsService {
      */
     Stream<ApplicationUserDto> search(ApplicationUserSearchDto searchParameters);
 
-    /**
-     * Search for users in the persistent data store matching all provided fields.
-     *
-     * @param searchParameters the search parameters to use in filtering.
-     * @return the users where the given fields match.
-     */
-    Stream<ApplicationUserDto> search(ApplicationUserSearchDto searchParameters);
 
     /**
      * Update the lock status of a user based on the email address.

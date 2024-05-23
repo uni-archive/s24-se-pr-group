@@ -31,14 +31,4 @@ public class UserDao extends AbstractDao<ApplicationUser, ApplicationUserDto> {
         );
         return users.stream().map(mapper::toDto);
     }
-
-    public Stream<ApplicationUserDto> search(ApplicationUserSearchDto searchParameters) {
-        List<ApplicationUser> users = ((UserRepository) repository).findByParams(
-            searchParameters.firstName(),
-            searchParameters.familyName(),
-            searchParameters.email(),
-            searchParameters.isLocked()
-        );
-        return users.stream().map(mapper::toDto);
-    }
 }

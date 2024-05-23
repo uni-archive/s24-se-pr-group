@@ -15,6 +15,7 @@ import { Observable }                                        from 'rxjs';
 
 import { LocationCreateRequest } from '../model/models';
 import { LocationDto } from '../model/models';
+import { PageLocationDto } from '../model/models';
 
 
 import { Configuration }                                     from '../configuration';
@@ -51,6 +52,20 @@ export interface LocationEndpointServiceInterface {
      * @param id 
      */
     findById2(id: number, extraHttpRequestParams?: any): Observable<LocationDto>;
+
+    /**
+     * 
+     * 
+     * @param name 
+     * @param city 
+     * @param street 
+     * @param postalCode 
+     * @param country 
+     * @param page 
+     * @param size 
+     * @param sort 
+     */
+    search(name?: string, city?: string, street?: string, postalCode?: string, country?: string, page?: number, size?: number, sort?: string, extraHttpRequestParams?: any): Observable<PageLocationDto>;
 
     /**
      * 

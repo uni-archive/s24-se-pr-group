@@ -1,10 +1,12 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.LocationDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.LocationSearch;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface LocationService {
     /**
@@ -44,4 +46,6 @@ public interface LocationService {
      * @return a list of {@link LocationDto} objects containing all locationes
      */
     Iterable<LocationDto> findAll();
+
+    Page<LocationDto> search(LocationSearch locationSearchRequest);
 }

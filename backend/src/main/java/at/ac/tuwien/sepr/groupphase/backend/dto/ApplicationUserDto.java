@@ -29,7 +29,7 @@ public class ApplicationUserDto implements AbstractDto {
         this.accountLocked = accountLocked;
         this.isAdmin = isAdmin;
         this.isSuperAdmin = isSuperAdmin;
-        this.address = addressDto;
+        this.address = address;
     }
 
     public ApplicationUserDto() {

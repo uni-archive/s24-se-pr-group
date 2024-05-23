@@ -13,6 +13,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AddressCreateRequest;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Address;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.AddressRepository;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.LocationRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -53,6 +54,8 @@ public class AddressEndpointTest {
 
     @Autowired
     private SecurityProperties securityProperties;
+    @Autowired
+    private LocationRepository locationRepository;
 
     @Test
     void createShouldCreateAddressAsAdmin() throws Exception {
@@ -164,8 +167,7 @@ public class AddressEndpointTest {
 
     @Test
     void findAllShouldReturnAllAddressesAsAdmin() throws Exception {
-        userRepository.findAll().forEach(x->{x.setAddress(null); userRepository.save(x);});
-        addressRepository.deleteAll();
+        int size = addressRepository.findAll().size();
         addressRepository.save(new Address("Street 1", "City 1", "1111", "Country 1"));
         addressRepository.save(new Address("Street 2", "City 2", "2222", "Country 2"));
 
@@ -177,6 +179,6 @@ public class AddressEndpointTest {
         MockHttpServletResponse response = mvcResult.getResponse();
         List<AddressDto> addresses = objectMapper.readValue(response.getContentAsString(), List.class);
 
-        Assertions.assertEquals(2, addresses.size());
+        Assertions.assertEquals(size+2, addresses.size());
     }
 }

@@ -1,6 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+import at.ac.tuwien.sepr.groupphase.backend.dto.AddressSearch;
 import at.ac.tuwien.sepr.groupphase.backend.dto.LocationDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.LocationSearch;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LocationCreateRequest;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.LocationResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
@@ -8,7 +10,9 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFound
 import at.ac.tuwien.sepr.groupphase.backend.service.LocationService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -72,5 +77,30 @@ public class LocationEndpoint {
     public ResponseEntity<Iterable<LocationDto>> findAll() {
         Iterable<LocationDto> locations = locationService.findAll();
         return new ResponseEntity<>(locations, HttpStatus.OK);
+    }
+
+    @Secured(Code.USER)
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<Page<LocationDto>> search(@RequestParam(name = "name", required = false) String name,
+                                                    @RequestParam(name = "city", required = false) String city,
+                                                    @RequestParam(name = "street", required = false) String street,
+                                                    @RequestParam(name = "postalCode", required = false) String postalCode,
+                                                    @RequestParam(name = "country", required = false) String country,
+                                                    @RequestParam(name = "page", defaultValue = "0") Integer page,
+                                                    @RequestParam(name = "size", defaultValue = "15") Integer size,
+                                                    @RequestParam(name = "sort", defaultValue = "name") String sort) {
+        AddressSearch addressSearch = new AddressSearch(city, street, postalCode, country);
+
+        Sort sortBy = Sort.by(sort.split(",")[0]);
+        if (sort.split(",").length > 1) {
+            if (sort.split(",")[1].equals("asc")) {
+                sortBy = sortBy.ascending();
+            } else if (sort.split(",")[1].equals("desc")) {
+                sortBy = sortBy.descending();
+            }
+        }
+        PageRequest pageable = PageRequest.of(page, size, sortBy);
+        LocationSearch locationSearchRequest = new LocationSearch(name, addressSearch, pageable);
+        return new ResponseEntity<>(locationService.search(locationSearchRequest), HttpStatus.OK);
     }
 }
