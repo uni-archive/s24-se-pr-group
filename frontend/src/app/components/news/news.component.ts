@@ -13,7 +13,9 @@ export class NewsComponent implements OnInit {
 
   error = false;
   errorMessage = '';
-  // After first submission attempt, form validation will start
+  success = false;
+  successMessage = '';
+
   submitted = false;
 
   currentNews: DetailedNewsDto;
@@ -62,7 +64,7 @@ export class NewsComponent implements OnInit {
     this.newsServiceNew.find(id).subscribe({
       next: res => {
         this.currentNews = res;
-        this.selectedFile = null;
+       // this.selectedFile = null;
         this.modalService.open(newsAddModal, {ariaLabelledBy: 'modal-basic-title'});
       },
       error: err => {
@@ -75,14 +77,7 @@ export class NewsComponent implements OnInit {
    * Starts form validation and builds a news dto for sending a creation request if the form is valid.
    * If the procedure was successful, the form will be cleared.
    */
-  addNewsAlt(form) {
-    this.submitted = true;
 
-    if (form.valid) {
-      this.createNews(this.currentNews);
-      this.clearForm();
-    }
-  }
 
   addNews(form) {
     this.submitted = true;
@@ -90,11 +85,25 @@ export class NewsComponent implements OnInit {
     if (form.valid && this.selectedFile) {
       this.createNews(this.currentNews);
       this.clearForm();
-    } else {
-      this.errorMessage = 'Bitte fülle alle Felder aus und wähle ein Bild!';
-      this.error = true;
+
     }
+    /*
+  else {
+    this.errorMessage = 'Bitte fülle alle Felder aus und wähle ein Bild!';
+    this.error = true;
   }
+  */
+
+  }
+
+  private clearForm() {
+    this.currentNews = {} as DetailedNewsDto;
+    this.submitted = false;
+
+
+  }
+
+
   getNews(): DetailedNewsDto[] {
     return this.news;
   }
@@ -105,13 +114,22 @@ export class NewsComponent implements OnInit {
   vanishError() {
     this.error = false;
   }
+  /**
+   * Success flag will be deactivated, which clears the success news
+   */
+  vanishSuccess() {
+    this.success = false;
+  }
+
+
+
 
   /**
    * Sends news creation request
    *
    * @param news the news which should be created
    */
-  private createNews(news: DetailedNewsDto) {
+  private createNews2(news: DetailedNewsDto) {
     console.log('NewsDto1:', news);
 
 
@@ -121,6 +139,25 @@ export class NewsComponent implements OnInit {
       },
       error: error => {
         this.defaultServiceErrorHandling(error);
+      }
+    });
+  }
+
+
+  private createNews(news: DetailedNewsDto) {
+    this.newsServiceNew.create(news.title, news.summary, news.text, this.selectedFile).subscribe({
+      next: () => {
+        this.modalService.dismissAll();
+        this.loadNews();
+        this.successMessage = 'Die News wurde erfolgreich gespeichert.';
+        this.success = true;
+                setTimeout(() => {
+          this.success = false;
+        }, 5000);
+      },
+      error: error => {
+        this.defaultServiceErrorHandling(error);
+        this.success = false;
       }
     });
   }
@@ -141,7 +178,6 @@ export class NewsComponent implements OnInit {
     });
   }
 
-
   private defaultServiceErrorHandling(error: any) {
     console.log(error);
     this.error = true;
@@ -151,10 +187,4 @@ export class NewsComponent implements OnInit {
       this.errorMessage = error.error;
     }
   }
-
-  private clearForm() {
-    this.currentNews = {} as DetailedNewsDto;
-    this.submitted = false;
-  }
-
 }

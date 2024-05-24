@@ -11,20 +11,26 @@ import javax.imageio.ImageIO;
 public class DummyImageGenerator {
 
     public static byte[] createDummyImage() throws IOException {
-        int width = 300;
-        int height = 200;
+        Random random = new Random();
+        int width = 400 + random.nextInt(601);
+        int height = width / (2 + random.nextInt(2));
 
         BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D image = bufferedImage.createGraphics();
 
         image.setColor(getRandomColor());
         image.fillRect(0, 0, width, height);
+
+        int circleDiameter = Math.min(width, height) / 2;
+        int circleX = (width - circleDiameter) / 2;
+        int circleY = (height - circleDiameter) / 2;
+
         image.setColor(getRandomColor());
-        image.fillOval(100, 50, 100, 100);
+        image.fillOval(circleX, circleY, circleDiameter, circleDiameter);
         image.setColor(Color.white);
-        image.drawString("Dummy-Bild", 120, 100);
+        image.drawString("Dummy-Bild", circleX + circleDiameter / 4, circleY + circleDiameter / 2);
         image.setColor(Color.black);
-        image.drawString("Dummy-Bild", 120, 120);
+        image.drawString("Dummy-Bild", circleX + circleDiameter / 4, circleY + circleDiameter / 2 + 20);
 
         image.dispose();
 

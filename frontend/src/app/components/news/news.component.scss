@@ -1,6 +1,31 @@
-img.news-image-preview {
-  max-width: 70%;
-  max-height: 300px; /* or any other value you prefer */
-  width: auto;
-  height: auto;
+.card {
+  position: relative;
+  overflow: hidden;
 }
+
+.news-image-preview {
+  width: 100%;
+  height: 40%;
+  object-fit: cover;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.error-toast {
+  background-color: #c23131;
+}
+
+.success-toast {
+  background-color: #64c561;
+}
+
+
+
+
+
+
+
+

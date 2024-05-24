@@ -19,10 +19,27 @@ import java.time.LocalDateTime;
 public class NewsDataGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final int NUMBER_OF_NEWS_TO_GENERATE = 5;
-    private static final String TEST_NEWS_TITLE = "Titel";
-    private static final String TEST_NEWS_SUMMARY = "Zusammenfassung des Texts";
-    private static final String TEST_NEWS_TEXT = "Text";
+    private static final int NUMBER_OF_NEWS_TO_GENERATE = 10;
+    private static final String TEST_NEWS_TITLE = "Lorem Ipsum";
+    private static final String TEST_NEWS_SUMMARY = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur " +
+        "consectetur egestas arcu viverra facilisis.";
+    private static final String TEST_NEWS_TEXT = "Curabitur consectetur egestas arcu viverra facilisis. Quisque " +
+        "dignissim, dolor ut imperdiet lacinia, nunc lectus dapibus tortor, iaculis luctus lacus eros non elit. Aenean " +
+        "dapibus, metus quis gravida euismod, tellus neque consectetur elit, volutpat elementum libero velit vel tellus." +
+        " Aliquam erat volutpat. Aenean accumsan viverra quam et convallis. Curabitur eros ligula, placerat a vulputate " +
+        "et, auctor ut lectus. Ut auctor risus et massa condimentum, nec dignissim justo luctus. Sed tincidunt quam " +
+        "tellus, ac pulvinar lorem commodo ut. Morbi porttitor nisl nec nulla luctus, tempus maximus mauris accumsan." +
+        " Sed dictum consequat hendrerit. Maecenas cursus bibendum sapien eu dictum. Lorem ipsum dolor sit amet," +
+        " consectetur adipiscing elit. Maecenas in tempor lectus.\n" +
+        "\n" +
+        "Praesent feugiat malesuada lacus et semper. Morbi iaculis viverra urna quis lacinia. Sed eget dui in odio" +
+        " tempus finibus eu eu nulla. Suspendisse nec posuere justo. Nunc tempus, arcu nec efficitur ullamcorper, lorem" +
+        " tortor fermentum dui, ac porttitor ex mi ac est. In imperdiet diam et tempor venenatis. Aenean ac orci magna.\n" +
+        "\n" +
+        "Vivamus efficitur pretium nisi sit amet scelerisque. Cras vel odio mauris. Suspendisse ullamcorper porta enim," +
+        " quis aliquet massa luctus ut. Nulla feugiat nunc non sollicitudin fermentum. Donec dolor est, commodo in orci " +
+        "et, euismod sodales purus. Duis faucibus sagittis cursus. Suspendisse condimentum massa ex, at mollis elit " +
+        "pulvinar vel. Nam ut arcu enim.";
 
     private final NewsRepository newsRepository;
 
@@ -40,8 +57,8 @@ public class NewsDataGenerator {
                 byte[] dummyImage = DummyImageGenerator.createDummyImage();
                 News news = News.NewsBuilder.aNews()
                     .withTitle(TEST_NEWS_TITLE + " " + i)
-                    .withSummary(TEST_NEWS_SUMMARY + " " + i)
-                    .withText(TEST_NEWS_TEXT + " " + i)
+                    .withSummary(TEST_NEWS_SUMMARY)
+                    .withText(TEST_NEWS_TEXT)
                     .withImage(dummyImage)
                     .withPublishedAt(LocalDateTime.now().minusMonths(i))
                     .build();
