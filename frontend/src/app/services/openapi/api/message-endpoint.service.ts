@@ -104,12 +104,12 @@ export class MessageEndpointService implements MessageEndpointServiceInterface {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public create(messageInquiryDto: MessageInquiryDto, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<DetailedMessageDto>;
-    public create(messageInquiryDto: MessageInquiryDto, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<DetailedMessageDto>>;
-    public create(messageInquiryDto: MessageInquiryDto, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<DetailedMessageDto>>;
-    public create(messageInquiryDto: MessageInquiryDto, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public create1(messageInquiryDto: MessageInquiryDto, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<DetailedMessageDto>;
+    public create1(messageInquiryDto: MessageInquiryDto, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<DetailedMessageDto>>;
+    public create1(messageInquiryDto: MessageInquiryDto, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<DetailedMessageDto>>;
+    public create1(messageInquiryDto: MessageInquiryDto, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (messageInquiryDto === null || messageInquiryDto === undefined) {
-            throw new Error('Required parameter messageInquiryDto was null or undefined when calling create.');
+            throw new Error('Required parameter messageInquiryDto was null or undefined when calling create1.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -178,12 +178,12 @@ export class MessageEndpointService implements MessageEndpointServiceInterface {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public find(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<DetailedMessageDto>;
-    public find(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<DetailedMessageDto>>;
-    public find(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<DetailedMessageDto>>;
-    public find(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public find1(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<DetailedMessageDto>;
+    public find1(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<DetailedMessageDto>>;
+    public find1(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<DetailedMessageDto>>;
+    public find1(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling find.');
+            throw new Error('Required parameter id was null or undefined when calling find1.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -241,10 +241,10 @@ export class MessageEndpointService implements MessageEndpointServiceInterface {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public findAll(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<Array<SimpleMessageDto>>;
-    public findAll(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<SimpleMessageDto>>>;
-    public findAll(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<SimpleMessageDto>>>;
-    public findAll(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public findAll1(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<Array<SimpleMessageDto>>;
+    public findAll1(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<SimpleMessageDto>>>;
+    public findAll1(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<SimpleMessageDto>>>;
+    public findAll1(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarHeaders = this.defaultHeaders;
 

@@ -165,12 +165,12 @@ export class LocationEndpointService implements LocationEndpointServiceInterface
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public create1(locationCreateRequest: LocationCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<LocationDto>;
-    public create1(locationCreateRequest: LocationCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<LocationDto>>;
-    public create1(locationCreateRequest: LocationCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<LocationDto>>;
-    public create1(locationCreateRequest: LocationCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public create2(locationCreateRequest: LocationCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<LocationDto>;
+    public create2(locationCreateRequest: LocationCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<LocationDto>>;
+    public create2(locationCreateRequest: LocationCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<LocationDto>>;
+    public create2(locationCreateRequest: LocationCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (locationCreateRequest === null || locationCreateRequest === undefined) {
-            throw new Error('Required parameter locationCreateRequest was null or undefined when calling create1.');
+            throw new Error('Required parameter locationCreateRequest was null or undefined when calling create2.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -237,10 +237,10 @@ export class LocationEndpointService implements LocationEndpointServiceInterface
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public findAll1(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<object>;
-    public findAll1(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<object>>;
-    public findAll1(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<object>>;
-    public findAll1(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public findAll2(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<object>;
+    public findAll2(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<object>>;
+    public findAll2(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<object>>;
+    public findAll2(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarHeaders = this.defaultHeaders;
 

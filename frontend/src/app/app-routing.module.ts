@@ -21,6 +21,7 @@ import {CreateEventComponent} from "./components/administrative-tasks/create-eve
 import {CreateShowComponent} from "./components/administrative-tasks/create-show/create-show.component";
 import {EventDatailpageComponent} from "./components/event-datailpage/event-datailpage.component";
 import {NewsComponent} from "./components/news/news.component";
+import {NewsDetailComponent} from './components/news/news-detail/news-detail.component';
 
 const routes: Routes = [
   {path: "", component: HomeComponent},
@@ -32,7 +33,8 @@ const routes: Routes = [
     component: MessageComponent,
   },
   {
-    path: 'my', canActivate: mapToCanActivate([AuthGuard]), children:
+     path: 'news-detail/:id', canActivate: [AuthGuard], component: NewsDetailComponent },
+  {path: 'my', canActivate: mapToCanActivate([AuthGuard]), children:
       [
         {path: 'tickets', component: TicketsComponent},
         {path: 'orders', component: OrdersViewComponent},

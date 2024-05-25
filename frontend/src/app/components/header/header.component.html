@@ -16,24 +16,24 @@
     <ul class="navbar-nav me-auto">
         <li class="nav-item">
             <a class="nav-link" *ngIf="authService.isLoggedIn()" routerLink="/news" routerLinkActive="active">News</a>
-        </li>
-      <li class="nav-item">
-        <a class="nav-link" *ngIf="authService.isLoggedIn()" routerLink="/my/tickets" routerLinkActive="active">Meine Tickets</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" *ngIf="authService.isLoggedIn()" routerLink="/my/orders" routerLinkActive="active">Meine Bestellungen</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" *ngIf="authService.isLoggedIn() && authService.getUserRole()==='ADMIN'" routerLink="/eventcreation" routerLinkActive="active">Erstelle Veranstaltung</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" *ngIf="authService.isLoggedIn() && authService.getUserRole()==='ADMIN'" routerLink="/showcreation" routerLinkActive="active">Erstelle Vorführung</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" routerLink="/search" routerLinkActive="active">Suche</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" *ngIf="authService.isLoggedIn()" routerLink="/news" routerLinkActive="active">News</a>
+      <a class="nav-link" *ngIf="authService.isLoggedIn()" routerLink="/my/tickets" routerLinkActive="active">Meine Tickets</a>
+      </li>
+      <li class="nav-item">
+      <a class="nav-link" *ngIf="authService.isLoggedIn()" routerLink="/my/orders" routerLinkActive="active">Meine Bestellungen</a>
+      </li>
+      <li class="nav-item">
+      <a class="nav-link" *ngIf="authService.isLoggedIn() && authService.getUserRole()==='ADMIN'" routerLink="/eventcreation" routerLinkActive="active">Erstelle Veranstaltung</a>
+      </li>
+      <li class="nav-item">
+      <a class="nav-link" *ngIf="authService.isLoggedIn() && authService.getUserRole()==='ADMIN'" routerLink="/showcreation" routerLinkActive="active">Erstelle Vorführung</a>
+      </li>
+      <li class="nav-item">
+      <a class="nav-link" *ngIf="authService.isLoggedIn() && authService.getUserRole()==='ADMIN'" routerLink="/locations" routerLinkActive="active">Aufführungsorte</a>
       </li>
     </ul>
     <!-- Right-aligned nav items -->

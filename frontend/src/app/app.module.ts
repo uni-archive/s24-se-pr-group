@@ -12,7 +12,7 @@ import { HomeComponent } from "./components/home/home.component";
 import { LoginComponent } from "./components/login/login.component";
 import { MessageComponent } from "./components/message/message.component";
 import { NewsComponent} from './components/news/news.component';
-import {NgbModule } from "@ng-bootstrap/ng-bootstrap";
+import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { httpInterceptorProviders } from "./interceptors";
 import {GlobalMessageComponent } from "./global-message/global-message.component";
 import { AngularPhoneNumberInput } from "angular-phone-number-input";
@@ -33,20 +33,22 @@ import {ShowSearchComponent} from "./components/searchpage-components/show-searc
 import {RegistrationComponent} from "./components/user/registration/registration.component";
 import {SearchpageComponent} from "./components/searchpage-components/searchpage/searchpage.component";
 import {ArtistSearchComponent} from "./components/searchpage-components/artist-search/artist-search.component";
+import {NewsDetailComponent} from "./components/news/news-detail/news-detail.component";
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    HeaderComponent,
-    FooterComponent,
-    HomeComponent,
-    LoginComponent,
-    MessageComponent,
-    NewsComponent,
-    RegistrationComponent,
-    GlobalMessageComponent,
-    UserHomeComponent,
-    ManageUserComponent,
+    declarations: [
+        AppComponent,
+        HeaderComponent,
+        FooterComponent,
+        HomeComponent,
+        LoginComponent,
+        MessageComponent,
+        NewsComponent,
+      NewsDetailComponent,
+        RegistrationComponent,
+        GlobalMessageComponent,
+        UserHomeComponent,
+        ManageUserComponent,
     SearchpageComponent,
     UserEditComponent,
     CountryDropdownComponent,
@@ -70,17 +72,14 @@ import {ArtistSearchComponent} from "./components/searchpage-components/artist-s
     PrintTicketButtonComponent,
     TicketsTableComponent,
     NgxPaginationModule,
-    EventSearchComponent,
+
+  EventSearchComponent,
     ShowSearchComponent,
     ShowSearchComponent,
-    ArtistSearchComponent,
-  ],
-  providers: [httpInterceptorProviders],
-  exports: [
-    HeaderComponent,
-    FooterComponent,
-    LocationSearchComponent
-  ],
-  bootstrap: [AppComponent],
+    ArtistSearchComponent,  ],
+    providers: [httpInterceptorProviders],
+    exports: [HeaderComponent, FooterComponent,
+    LocationSearchComponent],
+    bootstrap: [AppComponent],
 })
 export class AppModule {}
