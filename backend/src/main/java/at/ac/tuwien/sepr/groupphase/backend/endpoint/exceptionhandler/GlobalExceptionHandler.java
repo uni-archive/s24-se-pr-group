@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.exceptionhandler;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.MailNotSentException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleValidationException(RuntimeException ex, WebRequest request) {
         LOGGER.warn(ex.getMessage());
         return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY,
+            request);
+    }
+
+    @ExceptionHandler(value = {MailNotSentException.class})
+    protected ResponseEntity<Object> handleMailNotSentException(RuntimeException ex, WebRequest request) {
+        LOGGER.error(ex.getMessage());
+        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR,
             request);
     }
 
