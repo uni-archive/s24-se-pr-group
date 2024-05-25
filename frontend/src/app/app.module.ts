@@ -28,6 +28,8 @@ import {LocationEditComponent} from "./components/location/location-edit/locatio
 import {PaginatedListComponent} from "./components/paginated-list/paginated-list.component";
 import {ShowSearchComponent} from "./components/search/show-search/show-search.component";
 import {LocationSearchComponent} from "./components/location/location-search/location-search.component";
+import { TicketsTableComponent } from "./components/tickets/tickets-table/tickets-table.component";
+import { UserEditComponent } from "./components/user/user-edit/user-edit.component";
 
 @NgModule({
   declarations: [
@@ -41,6 +43,7 @@ import {LocationSearchComponent} from "./components/location/location-search/loc
     GlobalMessageComponent,
     UserHomeComponent,
     ManageUserComponent,
+    UserEditComponent,
     CountryDropdownComponent,
     LocationOverviewComponent,
     LocationCreateComponent,
@@ -60,7 +63,7 @@ import {LocationSearchComponent} from "./components/location/location-search/loc
     PrintPurchaseInvoiceButtonComponent,
     PrintTicketButtonComponent,
     TicketsTableComponent,
-    NgxPaginationModule
+    NgxPaginationModule,
   ],
   providers: [httpInterceptorProviders],
   exports: [HeaderComponent, FooterComponent],
