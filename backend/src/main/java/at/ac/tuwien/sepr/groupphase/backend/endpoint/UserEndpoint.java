@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserCreateRequest;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateInfoRequest;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.AddressResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
@@ -11,6 +12,7 @@ import at.ac.tuwien.sepr.groupphase.backend.mapper.UserMapper;
 import at.ac.tuwien.sepr.groupphase.backend.service.AddressService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.MailNotSentException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
@@ -100,6 +102,19 @@ public class UserEndpoint {
         LOGGER.info("Update user status by email: {}", user);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return userMapper.toResponse(userService.updateUserStatusByEmail(user, authentication.getName()));
+    }
+
+    @Secured("ROLE_USER")
+    @PutMapping(path = "/update/user", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ApplicationUserResponse updateUserInfo(@RequestBody UserUpdateInfoRequest userInfo) throws ValidationException, MailNotSentException {
+        LOGGER.info("Update user info: {}", userInfo);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        ApplicationUserDto user = userService.findApplicationUserById(userInfo.id());
+        if (!authentication.getName().equals(user.getEmail())) {
+            throw new ValidationException("User can only update their own information.");
+        }
+        return userMapper.toResponse(userService.updateUserInfo(userMapper.toDto(userInfo)));
     }
 
 }
