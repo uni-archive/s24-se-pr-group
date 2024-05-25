@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.MailNotSentException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -71,4 +72,24 @@ public interface UserService extends UserDetailsService {
      */
     ApplicationUserDto updateUserStatusByEmail(ApplicationUserDto toUpdate, String adminEmail) throws ValidationException,
         NotFoundException;
+
+    /**
+     * Update the user information.
+     *
+     * @param userInfo the user information to update
+     * @return the updated user information
+     * @throws NotFoundException    if the user does not exist
+     * @throws ValidationException  if the user information is invalid
+     * @throws MailNotSentException if the mail could not be sent
+     */
+    ApplicationUserDto updateUserInfo(ApplicationUserDto userInfo) throws ValidationException, MailNotSentException;
+
+    /**
+     * Find an application user based on the id.
+     *
+     * @param id the id
+     * @return the application user
+     * @throws NotFoundException if the user does not exist
+     */
+    ApplicationUserDto findApplicationUserById(Long id) throws NotFoundException;
 }
