@@ -3,6 +3,7 @@ package at.ac.tuwien.sepr.groupphase.backend.mapper;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserCreateRequest;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateInfoRequest;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.AddressResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.BaseResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.ApplicationUser;
@@ -27,6 +28,8 @@ public interface UserMapper extends BaseEntityMapper<ApplicationUser, Applicatio
     @Override
     @Mapping(source = "type", target = "admin", qualifiedByName = "userTypeToBoolean")
     ApplicationUserDto toDto(ApplicationUser entity);
+
+    ApplicationUserDto toDto(UserUpdateInfoRequest updateRequest);
 
     @Override
     @Mapping(source = "admin", target = "type", qualifiedByName = "booleanToUserType")
