@@ -72,14 +72,9 @@ public class UserValidator extends AbstractValidator {
         return errors;
     }
 
-    public void validateForUpdate(ApplicationUserDto objectToUpdate, ApplicationUserDto oldObject)
+    public void validateForUpdate(ApplicationUserDto objectToUpdate)
         throws ValidationException {
         List<String> errors = validateBaseCases(objectToUpdate);
-        if (!objectToUpdate.getEmail().equals(oldObject.getEmail())) {
-            if (Objects.nonNull(objectToUpdate.getEmail()) && userDao.findByEmail(objectToUpdate.getEmail()) != null) {
-                errors.add("Email already in use");
-            }
-        }
         endValidation(errors);
     }
 
