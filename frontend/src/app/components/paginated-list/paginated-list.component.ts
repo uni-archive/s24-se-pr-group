@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, TemplateRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, TemplateRef, SimpleChanges, OnChanges } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
 
@@ -7,14 +7,15 @@ import { debounceTime } from 'rxjs/operators';
   templateUrl: './paginated-list.component.html',
   styleUrls: ['./paginated-list.component.scss']
 })
-export class PaginatedListComponent implements OnInit {
+export class PaginatedListComponent implements OnInit, OnChanges {
   @Input() filterTemplate!: TemplateRef<any>;
   @Input() resultTemplate!: TemplateRef<any>;
   @Input() searchFunction!: (criteria: any, page: number, size: number) => any;
   @Input() showPaginationButtons: boolean = true;
-  @Input() filterConfig!: any; // New input to accept filter configuration
+  @Input() filterConfig: { [key: string]: any } = {}; // Accept filter configuration with default values
   @Input() createButtonEnabled: boolean = false;
   @Input() heading: string = '';
+  @Input() refresh: boolean = false; // Input to trigger refresh
 
   @Output() createNew = new EventEmitter<void>();
 
@@ -28,17 +29,34 @@ export class PaginatedListComponent implements OnInit {
   constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
-    // Dynamically create form controls based on filterConfig
-    this.filterConfig.forEach((controlName: string) => {
-      this.searchForm.addControl(controlName, new FormControl(''));
-    });
-
+    this.initializeFormControls();
     this.searchForm.valueChanges.pipe(debounceTime(300)).subscribe(() => {
       this.currentPage = 1;
       this.searchItems();
     });
 
     this.searchItems();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['refresh'] && !changes['refresh'].firstChange) {
+      this.searchItems();
+    }
+    if (changes['filterConfig']) {
+      this.initializeFormControls();
+    }
+  }
+
+  private initializeFormControls(): void {
+    // Clear the form controls if they exist
+    Object.keys(this.searchForm.controls).forEach(controlName => {
+      this.searchForm.removeControl(controlName);
+    });
+
+    // Dynamically create form controls based on filterConfig
+    Object.keys(this.filterConfig).forEach((controlName: string) => {
+      this.searchForm.addControl(controlName, new FormControl(this.filterConfig[controlName] ?? ''));
+    });
   }
 
   searchItems(): void {

@@ -1,23 +1,60 @@
-.alert {
+.alert-container {
+  position: fixed;
+  right: 20px;
+  z-index: 1050;
+  width: 350px; // Adjust width as necessary
+  max-width: 90%; // Ensures the alert box is responsive
+}
+
+.custom-alert {
   display: flex;
   align-items: center;
   justify-content: space-between; // Ensures content and close button are spaced apart
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 1050;
-  width: 300px;
-  padding-right: 10px; // Ensures padding from the right edge
+  padding: 15px 20px; // Better padding for content
+  word-wrap: break-word; // Ensures text stays inside the box
+  overflow-wrap: break-word; // Ensures text stays inside the box
+  margin-bottom: 10px; // Add some margin to space out the alerts
+  max-height: 100px; // Set max height to limit the box size
+  overflow: hidden; // Hide overflowed text
+  position: relative; // Ensure proper positioning of the details button
+}
+
+.message-text {
+  flex-grow: 1; // Ensure the message text takes up remaining space
+  overflow: hidden;
+  text-overflow: ellipsis; // Ensure text is cut off properly
+}
+
+.details-button {
+  margin-left: 10px;
+  flex-shrink: 0; // Ensure the button doesn't shrink
+  font-size: 0.875rem; // Adjust the font size
+  color: #007bff; // Bootstrap primary color
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
 .custom-close {
   border: none;
   background: transparent;
   color: inherit; // Inherits the text color of the alert for consistency
+  font-size: 1.5rem; // Larger font size for better clickability
   opacity: 0.8;
+  cursor: pointer; // Changes cursor to pointer to indicate button action
 
   &:hover {
     opacity: 1;
     color: #000; // Makes the button darker on hover for better visibility
   }
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
 }

@@ -1,0 +1,10 @@
+<app-generic-autocomplete [searchFunction]="searchLocations"
+                          [displayTemplate]="locationTemplate"
+                          label="Location"
+                          placeholder="Search and select a location"
+                          (itemSelected)="onLocationSelected($event)">
+</app-generic-autocomplete>
+
+<ng-template #locationTemplate let-location>
+  {{ location.name }}
+</ng-template>

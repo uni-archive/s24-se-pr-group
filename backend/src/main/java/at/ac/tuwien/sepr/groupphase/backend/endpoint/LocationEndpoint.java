@@ -10,6 +10,8 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFound
 import at.ac.tuwien.sepr.groupphase.backend.service.LocationService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
+import jakarta.annotation.security.PermitAll;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -64,7 +66,7 @@ public class LocationEndpoint {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @Secured(Code.USER)
+    @PermitAll
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 
     public ResponseEntity<LocationDto> findById(@PathVariable(name = "id") Long id) throws EntityNotFoundException {
@@ -79,7 +81,7 @@ public class LocationEndpoint {
         return new ResponseEntity<>(locations, HttpStatus.OK);
     }
 
-    @Secured(Code.USER)
+    @PermitAll
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<Page<LocationDto>> search(@RequestParam(name = "name", required = false) String name,
         @RequestParam(name = "city", required = false) String city,
@@ -103,5 +105,19 @@ public class LocationEndpoint {
         PageRequest pageable = PageRequest.of(page, size, sortBy);
         LocationSearch locationSearchRequest = new LocationSearch(name, addressSearch, withUpComingShows, pageable);
         return new ResponseEntity<>(locationService.search(locationSearchRequest), HttpStatus.OK);
+    }
+
+    @Secured(Code.USER)
+    @GetMapping(value = "/name/{name}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<List<LocationDto>> findByName(@PathVariable(name = "name") String name) {
+        LocationSearch locationSearchRequest = new LocationSearch(name, new AddressSearch("", "", "", ""), false,
+            PageRequest.of(0, Integer.MAX_VALUE));
+        return new ResponseEntity<>(locationService.search(locationSearchRequest).stream().toList(), HttpStatus.OK);
+    }
+
+    @Secured(Code.USER)
+    @GetMapping(value = "/name/")
+    public ResponseEntity<List<LocationDto>> findByName() {
+        return findByName("");
     }
 }

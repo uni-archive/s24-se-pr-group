@@ -5,30 +5,29 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDt
 import at.ac.tuwien.sepr.groupphase.backend.mapper.UserMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.UserRepository;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.specification.UserSpecification;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.stream.Stream;
 
 @Component
 public class UserDao extends AbstractDao<ApplicationUser, ApplicationUserDto> {
 
+    private final UserSpecification userSpecification;
+
     public UserDao(UserRepository repository,
-                   UserMapper mapper) {
+        UserMapper mapper, UserSpecification userSpecification) {
         super(repository, mapper);
+        this.userSpecification = userSpecification;
     }
+
 
     public ApplicationUserDto findByEmail(String email) {
         return (mapper).toDto(((UserRepository) repository).findByEmail(email));
     }
 
-    public Stream<ApplicationUserDto> search(ApplicationUserSearchDto searchParameters) {
-        List<ApplicationUser> users = ((UserRepository) repository).findByParams(
-            searchParameters.firstName(),
-            searchParameters.familyName(),
-            searchParameters.email(),
-            searchParameters.isLocked()
-        );
-        return users.stream().map(mapper::toDto);
+    public Page<ApplicationUserDto> search(ApplicationUserSearchDto searchParameters) {
+        Page<ApplicationUser> users = ((UserRepository) repository).findAll(
+            userSpecification.getUserSpecification(searchParameters), searchParameters.pageable());
+        return users.map(mapper::toDto);
     }
 }

@@ -16,6 +16,9 @@ import org.hibernate.action.internal.EntityActionVetoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
@@ -31,7 +34,8 @@ public class ShowDao extends AbstractDao<Show, ShowDto> {
     private final ArtistMapper artistMapper;
     private final EventMapper eventMapper;
 
-    protected ShowDao(ShowRepository repository, EventMapper eventMapper, EventDao dao, ArtistRepository artrepo, ArtistMapper artmapper, ShowMapper mapper) {
+    protected ShowDao(ShowRepository repository, EventMapper eventMapper, EventDao dao, ArtistRepository artrepo,
+        ArtistMapper artmapper, ShowMapper mapper) {
         super(repository, mapper);
         this.artrepo = artrepo;
         this.artistMapper = artmapper;
@@ -53,6 +57,10 @@ public class ShowDao extends AbstractDao<Show, ShowDto> {
             list.add(showListDto);
         }
         return list;
+    }
+
+    public Page<ShowDto> findByLocationId(Long locationId, Pageable pageable) {
+        return ((ShowRepository) repository).findByLocationId(locationId, pageable).map(mapper::toDto);
     }
 
     @Transactional

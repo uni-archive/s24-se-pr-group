@@ -77,4 +77,9 @@ export class LocationEditComponent implements OnInit {
       });
     }
   }
+
+
+  onLocationSelected(location: LocationDto): void {
+    this.editForm.get('location')!.setValue(location);
+  }
 }

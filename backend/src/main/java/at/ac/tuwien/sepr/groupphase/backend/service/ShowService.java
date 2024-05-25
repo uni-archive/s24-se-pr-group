@@ -44,5 +44,11 @@ public interface ShowService {
     List<ShowListDto> searchShows(ShowSearchDto searchDto) throws EntityNotFoundException;
 
 
+    /**
+     * Get all shows for a given location.
+     *
+     * @return all shows that are at the
+     */
+    Page<ShowDto> findByLocation(Long locationId, boolean onlyFutureShows, Pageable pageable);
 }
 

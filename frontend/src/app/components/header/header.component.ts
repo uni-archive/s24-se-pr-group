@@ -13,11 +13,15 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
   public applicationUserResponse: ApplicationUserResponse;
   private subscription: Subscription;
 
-  constructor(public authService: AuthService, private userService: UserEndpointService, private eventService: EventService) {
+  constructor(
+    public authService: AuthService,
+    private userService: UserEndpointService,
+    private eventService: EventService // Inject EventService
+  ) {
   }
 
   ngOnInit(): void {
-    this.subscription = this.eventService.registrationSuccess$.subscribe(() => {
+    this.subscription = this.eventService.loginSuccess$.subscribe(() => {
       this.loadUser();
     });
   }
@@ -33,11 +37,13 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   loadUser(): void {
-    this.userService.getUser().subscribe({
-      next: response => {
-        this.applicationUserResponse = response;
-      }
-    });
+    if (this.authService.isLoggedIn()) {
+      this.userService.getUser().subscribe({
+        next: response => {
+          this.applicationUserResponse = response;
+        }
+      });
+    }
   }
 
   getName(): string {

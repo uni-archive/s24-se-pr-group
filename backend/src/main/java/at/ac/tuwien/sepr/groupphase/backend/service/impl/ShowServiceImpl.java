@@ -62,4 +62,9 @@ public class ShowServiceImpl implements ShowService {
     public List<ShowListDto> searchShows(ShowSearchDto searchDto) throws EntityNotFoundException {
         return dao.searchShows(searchDto);
     }
+
+    @Override
+    public Page<ShowDto> findByLocation(Long locationId, boolean onlyFutureShows, Pageable pageable) {
+        return showDao.findByLocationId(locationId, pageable);
+    }
 }

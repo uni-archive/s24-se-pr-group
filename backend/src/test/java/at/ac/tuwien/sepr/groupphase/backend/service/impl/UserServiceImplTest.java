@@ -26,6 +26,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
@@ -92,15 +95,16 @@ class UserServiceImplTest {
     @Test
     void searchShouldReturnCorrectResults() {
         ApplicationUserSearchDto searchParams = new ApplicationUserSearchDto("Berta", "Muster", "admin@email.com",
-            false);
-        List<ApplicationUserDto> mockUsers = List.of(ApplicationUserSupplier.anAdminUser(), ApplicationUserSupplier.anAdminUser());
+            false, PageRequest.of(0, 10));
+        Page<ApplicationUserDto> mockUsers = new PageImpl<>(List.of(ApplicationUserSupplier.anAdminUser(), ApplicationUserSupplier.anAdminUser()),
+            PageRequest.of(0, 10), 2);
 
-        when(userDao.search(searchParams)).thenReturn(mockUsers.stream());
+        when(userDao.search(searchParams)).thenReturn(mockUsers);
 
-        Stream<ApplicationUserDto> result = userService.search(searchParams);
+        Page<ApplicationUserDto> result = userService.search(searchParams);
 
         verify(userDao).search(searchParams);
-        Assertions.assertEquals(mockUsers, result.collect(Collectors.toList()));
+        Assertions.assertEquals(mockUsers, result);
     }
 
     @Test

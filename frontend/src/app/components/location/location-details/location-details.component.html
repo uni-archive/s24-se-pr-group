@@ -1,0 +1,32 @@
+<app-paginated-list *ngIf="locationId"
+                    [filterTemplate]="filterTemplate"
+                    [resultTemplate]="resultTemplate"
+                    [searchFunction]="searchLocations"
+                    [filterConfig]="{}"
+                    [showPaginationButtons]="true"
+                    [heading]="'Veranstaltungen für ' + location.name"
+></app-paginated-list>
+
+<ng-template #filterTemplate let-form="form">
+</ng-template>
+
+<ng-template #resultTemplate let-items="items">
+  <div class="card-container">
+    <div class="card" *ngFor="let show of items">
+      <div class="card-content">
+        <div class="card-left">
+          <div>{{ show.event?.title }}</div>
+          <div>{{ show.dateTime|date:'short' }}</div>
+        </div>
+        <div class="card-right">
+          <div>{{ show.event?.description }}</div>
+          <div>
+            <button class="btn btn-secondary">
+              Buy Tickets
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

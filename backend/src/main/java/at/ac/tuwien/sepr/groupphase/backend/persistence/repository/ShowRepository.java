@@ -2,6 +2,9 @@ package at.ac.tuwien.sepr.groupphase.backend.persistence.repository;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Show;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -11,6 +14,9 @@ import java.util.List;
 
 @Repository
 public interface ShowRepository extends JpaRepository<Show, Long> {
+
+    @EntityGraph(attributePaths = {"artists", "event"})
+    Page<Show> findByLocationId(Long locationId, Pageable pageable);
 
     @Query("Select s from Show s join HallSectorShow h on (s.id = h.show.id) "
         + "where ((CAST(s.dateTime as date) = CAST(?1 as date) "

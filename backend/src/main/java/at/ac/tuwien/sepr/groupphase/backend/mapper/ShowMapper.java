@@ -17,5 +17,7 @@ public interface ShowMapper extends BaseEntityMapper<Show, ShowDto>, BaseRespons
     @Mapping(source = "eventid", target = "event")
     Show toEntity(ShowDto dto,  @Context CycleAvoidingMappingContext cycleAvoidingMappingContext);
 
+@Mapper
+public interface ShowMapper extends BaseEntityMapper<Show, ShowDto>, BaseResponseMapper<ShowDto, ShowResponse> {
 
 }

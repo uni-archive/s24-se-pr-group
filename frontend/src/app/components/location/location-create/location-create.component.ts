@@ -40,7 +40,7 @@ export class LocationCreateComponent {
         },
       };
 
-      this.locationService.create2(newLocation).subscribe({
+      this.locationService.create(newLocation).subscribe({
         next: () => {
           this.router.navigate(['/locations'])
           this.messagingService.setMessage('Location created successfully', 'success');

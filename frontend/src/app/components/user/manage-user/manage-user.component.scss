@@ -1,0 +1,37 @@
+.form-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.row {
+  width: 100%;
+}
+
+.col-form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.table-responsive {
+  margin-top: 1rem;
+}
+
+.table thead th {
+  vertical-align: middle;
+}
+
+.center-td td {
+  vertical-align: middle;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+}
+
+.min-width {
+  width: 100px;
+}
