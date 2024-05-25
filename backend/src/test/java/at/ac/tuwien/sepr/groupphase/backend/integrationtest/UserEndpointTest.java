@@ -3,13 +3,17 @@ package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 import at.ac.tuwien.sepr.groupphase.backend.basetest.TestData;
 import at.ac.tuwien.sepr.groupphase.backend.config.properties.SecurityProperties;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserCreateRequest;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.AddressRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
+import at.ac.tuwien.sepr.groupphase.backend.supplier.AddressSupplier;
 import at.ac.tuwien.sepr.groupphase.backend.supplier.ApplicationUserSupplier;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,14 +27,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.List;
-
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_ROLES;
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_USER;
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.DEFAULT_USER;
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.USER_ROLES;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -50,6 +52,9 @@ public class UserEndpointTest {
     private UserRepository userRepository;
 
     @Autowired
+    private AddressRepository addressRepository;
+
+    @Autowired
     private JwtTokenizer jwtTokenizer;
 
     @Autowired
@@ -58,21 +63,30 @@ public class UserEndpointTest {
     @Test
     void registerUserShouldResultInNewUser() throws Exception {
         UserCreateRequest userCreateRequest = new UserCreateRequest("abcd@cd.de", "password", "Peter", "Test",
-            "+43 6776182783", false);
+            "+43 6776182783", false, AddressSupplier.addressCreateRequest());
 
-        mockMvc.perform(post(TestData.USER_BASE_URI + "/registration")
+        MvcResult mvcResult = mockMvc.perform(post(TestData.USER_BASE_URI + "/registration")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userCreateRequest)))
-            .andExpect(status().isCreated());
+            .andExpect(status().isCreated())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+        ApplicationUserResponse applicationUserResponse = objectMapper.readValue(response.getContentAsString(),
+            ApplicationUserResponse.class);
 
         ApplicationUser user = userRepository.findByEmail("abcd@cd.de");
-        Assertions.assertNotNull(user);
+        Assertions.assertAll(
+            () -> Assertions.assertNotNull(user),
+            () -> Assertions.assertNotNull(applicationUserResponse.address()),
+            () -> Assertions.assertNotNull(applicationUserResponse.address().id()),
+            () -> Assertions.assertNotNull(addressRepository.findById(applicationUserResponse.address().id()))
+        );
     }
 
     @Test
     void registerUserShouldNotAllowToCreateUserIfAlreadyRegistered() throws Exception {
         UserCreateRequest userCreateRequest = new UserCreateRequest("cdef@ge.ck", "password", "Peter", "Test",
-            "+43 6776182783", false);
+            "+43 6776182783", false, AddressSupplier.addressCreateRequest());
 
         MvcResult mvcResult = mockMvc.perform(post(TestData.USER_BASE_URI + "/registration")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -93,7 +107,7 @@ public class UserEndpointTest {
     @Test
     void registerUserShouldNotAllowToCreateUserIfCreatedUserIsAdminButCreatingUserIsNot() throws Exception {
         UserCreateRequest userCreateRequest = new UserCreateRequest("cdef@ge.ck", "password", "Peter", "Test",
-            "+43 6776182783", true);
+            "+43 6776182783", true, AddressSupplier.addressCreateRequest());
 
         MvcResult mvcResult = mockMvc.perform(post(TestData.USER_BASE_URI + "/registration")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -113,7 +127,7 @@ public class UserEndpointTest {
     @Test
     void registerUserShouldAllowToCreateUserIfCreatedUserIsAdminAndCreatingUserIsAdmin() throws Exception {
         UserCreateRequest userCreateRequest = new UserCreateRequest("cdefij@ge.ck", "password", "Peter", "Test",
-            "+43 6776182783", true);
+            "+43 6776182783", true, AddressSupplier.addressCreateRequest());
 
         MvcResult mvcResult = mockMvc.perform(post(TestData.USER_BASE_URI + "/registration")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -133,7 +147,7 @@ public class UserEndpointTest {
     @Test
     void registerUserShouldAllowToAdminToCreateUser() throws Exception {
         UserCreateRequest userCreateRequest = new UserCreateRequest("cdefgh@ge.ck", "password", "Peter", "Test",
-            "+43 6776182783", false);
+            "+43 6776182783", false, AddressSupplier.addressCreateRequest());
 
         MvcResult mvcResult = mockMvc.perform(post(TestData.USER_BASE_URI + "/registration")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -152,7 +166,8 @@ public class UserEndpointTest {
 
     @Test
     void searchUsersShouldReturnResultsForAdmin() throws Exception {
-        ApplicationUserSearchDto searchParams = new ApplicationUserSearchDto("Berta", "Muster", "admin@email.com", false);
+        ApplicationUserSearchDto searchParams = new ApplicationUserSearchDto("Berta", "Muster", "admin@email.com",
+            false);
 
         MvcResult mvcResult = mockMvc.perform(get(TestData.USER_BASE_URI + "/search")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -171,7 +186,8 @@ public class UserEndpointTest {
 
     @Test
     void searchUsersShouldReturnForbiddenForNonAdmin() throws Exception {
-        ApplicationUserSearchDto searchParams = new ApplicationUserSearchDto("Berta", "Muster", "admin@email.com", false);
+        ApplicationUserSearchDto searchParams = new ApplicationUserSearchDto("Berta", "Muster", "admin@email.com",
+            false);
 
         mockMvc.perform(get(TestData.USER_BASE_URI + "/search")
                 .contentType(MediaType.APPLICATION_JSON)

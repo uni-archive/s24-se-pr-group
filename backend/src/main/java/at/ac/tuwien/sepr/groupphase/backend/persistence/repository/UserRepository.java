@@ -23,4 +23,14 @@ public interface UserRepository extends JpaRepository<ApplicationUser, Long> {
                                        @Param("email") String email,
                                        @Param("isLocked") boolean isLocked);
 
+    @Query("SELECT u FROM ApplicationUser u WHERE "
+        + "(:firstName IS NULL OR UPPER(u.firstName) LIKE UPPER(CONCAT('%', :firstName, '%'))) AND "
+        + "(:familyName IS NULL OR UPPER(u.familyName) LIKE UPPER(CONCAT('%', :familyName, '%'))) AND "
+        + "(:email IS NULL OR UPPER(u.email) LIKE UPPER(CONCAT('%', :email, '%'))) AND "
+        + "(:isLocked IS NULL OR u.accountLocked = :isLocked)")
+    List<ApplicationUser> findByParams(@Param("firstName") String firstName,
+                                       @Param("familyName") String familyName,
+                                       @Param("email") String email,
+                                       @Param("isLocked") Boolean isLocked);
+
 }

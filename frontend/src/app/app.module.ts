@@ -21,6 +21,13 @@ import { PrintTicketButtonComponent } from "./components/print-ticket-button/pri
 import { UserHomeComponent } from "./components/user/user-home/user-home.component";
 import { ManageUserComponent } from "./components/user/manage-user/manage-user.component";
 import {TicketsTableComponent} from "./components/tickets/tickets-table/tickets-table.component";
+import {CountryDropdownComponent} from "./components/user/country-dropdown/country-dropdown.component";
+import {LocationOverviewComponent} from "./components/location/location-overview/location-overview.component";
+import {LocationCreateComponent} from "./components/location/location-create/location-create.component";
+import {LocationEditComponent} from "./components/location/location-edit/location-edit.component";
+import {PaginatedListComponent} from "./components/paginated-list/paginated-list.component";
+import {ShowSearchComponent} from "./components/search/show-search/show-search.component";
+import {LocationSearchComponent} from "./components/location/location-search/location-search.component";
 
 @NgModule({
   declarations: [
@@ -34,6 +41,13 @@ import {TicketsTableComponent} from "./components/tickets/tickets-table/tickets-
     GlobalMessageComponent,
     UserHomeComponent,
     ManageUserComponent,
+    CountryDropdownComponent,
+    LocationOverviewComponent,
+    LocationCreateComponent,
+    LocationEditComponent,
+    PaginatedListComponent,
+    ShowSearchComponent,
+    LocationSearchComponent
   ],
   imports: [
     BrowserModule,

@@ -13,6 +13,12 @@ export class MessagingService {
 
   setMessage(message: string, type: string = 'success') {
     this.messageSource.next({text: message, type});
+
+    if (type === 'success' || type === 'warning') {
+      setTimeout(() => {
+        this.clearMessage();
+      }, 10000); // 10 seconds
+    }
   }
 
   clearMessage() {

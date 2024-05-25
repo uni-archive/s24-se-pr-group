@@ -15,7 +15,8 @@ public class ApplicationUserSupplier {
             .setPassword("password")
             .setAdmin(true)
             .setAccountLocked(false)
-            .setLoginCount(0);
+            .setLoginCount(0)
+            .setAddress(AddressSupplier.anAddress());
         return applicationUserDto;
     }
 

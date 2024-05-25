@@ -9,6 +9,7 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { AddressCreateRequest } from './address-create-request';
 
 
 export interface UserCreateRequest { 
@@ -18,5 +19,6 @@ export interface UserCreateRequest {
     familyName?: string;
     phoneNumber?: string;
     isAdmin?: boolean;
+    addressCreateRequest?: AddressCreateRequest;
 }
 

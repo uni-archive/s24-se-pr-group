@@ -8,6 +8,7 @@ public record ApplicationUserResponse(
     String phoneNumber,
     boolean accountLocked,
     boolean isAdmin,
-    boolean isSuperAdmin
+    boolean isSuperAdmin,
+    AddressResponse address
 ) {
 }

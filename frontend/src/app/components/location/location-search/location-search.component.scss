@@ -1,0 +1,47 @@
+.card-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border: 1px solid #007bff;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer; /* Change cursor to pointer */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-content {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.card-left {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.card-right {
+  text-align: right;
+  font-size: 0.9em;
+}
+
+.card-right div {
+  margin: 2px 0;
+}
+
+.card-actions {
+  margin-left: 10px;
+}
+
+.card:hover {
+  transform: translateY(-5px); /* Slightly lift the card */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a shadow */
+}

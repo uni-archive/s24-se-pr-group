@@ -1,0 +1,35 @@
+<div class="container">
+  <div class="btn-group">
+    <button (click)="setActiveContent('artist')" class="btn btn-primary" [class.active]="activeContent === 'artist'">
+      Künstler
+    </button>
+    <button (click)="setActiveContent('location')" class="btn btn-primary" [class.active]="activeContent === 'location'">
+      Ort
+    </button>
+    <button (click)="setActiveContent('event')" class="btn btn-primary" [class.active]="activeContent === 'event'">
+      Veranstaltungen
+    </button>
+    <button (click)="setActiveContent('show')" class="btn btn-primary" [class.active]="activeContent === 'show'">
+      Aufführungen
+    </button>
+  </div>
+
+  <div class="content">
+    <ng-container *ngIf="activeContent === 'artist'">
+      <!-- Insert content for Künstler here -->
+      <p>Content for Künstler</p>
+    </ng-container>
+    <ng-container *ngIf="activeContent === 'location'">
+      <!-- Insert content for Ort here -->
+      <app-location-search></app-location-search>
+    </ng-container>
+    <ng-container *ngIf="activeContent === 'event'">
+      <!-- Insert content for Veranstaltungen here -->
+      <p>Content for Veranstaltungen</p>
+    </ng-container>
+    <ng-container *ngIf="activeContent === 'show'">
+      <!-- Insert content for Aufführungen here -->
+      <p>Content for Aufführungen</p>
+    </ng-container>
+  </div>
+</div>

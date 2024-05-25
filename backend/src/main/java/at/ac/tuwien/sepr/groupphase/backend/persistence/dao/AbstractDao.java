@@ -4,6 +4,8 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.AbstractDto;
 import at.ac.tuwien.sepr.groupphase.backend.mapper.BaseEntityMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.AbstractEntity;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public abstract class AbstractDao<T extends AbstractEntity, D extends AbstractDto> {
@@ -18,7 +20,6 @@ public abstract class AbstractDao<T extends AbstractEntity, D extends AbstractDt
     }
 
     public D create(D createDto) {
-
         return mapper.toDto(repository.save(mapper.toEntity(createDto)));
     }
 
@@ -38,5 +39,9 @@ public abstract class AbstractDao<T extends AbstractEntity, D extends AbstractDt
             throw new EntityNotFoundException(entity.getId());
         }
         return mapper.toDto(repository.save(mapper.toEntity(entity)));
+    }
+
+    public List<D> findAll() {
+        return repository.findAll().stream().map(mapper::toDto).collect(Collectors.toList());
     }
 }

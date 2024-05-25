@@ -1,0 +1,52 @@
+<app-paginated-list
+  [filterTemplate]="filterTemplate"
+  [resultTemplate]="resultTemplate"
+  [searchFunction]="searchLocations"
+  [filterConfig]="filterConfig"
+  [showPaginationButtons]="true"
+  [heading]="'Locations'"
+></app-paginated-list>
+
+<ng-template #filterTemplate let-form="form">
+  <form [formGroup]="form" class="form-inline">
+    <div class="row align-items-center mb-2">
+      <div class="col-12 col-xl-6 mb-2">
+        <input type="text" class="form-control w-100" placeholder="Name" formControlName="name">
+      </div>
+      <div class="col-12 col-xl-6 mb-2">
+        <input type="text" class="form-control w-100" placeholder="Stadt" formControlName="city">
+      </div>
+    </div>
+    <div class="row align-items-center mb-2">
+      <div class="col-12 col-xl-4 mb-2">
+        <input type="text" class="form-control w-100" placeholder="Straße" formControlName="street">
+      </div>
+      <div class="col-12 col-xl-4 mb-2">
+        <input type="text" class="form-control w-100" placeholder="PLZ" formControlName="postalCode">
+      </div>
+      <div class="col-12 col-xl-4 mb-2">
+        <input type="text" class="form-control w-100" placeholder="Land" formControlName="country">
+      </div>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #resultTemplate let-items="items">
+  <div class="card-container">
+    <div class="card" *ngFor="let location of items" (click)="navigateToLocation(location.id)">
+      <div class="card-content">
+        <div class="card-left">
+          {{ location.name }}
+        </div>
+        <div class="card-right">
+          <div>{{ location.address?.city }}</div>
+          <div>{{ location.address?.street }}</div>
+          <div>{{ location.address?.zip }}</div>
+          <div>{{ location.address?.country }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+

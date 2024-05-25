@@ -1,17 +1,24 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
+import at.ac.tuwien.sepr.groupphase.backend.dto.AddressDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.mapper.UserMapper;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
+import at.ac.tuwien.sepr.groupphase.backend.mapper.UserMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.UserDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.security.SecurityUtil;
+import at.ac.tuwien.sepr.groupphase.backend.service.AddressService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.UserValidator;
+import java.lang.invoke.MethodHandles;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,16 +43,16 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenizer jwtTokenizer;
     private final UserValidator userValidator;
-    private final UserMapper userMapper;
+    private final AddressService addressService;
 
     @Autowired
     public UserServiceImpl(UserDao userDao, PasswordEncoder passwordEncoder, JwtTokenizer jwtTokenizer,
-                           UserValidator userValidator, UserMapper userMapper) {
+        UserValidator userValidator, AddressService addressService) {
         this.userDao = userDao;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
         this.userValidator = userValidator;
-        this.userMapper = userMapper;
+        this.addressService = addressService;
     }
 
     @Override
@@ -59,9 +66,9 @@ public class UserServiceImpl implements UserService {
         try {
             List<GrantedAuthority> grantedAuthorities;
             if (applicationUser.isAdmin()) {
-                grantedAuthorities = AuthorityUtils.createAuthorityList("ROLE_ADMIN", "ROLE_USER");
+                grantedAuthorities = AuthorityUtils.createAuthorityList(Code.ADMIN, Code.USER);
             } else {
-                grantedAuthorities = AuthorityUtils.createAuthorityList("ROLE_USER");
+                grantedAuthorities = AuthorityUtils.createAuthorityList(Code.USER);
             }
 
             return new User(applicationUser.getEmail(), applicationUser.getPassword(), grantedAuthorities);
@@ -89,7 +96,8 @@ public class UserServiceImpl implements UserService {
                 && userDetails.isAccountNonExpired()
                 && userDetails.isAccountNonLocked()
                 && userDetails.isCredentialsNonExpired()
-                && passwordEncoder.matches(userLoginDto.getPassword().concat(applicationUserDto.getSalt()), userDetails.getPassword())
+                && passwordEncoder.matches(userLoginDto.getPassword().concat(applicationUserDto.getSalt()),
+                userDetails.getPassword())
             ) {
                 List<String> roles = userDetails.getAuthorities()
                     .stream()
@@ -103,9 +111,11 @@ public class UserServiceImpl implements UserService {
         throw new BadCredentialsException("Username or password is incorrect or account is locked");
     }
 
-    public ApplicationUserDto createUser(ApplicationUserDto toCreate) throws ValidationException {
+    public ApplicationUserDto createUser(ApplicationUserDto toCreate) throws ValidationException, ForbiddenException {
         LOGGER.debug("Create user");
         userValidator.validateForCreate(toCreate);
+        AddressDto addressDto = addressService.create(toCreate.getAddress());
+        toCreate.setAddress(addressDto);
         toCreate.setSalt(SecurityUtil.generateSalt(32));
         toCreate.setPassword(passwordEncoder.encode(toCreate.getPassword() + toCreate.getSalt()));
         return userDao.create(toCreate);
@@ -118,12 +128,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ApplicationUserDto updateUserStatusByEmail(ApplicationUserDto toUpdate, String adminEmail) throws NotFoundException, ValidationException {
+    public ApplicationUserDto updateUserStatusByEmail(ApplicationUserDto toUpdate, String adminEmail)
+        throws NotFoundException, ValidationException {
         LOGGER.debug("Update user status: {}", toUpdate);
         userValidator.validateForUpdateStatus(toUpdate, adminEmail);
         ApplicationUserDto user = userDao.findByEmail(toUpdate.getEmail());
         if (user == null) {
-            throw new NotFoundException("Could not update the user with the email address " + toUpdate.getEmail() + " because it does not exist");
+            throw new NotFoundException("Could not update the user with the email address " + toUpdate.getEmail()
+                + " because it does not exist");
         }
         try {
             user.setAccountLocked(toUpdate.isAccountLocked());

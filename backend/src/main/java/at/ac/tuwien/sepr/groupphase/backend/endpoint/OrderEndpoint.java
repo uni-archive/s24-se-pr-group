@@ -5,6 +5,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.OrderSummaryResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.HallSectorShowResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.OrderResponseMapper;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.OrderService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
@@ -44,7 +45,7 @@ public class OrderEndpoint {
         this.userService = userService;
     }
 
-    @Secured("ROLE_USER")
+    @Secured(Code.USER)
     @GetMapping(path = "/order/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<OrderDetailsResponse> findById(@PathVariable("id") long id) {
         OrderDetailsResponse order;

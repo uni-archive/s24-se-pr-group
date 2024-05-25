@@ -9,6 +9,7 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { AddressDto } from './address-dto';
 
 
 export interface ApplicationUserDto { 
@@ -21,7 +22,8 @@ export interface ApplicationUserDto {
     salt?: string;
     loginCount?: number;
     accountLocked?: boolean;
-    superAdmin?: boolean;
+    address?: AddressDto;
     admin?: boolean;
+    superAdmin?: boolean;
 }
 
