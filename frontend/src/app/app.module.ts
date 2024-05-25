@@ -20,7 +20,8 @@ import { PrintPurchaseInvoiceButtonComponent } from "./components/print-purchase
 import { PrintTicketButtonComponent } from "./components/print-ticket-button/print-ticket-button.component";
 import { UserHomeComponent } from "./components/user/user-home/user-home.component";
 import { ManageUserComponent } from "./components/user/manage-user/manage-user.component";
-import {TicketsTableComponent} from "./components/tickets/tickets-table/tickets-table.component";
+import { TicketsTableComponent } from "./components/tickets/tickets-table/tickets-table.component";
+import { UserEditComponent } from "./components/user/user-edit/user-edit.component";
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import {TicketsTableComponent} from "./components/tickets/tickets-table/tickets-
     GlobalMessageComponent,
     UserHomeComponent,
     ManageUserComponent,
+    UserEditComponent,
   ],
   imports: [
     BrowserModule,
@@ -46,7 +48,7 @@ import {TicketsTableComponent} from "./components/tickets/tickets-table/tickets-
     PrintPurchaseInvoiceButtonComponent,
     PrintTicketButtonComponent,
     TicketsTableComponent,
-    NgxPaginationModule
+    NgxPaginationModule,
   ],
   providers: [httpInterceptorProviders],
   exports: [HeaderComponent, FooterComponent],
