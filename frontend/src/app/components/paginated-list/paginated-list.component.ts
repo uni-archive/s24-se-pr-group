@@ -13,6 +13,8 @@ export class PaginatedListComponent implements OnInit {
   @Input() searchFunction!: (criteria: any, page: number, size: number) => any;
   @Input() showPaginationButtons: boolean = true;
   @Input() filterConfig!: any; // New input to accept filter configuration
+  @Input() createButtonEnabled: boolean = false;
+  @Input() heading: string = '';
 
   @Output() createNew = new EventEmitter<void>();
 

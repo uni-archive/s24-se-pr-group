@@ -2,9 +2,13 @@ package at.ac.tuwien.sepr.groupphase.backend.persistence.specification;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.LocationSearch;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Location;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Show;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +25,7 @@ public class LocationSpecification {
             List<Predicate> predicates = new ArrayList<>();
             addNameToPredicates(locationSearch, root, criteriaBuilder, predicates);
             addAddressToPredicates(locationSearch, root, criteriaBuilder, predicates);
+            addWithUpcomingShowsToPredicates(locationSearch, root, criteriaBuilder, predicates);
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
@@ -56,6 +61,17 @@ public class LocationSpecification {
         if (StringUtils.isNotBlank(locationSearch.getAddressSearch().country())) {
             predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get(ADDRESS).get("country")),
                 "%" + locationSearch.getAddressSearch().country().toLowerCase() + "%"));
+        }
+    }
+
+    private void addWithUpcomingShowsToPredicates(
+        LocationSearch locationSearch,
+        Root<Location> root,
+        CriteriaBuilder criteriaBuilder,
+        List<Predicate> predicates) {
+        if (locationSearch.isWithUpComingShows()) {
+            Join<Location, Show> shows = root.join("shows", JoinType.INNER);
+            predicates.add(criteriaBuilder.greaterThan(shows.get("dateTime"), LocalDateTime.now()));
         }
     }
 }

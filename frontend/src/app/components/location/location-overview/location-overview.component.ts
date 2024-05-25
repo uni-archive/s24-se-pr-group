@@ -21,7 +21,8 @@ export class LocationOverviewComponent {
       criteria.country,
       page,
       size,
-      'name,asc'
+      'name,asc',
+      false
     );
   };
 

@@ -13,6 +13,7 @@ import {LocationCreateComponent} from "./components/location/location-create/loc
 import {AdminGuard} from "./guards/admin.guard";
 import {LocationEditComponent} from "./components/location/location-edit/location-edit.component";
 import {OrdersViewComponent} from "./components/orders/orders-view/orders-view.component";
+import {ShowSearchComponent} from "./components/search/show-search/show-search.component";
 
 
 
@@ -43,6 +44,12 @@ const routes: Routes = [
         {path: 'edit/:id', component: LocationEditComponent}
       ]
   },
+  {
+    path: "search", canActivate: mapToCanActivate([AuthGuard]),
+    children: [
+      {path: '', component: ShowSearchComponent}
+    ]
+  }
 ];
 
 @NgModule({

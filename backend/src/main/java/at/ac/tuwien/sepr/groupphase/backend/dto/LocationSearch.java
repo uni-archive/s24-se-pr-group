@@ -7,12 +7,14 @@ public class LocationSearch {
 
     private String name;
     private AddressSearch addressSearch;
+    private boolean withUpComingShows;
     private Pageable pageable;
 
-    public LocationSearch(String name, AddressSearch addressSearch, Pageable pageable) {
+    public LocationSearch(String name, AddressSearch addressSearch, boolean withUpComingShows, Pageable pageable) {
         this.name = name;
         this.addressSearch = addressSearch;
         this.pageable = pageable;
+        this.withUpComingShows = withUpComingShows;
     }
 
     public String getName() {
@@ -39,6 +41,15 @@ public class LocationSearch {
 
     public LocationSearch setPageable(Pageable pageable) {
         this.pageable = pageable;
+        return this;
+    }
+
+    public boolean isWithUpComingShows() {
+        return withUpComingShows;
+    }
+
+    public LocationSearch setWithUpComingShows(boolean withUpComingShows) {
+        this.withUpComingShows = withUpComingShows;
         return this;
     }
 }

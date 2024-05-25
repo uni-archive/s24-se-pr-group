@@ -18,6 +18,9 @@
         <a class="nav-link" *ngIf="authService.isLoggedIn()" routerLink="/message" routerLinkActive="active">Message</a>
       </li>
       <li class="nav-item">
+        <a class="nav-link" routerLink="/search" routerLinkActive="active">Suche</a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link" *ngIf="authService.isLoggedIn()" routerLink="/my/tickets" routerLinkActive="active">Meine Tickets</a>
       </li>
       <li class="nav-item">

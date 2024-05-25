@@ -8,13 +8,17 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LocationCreateRequest;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LocationResponse;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Address;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Location;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Show;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.AddressRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.LocationRepository;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.ShowRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.supplier.AddressSupplier;
 import at.ac.tuwien.sepr.groupphase.backend.util.PageModule;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
@@ -68,6 +72,9 @@ public class LocationEndpointTest {
 
     @Autowired
     private AddressRepository addressRepository;
+
+    @Autowired
+    private ShowRepository showRepository;
 
     @BeforeEach
     void setUp() {
@@ -408,6 +415,63 @@ public class LocationEndpointTest {
             () -> Assertions.assertEquals("Location 17", locations.getContent().get(8).name()),
             () -> Assertions.assertEquals("Location 18", locations.getContent().get(9).name()),
             () -> Assertions.assertEquals("Location 19", locations.getContent().get(10).name())
+        );
+    }
+
+    @Test
+    @DirtiesContext
+    void searchLocationShouldReturnOnlyLocationsThatHaveShowsInTheFuture() throws Exception {
+        Address address = new Address("Test Street 1", "1010", "Vienna", "Austria");
+        Address address2 = new Address("Test Street 2", "1010", "Vienna", "Austria");
+        Address address3 = new Address("Test Street 3", "1010", "Vienna", "Austria");
+        addressRepository.save(address);
+        addressRepository.save(address2);
+        addressRepository.save(address3);
+        Location locationWithShowsInFuture = new Location("Location 1", address);
+        Location locationWIthShowsInFutureAndPast = new Location("Location 2", address2);
+        Location locationWithShowsInPast = new Location("Location 3", address3);
+        Show showInFuture1 = new Show(LocalDateTime.now().plus(1, ChronoUnit.DAYS), List.of(), null, null, List.of());
+        Show showInFuture2 = new Show(LocalDateTime.now().plus(2, ChronoUnit.DAYS), List.of(), null, null, List.of());
+        Show showInPast1 = new Show(LocalDateTime.now().minus(1, ChronoUnit.DAYS), List.of(), null, null, List.of());
+        Show showInPast2 = new Show(LocalDateTime.now().minus(2, ChronoUnit.DAYS), List.of(), null, null, List.of());
+        showInFuture1 = showRepository.save(showInFuture1);
+        showInFuture2 = showRepository.save(showInFuture2);
+        showInPast1 = showRepository.save(showInPast1);
+        showInPast2 = showRepository.save(showInPast2);
+        locationWithShowsInFuture.setShows(List.of(showInFuture1));
+        locationRepository.save(locationWithShowsInFuture);
+        locationWIthShowsInFutureAndPast.setShows(List.of(showInPast1, showInFuture2));
+        locationRepository.save(locationWIthShowsInFutureAndPast);
+        locationWithShowsInPast.setShows(List.of(showInPast2));
+        locationRepository.save(locationWithShowsInPast);
+        showInFuture1.setLocation(locationWithShowsInFuture);
+        showInFuture2.setLocation(locationWIthShowsInFutureAndPast);
+        showInPast1.setLocation(locationWIthShowsInFutureAndPast);
+        showInPast2.setLocation(locationWithShowsInPast);
+        showRepository.save(showInFuture1);
+        showRepository.save(showInFuture2);
+        showRepository.save(showInPast1);
+        showRepository.save(showInPast2);
+
+
+        MvcResult mvcResult = mockMvc.perform(get("/api/v1/location/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES))
+                .param("page", "0")
+                .param("size", "15")
+                .param("sort", "name")
+                .param("withUpComingShows", "true")
+            )
+            .andExpect(status().isOk())
+            .andReturn();
+
+        MockHttpServletResponse response = mvcResult.getResponse();
+        Page<LocationResponse> locations = objectMapper.readValue(response.getContentAsString(), new TypeReference<Page<LocationResponse>>() {
+        });
+
+        Assertions.assertAll(
+            ()-> Assertions.assertEquals(2, locations.getNumberOfElements()),
+            ()-> Assertions.assertTrue(locations.stream().allMatch(location -> location.name().equals("Location 1") || location.name().equals("Location 2")))
         );
     }
 }

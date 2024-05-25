@@ -26,6 +26,8 @@ import {LocationOverviewComponent} from "./components/location/location-overview
 import {LocationCreateComponent} from "./components/location/location-create/location-create.component";
 import {LocationEditComponent} from "./components/location/location-edit/location-edit.component";
 import {PaginatedListComponent} from "./components/paginated-list/paginated-list.component";
+import {ShowSearchComponent} from "./components/search/show-search/show-search.component";
+import {LocationSearchComponent} from "./components/location/location-search/location-search.component";
 
 @NgModule({
   declarations: [
@@ -43,7 +45,9 @@ import {PaginatedListComponent} from "./components/paginated-list/paginated-list
     LocationOverviewComponent,
     LocationCreateComponent,
     LocationEditComponent,
-    PaginatedListComponent
+    PaginatedListComponent,
+    ShowSearchComponent,
+    LocationSearchComponent
   ],
   imports: [
     BrowserModule,

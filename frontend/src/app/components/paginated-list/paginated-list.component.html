@@ -2,8 +2,8 @@
   <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
   <div *ngIf="!error">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h2>List Overview</h2>
-      <button class="btn btn-primary" (click)="createNew.emit()">
+      <h2>{{heading}}</h2>
+      <button *ngIf="createButtonEnabled" class="btn btn-primary" (click)="createNew.emit()">
         <i class="bi bi-plus-circle"></i> Create New
       </button>
     </div>

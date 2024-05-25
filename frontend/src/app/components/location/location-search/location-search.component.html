@@ -3,9 +3,7 @@
   [resultTemplate]="resultTemplate"
   [searchFunction]="searchLocations"
   [filterConfig]="filterConfig"
-  (createNew)="navigateToCreate()"
   [showPaginationButtons]="true"
-  [createButtonEnabled]="true"
   [heading]="'Locations'"
 ></app-paginated-list>
 
@@ -34,32 +32,21 @@
 </ng-template>
 
 <ng-template #resultTemplate let-items="items">
-  <div class="table-responsive">
-    <table class="table table-striped">
-      <thead class="thead-light">
-      <tr>
-        <th>Name</th>
-        <th>Stadt</th>
-        <th>Straße</th>
-        <th>PLZ</th>
-        <th>Land</th>
-        <th>Aktionen</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr *ngFor="let location of items">
-        <td>{{ location.name }}</td>
-        <td>{{ location.address?.city }}</td>
-        <td>{{ location.address?.street }}</td>
-        <td>{{ location.address?.zip }}</td>
-        <td>{{ location.address?.country }}</td>
-        <td>
-          <button class="btn btn-info btn-sm" (click)="navigateToEdit(location.id)">
-            <i class="bi bi-pencil"></i>
-          </button>
-        </td>
-      </tr>
-      </tbody>
-    </table>
+  <div class="card-container">
+    <div class="card" *ngFor="let location of items" (click)="navigateToLocation(location.id)">
+      <div class="card-content">
+        <div class="card-left">
+          {{ location.name }}
+        </div>
+        <div class="card-right">
+          <div>{{ location.address?.city }}</div>
+          <div>{{ location.address?.street }}</div>
+          <div>{{ location.address?.zip }}</div>
+          <div>{{ location.address?.country }}</div>
+        </div>
+      </div>
+    </div>
   </div>
 </ng-template>
+
+

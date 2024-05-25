@@ -364,13 +364,14 @@ export class LocationEndpointService implements LocationEndpointServiceInterface
      * @param page 
      * @param size 
      * @param sort 
+     * @param withUpComingShows 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public search(name?: string, city?: string, street?: string, postalCode?: string, country?: string, page?: number, size?: number, sort?: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<PageLocationDto>;
-    public search(name?: string, city?: string, street?: string, postalCode?: string, country?: string, page?: number, size?: number, sort?: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageLocationDto>>;
-    public search(name?: string, city?: string, street?: string, postalCode?: string, country?: string, page?: number, size?: number, sort?: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageLocationDto>>;
-    public search(name?: string, city?: string, street?: string, postalCode?: string, country?: string, page?: number, size?: number, sort?: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public search(name?: string, city?: string, street?: string, postalCode?: string, country?: string, page?: number, size?: number, sort?: string, withUpComingShows?: boolean, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<PageLocationDto>;
+    public search(name?: string, city?: string, street?: string, postalCode?: string, country?: string, page?: number, size?: number, sort?: string, withUpComingShows?: boolean, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageLocationDto>>;
+    public search(name?: string, city?: string, street?: string, postalCode?: string, country?: string, page?: number, size?: number, sort?: string, withUpComingShows?: boolean, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageLocationDto>>;
+    public search(name?: string, city?: string, street?: string, postalCode?: string, country?: string, page?: number, size?: number, sort?: string, withUpComingShows?: boolean, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarQueryParameters = new HttpParams({encoder: this.encoder});
         if (name !== undefined && name !== null) {
@@ -404,6 +405,10 @@ export class LocationEndpointService implements LocationEndpointServiceInterface
         if (sort !== undefined && sort !== null) {
           localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
             <any>sort, 'sort');
+        }
+        if (withUpComingShows !== undefined && withUpComingShows !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>withUpComingShows, 'withUpComingShows');
         }
 
         let localVarHeaders = this.defaultHeaders;

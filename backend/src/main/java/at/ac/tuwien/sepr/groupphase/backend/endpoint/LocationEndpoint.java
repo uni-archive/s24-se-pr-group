@@ -82,13 +82,14 @@ public class LocationEndpoint {
     @Secured(Code.USER)
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<Page<LocationDto>> search(@RequestParam(name = "name", required = false) String name,
-                                                    @RequestParam(name = "city", required = false) String city,
-                                                    @RequestParam(name = "street", required = false) String street,
-                                                    @RequestParam(name = "postalCode", required = false) String postalCode,
-                                                    @RequestParam(name = "country", required = false) String country,
-                                                    @RequestParam(name = "page", defaultValue = "0") Integer page,
-                                                    @RequestParam(name = "size", defaultValue = "15") Integer size,
-                                                    @RequestParam(name = "sort", defaultValue = "name") String sort) {
+        @RequestParam(name = "city", required = false) String city,
+        @RequestParam(name = "street", required = false) String street,
+        @RequestParam(name = "postalCode", required = false) String postalCode,
+        @RequestParam(name = "country", required = false) String country,
+        @RequestParam(name = "page", defaultValue = "0") Integer page,
+        @RequestParam(name = "size", defaultValue = "15") Integer size,
+        @RequestParam(name = "sort", defaultValue = "name") String sort,
+        @RequestParam(name = "withUpComingShows", defaultValue = "false") Boolean withUpComingShows) {
         AddressSearch addressSearch = new AddressSearch(city, street, postalCode, country);
 
         Sort sortBy = Sort.by(sort.split(",")[0]);
@@ -100,7 +101,7 @@ public class LocationEndpoint {
             }
         }
         PageRequest pageable = PageRequest.of(page, size, sortBy);
-        LocationSearch locationSearchRequest = new LocationSearch(name, addressSearch, pageable);
+        LocationSearch locationSearchRequest = new LocationSearch(name, addressSearch, withUpComingShows, pageable);
         return new ResponseEntity<>(locationService.search(locationSearchRequest), HttpStatus.OK);
     }
 }

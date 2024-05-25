@@ -27,8 +27,20 @@ public class Show extends AbstractEntity {
     @JoinColumn(name = "EVENT_ID")
     private Event event;
 
+    @ManyToOne
+    @JoinColumn(name = "LOCATION_ID")
+    private Location location;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "show")
     private List<HallSectorShow> hallSectorShows;
+
+    public Show(LocalDateTime dateTime, List<Artist> artists, Event event, Location location, List<HallSectorShow> hallSectorShows) {
+        this.dateTime = dateTime;
+        this.artists = artists;
+        this.event = event;
+        this.location = location;
+        this.hallSectorShows = hallSectorShows;
+    }
 
     public Show(LocalDateTime dateTime, List<Artist> artists, Event event) {
         this.dateTime = dateTime;
@@ -58,6 +70,25 @@ public class Show extends AbstractEntity {
 
     public void setEvent(Event event) {
         this.event = event;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public Show setLocation(Location location) {
+        this.location = location;
+        return this;
+    }
+
+    public List<HallSectorShow> getHallSectorShows() {
+        return hallSectorShows;
+    }
+
+    public Show setHallSectorShows(
+        List<HallSectorShow> hallSectorShows) {
+        this.hallSectorShows = hallSectorShows;
+        return this;
     }
 
     public Show() {

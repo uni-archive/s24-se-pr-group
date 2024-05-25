@@ -4,6 +4,7 @@ public class LocationSearchRequest {
 
     private String name;
     private AddressSearchRequest addressSearch;
+    private boolean withUpComingShows;
     private PageRequest pageRequest;
 
     public LocationSearchRequest(String name, AddressSearchRequest addressSearch, PageRequest pageRequest) {
@@ -36,6 +37,15 @@ public class LocationSearchRequest {
 
     public LocationSearchRequest setPageRequest(PageRequest pageRequest) {
         this.pageRequest = pageRequest;
+        return this;
+    }
+
+    public boolean isWithUpComingShows() {
+        return withUpComingShows;
+    }
+
+    public LocationSearchRequest setWithUpComingShows(boolean withUpComingShows) {
+        this.withUpComingShows = withUpComingShows;
         return this;
     }
 }
