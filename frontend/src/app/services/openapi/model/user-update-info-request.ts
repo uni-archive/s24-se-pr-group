@@ -11,17 +11,9 @@
  */
 
 
-export interface ApplicationUserDto { 
+export interface UserUpdateInfoRequest { 
     id?: number;
     email?: string;
-    password?: string;
-    firstName?: string;
-    familyName?: string;
     phoneNumber?: string;
-    salt?: string;
-    loginCount?: number;
-    accountLocked?: boolean;
-    admin?: boolean;
-    superAdmin?: boolean;
 }
 

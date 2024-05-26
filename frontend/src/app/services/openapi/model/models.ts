@@ -16,3 +16,4 @@ export * from './ticket-details-response';
 export * from './ticket-details-response-hall-spot';
 export * from './user-create-request';
 export * from './user-login-dto';
+export * from './user-update-info-request';
