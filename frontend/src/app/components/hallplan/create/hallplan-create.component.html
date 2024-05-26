@@ -1,0 +1,99 @@
+<h1 class="my-5">Erstellen eines neuen Platzplanes</h1>
+
+<div class="container">
+  <div class="row align-items-start">
+    <div class="col">
+      <app-hallplan #hallplan/>
+    </div>
+    <div class="col">
+      <form class="container" [formGroup]="mainForm" (ngSubmit)="onSubmit()">
+        <div class="row">
+          <div class="form-group col-12">
+            <label for="title">Platzname:</label>
+            <input type="text" id="title" class="form-control" placeholder="Platzname eingeben" form="mainform" formControlName="hallname">
+            <div *ngIf="mainForm.get('hallname').invalid && mainForm.get('hallname').touched"
+                 class="invalid-feedback">
+              Bitte geben Sie einen Namen an.
+            </div>
+          </div>
+
+          <div class="form-group col-12">
+            <label for="inputGroupFile02">Hintergrundbild:</label>
+            <input type="file" class="form-control" id="inputGroupFile02" accept="image/png, image/jpeg" (change)="previewFile($event)" form="mainform" formControlName="backgroundImage">
+            <div *ngIf="mainForm.get('backgroundImage').invalid && mainForm.get('backgroundImage').touched"
+                 class="invalid-feedback">
+              Bitte wählen Sie ein Hintergrundbild aus.
+            </div>
+          </div>
+
+          <!--<div class="form-group col-12">
+            <span>Abmessungen des Platzes (in m):</span>
+            <div class="input-group">
+              <span class="input-group-text">Länge</span>
+              <input type="number" aria-label="First name" class="form-control" min="100" value="100" form="mainform">
+              <span class="input-group-text">Breite</span>
+              <input type="number" aria-label="Last name" class="form-control" min="100" value="100" form="mainform">
+            </div>
+          </div>-->
+
+          <button class="btn btn-outline-secondary form-group col-12" (click)="regenerateSeats()">Sitzplätze neugenerieren</button>
+
+          <!-- Ausgewählte section in card -->
+          <div class="mb-4">
+            <h3>Ausgewählter Sektor:</h3>
+            <div class="card col-12 mt-3" *ngIf="selectedSection" [formGroup]="sectionForm">
+              <div class="card-body">
+                <h5 class="card-title
+              ">{{selectedSection.name}}</h5>
+                <div class="form-group">
+                  <label for="sectorname">Sektorname:</label>
+                  <input type="text" id="sectorname" aria-label="Sektorname" class="form-control" formControlName="name" [value]="selectedSection.name">
+                  <div *ngIf="sectionForm.get('name').invalid"
+                       class="invalid-feedback">
+                    Bitte geben Sie einen Namen an.
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="color">Farbe:</label>
+                  <input type="color" id="color" aria-label="Color" class="form-control" formControlName="color" [value]="selectedSection.color">
+                </div>
+
+                <div class="form-check form-group">
+                  <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" formControlName="standingOnly">
+                  <label class="form-check-label" for="flexCheckDefault">
+                    Nur Stehplätze
+                  </label>
+                </div>
+
+                <div class="form-group" *ngIf="!sectionForm.get('standingOnly').value">
+                  <label for="color">Anzahl der Sitzplätze:</label>
+                  <input type="number" aria-label="First name" class="form-control disabled" disabled [value]="selectedSection.seats.length">
+                </div>
+                <div class="form-group" *ngIf="!sectionForm.get('standingOnly').value">
+                  <label for="color">Preis pro Sitzplatz:</label>
+                  <div class="input-group">
+                    <input type="number" aria-label="First name" class="form-control" formControlName="price" [value]="selectedSection.price">
+                    <span class="input-group-text">&euro;</span>
+                  </div>
+                  <div *ngIf="sectionForm.get('price').invalid"
+                       class="invalid-feedback">
+                    Bitte geben Sie einen Preis an.
+                  </div>
+                </div>
+
+
+                <button class="btn btn-outline-primary" [disabled]="!sectionForm.valid" (click)="updateSection()">Aktualisieren</button>
+              </div>
+            </div>
+            <p *ngIf="!selectedSection">Kein Sektor ausgewählt</p>
+          </div>
+
+
+
+          <button class="btn btn-outline-primary col-12" [disabled]="! mainForm.valid" type="submit">Speichern</button>
+
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

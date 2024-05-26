@@ -14,7 +14,8 @@ import {AdminGuard} from "./guards/admin.guard";
 import {LocationEditComponent} from "./components/location/location-edit/location-edit.component";
 import {OrdersViewComponent} from "./components/orders/orders-view/orders-view.component";
 import {ShowSearchComponent} from "./components/search/show-search/show-search.component";
-
+import {HallplanComponent} from "./components/hallplan/hallplan.component";
+import {HallplanCreateComponent} from "./components/hallplan/create/hallplan-create.component";
 
 
 const routes: Routes = [
@@ -49,12 +50,14 @@ const routes: Routes = [
     children: [
       {path: '', component: ShowSearchComponent}
     ]
-  }
+  },
+  {path: 'hallplan', component: HallplanComponent},
+  {path: 'hallplan/create', component: HallplanCreateComponent}
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes, {useHash: true})],
-  exports: [RouterModule],
+  exports: [RouterModule]
 })
 export class AppRoutingModule {
 }

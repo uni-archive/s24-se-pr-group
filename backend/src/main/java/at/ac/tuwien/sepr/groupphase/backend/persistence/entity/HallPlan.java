@@ -1,8 +1,9 @@
 package at.ac.tuwien.sepr.groupphase.backend.persistence.entity;
 
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 
 import java.sql.Blob;
@@ -12,14 +13,16 @@ import java.util.Objects;
 @Entity
 public class HallPlan extends AbstractEntity {
 
-    @Lob
-    @Column(name = "BACKGROUND_IMAGE")
-    private Blob backgroundImage;
+    @Column(name = "NAME")
+    private String name;
 
-    @OneToMany
+    @Column(name = "BACKGROUND_IMAGE", columnDefinition = "TEXT")
+    private String backgroundImage;
+
+    @OneToMany(mappedBy = "hallPlan", cascade = CascadeType.ALL)
     private List<HallSector> sectors;
 
-    public HallPlan(Blob backgroundImage, List<HallSector> sectors) {
+    public HallPlan(String backgroundImage, List<HallSector> sectors) {
         this.backgroundImage = backgroundImage;
         this.sectors = sectors;
     }
@@ -49,12 +52,20 @@ public class HallPlan extends AbstractEntity {
         return Objects.hash(backgroundImage, sectors);
     }
 
-    public Blob getBackgroundImage() {
+    public String getBackgroundImage() {
         return backgroundImage;
     }
 
-    public void setBackgroundImage(Blob backgroundImage) {
+    public void setBackgroundImage(String backgroundImage) {
         this.backgroundImage = backgroundImage;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public List<HallSector> getSectors() {

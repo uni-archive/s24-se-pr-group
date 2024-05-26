@@ -1,0 +1,25 @@
+<div class="card">
+  <div class="card-header">
+    Hallplan
+  </div>
+  <div class="card-body">
+    <div class="btn-overlay">
+      <div class="left btn-group">
+        <button type="button" class="btn btn-primary" (click)="createHelper.enable()" *ngIf="!createHelper?.enabled"><i class="bi-plus"></i></button>
+        <button type="button" class="btn btn-primary" (click)="finishSection()" *ngIf="createHelper?.enabled"><i class="bi-check-lg"></i></button>
+        <button type="button" class="btn btn-primary" (click)="deleteSelectedEntities()" [disabled]="! entitiesSelected"><i class="bi-trash"></i></button>
+      </div>
+      <div class="right btn-group">
+        <button type="button" class="btn btn-primary" (click)="zoomIn()"><i class="bi-zoom-in"></i></button>
+        <button type="button" class="btn btn-primary" (click)="zoomOut()"><i class="bi-zoom-out"></i></button>
+      </div>
+    </div>
+    <canvas #hallplanCanvas
+            (wheel)="onMouseScroll($event)"
+            (mousemove)="onMouseMove($event)"
+            (mousedown)="onMouseDown($event)"
+            (mouseup)="onMouseUp($event)"
+    ></canvas>
+  </div>
+</div>
+

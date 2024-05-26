@@ -8,6 +8,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.AddressResponseMappe
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.BaseResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.type.UserType;
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants.ComponentModel;
@@ -27,7 +28,7 @@ public interface UserMapper extends BaseEntityMapper<ApplicationUser, Applicatio
 
     @Override
     @Mapping(source = "type", target = "admin", qualifiedByName = "userTypeToBoolean")
-    ApplicationUserDto toDto(ApplicationUser entity);
+    ApplicationUserDto toDto(ApplicationUser entity, @Context CycleAvoidingMappingContext cycleAvoidingMappingContext);
 
     ApplicationUserDto toDto(UserUpdateInfoRequest updateRequest);
 

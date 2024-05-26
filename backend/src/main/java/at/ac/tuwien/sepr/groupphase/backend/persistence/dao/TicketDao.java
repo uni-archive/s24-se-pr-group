@@ -5,7 +5,6 @@ import at.ac.tuwien.sepr.groupphase.backend.mapper.TicketMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Ticket;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.TicketRepository;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,12 +17,14 @@ public class TicketDao extends AbstractDao<Ticket, TicketDetailsDto> {
         super(repository, mapper);
     }
 
+    @Transactional
     public TicketDetailsDto findById(long id) throws EntityNotFoundException {
         var opt = repository.findById(id);
         var found = opt.orElseThrow(() -> new EntityNotFoundException(id));
         return mapper.toDto(found);
     }
 
+    @Transactional
     public List<TicketDetailsDto> findByUserId(long userId) {
         var tickets = ((TicketRepository) repository).findTicketsByUserId(userId);
         return mapper.toDto(tickets);
