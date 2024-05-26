@@ -2,7 +2,6 @@ package at.ac.tuwien.sepr.groupphase.backend.persistence.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -23,8 +22,7 @@ public class HallSector extends AbstractEntity {
     private String frontendCoordinates;
 
     @OneToMany(mappedBy = "sector")
-    private List<HallSeat> seats;
-
+    private List<HallSpot> seats;
 
     @Override
     public String toString() {
@@ -72,18 +70,18 @@ public class HallSector extends AbstractEntity {
         this.frontendCoordinates = frontendCoordinates;
     }
 
-    public List<HallSeat> getSeats() {
+    public List<HallSpot> getSeats() {
         return seats;
     }
 
-    public void setSeats(List<HallSeat> seats) {
+    public void setSeats(List<HallSpot> seats) {
         this.seats = seats;
     }
 
     public HallSector() {
     }
 
-    public HallSector(HallPlan hallPlan, String name, String frontendCoordinates, List<HallSeat> seats) {
+    public HallSector(HallPlan hallPlan, String name, String frontendCoordinates, List<HallSpot> seats) {
         this.hallPlan = hallPlan;
         this.name = name;
         this.frontendCoordinates = frontendCoordinates;

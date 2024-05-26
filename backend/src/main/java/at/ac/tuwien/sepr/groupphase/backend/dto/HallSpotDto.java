@@ -1,8 +1,11 @@
 package at.ac.tuwien.sepr.groupphase.backend.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class HallSpotDto implements AbstractDto {
     private Long id;
 
+    @JsonIgnore
     private HallSectorDto sector;
 
     @Override
@@ -36,5 +39,13 @@ public class HallSpotDto implements AbstractDto {
             hallSpotDto.setSector(sector);
             return hallSpotDto;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "HallSpotDto{" +
+            "id=" + id +
+            ", sector=" + sector +
+            '}';
     }
 }
