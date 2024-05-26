@@ -1,7 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.basetest;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.EventType;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -22,6 +21,13 @@ public interface TestData {
 
     String ADMIN_USER = "admin@email.com";
     List<String> ADMIN_ROLES = new ArrayList<>() {
+        {
+            add(Code.ADMIN);
+            add(Code.USER);
+        }
+    };
+    String ADMIN_USER_2 = "admin2@email.com";
+    List<String> ADMIN_ROLES_2 = new ArrayList<>() {
         {
             add(Code.ADMIN);
             add(Code.USER);
