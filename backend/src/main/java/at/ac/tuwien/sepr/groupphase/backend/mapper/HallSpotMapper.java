@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.HallSeatDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.HallSpotDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSeat;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSpot;
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Named;
 import org.mapstruct.SubclassMapping;
@@ -17,6 +18,5 @@ public interface HallSpotMapper extends BaseEntityMapper<HallSpot, HallSpotDto> 
 
     @Override
     @SubclassMapping(source = HallSeat.class, target = HallSeatDto.class)
-    @Named("toDtoWithoutContext")
-    HallSpotDto toDto(HallSpot entity);
+    HallSpotDto toDto(HallSpot entity, @Context CycleAvoidingMappingContext cycleAvoidingMappingContext);
 }
