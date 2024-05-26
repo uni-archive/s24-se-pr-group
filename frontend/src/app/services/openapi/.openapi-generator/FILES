@@ -49,5 +49,6 @@ model/ticket-details-response-hall-spot.ts
 model/ticket-details-response.ts
 model/user-create-request.ts
 model/user-login-dto.ts
+model/user-update-info-request.ts
 param.ts
 variables.ts
