@@ -7,25 +7,20 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.MailBody;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.EmailChangeTokenMapper;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.UserMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.UserMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.EmailChangeTokenDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.UserDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.security.SecurityUtil;
-import at.ac.tuwien.sepr.groupphase.backend.service.EmailSenderService;
 import at.ac.tuwien.sepr.groupphase.backend.service.AddressService;
+import at.ac.tuwien.sepr.groupphase.backend.service.EmailSenderService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
-import at.ac.tuwien.sepr.groupphase.backend.service.exception.MailNotSentException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.MailNotSentException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.UserValidator;
 import jakarta.mail.MessagingException;
-import java.lang.invoke.MethodHandles;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,13 +50,12 @@ public class UserServiceImpl implements UserService {
     private final JwtTokenizer jwtTokenizer;
     private final UserValidator userValidator;
     private final EmailSenderService emailSenderService;
-    private final EmailChangeTokenMapper emailChangeTokenMapper;
     private final AddressService addressService;
 
     @Autowired
     public UserServiceImpl(UserDao userDao, EmailChangeTokenDao emailChangeTokenDao, PasswordEncoder passwordEncoder,
                            JwtTokenizer jwtTokenizer, UserValidator userValidator,
-                           EmailChangeTokenMapper emailChangeTokenMapper, EmailSenderService emailSenderService, AddressService addressService) {
+                           EmailSenderService emailSenderService, AddressService addressService) {
         this.userDao = userDao;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
@@ -69,7 +63,6 @@ public class UserServiceImpl implements UserService {
         this.addressService = addressService;
         this.emailSenderService = emailSenderService;
         this.emailChangeTokenDao = emailChangeTokenDao;
-        this.emailChangeTokenMapper = emailChangeTokenMapper;
     }
 
     @Override
