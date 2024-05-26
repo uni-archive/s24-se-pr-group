@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<div class="container mt-5">
+  <h2>Meine Daten</h2>
+
+  <!-- Display Form in Edit Mode -->
+  <form *ngIf="editMode" [formGroup]="userForm">
+    <div class="row">
+      <div class="row mb-3">
+        <div class="col-12">
+          <label class="font-weight-bold">Vorname:</label>
+          <span class="d-block ml-2">{{ user.firstName }}</span>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-12">
+          <label class="font-weight-bold">Familiennamen:</label>
+          <span class="d-block ml-2">{{ user.familyName }}</span>
+        </div>
+      </div>
+
+      <div class="form-group col-12">
+        <label for="email">Email:</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          class="form-control"
+          placeholder="Bitte E-Mail Adresse eingeben"
+        />
+        <div
+          *ngIf="userForm.get('email').invalid && userForm.get('email').touched"
+          class="invalid-feedback"
+        >
+          Bitte E-Mail Adresse eingeben.
+        </div>
+      </div>
+
+      <div class="form-group col-12">
+        <label for="phoneNumber">Telefonnummer:</label>
+        <input
+          type="text"
+          id="phoneNumber"
+          formControlName="phoneNumber"
+          class="form-control"
+          placeholder="Bitte Telefonnummer eintragen"
+        />
+        <div
+          *ngIf="
+            userForm.get('phoneNumber').invalid &&
+            userForm.get('phoneNumber').touched
+          "
+          class="invalid-feedback"
+        >
+          Bitte Telefonnummer eintragen.
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="form-group col-12 text-right">
+        <button
+          type="button"
+          class="btn btn-primary"
+          [disabled]="!userForm.valid"
+          (click)="saveUserDetails()"
+        >
+          Speichern
+        </button>
+        <button type="button" class="btn btn-danger" (click)="toggleEditMode()">
+          Abbrechen
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Display User Information in View Mode -->
+  <div *ngIf="!editMode">
+    <div class="row mb-3">
+      <div class="col-12">
+        <label class="font-weight-bold">Vorname:</label>
+        <span class="d-block ml-2">{{ user.firstName }}</span>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-12">
+        <label class="font-weight-bold">Familiennamen:</label>
+        <span class="d-block ml-2">{{ user.familyName }}</span>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-12">
+        <label class="font-weight-bold">Email:</label>
+        <span class="d-block ml-2">{{ user.email }}</span>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-12">
+        <label class="font-weight-bold">Telefonnummer:</label>
+        <span class="d-block ml-2">{{ user.phoneNumber }}</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12 text-right">
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="toggleEditMode()"
+        >
+          Bearbeiten
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

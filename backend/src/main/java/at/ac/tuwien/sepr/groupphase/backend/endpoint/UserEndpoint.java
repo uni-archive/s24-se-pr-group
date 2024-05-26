@@ -4,13 +4,13 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserCreateRequest;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateInfoRequest;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.AddressResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
 import at.ac.tuwien.sepr.groupphase.backend.mapper.UserMapper;
-import at.ac.tuwien.sepr.groupphase.backend.service.AddressService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.MailNotSentException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
@@ -40,15 +40,10 @@ public class UserEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final UserService userService;
     private final UserMapper userMapper;
-    private final AddressResponseMapper addressMapper;
-    private final AddressService addressService;
 
-    public UserEndpoint(UserService userService, UserMapper userMapper, AddressResponseMapper addressMapper,
-        AddressService addressService) {
+    public UserEndpoint(UserService userService, UserMapper userMapper) {
         this.userService = userService;
         this.userMapper = userMapper;
-        this.addressMapper = addressMapper;
-        this.addressService = addressService;
     }
 
     @PermitAll
@@ -101,5 +96,29 @@ public class UserEndpoint {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return userMapper.toResponse(userService.updateUserStatusByEmail(user, authentication.getName()));
     }
+
+    @Secured("ROLE_USER")
+    @PutMapping(path = "/update/user", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ApplicationUserResponse updateUserInfo(@RequestBody UserUpdateInfoRequest userInfo) throws ValidationException, MailNotSentException {
+        LOGGER.info("Update user info: {}", userInfo);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        ApplicationUserDto user = userService.findApplicationUserById(userInfo.id());
+        if (!authentication.getName().equals(user.getEmail())) {
+            throw new ValidationException("User can only update their own information.");
+        }
+        return userMapper.toResponse(userService.updateUserInfo(userMapper.toDto(userInfo)));
+    }
+
+    @PermitAll
+    @GetMapping("/update/user/email")
+    public ResponseEntity<?> updateUserEmailWithValidToken(@RequestParam("token") String token) {
+        if (userService.updateUserEmailWithValidToken(token) != null) {
+            return ResponseEntity.ok("Deine E-Mail-Adresse wurde erfolgreich geändert. Bitte melde dich mit deinen "
+                + "neuen Zugangsdaten an.");
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Dieser Link ist nicht gültig.");
+    }
+
 
 }
