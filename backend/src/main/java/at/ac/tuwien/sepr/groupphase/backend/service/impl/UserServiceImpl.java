@@ -2,13 +2,16 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.AddressDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.EmailChangeTokenDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.MailBody;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.mapper.EmailChangeTokenMapper;
 import at.ac.tuwien.sepr.groupphase.backend.mapper.UserMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
 import at.ac.tuwien.sepr.groupphase.backend.mapper.UserMapper;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.EmailChangeTokenDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.UserDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
@@ -36,8 +39,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 @Service
@@ -45,22 +50,26 @@ public class UserServiceImpl implements UserService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final UserDao userDao;
+    private final EmailChangeTokenDao emailChangeTokenDao;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenizer jwtTokenizer;
     private final UserValidator userValidator;
     private final EmailSenderService emailSenderService;
+    private final EmailChangeTokenMapper emailChangeTokenMapper;
     private final AddressService addressService;
 
     @Autowired
-    public UserServiceImpl(UserDao userDao, PasswordEncoder passwordEncoder, JwtTokenizer jwtTokenizer,
-                           UserValidator userValidator, EmailSenderService emailSenderService,
-                           AddressService addressService) {
+    public UserServiceImpl(UserDao userDao, EmailChangeTokenDao emailChangeTokenDao, PasswordEncoder passwordEncoder,
+                           JwtTokenizer jwtTokenizer, UserValidator userValidator,
+                           EmailChangeTokenMapper emailChangeTokenMapper, EmailSenderService emailSenderService, AddressService addressService) {
         this.userDao = userDao;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
         this.userValidator = userValidator;
         this.addressService = addressService;
         this.emailSenderService = emailSenderService;
+        this.emailChangeTokenDao = emailChangeTokenDao;
+        this.emailChangeTokenMapper = emailChangeTokenMapper;
     }
 
     @Override
@@ -165,6 +174,14 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException("Could not update the user because it does not exist.");
         }
 
+        // Update phone number if it is not null or empty
+        if (userInfo.getPhoneNumber() != null || !userInfo.getPhoneNumber().isBlank()) {
+            user.setPhoneNumber(userInfo.getPhoneNumber());
+        }
+
+        // Validate user information
+        userValidator.validateForUpdate(user);
+
         // Update email if it is different from the current email
         if ((userInfo.getEmail() != null || !userInfo.getEmail().isBlank()) && !Objects.equals(user.getEmail(),
             userInfo.getEmail())) {
@@ -178,6 +195,10 @@ public class UserServiceImpl implements UserService {
                 throw new ValidationException("The new email address is already in use.");
             }
 
+            // Create a token for email change
+            EmailChangeTokenDto emailChangeToken = createAndSaveEmailChangeToken(userInfo.getEmail(), user.getEmail());
+
+
             // Send email to the new email address to confirm the change
             MailBody mailBody = generateMailBodyChangeEmail(userInfo, user);
             try {
@@ -186,14 +207,6 @@ public class UserServiceImpl implements UserService {
                 throw new MailNotSentException("Error sending mail.", e);
             }
         }
-
-        // Update phone number if it is not null or empty
-        if (userInfo.getPhoneNumber() != null || !userInfo.getPhoneNumber().isBlank()) {
-            user.setPhoneNumber(userInfo.getPhoneNumber());
-        }
-
-        // Validate user information
-        userValidator.validateForUpdate(user);
 
         // Update user information
         try {
@@ -213,6 +226,26 @@ public class UserServiceImpl implements UserService {
             }
         }
         return null;
+    }
+
+    private EmailChangeTokenDto createAndSaveEmailChangeToken(String newEmail, String currentEmail) {
+        String token = UUID.randomUUID().toString();
+        LocalDateTime expiryDate = LocalDateTime.now().plusMinutes(10);
+
+        EmailChangeTokenDto emailChangeToken = new EmailChangeTokenDto();
+        emailChangeToken.setToken(token);
+        emailChangeToken.setNewEmail(newEmail);
+        emailChangeToken.setCurrentEmail(currentEmail);
+        emailChangeToken.setExpiryDate(expiryDate);
+
+        // Invalidate old tokens for the current email
+        invalidateOldTokens(currentEmail);
+
+        return emailChangeTokenDao.create(emailChangeToken);
+    }
+
+    private void invalidateOldTokens(String currentEmail) {
+        emailChangeTokenDao.findByCurrentEmail(currentEmail).forEach(token -> token.setExpiryDate(LocalDateTime.now().minusMinutes(1)));
     }
 
     private MailBody generateMailBodyChangeEmail(ApplicationUserDto userInfo, ApplicationUserDto user) {
