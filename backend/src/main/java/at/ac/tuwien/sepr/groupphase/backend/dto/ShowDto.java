@@ -1,59 +1,64 @@
 package at.ac.tuwien.sepr.groupphase.backend.dto;
 
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Artist;
+
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class ShowDto implements AbstractDto {
-    private Long id;
-    private LocalDateTime dateTime;
 
-    // TODO: not needed right now
-    // private List<ArtistDto> artists;
-    private EventDto event;
+    private long id;
+    private LocalDateTime dateTime;
+    private List<Artist> artistList;
+
+    private long eventid;
+
 
     @Override
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public ShowDto(long id, LocalDateTime dateTime, List<Artist> artistList, long event) {
         this.id = id;
+        this.dateTime = dateTime;
+        this.artistList = artistList;
+        this.eventid = event;
+    }
+
+    public ShowDto() {
     }
 
     public LocalDateTime getDateTime() {
         return dateTime;
     }
 
-    public void setDateTime(LocalDateTime dateTime) {
+    public List<Artist> getArtistList() {
+        return artistList;
+    }
+
+
+    public ShowDto setId(long id) {
+        this.id = id;
+        return this;
+    }
+
+    public ShowDto setDateTime(LocalDateTime dateTime) {
         this.dateTime = dateTime;
+        return this;
     }
 
-    public EventDto getEvent() {
-        return event;
+    public ShowDto setArtistList(List<Artist> artistList) {
+        this.artistList = artistList;
+        return this;
     }
 
-    public void setEvent(EventDto event) {
-        this.event = event;
+    public ShowDto setEventid(long eventid) {
+        this.eventid = eventid;
+        return this;
     }
 
-    public class ShowDtoBuilder {
-        private LocalDateTime dateTime;
-        private EventDto event;
-
-        public ShowDtoBuilder withDateTime(LocalDateTime dateTime) {
-            this.dateTime = dateTime;
-            return this;
-        }
-
-        public ShowDtoBuilder withEvent(EventDto event) {
-            this.event = event;
-            return this;
-        }
-
-        public ShowDto build() {
-            var showDto = new ShowDto();
-            showDto.setDateTime(dateTime);
-            showDto.setEvent(event);
-            return showDto;
-        }
+    public long getEventid() {
+        return eventid;
     }
 }

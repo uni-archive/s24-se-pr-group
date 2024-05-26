@@ -1,0 +1,13 @@
+.search-form{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px;
+}
+
+.btn-hover {
+  background-color: #80bdff;
+  &:hover {
+    filter: brightness(120%);
+  }
+}

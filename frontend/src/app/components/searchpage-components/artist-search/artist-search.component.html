@@ -1,0 +1,65 @@
+<form class="search-form" #SearchForm="ngForm" (ngSubmit)="onSubmit()">
+  <div class="row form-group align-items-end">
+
+    <div class="col-auto">
+      <label for="firstname">Vorname</label>
+      <input id="firstname" class="form-control" type="text" [(ngModel)]="firstname" name="firstname"
+             placeholder="Künstler Vorname">
+    </div>
+
+    <div class="col-auto">
+      <label for="lastname">Nachname</label>
+      <input id="lastname" class="form-control" type="text" [(ngModel)]="lastname" name="lastname"
+             placeholder="Künstler Nachname">
+    </div>
+
+    <div class="col-auto">
+      <label for="artistName">Künstlername</label>
+      <input id="artistName" class="form-control" type="text" [(ngModel)]="artistName" name="artistName"
+             placeholder="Künstlername">
+    </div>
+
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary">Suchen</button>
+    </div>
+  </div>
+</form>
+
+<div *ngIf="!showEvents" class="d-flex flex-column gap-2">
+  <div *ngIf="foundArtists && foundArtists.length === 0" class="alert alert-light" role="alert">
+    Keine Künstler*innen gefunden.
+  </div>
+  <div *ngFor="let artist of foundArtists" class="card" (click)="viewEventsForArtist(artist)">
+    <div class="card-body btn-hover" role="button">
+      {{formatArtistName(artist)}}
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showEvents" class="d-flex flex-column gap-2">
+  <div *ngIf="eventsOfArtist && eventsOfArtist.length === 0" class="alert alert-light" role="alert">
+    Keine Veranstaltungen für gefunden.
+  </div>
+  <div *ngFor="let event of eventsOfArtist" class="card">
+    <div class="card-body d-flex justify-content-between">
+      <div>
+        <h5 class="card-title">
+          {{event.title}}
+        </h5>
+        <h6 class="card-subtitle mb-2 text-body-secondary">
+          Beschreibung: {{event.description}}
+        </h6>
+      </div>
+      <div>
+        <p class="card-text mb-0">
+          Dauer: {{formatDuration(event.duration)}}
+        </p>
+        <p class="card-text">
+          Veranstaltungs-Art: {{formatEventType(event.eventType)}}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+

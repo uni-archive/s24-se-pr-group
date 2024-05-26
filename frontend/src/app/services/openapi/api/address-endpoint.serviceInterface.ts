@@ -50,7 +50,7 @@ export interface AddressEndpointServiceInterface {
      * 
      * @param id 
      */
-    findById3(id: number, extraHttpRequestParams?: any): Observable<AddressDto>;
+    findById4(id: number, extraHttpRequestParams?: any): Observable<AddressDto>;
 
     /**
      * 

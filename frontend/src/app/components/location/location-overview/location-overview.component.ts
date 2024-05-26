@@ -13,7 +13,7 @@ export class LocationOverviewComponent {
   constructor(private locationService: LocationEndpointService, private router: Router) {}
 
   searchLocations = (criteria: any, page: number, size: number) => {
-    return this.locationService.search(
+    return this.locationService.search1(
       criteria.name,
       criteria.city,
       criteria.street,

@@ -9,9 +9,14 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { Address } from './address';
+import { Show } from './show';
 
 
-export interface SearchUsers200Response { 
-    parallel?: boolean;
+export interface Location { 
+    id?: number;
+    name?: string;
+    address?: Address;
+    shows?: Array<Show>;
 }
 

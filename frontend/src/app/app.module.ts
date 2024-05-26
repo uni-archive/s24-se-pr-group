@@ -13,8 +13,7 @@ import { LoginComponent } from "./components/login/login.component";
 import { MessageComponent } from "./components/message/message.component";
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { httpInterceptorProviders } from "./interceptors";
-import { RegistrationComponent } from "./components/user/registration/registration.component";
-import { GlobalMessageComponent } from "./global-message/global-message.component";
+import {GlobalMessageComponent } from "./global-message/global-message.component";
 import { AngularPhoneNumberInput } from "angular-phone-number-input";
 import { PrintPurchaseInvoiceButtonComponent } from "./components/print-purchase-invoice-button/print-purchase-invoice-button.component";
 import { PrintTicketButtonComponent } from "./components/print-ticket-button/print-ticket-button.component";
@@ -26,9 +25,13 @@ import { LocationOverviewComponent } from "./components/location/location-overvi
 import { LocationCreateComponent } from "./components/location/location-create/location-create.component";
 import { LocationEditComponent } from "./components/location/location-edit/location-edit.component";
 import { PaginatedListComponent } from "./components/paginated-list/paginated-list.component";
-import { ShowSearchComponent } from "./components/search/show-search/show-search.component";
 import { LocationSearchComponent } from "./components/location/location-search/location-search.component";
 import { UserEditComponent } from "./components/user/user-edit/user-edit.component";
+import {EventSearchComponent} from "./components/searchpage-components/event-search/event-search.component";
+import {ShowSearchComponent} from "./components/searchpage-components/show-search/show-search.component";
+import {RegistrationComponent} from "./components/user/registration/registration.component";
+import {SearchpageComponent} from "./components/searchpage-components/searchpage/searchpage.component";
+import {ArtistSearchComponent} from "./components/searchpage-components/artist-search/artist-search.component";
 
 @NgModule({
   declarations: [
@@ -42,14 +45,16 @@ import { UserEditComponent } from "./components/user/user-edit/user-edit.compone
     GlobalMessageComponent,
     UserHomeComponent,
     ManageUserComponent,
+    SearchpageComponent,
     UserEditComponent,
     CountryDropdownComponent,
     LocationOverviewComponent,
     LocationCreateComponent,
     LocationEditComponent,
     PaginatedListComponent,
-    ShowSearchComponent,
     LocationSearchComponent,
+    GlobalMessageComponent,
+    SearchpageComponent,
   ],
   imports: [
     BrowserModule,
@@ -63,9 +68,17 @@ import { UserEditComponent } from "./components/user/user-edit/user-edit.compone
     PrintTicketButtonComponent,
     TicketsTableComponent,
     NgxPaginationModule,
+    EventSearchComponent,
+    ShowSearchComponent,
+    ShowSearchComponent,
+    ArtistSearchComponent,
   ],
   providers: [httpInterceptorProviders],
-  exports: [HeaderComponent, FooterComponent],
+  exports: [
+    HeaderComponent,
+    FooterComponent,
+    LocationSearchComponent
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

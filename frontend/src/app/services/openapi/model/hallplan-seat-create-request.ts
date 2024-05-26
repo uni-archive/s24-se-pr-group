@@ -11,10 +11,7 @@
  */
 
 
-export interface ApplicationUserSearchDto { 
-    firstName?: string;
-    familyName?: string;
-    email?: string;
-    isLocked?: boolean;
+export interface HallplanSeatCreateRequest { 
+    frontendCoordinates?: string;
 }
 

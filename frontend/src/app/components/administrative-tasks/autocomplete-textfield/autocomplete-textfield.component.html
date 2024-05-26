@@ -1,0 +1,8 @@
+<div class="form-group">
+  <label for="input-datalist">{{Label}}</label>
+  <input type="text" class="form-control" (change)="onChange()" [(ngModel)]="text" [placeholder]="placeholder" id="input-datalist">
+  <div class="container-fluid event-buttons">
+    <button class="btn btn-light btn-outline-dark eventbtn-group" (click)="eventClicked(event)" *ngFor="let event of autoCompleteList" >{{event?.artistName}} {{event?.title}} </button>
+  </div>
+</div>
+

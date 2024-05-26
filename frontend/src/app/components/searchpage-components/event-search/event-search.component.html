@@ -1,0 +1,60 @@
+<form class="search-form" #SearchForm="ngForm" (ngSubmit)="onSubmit()">
+  <div class="row form-group align-items-end">
+
+    <div class="col-auto">
+      <label for="textSearch">Text basierte Suche (Titel und Beschreibung)</label>
+      <input id="textSearch" class="form-control" type="text" [(ngModel)]="searchData.textSearch" name="textSearch"
+             placeholder="text search">
+
+    </div>
+    <div class="col-auto">
+      <label for="duration">Dauer in min (+-30%)</label>
+      <input id="duration" class="form-control" [(ngModel)]="searchData.dauer" type="number" step="1" name="dauer"
+             placeholder="duration in min" min="0">
+
+    </div>
+
+    <div class="col-auto">
+
+      <label for="type">Eventyp</label>
+      <select id="type" class="form-select" aria-label="Default select example" [(ngModel)]="searchData.typ" name="typ"
+              #typ=ngModel>
+        <option *ngFor="let type of eventTypes" [ngValue]="type">{{type}}</option>
+      </select>
+
+    </div>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary">Suchen</button>
+    </div>
+  </div>
+
+</form>
+
+<div *ngIf="events" class="d-flex flex-column gap-2">
+  <div *ngIf="events.length === 0" class="alert alert-light" role="alert">
+    Keine Veranstaltungen gefunden.
+  </div>
+  <div *ngFor="let event of events" class="card">
+    <div class="card-body d-flex justify-content-between">
+      <div>
+        <h5 class="card-title">
+          {{event.title}}
+        </h5>
+        <h6 class="card-subtitle mb-2 text-body-secondary description-text">
+          Beschreibung: {{event.description}}
+        </h6>
+      </div>
+      <div class="endcontainer">
+        <p class="card-text mb-0">
+          Dauer: {{formatDuration(event.duration)}}
+        </p>
+        <p class="card-text">
+          Veranstaltungs-Art: {{formatEventType(event.eventType)}}
+        </p>
+        <a class="btn-info" [href]="'/#/event/'+event.id">
+       mehr Infos
+          </a>
+      </div>
+    </div>
+  </div>
+</div>
