@@ -6,6 +6,7 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserCreateRequest;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateInfoRequest;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.AddressRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.UserRepository;
@@ -13,7 +14,6 @@ import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.supplier.AddressSupplier;
 import at.ac.tuwien.sepr.groupphase.backend.supplier.ApplicationUserSupplier;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,17 +22,21 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.List;
+
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_ROLES;
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_USER;
+import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_USER_2;
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.DEFAULT_USER;
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.USER_ROLES;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -243,5 +247,51 @@ public class UserEndpointTest {
 
         // Delete the entity
         userRepository.delete(objectMapper.convertValue(userToUpdate, ApplicationUser.class));
+    }
+
+    @Test
+    @WithMockUser(roles = "USER", username = "admin2@email.com")
+    void updateUserInfoShouldUpdatePhoneNummer() throws Exception {
+        // Arrange
+        ApplicationUser user = ApplicationUserSupplier.anAdminUserEntity();
+        user.setAddress(AddressSupplier.anAddressEntity());
+        addressRepository.save(user.getAddress());
+        userRepository.save(user);
+
+        UserUpdateInfoRequest updateRequest = new UserUpdateInfoRequest(
+            user.getId(), null,
+            "+431234567890"
+        );
+
+        // Act
+        MvcResult mvcResult = mockMvc.perform(put(TestData.USER_BASE_URI + "/update/user")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateRequest))
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(ADMIN_USER_2, USER_ROLES)))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        // Assert
+        MockHttpServletResponse response = mvcResult.getResponse();
+        ApplicationUserResponse applicationUserResponse = objectMapper.readValue(response.getContentAsString(), ApplicationUserResponse.class);
+        Assertions.assertEquals("+431234567890", applicationUserResponse.phoneNumber());
+
+        userRepository.delete(user);
+    }
+
+    @Test
+    void updateUserEmailWithValidTokenShouldReturnBadRequestForInvalidToken() throws Exception {
+        // Arrange
+        String invalidToken = "invalidToken";
+
+        // Act
+        MvcResult mvcResult = mockMvc.perform(get(TestData.USER_BASE_URI + "/update/user/email")
+                .param("token", invalidToken))
+            .andExpect(status().isBadRequest())
+            .andReturn();
+
+        // Assert
+        MockHttpServletResponse response = mvcResult.getResponse();
+        Assertions.assertEquals("Dieser Link ist nicht gültig.", response.getContentAsString());
     }
 }
