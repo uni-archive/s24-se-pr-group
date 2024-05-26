@@ -31,6 +31,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.List;
 
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_ROLES;
+import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_ROLES_2;
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_USER;
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_USER_2;
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.DEFAULT_USER;
@@ -267,7 +268,7 @@ public class UserEndpointTest {
         MvcResult mvcResult = mockMvc.perform(put(TestData.USER_BASE_URI + "/update/user")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateRequest))
-                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(ADMIN_USER_2, USER_ROLES)))
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(ADMIN_USER_2, ADMIN_ROLES_2)))
             .andExpect(status().isOk())
             .andReturn();
 
