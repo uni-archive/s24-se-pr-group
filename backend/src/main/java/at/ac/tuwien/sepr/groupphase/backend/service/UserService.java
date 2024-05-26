@@ -94,4 +94,12 @@ public interface UserService extends UserDetailsService {
      * @throws NotFoundException if the user does not exist
      */
     ApplicationUserDto findApplicationUserById(Long id) throws NotFoundException;
+
+    /**
+     * Update the email address of a user using a valid token.
+     *
+     * @param token the token
+     * @return the updated user
+     */
+    ApplicationUserDto updateUserEmailWithValidToken(String token);
 }

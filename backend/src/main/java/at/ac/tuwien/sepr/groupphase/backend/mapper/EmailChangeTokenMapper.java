@@ -9,6 +9,8 @@ import java.util.List;
 @Mapper
 public interface EmailChangeTokenMapper extends BaseEntityMapper<EmailChangeToken, EmailChangeTokenDto> {
 
+    EmailChangeTokenDto toDto(EmailChangeToken emailChangeToken);
+
     List<EmailChangeTokenDto> toDto(List<EmailChangeToken> emailChangeTokens);
 
     EmailChangeToken toEntity(EmailChangeTokenDto emailChangeTokenDto);
