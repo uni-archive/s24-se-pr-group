@@ -40,12 +40,4 @@ public class HallSpotDto implements AbstractDto {
             return hallSpotDto;
         }
     }
-
-    @Override
-    public String toString() {
-        return "HallSpotDto{" +
-            "id=" + id +
-            ", sector=" + sector +
-            '}';
-    }
 }

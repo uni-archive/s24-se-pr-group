@@ -94,16 +94,4 @@ public class HallSectorDto implements AbstractDto {
             return hallSector;
         }
     }
-
-    @Override
-    public String toString() {
-        return "HallSectorDto{" +
-            "id=" + id +
-            ", hallPlan=" + hallPlan +
-            ", name='" + name + '\'' +
-            ", frontendCoordinates='" + frontendCoordinates + '\'' +
-            ", seats=" + seats +
-            ", hallSectorShow=" + hallSectorShow +
-            '}';
-    }
 }

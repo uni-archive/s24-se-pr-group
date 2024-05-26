@@ -31,7 +31,7 @@ public interface HallSectorCreateRequestMapper extends BaseResponseMapper<HallSe
                     .map(hallSpotCreateRequest -> {
                         HallSeatDto dto = new HallSeatDto();
                         dto.setFrontendCoordinates(hallSpotCreateRequest.getFrontendCoordinates());
-                        return (HallSpotDto)dto;
+                        return (HallSpotDto) dto;
                     })
                     .toList();
         }

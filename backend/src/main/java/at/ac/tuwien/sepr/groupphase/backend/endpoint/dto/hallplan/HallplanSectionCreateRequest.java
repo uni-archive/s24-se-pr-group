@@ -74,16 +74,4 @@ public class HallplanSectionCreateRequest {
     public void setSpots(List<HallplanSeatCreateRequest> spots) {
         this.spots = spots;
     }
-
-    @Override
-    public String toString() {
-        return "HallplanSectionCreateDto{" +
-            "name='" + name + '\'' +
-            ", color='" + color + '\'' +
-            ", standingOnly=" + standingOnly +
-            ", price=" + price +
-            ", frontendCoordinates='" + frontendCoordinates + '\'' +
-            ", spots=" + spots +
-            '}';
-    }
 }

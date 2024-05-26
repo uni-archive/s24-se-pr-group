@@ -31,15 +31,6 @@ public class HallPlanDto implements AbstractDto {
         this.sectors = sectors;
     }
 
-    @Override
-    public String toString() {
-        return "HallplanCreateDto{" +
-            "name='" + name + '\'' +
-            ", backgroundImage=" + backgroundImage +
-            ", sectors=" + sectors +
-            '}';
-    }
-
     public String getName() {
         return name;
     }

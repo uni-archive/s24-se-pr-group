@@ -10,11 +10,4 @@ public class HallplanSeatCreateRequest {
     public void setFrontendCoordinates(String frontendCoordinates) {
         this.frontendCoordinates = frontendCoordinates;
     }
-
-    @Override
-    public String toString() {
-        return "HallplanSpotCreateDto{" +
-            "frontendCoordinates='" + frontendCoordinates + '\'' +
-            '}';
-    }
 }

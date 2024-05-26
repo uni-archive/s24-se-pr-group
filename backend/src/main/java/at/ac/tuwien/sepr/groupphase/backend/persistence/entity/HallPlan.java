@@ -1,6 +1,10 @@
 package at.ac.tuwien.sepr.groupphase.backend.persistence.entity;
 
-import jakarta.persistence.*;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 
 import java.sql.Blob;
 import java.util.List;

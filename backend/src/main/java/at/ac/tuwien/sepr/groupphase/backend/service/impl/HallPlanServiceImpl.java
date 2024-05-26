@@ -15,9 +15,11 @@ import java.lang.invoke.MethodHandles;
 
 @Service
 public class HallPlanServiceImpl extends AbstractService<HallPlanDto> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     HallPlanDao dao;
     HallSectorDao hallSectorDao;
     HallSpotDao hallSpotDao;
+
     public HallPlanServiceImpl(HallPlanDao dao, HallSectorDao hallSectorDao, HallSpotDao hallSpotDao) {
         super(null, dao);
         this.dao = dao;
@@ -25,32 +27,28 @@ public class HallPlanServiceImpl extends AbstractService<HallPlanDto> {
         this.hallSpotDao = hallSpotDao;
     }
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
     @Transactional
     @Override
     public HallPlanDto create(HallPlanDto dto) {
         var plan = dao.create(dto.withoutSectors());
         dto.getSectors().forEach(section -> {
-            LOGGER.info("Creating hall sector for hall plan. Hall plan ID: {}, Hall sector: {}", plan.getId(), section);
             section.setHallPlan(plan);
             var sectionInDb = hallSectorDao.create(section.withoutSeats());
-            LOGGER.info("Created hall sector for hall plan. Hall plan ID: {}, Hall sector ID: {}, section data: {}", plan.getId(), sectionInDb.getId(), sectionInDb);
             section.getSeats().forEach(seat -> {
                 seat.setSector(sectionInDb);
                 hallSpotDao.create(seat);
             });
         });
         HallPlanDto retVal = null;
-      try {
-          retVal = dao.findById(plan.getId());
-          retVal.setSectors(hallSectorDao.findByHallPlanId(plan.getId()));
-          retVal.getSectors().forEach(sector -> {
-              sector.setSeats(hallSpotDao.findByHallSectorId(sector.getId()));
-          });
-      } catch (EntityNotFoundException e) {
-        throw new RuntimeException(e);
-      }
-      return retVal;
+        try {
+            retVal = dao.findById(plan.getId());
+            retVal.setSectors(hallSectorDao.findByHallPlanId(plan.getId()));
+            retVal.getSectors().forEach(sector -> {
+                sector.setSeats(hallSpotDao.findByHallSectorId(sector.getId()));
+            });
+        } catch (EntityNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return retVal;
     }
 }

@@ -17,15 +17,6 @@ public class HallplanCreateRequest {
     @NotNull(message = "sectors must not be null")
     private List<HallplanSectionCreateRequest> sectors;
 
-    @Override
-    public String toString() {
-        return "HallplanCreateDto{" +
-            "name='" + name + '\'' +
-            ", backgroundImage=" + backgroundImage +
-            ", sections=" + sectors +
-            '}';
-    }
-
     public String getName() {
         return name;
     }

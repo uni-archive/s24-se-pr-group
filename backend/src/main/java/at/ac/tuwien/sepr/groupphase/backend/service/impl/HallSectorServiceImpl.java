@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class HallSectorServiceImpl extends AbstractService<HallSectorDto> {
     HallSectorDao dao;
+
     public HallSectorServiceImpl(HallSectorDao dao) {
         super(null, dao);
         this.dao = dao;
