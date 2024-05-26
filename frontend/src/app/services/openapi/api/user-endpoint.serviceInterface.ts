@@ -13,8 +13,10 @@ import { HttpHeaders }                                       from '@angular/comm
 
 import { Observable }                                        from 'rxjs';
 
+import { ApplicationUserDto } from '../model/models';
 import { ApplicationUserResponse } from '../model/models';
 import { UserCreateRequest } from '../model/models';
+import { UserUpdateInfoRequest } from '../model/models';
 
 
 import { Configuration }                                     from '../configuration';
@@ -37,5 +39,36 @@ export interface UserEndpointServiceInterface {
      * @param userCreateRequest 
      */
     register(userCreateRequest: UserCreateRequest, extraHttpRequestParams?: any): Observable<object>;
+
+    /**
+     * 
+     * 
+     * @param firstName 
+     * @param familyName 
+     * @param email 
+     * @param isLocked 
+     */
+    searchUsers(firstName?: string, familyName?: string, email?: string, isLocked?: boolean, extraHttpRequestParams?: any): Observable<Array<ApplicationUserDto>>;
+
+    /**
+     * 
+     * 
+     * @param token 
+     */
+    updateUserEmailWithValidToken(token: string, extraHttpRequestParams?: any): Observable<object>;
+
+    /**
+     * 
+     * 
+     * @param userUpdateInfoRequest 
+     */
+    updateUserInfo(userUpdateInfoRequest: UserUpdateInfoRequest, extraHttpRequestParams?: any): Observable<ApplicationUserResponse>;
+
+    /**
+     * 
+     * 
+     * @param applicationUserDto 
+     */
+    updateUserStatusByEmail(applicationUserDto: ApplicationUserDto, extraHttpRequestParams?: any): Observable<ApplicationUserResponse>;
 
 }

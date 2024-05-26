@@ -1,0 +1,27 @@
+<div class="modal-dialog">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" id="confirm-delete-dialog-title">Ticket-Reservierung stornieren</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+      Möchten Sie wirklich Ihre Ticket-Reservierung für
+      <h2 class="d-flex justify-content-center">{{ticket.show.event.title}}</h2>
+      stornieren?
+      Diese Aktion kann nicht mehr rückgängig gemacht werden.
+      Wenn Sie auf "Ja" klicken wird Ihr Ticket gelöscht und der Platz wird wieder freigegeben.
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary"
+              data-bs-dismiss="modal"
+      >
+        Nein, nicht stornieren
+      </button>
+      <button type="button" class="btn btn-danger"
+              data-bs-dismiss="modal"
+              (click)="confirm.emit()">
+        Ja, stornieren
+      </button>
+    </div>
+  </div>
+</div>

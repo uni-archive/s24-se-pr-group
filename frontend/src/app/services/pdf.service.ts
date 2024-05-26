@@ -10,6 +10,8 @@ import {
   ShowResponse,
   TicketDetailsResponse,
 } from "./openapi";
+import {formatDate, formatTime} from "../../formatters/datesFormatter";
+import {formatPrice} from "../../formatters/currencyFormatter";
 
 @Injectable({
   providedIn: 'root'
@@ -132,7 +134,7 @@ export class PdfService {
       ]
     };
 
-    const pdfName = `ticket-${ticket.show.event.title}-${this.formatDate(ticket.show.dateTime)}.pdf`;
+    const pdfName = `ticket-${ticket.show.event.title}-${formatDate(ticket.show.dateTime)}.pdf`;
     pdfMake.createPdf(docDefinition, null, null, pdfFonts.pdfMake.vfs).download(pdfName);
   }
 
@@ -161,10 +163,10 @@ export class PdfService {
           style: this.subheaderStyle,
         },
         {
-          text: this.formatDate(show.dateTime)
+          text: formatDate(show.dateTime)
         },
         {
-          text: this.formatTime(show.dateTime)
+          text: formatTime(show.dateTime)
         }
       ],
     };
@@ -237,7 +239,7 @@ export class PdfService {
               alignment: "right",
               stack: [
                 {text: `Rechnung Nr: ${cancellationInvoice.id}`},
-                {text: this.formatDate(cancellationInvoice.dateTime), fontSize: this.defaultFontSize},
+                {text: formatDate(cancellationInvoice.dateTime), fontSize: this.defaultFontSize},
               ]
             }
           ]
@@ -276,7 +278,7 @@ export class PdfService {
               alignment: "right",
               stack: [
                 {text: `Rechnung Nr: ${purchaseInvoice.id}`},
-                {text: this.formatDate(purchaseInvoice.dateTime), fontSize: this.defaultFontSize},
+                {text: formatDate(purchaseInvoice.dateTime), fontSize: this.defaultFontSize},
               ]
             }
           ]
@@ -377,11 +379,11 @@ export class PdfService {
     const fillOpacity = 0.4;
     return [
       {text: t.id, alignment: 'left', fillColor, fillOpacity},
-      {text: this.formatDate(t.show.dateTime), alignment: 'left', fillColor, fillOpacity},
+      {text: formatDate(t.show.dateTime), alignment: 'left', fillColor, fillOpacity},
       {text: t.reserved ? 'Ja' : 'Nein', alignment: 'left', fillColor, fillOpacity},
       {text: t.valid ? 'Ja' : 'Nein', alignment: 'left', fillColor, fillOpacity},
       {text: t.show.event.title, alignment: 'left', fillColor, fillOpacity},
-      {text: this.formatPrice(t.hallSpot.sector.hallSectorShow.price), alignment: "left", fillColor, fillOpacity},
+      {text: formatPrice(t.hallSpot.sector.hallSectorShow.price), alignment: "left", fillColor, fillOpacity},
     ];
   }
 
@@ -403,7 +405,7 @@ export class PdfService {
 
   private ticketPriceBeforeTaxValueField(order: OrderDetailsResponse): Content {
     return {
-      text: this.formatPrice(this.calculateOrderTotalPrice(order)),
+      text: formatPrice(this.calculateOrderTotalPrice(order)),
       style: this.priceValueStyle,
       width: "auto",
     } as Content
@@ -411,7 +413,7 @@ export class PdfService {
 
   private ticketPriceAfterTaxValueField(order: OrderDetailsResponse): Content {
     return {
-      text: this.formatPrice(this.calculateOrderTotalPrice(order) * 1.2),
+      text: formatPrice(this.calculateOrderTotalPrice(order) * 1.2),
       style: this.priceValueStyle,
       width: "auto",
     } as Content
@@ -433,7 +435,7 @@ export class PdfService {
 
   private ticketPriceTaxValueField(order: OrderDetailsResponse): Content {
     return {
-      text: this.formatPrice(this.calculateOrderTotalPrice(order) * 0.2),
+      text: formatPrice(this.calculateOrderTotalPrice(order) * 0.2),
       style: this.priceValueStyle,
       width: "auto",
     } as Content
@@ -489,7 +491,7 @@ export class PdfService {
   private cancellationInvoiceTextField(order: OrderDetailsResponse): Content {
     const purchaseInvoice = this.findPurchaseInvoice(order);
     return {
-      text: `Es wurde die Rechnung (Rechnung Nr: ${purchaseInvoice.id}) vom ${this.formatDate(purchaseInvoice.dateTime)} storniert. Die in der Rechnung enthaltenen Tickets, welche dadurch storniert wurden, finden Sie in der folgenden Tabelle:`
+      text: `Es wurde die Rechnung (Rechnung Nr: ${purchaseInvoice.id}) vom ${formatDate(purchaseInvoice.dateTime)} storniert. Die in der Rechnung enthaltenen Tickets, welche dadurch storniert wurden, finden Sie in der folgenden Tabelle:`
     }
   }
 
@@ -504,7 +506,8 @@ export class PdfService {
   private purchaseInvoiceTextField(order: OrderDetailsResponse): Content {
     const purchaseInvoice = this.findPurchaseInvoice(order);
     return {
-      text: `Es wurden folgende Tickets am ${this.formatDate(purchaseInvoice.dateTime)} gekauft:`
+
+      text: `Es wurden folgende Tickets am ${formatDate(purchaseInvoice.dateTime)} gekauft:`
     }
   }
 
@@ -515,24 +518,4 @@ export class PdfService {
       this.companyName,
     ]
   }
-
-  private formatDate(date: Date | string): string {
-    const d = new Date(date);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0'); // Months are zero-based, so add 1 and pad with leading zeros if necessary
-    const day = String(d.getDate()).padStart(2, '0'); // Pad with leading zeros if necessary
-    return `${year}-${month}-${day}`;
   }
-
-  private formatTime(date: Date | string): string {
-    const d = new Date(date);
-    const hours = d.getHours().toString().padStart(2, '0');
-    const minutes = d.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
-  }
-
-  private formatPrice(price: number): string {
-    const euro = price / 100;
-    return `${euro.toFixed(2)}€`
-  }
-}

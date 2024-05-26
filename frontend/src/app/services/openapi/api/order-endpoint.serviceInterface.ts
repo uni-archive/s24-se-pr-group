@@ -14,6 +14,7 @@ import { HttpHeaders }                                       from '@angular/comm
 import { Observable }                                        from 'rxjs';
 
 import { OrderDetailsResponse } from '../model/models';
+import { OrderSummaryResponse } from '../model/models';
 
 
 import { Configuration }                                     from '../configuration';
@@ -29,6 +30,19 @@ export interface OrderEndpointServiceInterface {
      * 
      * @param id 
      */
+    cancelOrder(id: number, extraHttpRequestParams?: any): Observable<{}>;
+
+    /**
+     * 
+     * 
+     * @param id 
+     */
     findById1(id: number, extraHttpRequestParams?: any): Observable<OrderDetailsResponse>;
+
+    /**
+     * 
+     * 
+     */
+    findForUser1(extraHttpRequestParams?: any): Observable<Array<OrderSummaryResponse>>;
 
 }

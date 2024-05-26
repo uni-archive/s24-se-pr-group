@@ -1,67 +1,172 @@
-<form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="container mt-5">
-  <h2>Registration</h2>
+<form
+  [formGroup]="registrationForm"
+  (ngSubmit)="onSubmit()"
+  class="container mt-5"
+>
+  <h2>Registrierung</h2>
   <div class="row">
     <div class="form-group col-12">
       <label for="email">Email:</label>
-      <input type="email" id="email" formControlName="email" class="form-control" placeholder="Enter your email">
-      <div *ngIf="registrationForm.get('email').invalid && registrationForm.get('email').touched"
-           class="invalid-feedback">
-        Please enter a valid email.
+      <input
+        type="email"
+        id="email"
+        formControlName="email"
+        class="form-control"
+        placeholder="Email"
+      />
+      <div
+        *ngIf="
+          registrationForm.get('email').invalid &&
+          registrationForm.get('email').touched
+        "
+        class="invalid-feedback"
+      >
+        Bitte geben Sie eine gültige Email-Adresse ein.
       </div>
     </div>
 
     <div class="form-group col-12">
-      <label for="password">Password:</label>
-      <input type="password" id="password" formControlName="password" class="form-control"
-             placeholder="Create a password">
-      <div *ngIf="registrationForm.get('password').invalid && registrationForm.get('password').touched"
-           class="invalid-feedback">
-        Your password must be at least 8 characters long.
+      <label for="password">Passwort:</label>
+      <input
+        type="password"
+        id="password"
+        formControlName="password"
+        class="form-control"
+        placeholder="Erstellen Sie ein Passwort"
+      />
+      <div
+        *ngIf="
+          registrationForm.get('password').invalid &&
+          registrationForm.get('password').touched
+        "
+        class="invalid-feedback"
+      >
+        Ihr Passwort muss mindestens 8 Zeichen lang sein.
       </div>
     </div>
 
     <div class="form-group col-12">
-      <label for="password">Password:</label>
-      <input type="password" id="password-repeat" formControlName="password_repeat" class="form-control"
-             placeholder="Create a password">
-      <div *ngIf="registrationForm.get('password_repeat').invalid && registrationForm.get('password_repeat').touched"
-           class="invalid-feedback">
-        Passwords do not match.
+      <label for="password-repeat">Passwort wiederholen:</label>
+      <input
+        type="password"
+        id="password-repeat"
+        formControlName="password_repeat"
+        class="form-control"
+        placeholder="Passwort wiederholen"
+      />
+      <div
+        *ngIf="
+          registrationForm.get('password_repeat').invalid &&
+          registrationForm.get('password_repeat').touched
+        "
+        class="invalid-feedback"
+      >
+        Die Passwörter stimmen nicht überein.
       </div>
     </div>
 
     <div class="form-group col-12 col-xl-6">
-      <label for="firstName">First Name:</label>
-      <input type="text" id="firstName" formControlName="firstName" class="form-control"
-             placeholder="Enter your first name">
+      <label for="firstName">Vorname:</label>
+      <input
+        type="text"
+        id="firstName"
+        formControlName="firstName"
+        class="form-control"
+        placeholder="Geben Sie Ihren Vornamen ein"
+      />
     </div>
 
     <div class="form-group col-12 col-xl-6">
-      <label for="familyName">Family Name:</label>
-      <input type="text" id="familyName" formControlName="familyName" class="form-control"
-             placeholder="Enter your family name">
+      <label for="familyName">Nachname:</label>
+      <input
+        type="text"
+        id="familyName"
+        formControlName="familyName"
+        class="form-control"
+        placeholder="Geben Sie Ihren Nachnamen ein"
+      />
     </div>
 
     <div class="form-group col-12">
-      <label for="phoneNumber">Phone Number:</label>
+      <label for="phoneNumber">Telefonnummer:</label>
       <angular-phone-number-input
         id="phoneNumber"
         formControlName="phoneNumber"
         [defaultCountry]="'AT'"
         [preferredCountries]="['AT', 'DE', 'CH']"
-        [error]="registrationForm.get('phoneNumber')?.touched && registrationForm.get('phoneNumber')?.invalid"
+        [error]="
+          registrationForm.get('phoneNumber')?.touched &&
+          registrationForm.get('phoneNumber')?.invalid
+        "
       ></angular-phone-number-input>
-      <div *ngIf="registrationForm.get('phoneNumber').invalid && registrationForm.get('phoneNumber').touched"
-           class="invalid-feedback">
-        Please enter a valid phone number. {{ registrationForm.get('phoneNumber').errors | json }}
+      <div
+        *ngIf="
+          registrationForm.get('phoneNumber').invalid &&
+          registrationForm.get('phoneNumber').touched
+        "
+        class="invalid-feedback"
+      >
+        Bitte geben Sie eine gültige Telefonnummer ein.
+      </div>
+    </div>
+
+    <div class="form-group col-12" *ngIf="isAdminFlag">
+      <label for="isAdmin">Kontorolle:</label>
+      <select
+        class="form-control"
+        id="isAdmin"
+        name="isAdmin"
+        formControlName="isAdmin"
+      >
+        <option value="true">Admin</option>
+        <option selected value="false">Benutzer</option>
+      </select>
+    </div>
+
+    <h3>Adresse</h3>
+    <div class="row">
+      <div class="form-group col-12">
+        <label for="street">Straße:</label>
+        <input
+          type="text"
+          id="street"
+          formControlName="street"
+          class="form-control"
+          placeholder="z.B.: Dr.-Karl-Renner-Ring 3/4A">
+      </div>
+      <div class="form-group col-12 col-xl-6">
+        <label for="zip">PLZ:</label>
+        <input
+          type="number"
+          id="zip"
+          formControlName="zip"
+          class="form-control"
+          placeholder="z.B.: 1010">
+      </div>
+      <div class="form-group col-12 col-xl-6">
+        <label for="city">Ort:</label>
+        <input
+          type="text"
+          id="city"
+          formControlName="city"
+          class="form-control"
+          placeholder="z.B.: Wien">
+      </div>
+      <div class="form-group col-12">
+        <country-dropdown [formControlName]="'country'"></country-dropdown>
       </div>
     </div>
   </div>
 
   <div class="row">
     <div class="form-group">
-      <button type="submit" class="btn btn-primary" [disabled]="!registrationForm.valid">Register</button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="!registrationForm.valid"
+      >
+        Registrieren
+      </button>
     </div>
   </div>
-
 </form>

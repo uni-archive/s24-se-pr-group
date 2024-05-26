@@ -11,25 +11,25 @@
             <div class="form-group" [class.is-invalid]="submitted && loginForm.get('username').invalid">
               <label for="inputUsername">Username</label>
               <input type="text" class="form-control" id="inputUsername" formControlName="username"
-                     aria-describedby="usernameHelp" placeholder="Enter username">
+                     aria-describedby="usernameHelp" placeholder="Benutzername eingeben">
               <div *ngIf="submitted && loginForm.get('username').errors" class="invalid-feedback">
-                <div *ngIf="loginForm.get('username').errors.required">Your username is required!</div>
+                <div *ngIf="loginForm.get('username').errors.required">Ihr Username ist erforderlich!</div>
               </div>
             </div>
 
             <div class="form-group" [class.is-invalid]="submitted && loginForm.get('password').invalid">
-              <label for="password">Password</label>
+              <label for="password">Passwort</label>
               <input type="password" class="form-control" id="password" formControlName="password"
-                     placeholder="Password">
+                     placeholder="Passwort">
               <div *ngIf="submitted && loginForm.get('password').errors" class="invalid-feedback">
-                <div *ngIf="loginForm.get('password').errors.required">Your password is required!</div>
-                <div *ngIf="loginForm.get('password').errors.minlength">Your password must be at least 8 characters long!</div>
+                <div *ngIf="loginForm.get('password').errors.required">Ihr Passwort ist erforderlich!</div>
+                <div *ngIf="loginForm.get('password').errors.minlength">Ihr Passwort muss mindestens 8 Zeichen lang sein!</div>
               </div>
             </div>
 
             <button type="submit" class="btn btn-primary float-right">Login</button>
 
-            <button type="button" class="btn btn-link mt-2" routerLink="/register">No account yet? Register here!</button>
+            <button type="button" class="btn btn-link mt-2" routerLink="/register">Noch kein Konto? Hier registrieren!</button>
           </form>
         </div>
       </div>

@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.persistence.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -24,6 +25,7 @@ public class HallSector extends AbstractEntity {
     @OneToMany(mappedBy = "sector")
     private List<HallSeat> seats;
 
+
     @Override
     public String toString() {
         return "HallSector{" + "hallPlan=" + hallPlan + ", name='" + name + '\'' + ", frontendCoordinates='" + frontendCoordinates + '\'' + ", seats=" + seats + '}';
@@ -43,7 +45,7 @@ public class HallSector extends AbstractEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(hallPlan, name, frontendCoordinates, seats);
+        return Objects.hash(getId(), hallPlan, name, frontendCoordinates, seats);
     }
 
     public HallPlan getHallPlan() {

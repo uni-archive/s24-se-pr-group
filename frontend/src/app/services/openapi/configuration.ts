@@ -76,12 +76,14 @@ export class Configuration {
         this.encoder = configurationParameters.encoder;
         if (configurationParameters.encodeParam) {
             this.encodeParam = configurationParameters.encodeParam;
-        } else {
+        }
+        else {
             this.encodeParam = param => this.defaultEncodeParam(param);
         }
         if (configurationParameters.credentials) {
             this.credentials = configurationParameters.credentials;
-        } else {
+        }
+        else {
             this.credentials = {};
         }
     }

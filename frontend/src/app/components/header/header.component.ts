@@ -1,25 +1,43 @@
-import {AfterViewInit, Component} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core';
 import {AuthService} from '../../services/auth.service';
-import {ApplicationUserResponse, UserEndpointService} from "../../services/openapi";
+import {ApplicationUserResponse, UserEndpointService} from '../../services/openapi';
+import {Subscription} from 'rxjs';
+import {EventService} from "../../services/event.service";
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
-export class HeaderComponent implements AfterViewInit {
+export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
   public applicationUserResponse: ApplicationUserResponse;
+  private subscription: Subscription;
 
-  constructor(public authService: AuthService, private userService: UserEndpointService) {
+  constructor(public authService: AuthService, private userService: UserEndpointService, private eventService: EventService) {
+  }
 
+  ngOnInit(): void {
+    this.subscription = this.eventService.registrationSuccess$.subscribe(() => {
+      this.loadUser();
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 
   ngAfterViewInit(): void {
-    this.userService.getUser().subscribe({next: response => {
-      this.applicationUserResponse = response;
-      console.log("response");
-      console.log(response);
-    }});
+    this.loadUser();
+  }
+
+  loadUser(): void {
+    this.userService.getUser().subscribe({
+      next: response => {
+        this.applicationUserResponse = response;
+      }
+    });
   }
 
   getName(): string {

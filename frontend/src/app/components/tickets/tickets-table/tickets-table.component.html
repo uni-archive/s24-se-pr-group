@@ -1,0 +1,119 @@
+<div class="d-flex gap-3">
+  <div class="form-floating col-2">
+    <select class="form-select" [(ngModel)]="ticketFilter" (change)="updateFilter()">
+      <option selected value="all">Alle</option>
+      <option value="bought">Gekauft</option>
+      <option value="reserved">Reserviert</option>
+    </select>
+    <label>Gekauft / Reserviert</label>
+  </div>
+
+  <div class="form-floating col-2">
+    <input type="text" class="form-control" [(ngModel)]="eventFilter" (keyup)="updateFilter()">
+    <label>Veranstaltung</label>
+  </div>
+
+  <div class="form-floating col-3">
+    <select class="form-select" id="showDateFilterSelect" [(ngModel)]="showDateFilter" (change)="updateFilter()">
+      <option value="all">Alle</option>
+      <option selected value="upcoming">Kommende Veranstaltungen</option>
+      <option value="previous">Vergangene Veranstaltungen</option>
+      <option value="specific">Bestimmter Zeitraum</option>
+    </select>
+    <label for="showDateFilterSelect">
+      Aufführungs-Datum
+    </label>
+  </div>
+
+  <div *ngIf="showDateFilter === 'specific'" class="form-floating col-2">
+    <input type="date" class="form-control" [(ngModel)]="showDateFilterSpecificFrom" (change)="updateFilter()">
+    <label>Von</label>
+  </div>
+
+  <div *ngIf="showDateFilter === 'specific'" class="form-floating col-2">
+    <input type="date" class="form-control" [(ngModel)]="showDateFilterSpecificTo" (change)="updateFilter()">
+    <label>Bis</label>
+  </div>
+
+</div>
+
+<div class="table-responsive">
+  <table class="table ">
+    <thead>
+    <tr>
+      <th scope="col">Ticket-Nr.</th>
+      <th scope="col">Veranstaltung</th>
+      <th scope="col">Aufführungs-Datum</th>
+      <th scope="col">Gekauft / Reserviert</th>
+      <th scope="col">Preis</th>
+      <th scope="col">Aktionen</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let ticket of ticketsPaged">
+      <th scope="row">{{ticket.id}}</th>
+      <td>{{ticket.show.event.title}}</td>
+      <td>{{ticket.show.dateTime | date}}</td>
+      <td>{{ticket.reserved ? "Reserviert" : "Gekauft" }}</td>
+      <td>{{formatPrice(ticket?.hallSpot?.sector?.hallSectorShow?.price)}}</td>
+      <td>
+        <div class="btn-group">
+          <a class="btn btn-sm responsive-info-button"
+             (click)="this.printTicketPDF(ticket)"
+          >
+            <i class="bi bi-printer"></i>
+          </a>
+          <a *ngIf="ticket.reserved && ticket.valid" class="btn btn-sm responsive-danger-button"
+             data-bs-toggle="modal"
+             [attr.data-bs-target]="'#cancelTicketReservationModal' + ticket.id"
+          >
+            <i class="bi bi-x-circle"></i>
+          </a>
+          <app-confirm-cancel-ticket-reservation-dialog
+            [ticket]="ticket"
+            (confirm)="cancelTicketReservation(ticket.id)"
+            [id]="'cancelTicketReservationModal' + ticket.id"
+          />
+        </div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="d-flex flex-row justify-content-start">
+  <ng-content/>
+
+  <div style="margin-left: auto">
+    <ngb-pagination
+      [collectionSize]="this.ticketsFiltered.length"
+      [(page)]="page"
+      [boundaryLinks]="true"
+      [pageSize]="10"
+      (pageChange)="updatePaging()"
+    >
+      <ng-template ngbPaginationPages let-page let-pages="pages">
+        <li class="ngb-custom-pages-item">
+          <div class="mb-3 d-flex flex-nowrap px-2">
+            <label id="paginationInputLabel" for="paginationInput" class="col-form-label me-2 ms-1">Seite</label>
+            <input
+              #i
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              class="form-control custom-pages-input"
+              id="paginationInput"
+              [value]="page"
+              (keyup.enter)="selectPage(i.value)"
+              (blur)="selectPage(i.value)"
+              (input)="formatInput($any($event).target)"
+              aria-labelledby="paginationInputLabel paginationDescription"
+              style="width: 3rem"
+            />
+            <span id="paginationDescription" class="col-form-label text-nowrap px-2"> of {{ pages.length }}</span>
+          </div>
+        </li>
+      </ng-template>
+    </ngb-pagination>
+  </div>
+</div>

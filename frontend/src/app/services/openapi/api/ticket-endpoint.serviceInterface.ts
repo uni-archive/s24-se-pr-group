@@ -29,6 +29,19 @@ export interface TicketEndpointServiceInterface {
      * 
      * @param id 
      */
+    cancelReservedTicket(id: number, extraHttpRequestParams?: any): Observable<{}>;
+
+    /**
+     * 
+     * 
+     * @param id 
+     */
     findById(id: number, extraHttpRequestParams?: any): Observable<TicketDetailsResponse>;
+
+    /**
+     * 
+     * 
+     */
+    findForUser(extraHttpRequestParams?: any): Observable<Array<TicketDetailsResponse>>;
 
 }

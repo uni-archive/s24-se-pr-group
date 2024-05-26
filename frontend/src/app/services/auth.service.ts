@@ -61,6 +61,10 @@ export class AuthService {
     return 'UNDEFINED';
   }
 
+  isAdmin(){
+    return this.getUserRole() === 'ADMIN';
+  }
+
   private setToken(authResponse: string) {
     localStorage.setItem('authToken', authResponse);
   }

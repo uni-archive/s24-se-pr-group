@@ -12,7 +12,7 @@ import java.util.Objects;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserValidator {
+public class UserValidator extends AbstractValidator {
 
     protected static final String EMAIL_REGEX = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
     private final UserDao userDao;
@@ -30,12 +30,6 @@ public class UserValidator {
         endValidation(errors);
     }
 
-    private void endValidation(List<String> errors) throws ValidationException {
-        if (!errors.isEmpty()) {
-            String message = "Validation Error: " + String.join(", ", errors);
-            throw new ValidationException(message);
-        }
-    }
 
     private List<String> validateBaseCases(ApplicationUserDto userDto) {
         List<String> errors = new ArrayList<>();
@@ -72,15 +66,33 @@ public class UserValidator {
                 errors.add("Phone number must be valid");
             }
         }
+        if (userDto.getAddress() == null) {
+            errors.add("Address must not be empty");
+        }
         return errors;
     }
 
-    public void validateForUpdate(ApplicationUserDto objectToUpdate, ApplicationUserDto oldObject)
+    public void validateForUpdate(ApplicationUserDto objectToUpdate)
         throws ValidationException {
         List<String> errors = validateBaseCases(objectToUpdate);
-        if (!objectToUpdate.getEmail().equals(oldObject.getEmail())) {
-            if (Objects.nonNull(objectToUpdate.getEmail()) && userDao.findByEmail(objectToUpdate.getEmail()) != null) {
-                errors.add("Email already in use");
+        endValidation(errors);
+    }
+
+    public void validateForUpdateStatus(ApplicationUserDto objectToUpdate, String adminEmail)
+        throws ValidationException {
+        List<String> errors = new ArrayList<>();
+        if (objectToUpdate == null) {
+            errors.add("User must not be null");
+            endValidation(errors);
+        }
+        if (objectToUpdate.getEmail() == null || objectToUpdate.getEmail().isEmpty()) {
+            errors.add("Email must not be empty");
+        } else {
+            if (!objectToUpdate.getEmail().matches(EMAIL_REGEX)) {
+                errors.add("Email must be valid");
+            }
+            if (objectToUpdate.getEmail().equals(adminEmail)) {
+                errors.add("Cannot update own status");
             }
         }
         endValidation(errors);

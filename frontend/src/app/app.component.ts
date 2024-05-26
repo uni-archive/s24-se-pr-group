@@ -1,4 +1,7 @@
-import { Component } from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
+import {ActivationEnd} from "@angular/router";
+import {HeaderComponent} from "./components/header/header.component";
+import {RegistrationComponent} from "./components/user/registration/registration.component";
 
 @Component({
   selector: 'app-root',
@@ -6,5 +9,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'SE PR Group Phase';
+  title = 'TicketLine';
 }

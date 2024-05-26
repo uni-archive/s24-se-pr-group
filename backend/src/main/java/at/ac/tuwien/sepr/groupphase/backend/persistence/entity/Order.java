@@ -4,12 +4,17 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.Transient;
+import org.hibernate.annotations.Formula;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,6 +29,9 @@ public class Order extends AbstractEntity {
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "order")
     private List<Ticket> tickets;
 
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "order")
+    private List<Invoice> invoices;
+
     @ManyToOne
     @JoinColumn(name = "CUSTOMER_ID")
     private ApplicationUser customer;
@@ -31,6 +39,7 @@ public class Order extends AbstractEntity {
     @Column(name = "dateTime")
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime dateTime;
+
 
     public List<Ticket> getTickets() {
         return tickets;
@@ -48,12 +57,29 @@ public class Order extends AbstractEntity {
         this.customer = customer;
     }
 
+    public List<Invoice> getInvoices() {
+        return invoices;
+    }
+
+    public void setInvoices(List<Invoice> invoices) {
+        this.invoices = invoices;
+    }
+
+    public LocalDateTime getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
+
     public Order() {
     }
 
-    public Order(List<Ticket> tickets, ApplicationUser customer) {
+    public Order(List<Ticket> tickets, ApplicationUser customer, List<Invoice> invoices) {
         this.tickets = tickets;
         this.customer = customer;
+        this.invoices = invoices;
     }
 
     @Override

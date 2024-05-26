@@ -12,7 +12,7 @@ public class Event extends AbstractEntity {
     @Column(name = "TITLE")
     private String title;
 
-    @Column(name = "DESCRIPTION")
+    @Column(name = "DESCRIPTION", length = 4096)
     private String description;
 
     @Column(name = "EVENT_TYPE")
@@ -27,7 +27,7 @@ public class Event extends AbstractEntity {
 
     @Override
     public String toString() {
-        return "Event{" + "title='" + title + '\'' + ", description='" + description + '\'' + ", eventType=" + eventType + ", duration=" + duration + ", shows=" + shows + '}';
+        return "Event{" + "title='" + title + '\'' + ", description='" + description + '\'' + ", eventType=" + eventType + ", duration=" + duration + '}';
     }
 
     public String getTitle() {

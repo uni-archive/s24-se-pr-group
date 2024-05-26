@@ -1,11 +1,17 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.MailNotSentException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+import java.util.stream.Stream;
 
 public interface UserService extends UserDetailsService {
 
@@ -46,5 +52,54 @@ public interface UserService extends UserDetailsService {
      * @return the created user
      * @throws ValidationException if the user is invalid
      */
-    public ApplicationUserDto createUser(ApplicationUserDto toCreate) throws ValidationException;
+    public ApplicationUserDto createUser(ApplicationUserDto toCreate) throws ValidationException, ForbiddenException;
+
+    /**
+     * Search for users in the persistent data store matching all provided fields.
+     *
+     * @param searchParameters the search parameters to use in filtering.
+     * @return the users where the given fields match.
+     */
+    Stream<ApplicationUserDto> search(ApplicationUserSearchDto searchParameters);
+
+
+    /**
+     * Update the lock status of a user based on the email address.
+     *
+     * @param toUpdate   the user to update
+     * @param adminEmail the email of the admin
+     * @return the updated user
+     * @throws ValidationException if the email is invalid
+     * @throws NotFoundException   if the email does not exist
+     */
+    ApplicationUserDto updateUserStatusByEmail(ApplicationUserDto toUpdate, String adminEmail) throws ValidationException,
+        NotFoundException;
+
+    /**
+     * Update the user information.
+     *
+     * @param userInfo the user information to update
+     * @return the updated user information
+     * @throws NotFoundException    if the user does not exist
+     * @throws ValidationException  if the user information is invalid
+     * @throws MailNotSentException if the mail could not be sent
+     */
+    ApplicationUserDto updateUserInfo(ApplicationUserDto userInfo) throws ValidationException, MailNotSentException;
+
+    /**
+     * Find an application user based on the id.
+     *
+     * @param id the id
+     * @return the application user
+     * @throws NotFoundException if the user does not exist
+     */
+    ApplicationUserDto findApplicationUserById(Long id) throws NotFoundException;
+
+    /**
+     * Update the email address of a user using a valid token.
+     *
+     * @param token the token
+     * @return the updated user
+     */
+    ApplicationUserDto updateUserEmailWithValidToken(String token);
 }

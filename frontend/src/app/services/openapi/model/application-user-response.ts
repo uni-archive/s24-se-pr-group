@@ -9,6 +9,7 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { AddressResponse } from './address-response';
 
 
 export interface ApplicationUserResponse { 
@@ -19,5 +20,7 @@ export interface ApplicationUserResponse {
     phoneNumber?: string;
     accountLocked?: boolean;
     isAdmin?: boolean;
+    isSuperAdmin?: boolean;
+    address?: AddressResponse;
 }
 
