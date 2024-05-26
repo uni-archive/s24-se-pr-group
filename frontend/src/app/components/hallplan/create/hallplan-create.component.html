@@ -6,8 +6,7 @@
       <app-hallplan #hallplan/>
     </div>
     <div class="col">
-      <form id="mainform" ></form>
-      <div class="container" [formGroup]="mainForm" (ngSubmit)="onSubmit()">
+      <form class="container" [formGroup]="mainForm" (ngSubmit)="onSubmit()">
         <div class="row">
           <div class="form-group col-12">
             <label for="title">Platzname:</label>
@@ -42,7 +41,7 @@
           <!-- Ausgewählte section in card -->
           <div class="mb-4">
             <h3>Ausgewählter Sektor:</h3>
-            <form class="card col-12 mt-3" *ngIf="selectedSection" [formGroup]="sectionForm" (ngSubmit)="updateSection()">
+            <div class="card col-12 mt-3" *ngIf="selectedSection" [formGroup]="sectionForm">
               <div class="card-body">
                 <h5 class="card-title
               ">{{selectedSection.name}}</h5>
@@ -83,18 +82,18 @@
                 </div>
 
 
-                <button class="btn btn-outline-primary" [disabled]="!sectionForm.valid">Aktualisieren</button>
+                <button class="btn btn-outline-primary" [disabled]="!sectionForm.valid" (click)="updateSection()">Aktualisieren</button>
               </div>
-            </form>
+            </div>
             <p *ngIf="!selectedSection">Kein Sektor ausgewählt</p>
           </div>
 
 
 
-          <button class="btn btn-outline-primary col-12" [disabled]="! mainForm.valid">Speichern</button>
+          <button class="btn btn-outline-primary col-12" [disabled]="! mainForm.valid" type="submit">Speichern</button>
 
         </div>
-      </div>
+      </form>
     </div>
   </div>
 </div>

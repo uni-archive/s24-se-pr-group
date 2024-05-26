@@ -31,24 +31,7 @@ export class HallplanComponent {
   backgroundImageUrl: string;
   entitiesSelected: boolean = false;
 
-  sections: HallSection[] = [
-    // generate 5 random sections
-
-    // Example: Section 1
-    {
-      points: [
-        { x: 100, y: 150 },
-        { x: 200, y: 100 },
-        { x: 200, y: 200 },
-        { x: 100, y: 200 }
-      ],
-      name: 'Section 1',
-      color: 'red',
-      price: 100,
-      seats: [],
-      isStandingOnly: true
-    },
-   ];
+  sections: HallSection[] = [];
 
   drawHelper: DrawHelper;
   moveHelper: MoveHelper;
