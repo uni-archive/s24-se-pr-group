@@ -1,6 +1,8 @@
 import { Component, Input, OnInit, SimpleChanges } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { Router } from "@angular/router";
 import { firstValueFrom } from "rxjs";
+import { AuthService } from "src/app/services/auth.service";
 import { MessagingService } from "src/app/services/messaging.service";
 import {
   ApplicationUserResponse,
@@ -20,7 +22,9 @@ export class UserEditComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private userEndpointService: UserEndpointService,
-    private messagingService: MessagingService
+    private messagingService: MessagingService,
+    private authService: AuthService,
+    private router: Router
   ) {
     this.createForm();
   }
@@ -52,6 +56,14 @@ export class UserEditComponent implements OnInit {
       this.updateFormValues();
     } catch (error) {
       console.error("Error loading user data", error);
+      if (this.authService.isLoggedIn()) {
+        this.messagingService.setMessage(
+          "Fehler beim Laden der Benutzerdaten. Bitte erneut anmelden.",
+          "error"
+        );
+        this.authService.logoutUser();
+        this.router.navigate(["/login"]);
+      }
     }
   }
 
@@ -73,12 +85,19 @@ export class UserEditComponent implements OnInit {
         const user = await firstValueFrom(
           this.userEndpointService.updateUserInfo(this.userForm.value)
         );
+        if (this.user.email !== this.userForm.value.email) {
+          this.messagingService.setMessage(
+            "Bestätige bitte deine neue E-Mail-Adresse.",
+            "success"
+          );
+        } else {
+          this.messagingService.setMessage(
+            "Benutzer erfolgreich aktualisiert.",
+            "success"
+          );
+        }
         this.user = user;
         this.updateFormValues();
-        this.messagingService.setMessage(
-          "Benutzer erfolgreich aktualisiert.",
-          "success"
-        );
         this.editMode = false;
       } catch (error) {
         console.error("Error saving user details", error);
