@@ -7,5 +7,7 @@ import java.util.List;
 
 public interface EmailChangeTokenRepository extends JpaRepository<EmailChangeToken, Long> {
 
+    EmailChangeToken findByToken(String token);
+
     List<EmailChangeToken> findByCurrentEmail(String currentEmail);
 }

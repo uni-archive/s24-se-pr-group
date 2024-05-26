@@ -14,6 +14,10 @@ public class EmailChangeTokenDao extends AbstractDao<EmailChangeToken, EmailChan
         super(repository, mapper);
     }
 
+    public EmailChangeTokenDto findByToken(String token) {
+        return (mapper).toDto(((EmailChangeTokenRepository) repository).findByToken(token));
+    }
+
     public List<EmailChangeTokenDto> findByCurrentEmail(String currentEmail) {
         return (mapper).toDto(((EmailChangeTokenRepository) repository).findByCurrentEmail(currentEmail));
     }

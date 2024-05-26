@@ -105,4 +105,15 @@ public class UserEndpoint {
         return userMapper.toResponse(userService.updateUserInfo(userMapper.toDto(userInfo)));
     }
 
+    @PermitAll
+    @GetMapping("/update/user/email")
+    public ResponseEntity<?> updateUserEmailWithValidToken(@RequestParam("token") String token) {
+        if (userService.updateUserEmailWithValidToken(token) != null) {
+            return ResponseEntity.ok("Deine E-Mail-Adresse wurde erfolgreich geändert. Bitte melde dich mit deinen " +
+                "neuen Zugangsdaten an.");
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Dieser Link ist nicht gültig.");
+    }
+
+
 }

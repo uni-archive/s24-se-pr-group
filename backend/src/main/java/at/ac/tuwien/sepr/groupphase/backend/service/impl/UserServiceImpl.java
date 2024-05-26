@@ -187,9 +187,8 @@ public class UserServiceImpl implements UserService {
             // Create a token for email change
             EmailChangeTokenDto emailChangeToken = createAndSaveEmailChangeToken(userInfo.getEmail(), user.getEmail());
 
-
             // Send email to the new email address to confirm the change
-            MailBody mailBody = generateMailBodyChangeEmail(userInfo, user);
+            MailBody mailBody = generateMailBodyChangeEmail(userInfo, user, emailChangeToken.getToken());
             try {
                 emailSenderService.sendHtmlMail(mailBody);
             } catch (MessagingException e) {
@@ -217,6 +216,25 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+    @Override
+    public ApplicationUserDto updateUserEmailWithValidToken(String token) {
+        EmailChangeTokenDto emailChangeToken = emailChangeTokenDao.findByToken(token);
+        if (emailChangeToken != null && emailChangeToken.getExpiryDate().isAfter(LocalDateTime.now())) {
+            ApplicationUserDto user = userDao.findByEmail(emailChangeToken.getCurrentEmail());
+            user.setEmail(emailChangeToken.getNewEmail());
+            ApplicationUserDto updatedUser = null;
+            try {
+                updatedUser = userDao.update(user);
+            } catch (EntityNotFoundException e) {
+                LOGGER.error("Could not update the user with the email address {} because it does not exist.",
+                    emailChangeToken.getCurrentEmail());
+            }
+            invalidateOldTokens(emailChangeToken.getCurrentEmail());
+            return updatedUser;
+        }
+        return null;
+    }
+
     private EmailChangeTokenDto createAndSaveEmailChangeToken(String newEmail, String currentEmail) {
         String token = UUID.randomUUID().toString();
         LocalDateTime expiryDate = LocalDateTime.now().plusMinutes(10);
@@ -234,12 +252,21 @@ public class UserServiceImpl implements UserService {
     }
 
     private void invalidateOldTokens(String currentEmail) {
-        emailChangeTokenDao.findByCurrentEmail(currentEmail).forEach(token -> token.setExpiryDate(LocalDateTime.now().minusMinutes(1)));
+        emailChangeTokenDao.findByCurrentEmail(currentEmail).forEach(token -> {
+            token.setExpiryDate(LocalDateTime.now().minusMinutes(1));
+            try {
+                emailChangeTokenDao.update(token);  // Save the updated token
+            } catch (EntityNotFoundException e) {
+                throw new NotFoundException("Could not update the email change token because it does not exist.");
+            }
+        });
     }
 
-    private MailBody generateMailBodyChangeEmail(ApplicationUserDto userInfo, ApplicationUserDto user) {
+    private MailBody generateMailBodyChangeEmail(ApplicationUserDto userInfo, ApplicationUserDto user, String token) {
         String email = userInfo.getEmail();
         String subject = "Ihre E-Mail Adresse wurde geändert.";
+        String url = "http://localhost:8080/api/v1/users/update/user/email?token=" + token;
+
         String emailTemplate = "<html>"
             + "<body>"
             + "<p>Hallo " + user.getFirstName() + ",</p>"
@@ -249,7 +276,7 @@ public class UserServiceImpl implements UserService {
             + " verwenden möchtest, ignoriere einfach diese E-Mail.</p>"
             + "<p>Bis du diese Änderung bestätigst, musst du deine aktuelle E-Mail-Adresse verwenden, um "
             + "dich bei TicketLine anzumelden.</p>"
-            + "<a href=\"[Link zum Ändern der E-Mail]\" style=\"display: inline-block; padding: 10px 20px; "
+            + "<a href=\"" + url + "\" style=\"display: inline-block; padding: 10px 20px; "
             + "font-size: 16px; color: #fff; background-color: #007bff; text-decoration: none; border-radius:"
             + " 5px;\">E-Mail Adresse ändern</a>"
             + "<p>Dieser Link ist für die nächsten 10 Minuten gültig.</p>"
