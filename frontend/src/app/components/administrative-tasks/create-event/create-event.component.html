@@ -1,0 +1,31 @@
+
+<form (submit)="onSubmit()" #createForm="ngForm" >
+<div class="form-group">
+  <div class="row g-3 align-items-center" >
+    <div class="col-auto flex-grow-1">
+    <label for="title" class="form-label">Titel</label>
+    <input required type="text" [(ngModel)]="createDto.title" class="form-control" name="title" id="title" placeholder="Titel">
+    </div>
+
+    <div class="col-auto">
+    <label for="duration" class="form-label">Länge (in min)</label>
+    <input required type="number" min="0" [(ngModel)]="createDto.duration" class="form-control" name="duration" id="duration" placeholder="0">
+    </div>
+
+    <div class="col-auto">
+    <label for="typeselect" class="form-label">Typ der Veranstaltung</label>
+    <select required class="form-select" id="typeselect" aria-label="Default select example" [(ngModel)]="eventType" name="typ" #typ=ngModel>
+      <option *ngFor="let type of eventTypes" [ngValue]="type">{{type}}</option>
+    </select>
+    </div>
+  </div>
+  <div class="mb-3">
+    <label for="description" class="form-label">Beschreibung</label>
+    <textarea required class="form-control" [(ngModel)]="createDto.description" name="description" id="description" rows="3"></textarea>
+  </div>
+
+</div>
+
+  <button type="submit" class="btn btn-primary" >Erstelle Event</button>
+
+</form>

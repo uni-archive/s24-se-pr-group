@@ -1,0 +1,22 @@
+<div class="container">
+
+  <div class="input-group justify-content-center" id="searchRadio">
+    <button (click)="searchMode='ARTIST'" class="btn btn-outline-primary {{(searchMode==='ARTIST'?('active'):(''))}}"
+            type="button">Künstler
+    </button>
+    <button (click)="searchMode='LOCATION'"
+            class="btn btn-outline-primary {{(searchMode==='LOCATION'?('active'):(''))}}" type="button">Orte
+    </button>
+    <button (click)="searchMode='EVENT'" class="btn btn-outline-primary {{(searchMode==='EVENT'?('active'):(''))}}"
+            type="button">Veranstaltungen
+    </button>
+    <button (click)="searchMode='SHOW'" class="btn btn-outline-primary {{(searchMode==='SHOW'?('active'):(''))}}"
+            type="button">Aufführungen
+    </button>
+  </div>
+
+  <app-event-search [hidden]="searchMode!=='EVENT'"></app-event-search>
+  <app-show-search [hidden]="searchMode!=='SHOW'"></app-show-search>
+  <app-artist-search [hidden]="searchMode!=='ARTIST'"></app-artist-search>
+
+</div>

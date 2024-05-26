@@ -69,7 +69,8 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "buildTarget": "sepr-group-phase:build"
+            "buildTarget": "sepr-group-phase:build",
+            "proxyConfig": "src/proxy.conf.json"
           },
           "configurations": {
             "production": {

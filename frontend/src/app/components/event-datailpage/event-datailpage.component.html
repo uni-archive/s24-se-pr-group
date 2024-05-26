@@ -1,0 +1,32 @@
+<div class="container">
+  <h3>{{event?.title}}</h3>
+  <h5>Typ: {{event?.eventType==="THEATER"?("Kinofilm"):(event?.eventType==="CONCERT")?("Konzert"):("Theaterstück")}}</h5>
+  <h6>Beschreibung:</h6>
+  <p>{{event?.description}}</p>
+
+  <div *ngIf="shows" class="d-flex flex-column gap-2">
+    <div *ngIf="shows.length === 0" class="alert alert-light" role="alert">
+      Keine Veranstaltungen gefunden.
+    </div>
+    <div *ngFor="let show of shows" class="card">
+      <div class="card-body d-flex justify-content-between">
+        <div>
+          <h5 class="card-title">
+            {{show.eventName}}
+          </h5>
+          <h6 class="card-subtitle mb-2 text-body-secondary">
+            Aufführung am: {{formatDateStr(show.dateTime)}}
+          </h6>
+        </div>
+        <div>
+          <p class="card-text mb-0 float-end">
+            Tickets ab: {{show.startingPrice/100}}€
+          </p>
+          <br>
+          <p class="card-text float-end" *ngIf="show.artistList.length < 10" >{{show.artistList.map(artistMap)}}</p>
+          <p class="card-text float-end" *ngIf="show.artistList.length >= 10" >10+ auftretende Musiker*innen</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -16,6 +16,10 @@ import {OrdersViewComponent} from "./components/orders/orders-view/orders-view.c
 import {ShowSearchComponent} from "./components/search/show-search/show-search.component";
 import {HallplanComponent} from "./components/hallplan/hallplan.component";
 import {HallplanCreateComponent} from "./components/hallplan/create/hallplan-create.component";
+import {SearchpageComponent} from "./components/searchpage-components/searchpage/searchpage.component";
+import {CreateEventComponent} from "./components/administrative-tasks/create-event/create-event.component";
+import {CreateShowComponent} from "./components/administrative-tasks/create-show/create-show.component";
+import {EventDatailpageComponent} from "./components/event-datailpage/event-datailpage.component";
 
 
 const routes: Routes = [
@@ -48,9 +52,12 @@ const routes: Routes = [
   {
     path: "search", canActivate: mapToCanActivate([AuthGuard]),
     children: [
-      {path: '', component: ShowSearchComponent}
+      {path: '', component: SearchpageComponent}
     ]
   },
+  {path: "event/:id", component: EventDatailpageComponent},
+  {path: "eventcreation", component: CreateEventComponent},
+  {path: "showcreation", component: CreateShowComponent},
   {path: 'hallplan', component: HallplanComponent},
   {path: 'hallplan/create', component: HallplanCreateComponent}
 ];

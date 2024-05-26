@@ -8,4 +8,6 @@
 ### Start the backed with test data
 If the database is not clean, the test data won't be inserted
 
-`mvn spring-boot:run -Dspring-boot.run.profiles=generateData`
+`mvn spring-boot:test-run
+-Dspring-boot.run.mainClass=at.ac.tuwien.sepr.groupphase.backend.DevelopmentApplication
+-f pom.xml`
