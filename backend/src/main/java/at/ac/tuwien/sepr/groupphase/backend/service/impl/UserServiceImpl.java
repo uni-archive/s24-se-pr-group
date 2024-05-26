@@ -168,7 +168,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // Update phone number if it is not null or empty
-        if (userInfo.getPhoneNumber() != null || !userInfo.getPhoneNumber().isBlank()) {
+        if (userInfo.getPhoneNumber() != null) {
             user.setPhoneNumber(userInfo.getPhoneNumber());
         }
 
@@ -176,7 +176,7 @@ public class UserServiceImpl implements UserService {
         userValidator.validateForUpdate(user);
 
         // Update email if it is different from the current email
-        if ((userInfo.getEmail() != null || !userInfo.getEmail().isBlank()) && !Objects.equals(user.getEmail(),
+        if ((userInfo.getEmail() != null) && !Objects.equals(user.getEmail(),
             userInfo.getEmail())) {
             ApplicationUserDto userByEmail = null;
             try {
