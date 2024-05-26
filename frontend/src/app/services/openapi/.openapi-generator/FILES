@@ -18,6 +18,8 @@ api/login-endpoint.service.ts
 api/login-endpoint.serviceInterface.ts
 api/message-endpoint.service.ts
 api/message-endpoint.serviceInterface.ts
+api/news-endpoint.service.ts
+api/news-endpoint.serviceInterface.ts
 api/order-endpoint.service.ts
 api/order-endpoint.serviceInterface.ts
 api/show-endpoint.service.ts
@@ -41,6 +43,7 @@ model/artist-search-dto.ts
 model/artist-search-response.ts
 model/artist.ts
 model/detailed-message-dto.ts
+model/detailed-news-dto.ts
 model/event-creation-dto.ts
 model/event-dto.ts
 model/event-response.ts
@@ -74,6 +77,7 @@ model/show-response.ts
 model/show-search-dto.ts
 model/show.ts
 model/simple-message-dto.ts
+model/simple-news-dto.ts
 model/sort-object.ts
 model/ticket-details-response-hall-spot.ts
 model/ticket-details-response.ts
