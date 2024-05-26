@@ -5,9 +5,8 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.HallSpotDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSeat;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSpot;
 import org.mapstruct.Mapper;
+import org.mapstruct.Named;
 import org.mapstruct.SubclassMapping;
-
-import java.util.List;
 
 @Mapper
 public interface HallSpotMapper extends BaseEntityMapper<HallSpot, HallSpotDto> {
@@ -18,5 +17,6 @@ public interface HallSpotMapper extends BaseEntityMapper<HallSpot, HallSpotDto> 
 
     @Override
     @SubclassMapping(source = HallSeat.class, target = HallSeatDto.class)
+    @Named("toDtoWithoutContext")
     HallSpotDto toDto(HallSpot entity);
 }
