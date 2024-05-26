@@ -9,7 +9,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 
+import javax.sql.rowset.serial.SerialBlob;
 import java.sql.Blob;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -20,16 +22,19 @@ public class News extends AbstractEntity {
     @Column(name = "TITLE")
     private String title;
 
-    @Column(name = "dateTime")
     @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime dateTime;
+    @Column(nullable = false, name = "published_at")
+    private LocalDateTime publishedAt;
 
-    @Column(name = "DESCRIPTION")
-    private String description;
+    @Column(nullable = false, length = 500)
+    private String summary;
+
+    @Column(nullable = false, length = 10000)
+    private String text;
 
     @Lob
     @Column(name = "NEWS_IMAGE")
-    private Blob newsImage;
+    private Blob image;
 
     @ManyToMany(mappedBy = "news")
     private List<ApplicationUser> users;
@@ -37,6 +42,14 @@ public class News extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "EVENT_ID")
     private Event event;
+
+    public LocalDateTime getPublishedAt() {
+        return publishedAt;
+    }
+
+    public void setPublishedAt(LocalDateTime publishedAt) {
+        this.publishedAt = publishedAt;
+    }
 
     public String getTitle() {
         return title;
@@ -46,39 +59,29 @@ public class News extends AbstractEntity {
         this.title = title;
     }
 
-
-    public LocalDateTime getDateTime() {
-        return dateTime;
+    public String getSummary() {
+        return summary;
     }
 
-    public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime = dateTime;
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 
 
-    public String getDescription() {
-        return description;
+    public Blob getImage() {
+        return image;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-
-    public Blob getNewsImage() {
-        return newsImage;
-    }
-
-    public void setNewsImage(Blob backgroundImage) {
-        this.newsImage = backgroundImage;
-    }
-
-    public List<ApplicationUser> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<ApplicationUser> users) {
-        this.users = users;
+    public void setImage(Blob image) {
+        this.image = image;
     }
 
     public Event getEvent() {
@@ -94,21 +97,85 @@ public class News extends AbstractEntity {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof News news)) {
             return false;
         }
-        News news = (News) o;
-        return Objects.equals(title, news.title) && Objects.equals(dateTime, news.dateTime) && Objects.equals(description, news.description) && Objects.equals(newsImage, news.newsImage) && Objects.equals(users, news.users)
-            && Objects.equals(event, news.event);
+        return Objects.equals(getId(), news.getId()) && Objects.equals(publishedAt, news.publishedAt) && Objects.equals(title, news.title)
+            && Objects.equals(summary, news.summary) && Objects.equals(text, news.text) && Objects.equals(image, news.image) && Objects.equals(users, news.users) && Objects.equals(event, news.event);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(title, dateTime, description, newsImage, users, event);
+        return Objects.hash(getId(), publishedAt, title, summary, text, image, users, event);
     }
 
     @Override
     public String toString() {
-        return "News{" + "title='" + title + '\'' + ", dateTime=" + dateTime + ", description='" + description + '\'' + ", newsImage=" + newsImage + ", users=" + users + ", event=" + event + '}';
+        return "News{" + "publishedAt=" + publishedAt + ", title='" + title + '\'' + ", summary='" + summary + '\'' + ", text='" + text + '\'' + ", users=" + users + ", event=" + event + '}';
+    }
+
+
+    public static final class NewsBuilder {
+        private Long id;
+        private LocalDateTime publishedAt;
+        private String title;
+        private String summary;
+        private String text;
+        private byte[] image;
+
+        private NewsBuilder() {
+        }
+
+        public static NewsBuilder aNews() {
+            return new NewsBuilder();
+        }
+
+        public NewsBuilder withId(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public NewsBuilder withPublishedAt(LocalDateTime publishedAt) {
+            this.publishedAt = publishedAt;
+            return this;
+        }
+
+        public NewsBuilder withTitle(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public NewsBuilder withSummary(String summary) {
+            this.summary = summary;
+            return this;
+        }
+
+        public NewsBuilder withText(String text) {
+            this.text = text;
+            return this;
+        }
+
+        public NewsBuilder withImage(byte[] image) {
+            this.image = image;
+            return this;
+        }
+
+        public News build() {
+            News news = new News();
+            news.setId(id);
+            news.setPublishedAt(publishedAt);
+            news.setTitle(title);
+            news.setSummary(summary);
+            news.setText(text);
+            if (image != null) {
+                try {
+                    Blob blob = new SerialBlob(image);
+                    news.setImage(blob);
+                } catch (SQLException e) {
+                    throw new RuntimeException("Fehler bei der Umwandlung von byte[] zu Blob", e);
+                }
+            }
+            return news;
+        }
     }
 }

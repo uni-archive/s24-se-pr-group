@@ -38,13 +38,13 @@ export interface LocationEndpointServiceInterface {
      * 
      * @param locationCreateRequest 
      */
-    create1(locationCreateRequest: LocationCreateRequest, extraHttpRequestParams?: any): Observable<LocationDto>;
+    create2(locationCreateRequest: LocationCreateRequest, extraHttpRequestParams?: any): Observable<LocationDto>;
 
     /**
      * 
      * 
      */
-    findAll1(extraHttpRequestParams?: any): Observable<object>;
+    findAll2(extraHttpRequestParams?: any): Observable<object>;
 
     /**
      * 

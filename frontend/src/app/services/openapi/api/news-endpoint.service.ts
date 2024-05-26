@@ -19,25 +19,23 @@ import { CustomHttpParameterCodec }                          from '../encoder';
 import { Observable }                                        from 'rxjs';
 
 // @ts-ignore
-import { DetailedMessageDto } from '../model/detailed-message-dto';
+import { DetailedNewsDto } from '../model/detailed-news-dto';
 // @ts-ignore
-import { MessageInquiryDto } from '../model/message-inquiry-dto';
-// @ts-ignore
-import { SimpleMessageDto } from '../model/simple-message-dto';
+import { SimpleNewsDto } from '../model/simple-news-dto';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 import {
-    MessageEndpointServiceInterface
-} from './message-endpoint.serviceInterface';
+    NewsEndpointServiceInterface
+} from './news-endpoint.serviceInterface';
 
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class MessageEndpointService implements MessageEndpointServiceInterface {
+export class NewsEndpointService implements NewsEndpointServiceInterface {
 
     protected basePath = 'http://localhost:8080';
     public defaultHeaders = new HttpHeaders();
@@ -61,6 +59,19 @@ export class MessageEndpointService implements MessageEndpointServiceInterface {
         this.encoder = this.configuration.encoder || new CustomHttpParameterCodec();
     }
 
+    /**
+     * @param consumes string[] mime-types
+     * @return true: consumes contains 'multipart/form-data', false: otherwise
+     */
+    private canConsumeForm(consumes: string[]): boolean {
+        const form = 'multipart/form-data';
+        for (const consume of consumes) {
+            if (form === consume) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     // @ts-ignore
     private addToHttpParams(httpParams: HttpParams, value: any, key?: string): HttpParams {
@@ -99,17 +110,43 @@ export class MessageEndpointService implements MessageEndpointServiceInterface {
     }
 
     /**
-     * Publish a new message
-     * @param messageInquiryDto 
+     * Publish a new news
+     * @param title 
+     * @param summary 
+     * @param text 
+     * @param image 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public create1(messageInquiryDto: MessageInquiryDto, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<DetailedMessageDto>;
-    public create1(messageInquiryDto: MessageInquiryDto, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<DetailedMessageDto>>;
-    public create1(messageInquiryDto: MessageInquiryDto, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<DetailedMessageDto>>;
-    public create1(messageInquiryDto: MessageInquiryDto, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (messageInquiryDto === null || messageInquiryDto === undefined) {
-            throw new Error('Required parameter messageInquiryDto was null or undefined when calling create1.');
+    public create(title: string, summary: string, text: string, image: Blob, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<DetailedNewsDto>;
+    public create(title: string, summary: string, text: string, image: Blob, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<DetailedNewsDto>>;
+    public create(title: string, summary: string, text: string, image: Blob, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<DetailedNewsDto>>;
+    public create(title: string, summary: string, text: string, image: Blob, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (title === null || title === undefined) {
+            throw new Error('Required parameter title was null or undefined when calling create.');
+        }
+        if (summary === null || summary === undefined) {
+            throw new Error('Required parameter summary was null or undefined when calling create.');
+        }
+        if (text === null || text === undefined) {
+            throw new Error('Required parameter text was null or undefined when calling create.');
+        }
+        if (image === null || image === undefined) {
+            throw new Error('Required parameter image was null or undefined when calling create.');
+        }
+
+        let localVarQueryParameters = new HttpParams({encoder: this.encoder});
+        if (title !== undefined && title !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>title, 'title');
+        }
+        if (summary !== undefined && summary !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>summary, 'summary');
+        }
+        if (text !== undefined && text !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>text, 'text');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -118,7 +155,7 @@ export class MessageEndpointService implements MessageEndpointServiceInterface {
         if (localVarHttpHeaderAcceptSelected === undefined) {
             // to determine the Accept header
             const httpHeaderAccepts: string[] = [
-                'application/json;charset=UTF-8'
+                'application/json'
             ];
             localVarHttpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         }
@@ -136,14 +173,27 @@ export class MessageEndpointService implements MessageEndpointServiceInterface {
             localVarTransferCache = true;
         }
 
-
         // to determine the Content-Type header
         const consumes: string[] = [
-            'application/json'
+            'multipart/form-data'
         ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
+
+        const canConsumeForm = this.canConsumeForm(consumes);
+
+        let localVarFormParams: { append(param: string, value: any): any; };
+        let localVarUseForm = false;
+        let localVarConvertFormParamsToString = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        // see https://stackoverflow.com/questions/4007969/application-x-www-form-urlencoded-or-multipart-form-data
+        localVarUseForm = canConsumeForm;
+        if (localVarUseForm) {
+            localVarFormParams = new FormData();
+        } else {
+            localVarFormParams = new HttpParams({encoder: this.encoder});
+        }
+
+        if (image !== undefined) {
+            localVarFormParams = localVarFormParams.append('image', <any>image) as any || localVarFormParams;
         }
 
         let responseType_: 'text' | 'json' | 'blob' = 'json';
@@ -157,11 +207,12 @@ export class MessageEndpointService implements MessageEndpointServiceInterface {
             }
         }
 
-        let localVarPath = `/api/v1/messages`;
-        return this.httpClient.request<DetailedMessageDto>('post', `${this.configuration.basePath}${localVarPath}`,
+        let localVarPath = `/api/v1/news`;
+        return this.httpClient.request<DetailedNewsDto>('post', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: messageInquiryDto,
+                body: localVarConvertFormParamsToString ? localVarFormParams.toString() : localVarFormParams,
+                params: localVarQueryParameters,
                 responseType: <any>responseType_,
                 withCredentials: this.configuration.withCredentials,
                 headers: localVarHeaders,
@@ -173,17 +224,17 @@ export class MessageEndpointService implements MessageEndpointServiceInterface {
     }
 
     /**
-     * Get detailed information about a specific message
+     * Get detailed information about a specific news
      * @param id 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public find1(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<DetailedMessageDto>;
-    public find1(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<DetailedMessageDto>>;
-    public find1(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<DetailedMessageDto>>;
-    public find1(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public find(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<DetailedNewsDto>;
+    public find(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<DetailedNewsDto>>;
+    public find(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<DetailedNewsDto>>;
+    public find(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling find1.');
+            throw new Error('Required parameter id was null or undefined when calling find.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -192,7 +243,7 @@ export class MessageEndpointService implements MessageEndpointServiceInterface {
         if (localVarHttpHeaderAcceptSelected === undefined) {
             // to determine the Accept header
             const httpHeaderAccepts: string[] = [
-                'application/json;charset=UTF-8'
+                'application/json'
             ];
             localVarHttpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         }
@@ -222,8 +273,8 @@ export class MessageEndpointService implements MessageEndpointServiceInterface {
             }
         }
 
-        let localVarPath = `/api/v1/messages/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
-        return this.httpClient.request<DetailedMessageDto>('get', `${this.configuration.basePath}${localVarPath}`,
+        let localVarPath = `/api/v1/news/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
+        return this.httpClient.request<DetailedNewsDto>('get', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,
@@ -237,14 +288,14 @@ export class MessageEndpointService implements MessageEndpointServiceInterface {
     }
 
     /**
-     * Get list of messages without details
+     * Get list of news without details
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public findAll1(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<Array<SimpleMessageDto>>;
-    public findAll1(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<SimpleMessageDto>>>;
-    public findAll1(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<SimpleMessageDto>>>;
-    public findAll1(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public findAll(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<SimpleNewsDto>>;
+    public findAll(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<SimpleNewsDto>>>;
+    public findAll(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<SimpleNewsDto>>>;
+    public findAll(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarHeaders = this.defaultHeaders;
 
@@ -252,7 +303,7 @@ export class MessageEndpointService implements MessageEndpointServiceInterface {
         if (localVarHttpHeaderAcceptSelected === undefined) {
             // to determine the Accept header
             const httpHeaderAccepts: string[] = [
-                'application/json;charset=UTF-8'
+                'application/json'
             ];
             localVarHttpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         }
@@ -282,8 +333,8 @@ export class MessageEndpointService implements MessageEndpointServiceInterface {
             }
         }
 
-        let localVarPath = `/api/v1/messages`;
-        return this.httpClient.request<Array<SimpleMessageDto>>('get', `${this.configuration.basePath}${localVarPath}`,
+        let localVarPath = `/api/v1/news`;
+        return this.httpClient.request<Array<SimpleNewsDto>>('get', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,

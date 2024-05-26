@@ -13,37 +13,39 @@ import { HttpHeaders }                                       from '@angular/comm
 
 import { Observable }                                        from 'rxjs';
 
-import { DetailedMessageDto } from '../model/models';
-import { MessageInquiryDto } from '../model/models';
-import { SimpleMessageDto } from '../model/models';
+import { DetailedNewsDto } from '../model/models';
+import { SimpleNewsDto } from '../model/models';
 
 
 import { Configuration }                                     from '../configuration';
 
 
 
-export interface MessageEndpointServiceInterface {
+export interface NewsEndpointServiceInterface {
     defaultHeaders: HttpHeaders;
     configuration: Configuration;
 
     /**
-     * Publish a new message
+     * Publish a new news
      * 
-     * @param messageInquiryDto 
+     * @param title 
+     * @param summary 
+     * @param text 
+     * @param image 
      */
-    create1(messageInquiryDto: MessageInquiryDto, extraHttpRequestParams?: any): Observable<DetailedMessageDto>;
+    create(title: string, summary: string, text: string, image: Blob, extraHttpRequestParams?: any): Observable<DetailedNewsDto>;
 
     /**
-     * Get detailed information about a specific message
+     * Get detailed information about a specific news
      * 
      * @param id 
      */
-    find1(id: number, extraHttpRequestParams?: any): Observable<DetailedMessageDto>;
+    find(id: number, extraHttpRequestParams?: any): Observable<DetailedNewsDto>;
 
     /**
-     * Get list of messages without details
+     * Get list of news without details
      * 
      */
-    findAll1(extraHttpRequestParams?: any): Observable<Array<SimpleMessageDto>>;
+    findAll(extraHttpRequestParams?: any): Observable<Array<SimpleNewsDto>>;
 
 }
