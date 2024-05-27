@@ -46,7 +46,7 @@ public class EventEndpoint {
         return service.createEvent(createDto);
     }
 
-    @Secured("ROLE_USER")
+    @PermitAll
     @PostMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<EventDto>> searchEvents(@RequestBody EventSearchDto searchDto) {
         return ResponseEntity.ok(service.searchEvents(searchDto));
