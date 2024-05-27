@@ -17,6 +17,7 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Ticket;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.type.InvoiceType;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.type.UserType;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.AddressRepository;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.ArtistRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.EventRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallPlanRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallSectorRepository;
@@ -85,6 +86,8 @@ public class TicketViewDataGenerator {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private AddressRepository addressRepository;
+    @Autowired
+    private ArtistRepository artistRepository;
 
     @PostConstruct
     private void generateData() {
@@ -141,6 +144,7 @@ public class TicketViewDataGenerator {
 
         eventRepository.saveAll(events);
         showRepository.saveAll(shows);
+        artistRepository.saveAll(artists);
 
         // creating hallplan
         var hallplan = new HallPlan();

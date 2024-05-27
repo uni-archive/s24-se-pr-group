@@ -58,7 +58,7 @@ public class EventEndpoint {
         return ResponseEntity.ok(service.getById(eventid));
     }
 
-    @Secured("ROLE_USER")
+    @PermitAll
     @GetMapping(value = "/by-artist/{artistId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<EventResponse>> findByArtist(@PathVariable("artistId") long artistId) {
         var found = service.findByArtist(artistId);

@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistSearchResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ArtistResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.service.ArtistService;
+import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -29,7 +30,7 @@ public class ArtistEndpoint {
         this.artistResponseMapper = artistResponseMapper;
     }
 
-    @Secured("ROLE_USER")
+    @PermitAll
     @PostMapping(path = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ArtistSearchResponse>> search(@ModelAttribute ArtistSearchDto searchDto) {
         return ResponseEntity.ok(artistResponseMapper.toResponseList(artistService.search(searchDto)));

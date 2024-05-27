@@ -112,7 +112,7 @@ export class OrderTableComponent implements OnInit {
           this.pdfService.createCancellationInvoicePDF(o);
         },
         error: err => {
-          this.messagingService.setMessage("Konnte Storno-Rechnung nicht drucken. Versuchen Sie es später bitte erneut.", 'error');
+          this.messagingService.setMessage("Konnte Storno-Rechnung nicht drucken. Versuchen Sie es später bitte erneut.", 'danger');
         }
       })
   }

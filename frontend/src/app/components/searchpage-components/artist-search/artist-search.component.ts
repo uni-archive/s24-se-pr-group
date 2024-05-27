@@ -45,7 +45,7 @@ export class ArtistSearchComponent {
           this.foundArtists = res;
         },
         error: err => {
-          this.messagingService.setMessage("Künstler*innen konnten nicht gesucht werden. Bitte versuchen Sie es später erneut.", 'error')
+          this.messagingService.setMessage("Künstler*innen konnten nicht gesucht werden. Bitte versuchen Sie es später erneut.", 'danger')
         }
       })
   }

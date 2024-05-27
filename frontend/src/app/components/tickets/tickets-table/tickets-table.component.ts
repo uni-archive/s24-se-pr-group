@@ -72,7 +72,7 @@ export class TicketsTableComponent implements OnInit {
         },
         error: err => {
           console.log(err)
-          this.messagingService.setMessage("Ihre Tickets konnten nicht geladen werden. Bitte versuchen Sie es später erneut.", 'error');
+          this.messagingService.setMessage("Ihre Tickets konnten nicht geladen werden. Bitte versuchen Sie es später erneut.", 'danger');
         }
       });
   }
@@ -152,7 +152,7 @@ export class TicketsTableComponent implements OnInit {
           this.messagingService.setMessage("Ihre Ticket-Reservierung wurde erfolgreich storniert.");
         },
         error: err => {
-          this.messagingService.setMessage("Ihre Ticket-Reservierung konnte nicht storniert werden.", 'error');
+          this.messagingService.setMessage("Ihre Ticket-Reservierung konnte nicht storniert werden.", 'danger');
         }
       })
   }

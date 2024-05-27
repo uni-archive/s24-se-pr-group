@@ -42,7 +42,7 @@ export class OrdersDetailsViewComponent implements OnInit {
   private loadOrder(): void {
     const orderId = parseInt(this.route.snapshot.paramMap.get("id"));
     if (isNaN(orderId)) {
-      this.messagingService.setMessage("Es wurde eine ungültige Bestellungs-Nr. angegeben.", 'error');
+      this.messagingService.setMessage("Es wurde eine ungültige Bestellungs-Nr. angegeben.", 'danger');
       this.router.navigate(["/my/orders"]);
     }
     this.orderService.findById1(orderId).subscribe({
@@ -51,7 +51,7 @@ export class OrdersDetailsViewComponent implements OnInit {
         this.subj.next(order.tickets);
       },
       error: err => {
-        this.messagingService.setMessage("Die Bestellung konnte nicht geladen werden.", 'error');
+        this.messagingService.setMessage("Die Bestellung konnte nicht geladen werden.", 'danger');
         this.router.navigate(["/my/orders"]);
       }
     });
@@ -69,7 +69,7 @@ export class OrdersDetailsViewComponent implements OnInit {
           this.loadOrder();
         },
         error: err => {
-          this.messagingService.setMessage("Konnte die Bestellung nicht stornieren. Bitte versuchen Sie es später erneut.", 'error');
+          this.messagingService.setMessage("Konnte die Bestellung nicht stornieren. Bitte versuchen Sie es später erneut.", 'danger');
         }
       })
   }
@@ -80,7 +80,7 @@ export class OrdersDetailsViewComponent implements OnInit {
 
   printCancellationReceipt(): void {
     if(this.order.invoices.length < 2) {
-      this.messagingService.setMessage("Konnte kein Storno-PDF erstellen. Die Rechnung wurde noch nicht storniert.", 'error');
+      this.messagingService.setMessage("Konnte kein Storno-PDF erstellen. Die Rechnung wurde noch nicht storniert.", 'danger');
       return;
     }
 
