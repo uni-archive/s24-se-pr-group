@@ -16,6 +16,7 @@ public class HallSectorShowDao extends AbstractDao<HallSectorShow, HallSectorSho
         super(repository, mapper);
     }
 
+    @Transactional
     public List<HallSectorShowDto> findByShowId(long id) {
         var found = ((HallSectorShowRepository) repository).findByShowId(id);
         return found.stream().map(mapper::toDto).toList();

@@ -11,18 +11,18 @@ public class ShowDto implements AbstractDto {
     private LocalDateTime dateTime;
     private List<Artist> artistList;
 
-    private long eventid;
+    private EventDto event;
 
     @Override
     public Long getId() {
         return id;
     }
 
-    public ShowDto(long id, LocalDateTime dateTime, List<Artist> artistList, long event) {
+    public ShowDto(long id, LocalDateTime dateTime, List<Artist> artistList, EventDto event) {
         this.id = id;
         this.dateTime = dateTime;
         this.artistList = artistList;
-        this.eventid = event;
+        this.event = event;
     }
 
     public ShowDto() {
@@ -52,12 +52,12 @@ public class ShowDto implements AbstractDto {
         return this;
     }
 
-    public ShowDto setEventid(long eventid) {
-        this.eventid = eventid;
+    public ShowDto setEvent(EventDto event) {
+        this.event = event;
         return this;
     }
 
-    public long getEventid() {
-        return eventid;
+    public EventDto getEvent() {
+        return event;
     }
 }

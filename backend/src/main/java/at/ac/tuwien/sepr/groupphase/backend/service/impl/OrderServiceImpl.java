@@ -13,6 +13,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.validator.OrderValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
@@ -36,6 +37,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public OrderDetailsDto findById(long id, ApplicationUserDto user) throws EntityNotFoundException, ValidationException {
         LOGGER.trace("Get order details. Order-ID: {}, User: {}", id, user);
         var found = orderDao.findById(id);
@@ -50,6 +52,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public List<OrderSummaryDto> findForUser(long userId) {
         LOGGER.trace("Get all orders for user. User-ID: {}", userId);
         var orders = orderDao.findForUser(userId);

@@ -5,7 +5,6 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowListDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowCreationDto;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.ShowMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.EventDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.ShowDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
@@ -39,7 +38,7 @@ public class ShowServiceImpl implements ShowService {
     public ResponseEntity<String> createShow(ShowCreationDto creationDto) {
         try {
             EventDto sh = eventDao.findById(creationDto.getEventid());
-            ShowDto dto = new ShowDto().setDateTime(creationDto.getDateTime()).setEventid(sh.getId());
+            ShowDto dto = new ShowDto().setDateTime(creationDto.getDateTime()).setEvent(new EventDto());
             dao.create(dto);
             return ResponseEntity.ok("\"Vorführung erfolreich erstellt.\"");
         } catch (Exception ex) {
