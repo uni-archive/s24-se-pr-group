@@ -68,7 +68,6 @@ public class LocationEndpoint {
 
     @PermitAll
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-
     public ResponseEntity<LocationDto> findById(@PathVariable(name = "id") Long id) throws EntityNotFoundException {
         LocationDto location = locationService.findById(id);
         return new ResponseEntity<>(location, HttpStatus.OK);

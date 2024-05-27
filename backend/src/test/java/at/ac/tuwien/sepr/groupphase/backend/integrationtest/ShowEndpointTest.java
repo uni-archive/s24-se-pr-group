@@ -103,36 +103,4 @@ public class ShowEndpointTest {
                 foundShows.getContent().get(0).dateTime().toEpochSecond(ZoneOffset.UTC))
         );
     }
-
-    @Test
-    void getByIdShouldReturnSingleCorrectShow() throws Exception {
-        Location location1 = new Location("Test Location 1",
-            addressRepository.saveAndFlush(AddressSupplier.anAddressEntity()));
-        Location location2 = new Location("Test Location 2",
-            addressRepository.saveAndFlush(AddressSupplier.anAddressEntity()));
-        locationRepository.saveAndFlush(location1);
-        locationRepository.saveAndFlush(location2);
-
-        LocalDateTime expectedTime = LocalDateTime.now().plus(8, ChronoUnit.DAYS);
-        Show show1 = new Show(expectedTime, List.of(), null, location1, List.of());
-        Show show2 = new Show(LocalDateTime.now().plus(9, ChronoUnit.DAYS), List.of(), null, location2, List.of());
-        showRepository.saveAndFlush(show1);
-        showRepository.saveAndFlush(show2);
-
-        // Perform request
-        MvcResult mvcResult = mockMvc.perform(get("/api/v1/show/" + show1.getId())
-                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(DEFAULT_USER, USER_ROLES)))
-            .andExpect(status().isOk())
-            .andReturn();
-
-        // Check response
-        MockHttpServletResponse response = mvcResult.getResponse();
-        ShowResponse foundShow = objectMapper.readValue(response.getContentAsString(),
-            ShowResponse.class);
-
-        Assertions.assertAll(
-            () -> Assertions.assertEquals(expectedTime.toEpochSecond(ZoneOffset.UTC),
-                foundShow.dateTime().toEpochSecond(ZoneOffset.UTC))
-        );
-    }
 }

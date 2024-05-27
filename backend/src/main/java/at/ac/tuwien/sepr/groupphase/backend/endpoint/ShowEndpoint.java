@@ -5,6 +5,7 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.ShowListDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowResponse;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
 import at.ac.tuwien.sepr.groupphase.backend.mapper.ShowMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.ShowService;
@@ -36,13 +37,14 @@ public class ShowEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private ShowService service;
+    private final ShowMapper showMapper;
 
     public ShowEndpoint(ShowService showService, ShowMapper showMapper) {
         this.service = showService;
         this.showMapper = showMapper;
     }
 
-    @PermitAll
+    @Secured(Code.ADMIN)
     @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createShow(@RequestBody ShowCreationDto creationDto) {
         LOGGER.info("POST /create {}", creationDto);
@@ -50,7 +52,7 @@ public class ShowEndpoint {
     }
 
     @PermitAll
-    @GetMapping(value = "/{eventid}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/event/{eventid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ShowListDto>> getShowsByEventId(@PathVariable("eventid") long eventid)
         throws EntityNotFoundException {
         var result = service.getShowsByEventId(eventid);

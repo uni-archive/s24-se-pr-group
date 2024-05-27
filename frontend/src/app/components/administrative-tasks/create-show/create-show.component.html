@@ -1,35 +1,37 @@
-
-<form (submit)="onSubmit()" #createForm="ngForm" >
+<form (submit)="onSubmit()" #createForm="ngForm" class="container mt-5">
+  <h2>Vorstellung erstellen</h2>
   <div class="form-group input-fields">
-    <div class="col">
-    <div class="row g-3 align-items-center" >
-      <div class="col-auto flex-grow-1">
-        <app-autocomplete-textfield  [autoCompleteList]="eventList" (eventChosen)="onEventChosen($event)" (search)="onEventChange($event)" placeholder="Veranstaltung" Label="Veranstaltung" ></app-autocomplete-textfield>
+    <div class="row g-3 align-items-center">
+      <div class="col-12 col-md-6 form-group">
+        <app-autocomplete-textfield
+          [autoCompleteList]="eventList"
+          (eventChosen)="onEventChosen($event)"
+          (search)="onEventChange($event)"
+          placeholder="Veranstaltung"
+          Label="Veranstaltung">
+        </app-autocomplete-textfield>
       </div>
-
-      <div class="col-auto flex-grow-1">
-        <app-autocomplete-textfield [autoCompleteList]="locationList" placeholder="Ort" Label="Ort" ></app-autocomplete-textfield>
+      <div class="col-12 col-md-6 form-group">
+        <app-autocomplete-textfield
+          [autoCompleteList]="locationList"
+          placeholder="Ort"
+          Label="Ort">
+        </app-autocomplete-textfield>
       </div>
     </div>
 
-    <div class="row g-3 align-items-center" >
-
-      <div class="col-auto flex-grow-1">
-        <app-tag-search [autoCompleteList]="artistList" [chosenArtists]="this.createDto.artists" (artistRemoved)="onArtistRemoved($event)" (itemChosen)="onArtistsChosen($event)" (search)="onArtistChange($event)" placeholder="Künstler" Label="Künstler" ></app-tag-search>
+    <div class="row g-3 align-items-center">
+      <div class="col-12 col-md-6 form-group">
+        <app-location-autocomplete
+          (selectedLocation)="handleLocationSelected($event)">
+        </app-location-autocomplete>
       </div>
-
-      <div class="col-auto flex-grow-1">
-        <div class="form-group">
+      <div class="col-12 col-md-6 form-group">
         <label for="timeinput">Uhrzeit</label>
         <input id="timeinput" name="datetime" [(ngModel)]="createDto.dateTime" class="form-control" type="datetime-local">
-        </div>
       </div>
-
     </div>
-    </div>
-
   </div>
 
-  <button type="submit" class="btn btn-primary" >Erstelle Vorstellung</button>
-
+  <button type="submit" class="btn btn-primary">Erstelle Vorstellung</button>
 </form>

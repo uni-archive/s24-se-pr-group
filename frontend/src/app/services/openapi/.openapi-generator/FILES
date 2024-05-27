@@ -1,4 +1,5 @@
 .gitignore
+.openapi-generator-ignore
 README.md
 api.module.ts
 api/address-endpoint.service.ts
@@ -16,8 +17,6 @@ api/location-endpoint.service.ts
 api/location-endpoint.serviceInterface.ts
 api/login-endpoint.service.ts
 api/login-endpoint.serviceInterface.ts
-api/message-endpoint.service.ts
-api/message-endpoint.serviceInterface.ts
 api/news-endpoint.service.ts
 api/news-endpoint.serviceInterface.ts
 api/order-endpoint.service.ts
@@ -42,7 +41,6 @@ model/artist-dto.ts
 model/artist-search-dto.ts
 model/artist-search-response.ts
 model/artist.ts
-model/detailed-message-dto.ts
 model/detailed-news-dto.ts
 model/event-creation-dto.ts
 model/event-dto.ts
@@ -64,11 +62,12 @@ model/invoice-response.ts
 model/location-create-request.ts
 model/location-dto.ts
 model/location.ts
-model/message-inquiry-dto.ts
 model/models.ts
 model/order-details-response.ts
 model/order-summary-response.ts
+model/page-application-user-response.ts
 model/page-location-dto.ts
+model/page-show-response.ts
 model/pageable-object.ts
 model/show-creation-dto.ts
 model/show-dto.ts
@@ -76,7 +75,6 @@ model/show-list-dto.ts
 model/show-response.ts
 model/show-search-dto.ts
 model/show.ts
-model/simple-message-dto.ts
 model/simple-news-dto.ts
 model/sort-object.ts
 model/ticket-details-response-hall-spot.ts

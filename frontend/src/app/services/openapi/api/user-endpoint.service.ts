@@ -23,6 +23,8 @@ import { ApplicationUserDto } from '../model/application-user-dto';
 // @ts-ignore
 import { ApplicationUserResponse } from '../model/application-user-response';
 // @ts-ignore
+import { PageApplicationUserResponse } from '../model/page-application-user-response';
+// @ts-ignore
 import { UserCreateRequest } from '../model/user-create-request';
 // @ts-ignore
 import { UserUpdateInfoRequest } from '../model/user-update-info-request';
@@ -237,13 +239,15 @@ export class UserEndpointService implements UserEndpointServiceInterface {
      * @param familyName 
      * @param email 
      * @param isLocked 
+     * @param page 
+     * @param size 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public searchUsers(firstName?: string, familyName?: string, email?: string, isLocked?: boolean, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<ApplicationUserDto>>;
-    public searchUsers(firstName?: string, familyName?: string, email?: string, isLocked?: boolean, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<ApplicationUserDto>>>;
-    public searchUsers(firstName?: string, familyName?: string, email?: string, isLocked?: boolean, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<ApplicationUserDto>>>;
-    public searchUsers(firstName?: string, familyName?: string, email?: string, isLocked?: boolean, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public searchUsers(firstName?: string, familyName?: string, email?: string, isLocked?: boolean, page?: number, size?: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageApplicationUserResponse>;
+    public searchUsers(firstName?: string, familyName?: string, email?: string, isLocked?: boolean, page?: number, size?: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageApplicationUserResponse>>;
+    public searchUsers(firstName?: string, familyName?: string, email?: string, isLocked?: boolean, page?: number, size?: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageApplicationUserResponse>>;
+    public searchUsers(firstName?: string, familyName?: string, email?: string, isLocked?: boolean, page?: number, size?: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarQueryParameters = new HttpParams({encoder: this.encoder});
         if (firstName !== undefined && firstName !== null) {
@@ -261,6 +265,14 @@ export class UserEndpointService implements UserEndpointServiceInterface {
         if (isLocked !== undefined && isLocked !== null) {
           localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
             <any>isLocked, 'isLocked');
+        }
+        if (page !== undefined && page !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>page, 'page');
+        }
+        if (size !== undefined && size !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>size, 'size');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -300,7 +312,7 @@ export class UserEndpointService implements UserEndpointServiceInterface {
         }
 
         let localVarPath = `/api/v1/users/search`;
-        return this.httpClient.request<Array<ApplicationUserDto>>('get', `${this.configuration.basePath}${localVarPath}`,
+        return this.httpClient.request<PageApplicationUserResponse>('get', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 params: localVarQueryParameters,

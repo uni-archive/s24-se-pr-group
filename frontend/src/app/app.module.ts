@@ -10,7 +10,6 @@ import {HeaderComponent} from "./components/header/header.component";
 import {FooterComponent} from "./components/footer/footer.component";
 import {HomeComponent} from "./components/home/home.component";
 import {LoginComponent} from "./components/login/login.component";
-import {MessageComponent} from "./components/message/message.component";
 import {NewsComponent} from './components/news/news.component';
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {httpInterceptorProviders} from "./interceptors";
@@ -33,7 +32,7 @@ import {UserEditComponent} from "./components/user/user-edit/user-edit.component
 import {EventSearchComponent} from "./components/searchpage-components/event-search/event-search.component";
 import {ShowSearchComponent} from "./components/searchpage-components/show-search/show-search.component";
 import {RegistrationComponent} from "./components/user/registration/registration.component";
-import {SearchpageComponent} from "./components/searchpage-components/searchpage/searchpage.component";
+import {SearchPageComponent} from "./components/searchpage-components/searchpage/search-page.component";
 import {ArtistSearchComponent} from "./components/searchpage-components/artist-search/artist-search.component";
 import {NewsDetailComponent} from "./components/news/news-detail/news-detail.component";
 import {LocationDetailsComponent} from "./components/location/location-details/location-details.component";
@@ -43,7 +42,10 @@ import {
 import {
   GenericAutocompleteComponent
 } from "./components/autocomplete/generic-autocomplete/generic-autocomplete.component";
-import {ShowSearchComponent} from "./components/search/show-search/show-search.component";
+import {CreateShowComponent} from "./components/administrative-tasks/create-show/create-show.component";
+import {
+  AutocompleteTextfieldComponent
+} from "./components/administrative-tasks/autocomplete-textfield/autocomplete-textfield.component";
 
 @NgModule({
   declarations: [
@@ -52,14 +54,12 @@ import {ShowSearchComponent} from "./components/search/show-search/show-search.c
     FooterComponent,
     HomeComponent,
     LoginComponent,
-    MessageComponent,
     NewsComponent,
     NewsDetailComponent,
     RegistrationComponent,
     GlobalMessageComponent,
     UserHomeComponent,
     ManageUserComponent,
-    SearchpageComponent,
     UserEditComponent,
     CountryDropdownComponent,
     LocationOverviewComponent,
@@ -68,10 +68,12 @@ import {ShowSearchComponent} from "./components/search/show-search/show-search.c
     PaginatedListComponent,
     LocationSearchComponent,
     GlobalMessageComponent,
-    SearchpageComponent,
+    SearchPageComponent,
     LocationDetailsComponent,
     LocationAutocompleteComponent,
-    GenericAutocompleteComponent
+    GenericAutocompleteComponent,
+    CreateShowComponent,
+    AutocompleteTextfieldComponent
   ],
   imports: [
     BrowserModule,
@@ -87,12 +89,11 @@ import {ShowSearchComponent} from "./components/search/show-search/show-search.c
     NgxPaginationModule,
     EventSearchComponent,
     ShowSearchComponent,
-    ShowSearchComponent,
     ArtistSearchComponent
   ],
   providers: [httpInterceptorProviders],
   exports: [HeaderComponent, FooterComponent,
-    LocationSearchComponent],
+    LocationSearchComponent, LocationAutocompleteComponent],
   bootstrap: [AppComponent],
 })
 export class AppModule {

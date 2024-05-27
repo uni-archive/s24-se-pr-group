@@ -13,6 +13,8 @@ import at.ac.tuwien.sepr.groupphase.backend.service.ShowService;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -24,13 +26,11 @@ public class ShowServiceImpl implements ShowService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    ShowMapper mapper;
-    ShowDao dao;
-    EventDao eventDao;
+    private final ShowDao dao;
+    private final EventDao eventDao;
 
-    public ShowServiceImpl(ShowMapper mapper, ShowDao dao, EventDao eventDao) {
+    public ShowServiceImpl(ShowDao dao, EventDao eventDao) {
         this.eventDao = eventDao;
-        this.mapper = mapper;
         this.dao = dao;
     }
 
@@ -65,6 +65,6 @@ public class ShowServiceImpl implements ShowService {
 
     @Override
     public Page<ShowDto> findByLocation(Long locationId, boolean onlyFutureShows, Pageable pageable) {
-        return showDao.findByLocationId(locationId, pageable);
+        return dao.findByLocationId(locationId, pageable);
     }
 }

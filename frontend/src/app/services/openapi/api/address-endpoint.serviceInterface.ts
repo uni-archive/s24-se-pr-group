@@ -30,7 +30,7 @@ export interface AddressEndpointServiceInterface {
      * 
      * @param addressCreateRequest 
      */
-    create3(addressCreateRequest: AddressCreateRequest, extraHttpRequestParams?: any): Observable<AddressDto>;
+    create2(addressCreateRequest: AddressCreateRequest, extraHttpRequestParams?: any): Observable<AddressDto>;
 
     /**
      * 
@@ -43,7 +43,7 @@ export interface AddressEndpointServiceInterface {
      * 
      * 
      */
-    findAll3(extraHttpRequestParams?: any): Observable<Array<AddressDto>>;
+    findAll2(extraHttpRequestParams?: any): Observable<Array<AddressDto>>;
 
     /**
      * 

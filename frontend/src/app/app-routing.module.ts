@@ -12,10 +12,9 @@ import {LocationCreateComponent} from "./components/location/location-create/loc
 import {AdminGuard} from "./guards/admin.guard";
 import {LocationEditComponent} from "./components/location/location-edit/location-edit.component";
 import {OrdersViewComponent} from "./components/orders/orders-view/orders-view.component";
-import {ShowSearchComponent} from "./components/search/show-search/show-search.component";
 import {HallplanComponent} from "./components/hallplan/hallplan.component";
 import {HallplanCreateComponent} from "./components/hallplan/create/hallplan-create.component";
-import {SearchpageComponent} from "./components/searchpage-components/searchpage/searchpage.component";
+import {SearchPageComponent} from "./components/searchpage-components/searchpage/search-page.component";
 import {CreateEventComponent} from "./components/administrative-tasks/create-event/create-event.component";
 import {CreateShowComponent} from "./components/administrative-tasks/create-show/create-show.component";
 import {EventDatailpageComponent} from "./components/event-datailpage/event-datailpage.component";
@@ -52,7 +51,7 @@ const routes: Routes = [
   {
     path: "search",
     children: [
-      {path: '', component: SearchpageComponent}
+      {path: '', component: SearchPageComponent}
     ]
   },
   {path: "event/:id", component: EventDatailpageComponent},

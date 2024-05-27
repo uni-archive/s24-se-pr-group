@@ -13,6 +13,7 @@ import { HttpHeaders }                                       from '@angular/comm
 
 import { Observable }                                        from 'rxjs';
 
+import { PageShowResponse } from '../model/models';
 import { ShowCreationDto } from '../model/models';
 import { ShowListDto } from '../model/models';
 import { ShowSearchDto } from '../model/models';
@@ -32,6 +33,16 @@ export interface ShowEndpointServiceInterface {
      * @param showCreationDto 
      */
     createShow(showCreationDto: ShowCreationDto, extraHttpRequestParams?: any): Observable<string>;
+
+    /**
+     * 
+     * 
+     * @param locationId 
+     * @param onlyFutureShows 
+     * @param page 
+     * @param size 
+     */
+    getShowByLocation(locationId: number, onlyFutureShows?: boolean, page?: number, size?: number, extraHttpRequestParams?: any): Observable<PageShowResponse>;
 
     /**
      * 

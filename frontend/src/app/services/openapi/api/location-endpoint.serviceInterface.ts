@@ -38,13 +38,13 @@ export interface LocationEndpointServiceInterface {
      * 
      * @param locationCreateRequest 
      */
-    create2(locationCreateRequest: LocationCreateRequest, extraHttpRequestParams?: any): Observable<LocationDto>;
+    create1(locationCreateRequest: LocationCreateRequest, extraHttpRequestParams?: any): Observable<LocationDto>;
 
     /**
      * 
      * 
      */
-    findAll2(extraHttpRequestParams?: any): Observable<object>;
+    findAll1(extraHttpRequestParams?: any): Observable<object>;
 
     /**
      * 
@@ -52,6 +52,19 @@ export interface LocationEndpointServiceInterface {
      * @param id 
      */
     findById2(id: number, extraHttpRequestParams?: any): Observable<LocationDto>;
+
+    /**
+     * 
+     * 
+     * @param name 
+     */
+    findByName(name: string, extraHttpRequestParams?: any): Observable<Array<LocationDto>>;
+
+    /**
+     * 
+     * 
+     */
+    findByName1(extraHttpRequestParams?: any): Observable<Array<LocationDto>>;
 
     /**
      * 
