@@ -7,6 +7,7 @@ import {Observable} from "rxjs";
 import {HallplanCreateDto} from "../../../dtos/hallplan";
 import {HallplanService} from "../../../services/hallplan.service";
 import {MessagingService} from "../../../services/messaging.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-hallplan-create',
@@ -30,6 +31,7 @@ export class HallplanCreateComponent {
 
   constructor(private fb: FormBuilder,
               private messagingService: MessagingService,
+              private router: Router,
               private hallplanService: HallplanService) {
     this.sectionForm = this.fb.group({
       name: ['', Validators.required],
@@ -48,7 +50,6 @@ export class HallplanCreateComponent {
   }
 
   onSelectedEntitiesChange(selectedEntities: InteractableEntity[]) {
-    //const selectedEntity = selectedEntities.length ? selectedEntities[0] : null;
     const selectedSections = this.hallplan.sections.filter(section => selectedEntities.map((entity: InteractableEntity & DrawableEntity) => entity.data).includes(section));
     this.selectedSection = selectedSections.length ? selectedSections[0] : null;
     if (this.selectedSection) {
@@ -64,11 +65,10 @@ export class HallplanCreateComponent {
   onSubmit() {
     if (!this.mainForm.valid)
       return;
-    console.log(this.mainForm.value.backgroundImage)
-    console.log(this.mapHallplanToCreateDto())
     this.hallplanService.createHallplan(this.mapHallplanToCreateDto()).subscribe({
       next: response => {
-        this.messagingService.setMessage("Hallplan wurde erfolgreich erstellt", "success");
+        this.messagingService.setMessage("Saalplan wurde erfolgreich erstellt", "success");
+        this.router.navigate(['/user/home']);
         console.log('Response:', response);
       }
       ,
@@ -121,7 +121,6 @@ export class HallplanCreateComponent {
     const price = this.sectionForm.value.price;
     const color = this.sectionForm.value.color;
     const standingOnly = this.sectionForm.value.standingOnly;
-    console.log(name, price, color, standingOnly);
     this.selectedSection.name = name;
     this.selectedSection.price = Number(price);
     this.selectedSection.color = color;

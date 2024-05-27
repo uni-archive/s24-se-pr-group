@@ -19,7 +19,7 @@
           (click)="toggleRegistration('createUser')"
           *ngIf="isAdmin"
         >
-          Create User
+          Nutzer erstellen
         </a>
         <a
           id="manageUser"
@@ -28,7 +28,14 @@
           (click)="toggleRegistration('manageUser')"
           *ngIf="isAdmin"
         >
-          Manage User
+          Nutzer verwalten
+        </a>
+        <a
+          class="list-group-item list-group-item-action"
+          routerLink="/hallplan/create" routerLinkActive="active"
+          *ngIf="isAdmin"
+        >
+          Saalplan erstellen
         </a>
       </div>
     </div>

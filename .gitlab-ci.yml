@@ -42,7 +42,7 @@ e2e-test:
     - cd ../backend
     - mvn -B clean install -DskipTests
     - mvn spring-boot:test-run -Dspring-boot.run.mainClass=at.ac.tuwien.sepr.groupphase.backend.DevelopmentApplication &
-    - sleep 120
+    - sleep 30
     - cd ../e2e
     - npm ci --legacy-peer-deps
     - npx cypress run
