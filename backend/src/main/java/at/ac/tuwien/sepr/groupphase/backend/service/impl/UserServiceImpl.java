@@ -39,7 +39,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -272,23 +271,51 @@ public class UserServiceImpl implements UserService {
         String subject = "Ihre E-Mail Adresse wurde geändert.";
         String url = "http://localhost:8080/api/v1/users/update/user/email?token=" + token;
 
-        String emailTemplate = "<html>"
-            + "<body>"
-            + "<p>Hallo " + user.getFirstName() + ",</p>"
-            + "<p>Wir möchten bestätigen, dass du " + userInfo.getEmail() + " als deine E-Mail für TicketLine"
-            + " bevorzugst.</p>"
-            + "<p>Falls du deine E-Mail-Adresse nicht ändern und weiterhin die aktuelle E-Mail-Adresse " + user.getEmail()
-            + " verwenden möchtest, ignoriere einfach diese E-Mail.</p>"
-            + "<p>Bis du diese Änderung bestätigst, musst du deine aktuelle E-Mail-Adresse verwenden, um "
-            + "dich bei TicketLine anzumelden.</p>"
-            + "<a href=\"" + url + "\" style=\"display: inline-block; padding: 10px 20px; "
-            + "font-size: 16px; color: #fff; background-color: #007bff; text-decoration: none; border-radius:"
-            + " 5px;\">E-Mail Adresse ändern</a>"
-            + "<p>Dieser Link ist für die nächsten 10 Minuten gültig.</p>"
-            + "<p>Dies ist eine automatisch generierte E-Mail – bitte antworten Sie nicht auf diese E-Mail"
-            + ".</p>"
-            + "</body>"
-            + "</html>";
-        return new MailBody(email, subject, emailTemplate);
+        StringBuilder emailTemplate = new StringBuilder();
+        emailTemplate.append("<!DOCTYPE html>\n")
+            .append("<html lang=\"de\">\n")
+            .append("<head>\n")
+            .append("   <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n")
+            .append("   <style>\n")
+            .append("      body { background-color: #f8f9fa; font-family: Arial, sans-serif; }\n")
+            .append("      .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; }\n")
+            .append("      .card { background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 0.25rem; padding: 20px; }\n")
+            .append("      .card-body { padding: 20px; }\n")
+            .append("      .h3 { font-size: 1.75rem; margin-bottom: 0.5rem; }\n")
+            .append("      .h5 { font-size: 1.25rem; }\n")
+            .append("      .text-gray-700 { color: #6c757d; }\n")
+            .append("      .btn-primary { display: inline-block; font-weight: 400; color: #fff !important; text-align: center; vertical-align: middle; cursor: pointer; background-color: #007bff; border: 1px solid #007bff; padding: 0.375rem 0.75rem; font-size: 1rem; border-radius: 0.25rem; text-decoration: none; }\n")
+            .append("   </style>\n")
+            .append("</head>\n")
+            .append("<body>\n")
+            .append("    <div class=\"container\">\n")
+            .append("      <div class=\"card my-10\">\n")
+            .append("        <div class=\"card-body\">\n")
+            .append("          <h1 class=\"h3\">Bestätigung E-Mail Änderung</h1>\n")
+            .append("          <h5 class=\"h5\">Hallo ").append(user.getFirstName()).append(",</h5>\n")
+            .append("          <hr>\n")
+            .append("          <div>\n")
+            .append("            <p class=\"text-gray-700\">Wir möchten bestätigen, dass du ")
+            .append(userInfo.getEmail())
+            .append(" als deine E-Mail für TicketLine bevorzugst.</p>\n")
+            .append("            <p class=\"text-gray-700\">Falls du deine E-Mail-Adresse nicht ändern und weiterhin die ")
+            .append("aktuelle E-Mail-Adresse ").append(user.getEmail())
+            .append(" verwenden möchtest, ignoriere einfach diese E-Mail.</p>\n")
+            .append("            <p class=\"text-gray-700\">Bis du diese Änderung bestätigst, musst du deine aktuelle ")
+            .append("E-Mail-Adresse verwenden, um dich bei TicketLine anzumelden.</p>\n")
+            .append("          <hr>\n")
+            .append("          <a class=\"btn btn-primary\" href=\"").append(url)
+            .append("\" target=\"_blank\" style=\"color: #fff !important;\">E-Mail Adresse ändern</a>\n")
+            .append("            <p class=\"text-gray-700\">Dieser Link ist für die nächsten 10 Minuten gültig.</p>\n")
+            .append("            <p class=\"text-gray-700\">Dies ist eine automatisch generierte E-Mail – bitte antworte nicht auf diese E-Mail.</p>\n")
+            .append("          </div>\n")
+            .append("        </div>\n")
+            .append("      </div>\n")
+            .append("    </div>\n")
+            .append("  </body>\n")
+            .append("</html>");
+
+        return new MailBody(email, subject, emailTemplate.toString());
     }
+
 }
