@@ -22,8 +22,8 @@ export class AuthInterceptor implements HttpInterceptor {
     const locationUri = this.globals.backendUri + '/location/';
     const showLocationUri = this.globals.backendUri + '/show/location/';
     const byArtistUri = this.globals.backendUri + '/events/by-artist/';
-    let allowedUriStarts = [locationUri, showLocationUri, searchUri, searchArtistUri, searchShowsUri, eventsSearchUri, byArtistUri];
-
+    const showEventUri = this.globals.backendUri + '/show/event/';
+    let allowedUriStarts = [locationUri, showLocationUri, searchUri, searchArtistUri, searchShowsUri, eventsSearchUri, byArtistUri, showEventUri];
 
     console.log('Intercepted request: ' + req.url)
     // Do not intercept authentication requests

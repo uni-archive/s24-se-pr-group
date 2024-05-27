@@ -19,14 +19,13 @@ export class EventDatailpageComponent implements OnInit {
   public id :number;
   ngOnInit(): void {
     this.id = parseInt(this.route.snapshot.paramMap.get('id'));
-    alert("ID IS "+this.id);
     this.eventService.findById3(this.id).subscribe({
       next: value => this.event = value,
       error: err => this.messagingService.setMessage(err)
     });
     this.showService.getShowsByEventId(this.id).subscribe({
       next: value => this.shows = value,
-      error: err => this.messagingService.setMessage(err)
+      error: err => console.log(err)//this.messagingService.setMessage(err)
     });
   }
 
