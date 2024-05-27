@@ -42,10 +42,22 @@ export class UserEditComponent implements OnInit {
   createForm() {
     this.userForm = this.fb.group({
       id: [this.user.id, Validators.required],
-      email: [this.user.email, [Validators.required, Validators.email]],
-      firstName: [this.user.firstName, Validators.required],
-      familyName: [this.user.familyName, Validators.required],
-      phoneNumber: [this.user.phoneNumber, Validators.required],
+      email: [
+        { value: this.user.email, disabled: true },
+        [Validators.required, Validators.email],
+      ],
+      firstName: [
+        { value: this.user.firstName, disabled: true },
+        Validators.required,
+      ],
+      familyName: [
+        { value: this.user.familyName, disabled: true },
+        Validators.required,
+      ],
+      phoneNumber: [
+        { value: this.user.phoneNumber, disabled: true },
+        Validators.required,
+      ],
     });
   }
 
@@ -98,6 +110,17 @@ export class UserEditComponent implements OnInit {
         }
         this.user = user;
         this.updateFormValues();
+        this.userForm = this.fb.group({
+          id: [this.user.id, Validators.required],
+          email: [
+            { value: this.user.email, disabled: true },
+            [Validators.required, Validators.email],
+          ],
+          phoneNumber: [
+            { value: this.user.phoneNumber, disabled: true },
+            Validators.required,
+          ],
+        });
         this.editMode = false;
       } catch (error) {
         console.error("Error saving user details", error);
@@ -107,5 +130,16 @@ export class UserEditComponent implements OnInit {
 
   toggleEditMode() {
     this.editMode = !this.editMode;
+    this.userForm = this.fb.group({
+      id: [this.user.id, Validators.required],
+      email: [
+        { value: this.user.email, disabled: !this.editMode },
+        [Validators.required, Validators.email],
+      ],
+      phoneNumber: [
+        { value: this.user.phoneNumber, disabled: !this.editMode },
+        Validators.required,
+      ],
+    });
   }
 }
