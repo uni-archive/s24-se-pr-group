@@ -12,73 +12,34 @@ import {
   styleUrls: ["./manage-user.component.scss"],
 })
 export class ManageUserComponent {
-  searchParams = {
-    firstName: "",
-    familyName: "",
-    email: "",
-    isLocked: false,
+  filterConfig = {
+    firstName: '',
+    familyName: '',
+    email: '',
+    isLocked: false
   };
-  users: ApplicationUserDto[] = [];
-  searchChangedObservable = new Subject<void>();
-
-  // Pagination related properties
-  itemsPerPage = 10;
-  currentPage = 1;
-
   constructor(
     private userEndpointService: UserEndpointService,
     private messagingService: MessagingService
   ) {}
 
   ngOnInit() {
-    this.searchChangedObservable
-      .pipe(debounceTime(300))
-      .subscribe({ next: () => this.searchUsers() });
-    // only display locked users by default
-    this.searchParams.isLocked = true;
-    this.searchUsers();
+
   }
 
-  searchChanged(): void {
-    this.searchChangedObservable.next();
+  searchUsers = (criteria: any, page: number, size: number) => {
+    return this.userEndpointService.searchUsers(
+      criteria.firstName,
+      criteria.familyName,
+      criteria.email,
+      criteria.isLocked,
+      page,
+      size
+    );
   }
-
-  searchUsers() {
-    if (
-      this.searchParams.firstName == null ||
-      this.searchParams.firstName === ""
-    ) {
-      delete this.searchParams.firstName;
-    }
-    if (
-      this.searchParams.familyName == null ||
-      this.searchParams.familyName === ""
-    ) {
-      delete this.searchParams.familyName;
-    }
-    if (this.searchParams.email == null || this.searchParams.email === "") {
-      delete this.searchParams.email;
-    }
-    if (this.searchParams.isLocked == null) {
-      delete this.searchParams.isLocked;
-    }
-    this.userEndpointService
-      .searchUsers(
-        this.searchParams.firstName,
-        this.searchParams.familyName,
-        this.searchParams.email,
-        this.searchParams.isLocked
-      )
-      .subscribe({
-        next: (response: ApplicationUserDto[]) => {
-          this.users = response;
-        },
-        error: (error) => console.error("Error loading users:", error),
-      });
-  }
-
-  onTableDataChange(event: any): void {
-    this.currentPage = event;
+  shouldRefresh: boolean;
+  triggerRefresh(): void {
+    this.shouldRefresh = !this.shouldRefresh;
   }
 
   updateLockStatus(user: ApplicationUserDto, status: boolean) {
@@ -107,7 +68,6 @@ export class ManageUserComponent {
                   user.accountLocked ? "gesperrt" : "entsperrt"
                 }.`
               );
-              this.searchUsers();
             },
             error: (error) =>
               console.error("Fehler beim Laden der Benutzer:", error),

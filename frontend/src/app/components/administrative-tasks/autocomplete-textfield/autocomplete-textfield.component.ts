@@ -5,11 +5,6 @@ import {Artist, EventDto, ShowDto} from "../../../services/openapi";
 
 @Component({
   selector: 'app-autocomplete-textfield',
-  standalone: true,
-  imports: [
-    NgForOf,
-    FormsModule
-  ],
   templateUrl: './autocomplete-textfield.component.html',
   styleUrl: './autocomplete-textfield.component.scss'
 })

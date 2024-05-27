@@ -1,6 +1,27 @@
-<div *ngFor="let message of messages" class="alert alert-{{ message.type }} alert-dismissible fade show" style="position: fixed; top: 20px; right: 20px; z-index: 1000; width: 300px;">
-  <span>{{ message.text }}</span>
-  <button type="button" class="close custom-close" (click)="closeMessage(message.id)">
-    <span aria-hidden="true">&times;</span>
-  </button>
+<div *ngFor="let message of messages; let i = index" class="alert-container" [ngStyle]="{'top': (80 + i * 100) + 'px'}">
+  <div class="alert alert-{{ message.type }} alert-dismissible fade show custom-alert">
+    <span class="message-text">{{ message.text.length > 70 ? (message.text | slice:0:70) + '...' : message.text }}</span>
+    <button *ngIf="message.text.length > 70" type="button" class="btn btn-link details-button" (click)="showDetails(message.text)">Details</button>
+    <button type="button" class="close custom-close" (click)="closeMessage(message.id)">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
 </div>
+
+<!-- Modal -->
+<div *ngIf="detailedMessage" class="modal fade show" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true" style="display: block;">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="detailsModalLabel">Message Details</h5>
+      </div>
+      <div class="modal-body">
+        {{ detailedMessage }}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeDetails()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade show" *ngIf="detailedMessage"></div>

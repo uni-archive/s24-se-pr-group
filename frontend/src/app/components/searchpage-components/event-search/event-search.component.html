@@ -19,7 +19,7 @@
       <label for="type">Eventyp</label>
       <select id="type" class="form-select" aria-label="Default select example" [(ngModel)]="searchData.typ" name="typ"
               #typ=ngModel>
-        <option *ngFor="let type of eventTypes" [ngValue]="type">{{type}}</option>
+        <option *ngFor="let type of eventTypes" [ngValue]="type">{{ type }}</option>
       </select>
 
     </div>
@@ -38,22 +38,22 @@
     <div class="card-body d-flex justify-content-between">
       <div>
         <h5 class="card-title">
-          {{event.title}}
+          {{ event.title }}
         </h5>
         <h6 class="card-subtitle mb-2 text-body-secondary description-text">
-          Beschreibung: {{event.description}}
+          Beschreibung: {{ event.description }}
         </h6>
       </div>
       <div class="endcontainer">
         <p class="card-text mb-0">
-          Dauer: {{formatDuration(event.duration)}}
+          Dauer: {{ formatDuration(event.duration) }}
         </p>
         <p class="card-text">
-          Veranstaltungs-Art: {{formatEventType(event.eventType)}}
+          Veranstaltungs-Art: {{ formatEventType(event.eventType) }}
         </p>
         <a class="btn-info" [href]="'/#/event/'+event.id">
-       mehr Infos
-          </a>
+          mehr Infos
+        </a>
       </div>
     </div>
   </div>

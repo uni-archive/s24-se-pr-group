@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { LocationDto, LocationEndpointService, PageLocationDto } from '../../../services/openapi';
+import {Component} from '@angular/core';
+import {Router} from '@angular/router';
+import {LocationEndpointService} from '../../../services/openapi';
 
 @Component({
   selector: 'app-location-overview',
@@ -8,9 +8,10 @@ import { LocationDto, LocationEndpointService, PageLocationDto } from '../../../
   styleUrls: ['./location-overview.component.scss']
 })
 export class LocationOverviewComponent {
-  filterConfig = ['name', 'city', 'street', 'postalCode', 'country'];
+  filterConfig = {name: '', city: '', street: '', postalCode: '', country: ''};
 
-  constructor(private locationService: LocationEndpointService, private router: Router) {}
+  constructor(private locationService: LocationEndpointService, private router: Router) {
+  }
 
   searchLocations = (criteria: any, page: number, size: number) => {
     return this.locationService.search1(

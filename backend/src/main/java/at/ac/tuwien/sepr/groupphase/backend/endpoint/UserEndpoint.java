@@ -13,8 +13,11 @@ import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.MailNotSentException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import jakarta.annotation.security.PermitAll;
+import java.lang.invoke.MethodHandles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,9 +32,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.lang.invoke.MethodHandles;
-import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/v1/users")
@@ -77,20 +77,24 @@ public class UserEndpoint {
 
     @Secured(Code.ADMIN)
     @GetMapping(path = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<ApplicationUserDto> searchUsers(
-        @RequestParam(name = "firstName", required = false) String firstName,
-        @RequestParam(name = "familyName", required = false) String familyName,
-        @RequestParam(name = "email", required = false) String email,
-        @RequestParam(name = "isLocked", required = false) Boolean isLocked) {
+    public Page<ApplicationUserResponse> searchUsers(
+        @RequestParam(name = "firstName", defaultValue = "", required = false) String firstName,
+        @RequestParam(name = "familyName", defaultValue = "", required = false) String familyName,
+        @RequestParam(name = "email", defaultValue = "", required = false) String email,
+        @RequestParam(name = "isLocked", defaultValue = "false", required = false) Boolean isLocked,
+        @RequestParam(name = "page", defaultValue = "0", required = false) Integer page,
+        @RequestParam(name = "size", defaultValue = "15", required = false) Integer size) {
         LOGGER.info("Search users by first name: {}, family name: {}, email: {}, is locked: {}", firstName, familyName,
             email, isLocked);
-        ApplicationUserSearchDto searchParams = new ApplicationUserSearchDto(firstName, familyName, email, isLocked);
-        return userService.search(searchParams).toList();
+        ApplicationUserSearchDto searchParams = new ApplicationUserSearchDto(firstName, familyName, email, isLocked,
+            PageRequest.of(page, size));
+        return userService.search(searchParams).map(userMapper::toResponse);
     }
 
     @Secured(Code.ADMIN)
     @PutMapping(path = "/update/status", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ApplicationUserResponse updateUserStatusByEmail(@RequestBody ApplicationUserDto user) throws ValidationException,
+    public ApplicationUserResponse updateUserStatusByEmail(@RequestBody ApplicationUserDto user)
+        throws ValidationException,
         NotFoundException {
         LOGGER.info("Update user status by email: {}", user);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -99,7 +103,8 @@ public class UserEndpoint {
 
     @Secured("ROLE_USER")
     @PutMapping(path = "/update/user", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ApplicationUserResponse updateUserInfo(@RequestBody UserUpdateInfoRequest userInfo) throws ValidationException, MailNotSentException {
+    public ApplicationUserResponse updateUserInfo(@RequestBody UserUpdateInfoRequest userInfo)
+        throws ValidationException, MailNotSentException {
         LOGGER.info("Update user info: {}", userInfo);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

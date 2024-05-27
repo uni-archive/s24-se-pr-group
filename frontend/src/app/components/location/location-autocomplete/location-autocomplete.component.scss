@@ -1,0 +1,13 @@
+.form-group {
+  position: relative;
+}
+
+.list-group-item {
+  cursor: pointer;
+}
+
+.list-group {
+  max-height: 200px; // Adjust as needed
+  overflow-y: auto;
+  z-index: 1000; // Ensure it is above other elements
+}

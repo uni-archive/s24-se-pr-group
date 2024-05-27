@@ -1,8 +1,16 @@
 package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 
+import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_ROLES;
+import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_USER;
+import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.DEFAULT_USER;
+import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.USER_ROLES;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import at.ac.tuwien.sepr.groupphase.backend.basetest.TestData;
 import at.ac.tuwien.sepr.groupphase.backend.config.properties.SecurityProperties;
-import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserCreateRequest;
@@ -13,16 +21,23 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.UserRepositor
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.supplier.AddressSupplier;
 import at.ac.tuwien.sepr.groupphase.backend.supplier.ApplicationUserSupplier;
+import at.ac.tuwien.sepr.groupphase.backend.util.PageModule;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.MethodMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -64,6 +79,12 @@ public class UserEndpointTest {
 
     @Autowired
     private SecurityProperties securityProperties;
+
+
+    @BeforeEach
+    void setUp() {
+        objectMapper.registerModule(new PageModule());
+    }
 
     @Test
     void registerUserShouldResultInNewUser() throws Exception {
@@ -170,9 +191,11 @@ public class UserEndpointTest {
     }
 
     @Test
+    @DirtiesContext(methodMode = MethodMode.BEFORE_METHOD)
     void searchUsersShouldReturnResultsForAdmin() throws Exception {
-        ApplicationUserSearchDto searchParams = new ApplicationUserSearchDto("Berta", "Muster", "admin@email.com",
-            false);
+        userRepository.save(ApplicationUserSupplier.anAdminUserEntity());
+        ApplicationUserSearchDto searchParams = new ApplicationUserSearchDto("Berta", "", "@email.com",
+            false, PageRequest.of(0, 15));
 
         MvcResult mvcResult = mockMvc.perform(get(TestData.USER_BASE_URI + "/search")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -185,14 +208,20 @@ public class UserEndpointTest {
             .andReturn();
 
         MockHttpServletResponse response = mvcResult.getResponse();
-        List<ApplicationUserDto> users = objectMapper.readValue(response.getContentAsString(), List.class);
-        Assertions.assertNotNull(users);
+        Page<ApplicationUserResponse> users = objectMapper.readValue(response.getContentAsString(),
+            new TypeReference<Page<ApplicationUserResponse>>() {
+            });
+        Assertions.assertAll(
+            () -> Assertions.assertNotNull(users),
+            () -> Assertions.assertEquals(1, users.getTotalElements()),
+            () -> Assertions.assertEquals(1, users.getTotalPages())
+        );
     }
 
     @Test
     void searchUsersShouldReturnForbiddenForNonAdmin() throws Exception {
-        ApplicationUserSearchDto searchParams = new ApplicationUserSearchDto("Berta", "Muster", "admin@email.com",
-            false);
+        ApplicationUserSearchDto searchParams = new ApplicationUserSearchDto("Berta", "", "admin@email.com",
+            false, PageRequest.of(0, 15));
 
         mockMvc.perform(get(TestData.USER_BASE_URI + "/search")
                 .contentType(MediaType.APPLICATION_JSON)

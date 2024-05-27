@@ -3,11 +3,11 @@ import {EventService} from "../../../services/event.service";
 import {EventSearch} from "../../../dtos/EventSearchDto";
 
 @Component({
-  selector: 'app-searchpage',
-  templateUrl: './searchpage.component.html',
-  styleUrl: './searchpage.component.scss'
+  selector: 'app-search-page',
+  templateUrl: './search-page.component.html',
+  styleUrl: './search-page.component.scss'
 })
-export class SearchpageComponent {
+export class SearchPageComponent {
   public searchMode = "EVENT";
 
   constructor() {

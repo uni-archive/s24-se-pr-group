@@ -15,6 +15,7 @@ import { Observable }                                        from 'rxjs';
 
 import { ApplicationUserDto } from '../model/models';
 import { ApplicationUserResponse } from '../model/models';
+import { PageApplicationUserResponse } from '../model/models';
 import { UserCreateRequest } from '../model/models';
 import { UserUpdateInfoRequest } from '../model/models';
 
@@ -47,8 +48,10 @@ export interface UserEndpointServiceInterface {
      * @param familyName 
      * @param email 
      * @param isLocked 
+     * @param page 
+     * @param size 
      */
-    searchUsers(firstName?: string, familyName?: string, email?: string, isLocked?: boolean, extraHttpRequestParams?: any): Observable<Array<ApplicationUserDto>>;
+    searchUsers(firstName?: string, familyName?: string, email?: string, isLocked?: boolean, page?: number, size?: number, extraHttpRequestParams?: any): Observable<PageApplicationUserResponse>;
 
     /**
      * 

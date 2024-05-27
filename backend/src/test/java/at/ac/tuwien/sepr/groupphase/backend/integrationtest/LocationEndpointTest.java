@@ -474,4 +474,36 @@ public class LocationEndpointTest {
             ()-> Assertions.assertTrue(locations.stream().allMatch(location -> location.name().equals("Location 1") || location.name().equals("Location 2")))
         );
     }
+
+    @Test
+    void getLocationByNameShouldReturnLocationsThatContainSearchedCriteria() throws Exception {
+        Address address = new Address("Test Street 1", "1010", "Vienna", "Austria");
+        Address address2 = new Address("Test Street 2", "1010", "Vienna", "Austria");
+        Address address3 = new Address("Test Street 3", "1010", "Vienna", "Austria");
+        addressRepository.save(address);
+        addressRepository.save(address2);
+        addressRepository.save(address3);
+        Location location1 = new Location("abcdefg", address);
+        Location location2 = new Location("mmmmdefghijkmm", address2);
+        Location location3 = new Location("kjlkljkjkjlkjlkjl", address3);
+        locationRepository.save(location1);
+        locationRepository.save(location2);
+        locationRepository.save(location3);
+
+        MvcResult mvcResult = mockMvc.perform(get("/api/v1/location/name/defg")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES))
+            )
+            .andExpect(status().isOk())
+            .andReturn();
+
+        MockHttpServletResponse response = mvcResult.getResponse();
+        List<LocationResponse> locations = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<LocationResponse>>() {
+        });
+
+        Assertions.assertAll(
+            ()-> Assertions.assertEquals(2, locations.size()),
+            ()-> Assertions.assertTrue(locations.stream().allMatch(location -> location.name().equals("abcdefg") || location.name().equals("mmmmdefghijkmm")))
+        );
+    }
 }

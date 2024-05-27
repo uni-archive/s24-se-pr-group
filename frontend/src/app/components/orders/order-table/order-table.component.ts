@@ -63,7 +63,7 @@ export class OrderTableComponent implements OnInit {
         },
         error: err => {
           console.log(err)
-          this.messagingService.setMessage("Ihre Tickets konnten nicht geladen werden. Bitte versuchen Sie es später erneut.", 'error');
+          this.messagingService.setMessage("Ihre Tickets konnten nicht geladen werden. Bitte versuchen Sie es später erneut. ", 'danger');
         }
       });
   }

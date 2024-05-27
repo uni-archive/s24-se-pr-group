@@ -11,12 +11,25 @@ export class AuthInterceptor implements HttpInterceptor {
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+
+
     const authUri = this.globals.backendUri + '/authentication';
     const registerUri = this.globals.backendUri + '/users/registration';
+    const searchUri = this.globals.backendUri + '/location/search';
+
+
+
+    let allowedUris = [authUri, registerUri, searchUri];
+
+    const locationUri = this.globals.backendUri + '/location/';
+    const showLocationuri = this.globals.backendUri + '/show/location/';
+    let allowedUriStarts = [locationUri, showLocationuri];
+
 
     console.log('Intercepted request: ' + req.url)
     // Do not intercept authentication requests
-    if (req.url === authUri || req.url === registerUri) {
+    if (allowedUris.includes(req.url) || allowedUriStarts.some(uri => req.url.startsWith(uri)) && !this.authService.isLoggedIn()) {
+      console.log('Request is allowed');
       return next.handle(req);
     }
 

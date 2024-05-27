@@ -7,6 +7,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.MailNotSentException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -60,7 +61,7 @@ public interface UserService extends UserDetailsService {
      * @param searchParameters the search parameters to use in filtering.
      * @return the users where the given fields match.
      */
-    Stream<ApplicationUserDto> search(ApplicationUserSearchDto searchParameters);
+    Page<ApplicationUserDto> search(ApplicationUserSearchDto searchParameters);
 
 
     /**

@@ -5,6 +5,8 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.ShowListDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -44,5 +46,11 @@ public interface ShowService {
     List<ShowListDto> searchShows(ShowSearchDto searchDto) throws EntityNotFoundException;
 
 
+    /**
+     * Get all shows for a given location.
+     *
+     * @return all shows that are at the
+     */
+    Page<ShowDto> findByLocation(Long locationId, boolean onlyFutureShows, Pageable pageable);
 }
 

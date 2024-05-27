@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {Globals} from "../global/globals";
 import {EventDto} from "./openapi";
 import {EventSearch} from "../dtos/EventSearchDto";
-import {Observable, Subject} from "rxjs";
+import {Observable, Subject} from 'rxjs';
 import {EventEndpointService, EventSearchDto} from "./openapi";
 
 @Injectable({
@@ -10,12 +10,18 @@ import {EventEndpointService, EventSearchDto} from "./openapi";
 })
 export class EventService {
 
-  private registrationSuccessSubject = new Subject<void>();
+  private loginSuccessSource = new Subject<void>();
+  private registrationSuccessSource = new Subject<void>();
 
-  registrationSuccess$ = this.registrationSuccessSubject.asObservable();
+  loginSuccess$ = this.loginSuccessSource.asObservable();
+  registrationSuccess$ = this.loginSuccessSource.asObservable();
+
+  emitLoginSuccess() {
+    this.loginSuccessSource.next();
+  }
 
   emitRegistrationSuccess() {
-    this.registrationSuccessSubject.next();
+    this.registrationSuccessSource.next();
   }
 
   private messageBaseUri: string = this.globals.backendUri + '/events';

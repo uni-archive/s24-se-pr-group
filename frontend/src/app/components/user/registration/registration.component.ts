@@ -60,7 +60,7 @@ export class RegistrationComponent implements AfterViewInit {
         addressCreateRequest: {
           street: this.registrationForm.value.street,
           city: this.registrationForm.value.city,
-          zip: this.registrationForm.value.zip.toLocaleString(),
+          zip: this.registrationForm.value.zip,
           country: this.registrationForm.value.country,
         },
       };

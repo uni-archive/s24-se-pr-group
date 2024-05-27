@@ -8,7 +8,7 @@ import {Router} from "@angular/router";
   styleUrl: './location-search.component.scss'
 })
 export class LocationSearchComponent {
-  filterConfig = ['name', 'city', 'street', 'postalCode', 'country'];
+  filterConfig = {name: '', city: '', street: '', postalCode: '', country: ''};
 
   constructor(private locationService: LocationEndpointService, private router: Router) {}
 

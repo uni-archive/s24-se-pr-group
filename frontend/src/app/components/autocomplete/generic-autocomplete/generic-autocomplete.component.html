@@ -1,0 +1,28 @@
+<form [formGroup]="searchForm" class="position-relative">
+  <div class="form-group">
+    <label for="generic-search">{{ label }}</label>
+    <div class="input-group">
+      <input type="text"
+             id="generic-search"
+             class="form-control"
+             formControlName="search"
+             [placeholder]="placeholder"
+             (focus)="onInputFocus()"
+             (blur)="onInputBlur()" />
+      <div class="input-group-prepend">
+        <span class="input-group-text">
+          <i class="bi bi-search"></i>
+        </span>
+      </div>
+    </div>
+  </div>
+  <ul *ngIf="showSuggestions" class="list-group position-absolute w-100" style="z-index: 1000; max-height: 200px; overflow-y: auto;">
+    <ng-container *ngIf="filteredItems$ | async as items">
+      <li *ngFor="let item of items"
+          class="list-group-item list-group-item-action"
+          (click)="selectItem(item)">
+        <ng-template [ngTemplateOutlet]="displayTemplate" [ngTemplateOutletContext]="{ $implicit: item }"></ng-template>
+      </li>
+    </ng-container>
+  </ul>
+</form>

@@ -1,55 +1,65 @@
-import { BrowserModule } from "@angular/platform-browser";
-import { NgModule } from "@angular/core";
-import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { HttpClientModule } from "@angular/common/http";
-import { NgxPaginationModule } from "ngx-pagination";
+import {BrowserModule} from "@angular/platform-browser";
+import {NgModule} from "@angular/core";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {HttpClientModule} from "@angular/common/http";
+import {NgxPaginationModule} from "ngx-pagination";
 
-import { AppRoutingModule } from "./app-routing.module";
-import { AppComponent } from "./app.component";
-import { HeaderComponent } from "./components/header/header.component";
-import { FooterComponent } from "./components/footer/footer.component";
-import { HomeComponent } from "./components/home/home.component";
-import { LoginComponent } from "./components/login/login.component";
-import { MessageComponent } from "./components/message/message.component";
-import { NewsComponent} from './components/news/news.component';
-import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
-import { httpInterceptorProviders } from "./interceptors";
-import {GlobalMessageComponent } from "./global-message/global-message.component";
-import { AngularPhoneNumberInput } from "angular-phone-number-input";
-import { PrintPurchaseInvoiceButtonComponent } from "./components/print-purchase-invoice-button/print-purchase-invoice-button.component";
-import { PrintTicketButtonComponent } from "./components/print-ticket-button/print-ticket-button.component";
-import { UserHomeComponent } from "./components/user/user-home/user-home.component";
-import { ManageUserComponent } from "./components/user/manage-user/manage-user.component";
-import { TicketsTableComponent } from "./components/tickets/tickets-table/tickets-table.component";
-import { CountryDropdownComponent } from "./components/user/country-dropdown/country-dropdown.component";
-import { LocationOverviewComponent } from "./components/location/location-overview/location-overview.component";
-import { LocationCreateComponent } from "./components/location/location-create/location-create.component";
-import { LocationEditComponent } from "./components/location/location-edit/location-edit.component";
-import { PaginatedListComponent } from "./components/paginated-list/paginated-list.component";
-import { LocationSearchComponent } from "./components/location/location-search/location-search.component";
-import { UserEditComponent } from "./components/user/user-edit/user-edit.component";
+import {AppRoutingModule} from "./app-routing.module";
+import {AppComponent} from "./app.component";
+import {HeaderComponent} from "./components/header/header.component";
+import {FooterComponent} from "./components/footer/footer.component";
+import {HomeComponent} from "./components/home/home.component";
+import {LoginComponent} from "./components/login/login.component";
+import {NewsComponent} from './components/news/news.component';
+import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
+import {httpInterceptorProviders} from "./interceptors";
+import {GlobalMessageComponent} from "./global-message/global-message.component";
+import {AngularPhoneNumberInput} from "angular-phone-number-input";
+import {
+  PrintPurchaseInvoiceButtonComponent
+} from "./components/print-purchase-invoice-button/print-purchase-invoice-button.component";
+import {PrintTicketButtonComponent} from "./components/print-ticket-button/print-ticket-button.component";
+import {UserHomeComponent} from "./components/user/user-home/user-home.component";
+import {ManageUserComponent} from "./components/user/manage-user/manage-user.component";
+import {TicketsTableComponent} from "./components/tickets/tickets-table/tickets-table.component";
+import {CountryDropdownComponent} from "./components/user/country-dropdown/country-dropdown.component";
+import {LocationOverviewComponent} from "./components/location/location-overview/location-overview.component";
+import {LocationCreateComponent} from "./components/location/location-create/location-create.component";
+import {LocationEditComponent} from "./components/location/location-edit/location-edit.component";
+import {PaginatedListComponent} from "./components/paginated-list/paginated-list.component";
+import {LocationSearchComponent} from "./components/location/location-search/location-search.component";
+import {UserEditComponent} from "./components/user/user-edit/user-edit.component";
 import {EventSearchComponent} from "./components/searchpage-components/event-search/event-search.component";
 import {ShowSearchComponent} from "./components/searchpage-components/show-search/show-search.component";
 import {RegistrationComponent} from "./components/user/registration/registration.component";
-import {SearchpageComponent} from "./components/searchpage-components/searchpage/searchpage.component";
+import {SearchPageComponent} from "./components/searchpage-components/searchpage/search-page.component";
 import {ArtistSearchComponent} from "./components/searchpage-components/artist-search/artist-search.component";
 import {NewsDetailComponent} from "./components/news/news-detail/news-detail.component";
+import {LocationDetailsComponent} from "./components/location/location-details/location-details.component";
+import {
+  LocationAutocompleteComponent
+} from "./components/location/location-autocomplete/location-autocomplete.component";
+import {
+  GenericAutocompleteComponent
+} from "./components/autocomplete/generic-autocomplete/generic-autocomplete.component";
+import {CreateShowComponent} from "./components/administrative-tasks/create-show/create-show.component";
+import {
+  AutocompleteTextfieldComponent
+} from "./components/administrative-tasks/autocomplete-textfield/autocomplete-textfield.component";
 
 @NgModule({
-    declarations: [
-        AppComponent,
-        HeaderComponent,
-        FooterComponent,
-        HomeComponent,
-        LoginComponent,
-        MessageComponent,
-        NewsComponent,
-      NewsDetailComponent,
-        RegistrationComponent,
-        GlobalMessageComponent,
-        UserHomeComponent,
-        ManageUserComponent,
-    SearchpageComponent,
+  declarations: [
+    AppComponent,
+    HeaderComponent,
+    FooterComponent,
+    HomeComponent,
+    LoginComponent,
+    NewsComponent,
+    NewsDetailComponent,
+    RegistrationComponent,
+    GlobalMessageComponent,
+    UserHomeComponent,
+    ManageUserComponent,
     UserEditComponent,
     CountryDropdownComponent,
     LocationOverviewComponent,
@@ -58,7 +68,12 @@ import {NewsDetailComponent} from "./components/news/news-detail/news-detail.com
     PaginatedListComponent,
     LocationSearchComponent,
     GlobalMessageComponent,
-    SearchpageComponent,
+    SearchPageComponent,
+    LocationDetailsComponent,
+    LocationAutocompleteComponent,
+    GenericAutocompleteComponent,
+    CreateShowComponent,
+    AutocompleteTextfieldComponent
   ],
   imports: [
     BrowserModule,
@@ -72,14 +87,14 @@ import {NewsDetailComponent} from "./components/news/news-detail/news-detail.com
     PrintTicketButtonComponent,
     TicketsTableComponent,
     NgxPaginationModule,
-
-  EventSearchComponent,
+    EventSearchComponent,
     ShowSearchComponent,
-    ShowSearchComponent,
-    ArtistSearchComponent,  ],
-    providers: [httpInterceptorProviders],
-    exports: [HeaderComponent, FooterComponent,
-    LocationSearchComponent],
-    bootstrap: [AppComponent],
+    ArtistSearchComponent
+  ],
+  providers: [httpInterceptorProviders],
+  exports: [HeaderComponent, FooterComponent,
+    LocationSearchComponent, LocationAutocompleteComponent],
+  bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule {
+}

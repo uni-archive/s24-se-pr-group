@@ -15,11 +15,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserDataGenerator {
 
-    private static final ApplicationUser ADMIN_USER = new ApplicationUser("admin@email.com", "", "Bert", "Berta", "+430987654321",
+    private static final ApplicationUser ADMIN_USER = new ApplicationUser("admin@email.com", "", "Bert", "Berta", "+4367768822344",
         "abcdefghijklmnopqrstuvwxyz", 0, false, UserType.ADMIN, false, new Address());
-    private static final ApplicationUser CUSTOMER_USER = new ApplicationUser("user@email.com", "", "Erna", "Erna", "+431234567890", "zyxwvutsrqponmlkjihgfedcba", 0, false, UserType.CUSTOMER, false,  new Address());
+    private static final ApplicationUser CUSTOMER_USER = new ApplicationUser("user@email.com", "", "Erna", "Erna", "+4367768822344", "zyxwvutsrqponmlkjihgfedcba", 0, false, UserType.CUSTOMER, false,  new Address());
     private static final ApplicationUser SUPER_ADMIN_USER = new ApplicationUser("sadmin@email.com", "", "Super", "Admin",
-        "+431234567890", "zyxwvutsrqponmlkjihgfedcba", 0, false, UserType.ADMIN, true,  new Address());
+        "+4367768822344", "zyxwvutsrqponmlkjihgfedcba", 0, false, UserType.ADMIN, true,  new Address());
 
     @Autowired
     private UserRepository userRepository;

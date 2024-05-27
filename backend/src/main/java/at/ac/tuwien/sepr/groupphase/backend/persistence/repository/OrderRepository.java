@@ -29,6 +29,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      * @param userId the id of the user.
      * @return a list of {@link Order} associated with the user.
      */
-    @Query("SELECT o, SIZE(o.tickets), SUM(hss.price) FROM Order o, HallSectorShow hss INNER JOIN o.tickets t INNER JOIN t.hallSpot hs INNER JOIN hs.sector sec WHERE o.customer.id = :userId AND hss.sector.id = sec.id")
+    @Query("SELECT o, SIZE(o.tickets), SUM(hss.price) " +
+        "FROM Order o " +
+        "JOIN o.tickets t " +
+        "JOIN t.hallSpot hs " +
+        "JOIN hs.sector sec, HallSectorShow hss " +
+        "WHERE o.customer.id = :userId " +
+        "AND hss.sector.id = sec.id " +
+        "GROUP BY o")
     List<Object[]> findForUser(@Param("userId") long userId);
 }
