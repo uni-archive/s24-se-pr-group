@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.dto;
 
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.EventType;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 
 public class EventDto implements AbstractDto {
@@ -11,6 +12,7 @@ public class EventDto implements AbstractDto {
     private long duration;
     private String title;
     private EventType eventType;
+    @JsonIgnore
     private List<ShowDto> shows;
 
     @Override

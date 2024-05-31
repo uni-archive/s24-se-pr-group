@@ -43,8 +43,6 @@ public class ShowCreateTest {
         service.createShow(new ShowCreationDto(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay(), 1L,null));
 
         assertEquals(1, service.getAllShows().size());
-
-
     }
 
 }
