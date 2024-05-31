@@ -10,12 +10,13 @@
  * Do not edit the class manually.
  */
 import { Artist } from './artist';
+import { EventDto } from './event-dto';
 
 
 export interface ShowDto { 
     id?: number;
     dateTime?: string;
     artistList?: Array<Artist>;
-    eventid?: number;
+    event?: EventDto;
 }
 

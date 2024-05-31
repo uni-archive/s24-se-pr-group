@@ -37,7 +37,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(value = {NotFoundException.class})
     protected ResponseEntity<Object> handleNotFound(NotFoundException ex, WebRequest request) {
-        LOGGER.warn(ex.getMessage());
+        LOGGER.warn("", ex);
         return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 
@@ -50,7 +50,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(value = {ValidationException.class})
     protected ResponseEntity<Object> handleValidationException(ValidationException ex, WebRequest request) {
-        LOGGER.warn(ex.getMessage());
+        LOGGER.warn("", ex);
         return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY,
             request);
     }
@@ -65,14 +65,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.ValidationException.class})
     protected ResponseEntity<Object> handleEndpointValidationException(
         at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.ValidationException ex, WebRequest request) {
-        LOGGER.warn(ex.getMessage());
+        LOGGER.warn("", ex);
         return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY,
             request);
     }
 
     @ExceptionHandler(value = {MailNotSentException.class})
     protected ResponseEntity<Object> handleMailNotSentException(RuntimeException ex, WebRequest request) {
-        LOGGER.error(ex.getMessage());
+        LOGGER.error("", ex);
         return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR,
             request);
     }
@@ -86,7 +86,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(value = {ForbiddenException.class})
     protected ResponseEntity<Object> handleForbiddenException(ForbiddenException ex, WebRequest request) {
-        LOGGER.warn(ex.getMessage());
+        LOGGER.warn("", ex);
         return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN,
             request);
     }

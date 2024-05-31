@@ -59,7 +59,7 @@ public class ShowServiceImpl implements ShowService {
             dao.create(dto);
             return ResponseEntity.ok("\"Vorführung erfolreich erstellt.\"");
         } catch (Exception ex) {
-            LOGGER.error("ERROR occurred: {}", ex.getMessage());
+            LOGGER.error("ERROR occurred: {}", ex.getMessage(), ex);
             return ResponseEntity.internalServerError().body("\"Erstellung gescheitert.\"");
         }
     }
