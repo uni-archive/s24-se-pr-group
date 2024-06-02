@@ -31,11 +31,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      */
     @Query("SELECT o, SIZE(o.tickets), SUM(hss.price) " +
         "FROM Order o " +
-        "JOIN o.tickets t " +
-        "JOIN t.hallSpot hs " +
-        "JOIN hs.sector sec, HallSectorShow hss " +
+        "LEFT JOIN o.tickets t " +
+        "LEFT JOIN t.hallSpot hs " +
+        "LEFT JOIN hs.sector sec, HallSectorShow hss " +
         "WHERE o.customer.id = :userId " +
-        "AND hss.sector.id = sec.id " +
+        "AND (sec IS NULL OR hss.sector.id = sec.id)" +
         "GROUP BY o")
     List<Object[]> findForUser(@Param("userId") long userId);
 }

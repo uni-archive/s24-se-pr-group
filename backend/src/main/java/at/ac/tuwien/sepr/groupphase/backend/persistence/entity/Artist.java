@@ -45,7 +45,7 @@ public class Artist extends AbstractEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(artistName, firstName, lastName, shows);
+        return Objects.hash(artistName, firstName, lastName);
     }
 
     @Override

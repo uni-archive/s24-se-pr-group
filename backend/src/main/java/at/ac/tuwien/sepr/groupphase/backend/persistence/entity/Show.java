@@ -108,7 +108,7 @@ public class Show extends AbstractEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(dateTime, artists, event);
+        return Objects.hash(dateTime);
     }
 
     @Override
