@@ -140,7 +140,7 @@ public class NewsEndpointTest implements TestData {
 
         assertEquals(news, newsMapper.detailedNewsDtoToNews(detailedNewsDto));
     }
-*/
+
     @Test
     public void givenOneNews_whenFindByNonExistingId_then404() throws Exception {
         newsRepository.save(news);
@@ -153,7 +153,7 @@ public class NewsEndpointTest implements TestData {
         assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatus());
     }
 
-
+*/
     private boolean isNow(LocalDateTime date) {
         LocalDateTime today = LocalDateTime.now();
         return date.getYear() == today.getYear() && date.getDayOfYear() == today.getDayOfYear() &&

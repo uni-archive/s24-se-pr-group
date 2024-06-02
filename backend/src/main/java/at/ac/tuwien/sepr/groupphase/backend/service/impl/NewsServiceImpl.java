@@ -59,7 +59,7 @@ public class NewsServiceImpl implements NewsService {
     @Override
     public List<NewsDto> getAllNews() {
         LOGGER.debug("Find all news");
-        return newsDao.findAll();
+        return newsDao.findAllByOrderByPublishedAtDesc();
     }
 }
 /*package at.ac.tuwien.sepr.groupphase.backend.service.impl;

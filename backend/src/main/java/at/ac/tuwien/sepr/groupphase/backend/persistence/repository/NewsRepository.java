@@ -24,5 +24,5 @@ import java.util.List;
 
 public interface NewsRepository extends JpaRepository<News, Long> {
 
-   // List<News> findAllByOrderByPublishedAtDesc();
+    List<News> findAllByOrderByPublishedAtDesc();
 }
