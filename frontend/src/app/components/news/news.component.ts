@@ -181,10 +181,17 @@ export class NewsComponent implements OnInit {
   private defaultServiceErrorHandling(error: any) {
     console.log(error);
     this.error = true;
-    if (typeof error.error === 'object') {
-      this.errorMessage = error.error.error;
+    if (error.error && error.error.detail) {
+      this.errorMessage = error.error.detail;
+    } else if (error.error && error.error.message) {
+      this.errorMessage = error.error.message;
+    } else if (error.error && typeof error.error === 'object') {
+      this.errorMessage = JSON.stringify(error.error);
+    } else if (error.message) {
+      this.errorMessage = error.message;
     } else {
-      this.errorMessage = error.error;
+      this.errorMessage = 'Ein unbekannter Fehler ist aufgetreten.';
     }
   }
+
 }
