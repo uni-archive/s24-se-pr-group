@@ -3,6 +3,7 @@ package at.ac.tuwien.sepr.groupphase.backend.supplier;
 import at.ac.tuwien.sepr.groupphase.backend.dto.AddressDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AddressCreateRequest;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Address;
+import com.github.javafaker.Faker;
 
 public class AddressSupplier {
 
@@ -28,6 +29,16 @@ public class AddressSupplier {
         address.setZip("1010");
         address.setCountry("Austria");
         return address;
+    }
+
+    public static Address anAddress(Faker faker) {
+        var addr = faker.address();
+        return new Address(
+            addr.streetAddress(),
+            addr.zipCode(),
+            addr.city(),
+            addr.country()
+        );
     }
 
 }

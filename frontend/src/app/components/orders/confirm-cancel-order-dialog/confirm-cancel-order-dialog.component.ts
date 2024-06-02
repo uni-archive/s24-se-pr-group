@@ -18,7 +18,7 @@ export class ConfirmCancelOrderDialogComponent implements OnInit {
   orderPrice(): number {
     return this.order.tickets
       .map(t => t.hallSpot.sector.hallSectorShow.price)
-      .reduce((p1, p2) => p1 + p2);
+      .reduce((p1, p2) => p1 + p2, 0);
   }
 
   ngOnInit(): void {

@@ -71,7 +71,6 @@ export class TicketsTableComponent implements OnInit {
           this.updateFilter();
         },
         error: err => {
-          console.log(err)
           this.messagingService.setMessage("Ihre Tickets konnten nicht geladen werden. Bitte versuchen Sie es später erneut.", 'danger');
         }
       });

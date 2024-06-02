@@ -8,6 +8,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,6 +31,7 @@ public class Order extends AbstractEntity {
     private ApplicationUser customer;
 
     @Column(name = "dateTime")
+    @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime dateTime;
 
