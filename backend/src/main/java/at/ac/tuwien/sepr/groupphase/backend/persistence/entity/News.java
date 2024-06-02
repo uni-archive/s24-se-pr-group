@@ -9,9 +9,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 
-import javax.sql.rowset.serial.SerialBlob;
-import java.sql.Blob;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -33,8 +30,8 @@ public class News extends AbstractEntity {
     private String text;
 
     @Lob
-    @Column(name = "NEWS_IMAGE")
-    private Blob image;
+    @Column(name = "IMAGE")
+    private byte[] image;
 
     @ManyToMany(mappedBy = "news")
     private List<ApplicationUser> users;
@@ -75,12 +72,11 @@ public class News extends AbstractEntity {
         this.text = text;
     }
 
-
-    public Blob getImage() {
+    public byte[] getImage() {
         return image;
     }
 
-    public void setImage(Blob image) {
+    public void setImage(byte[] image) {
         this.image = image;
     }
 
@@ -113,7 +109,6 @@ public class News extends AbstractEntity {
     public String toString() {
         return "News{" + "publishedAt=" + publishedAt + ", title='" + title + '\'' + ", summary='" + summary + '\'' + ", text='" + text + '\'' + ", users=" + users + ", event=" + event + '}';
     }
-
 
     public static final class NewsBuilder {
         private Long id;
@@ -167,14 +162,7 @@ public class News extends AbstractEntity {
             news.setTitle(title);
             news.setSummary(summary);
             news.setText(text);
-            if (image != null) {
-                try {
-                    Blob blob = new SerialBlob(image);
-                    news.setImage(blob);
-                } catch (SQLException e) {
-                    throw new RuntimeException("Fehler bei der Umwandlung von byte[] zu Blob", e);
-                }
-            }
+            news.setImage(image);
             return news;
         }
     }

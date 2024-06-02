@@ -1,5 +1,69 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
+import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.NewsDao;
+import at.ac.tuwien.sepr.groupphase.backend.dto.NewsDto;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.NewsService;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
+import at.ac.tuwien.sepr.groupphase.backend.service.validator.NewsValidator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.lang.invoke.MethodHandles;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@Service
+public class NewsServiceImpl implements NewsService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+
+    private final NewsDao newsDao;
+
+    private final NewsValidator newsValidator;
+
+    @Autowired
+    public NewsServiceImpl(NewsDao newsDao, NewsValidator newsValidator) {
+
+        this.newsDao = newsDao;
+        this.newsValidator = newsValidator;
+    }
+
+    @Override
+    public NewsDto getNewsById(Long id) throws EntityNotFoundException {
+        LOGGER.debug("Find news with id {}", id);
+        return newsDao.findById(id);
+    }
+
+    @Override
+    public NewsDto createNews(NewsDto newsDto) throws ValidationException {
+        LOGGER.debug("Publish new news {}", newsDto);
+        newsDto.setPublishedAt(LocalDateTime.now());
+        if (newsDto.getTitle() != null) {
+            newsDto.setTitle(newsDto.getTitle().trim());
+        }
+        if (newsDto.getSummary() != null) {
+            newsDto.setSummary(newsDto.getSummary().trim());
+        }
+        if (newsDto.getText() != null) {
+            newsDto.setText(newsDto.getText().trim());
+        }
+        newsValidator.validateForPublish(newsDto);
+        return newsDao.create(newsDto);
+    }
+
+    @Override
+    public List<NewsDto> getAllNews() {
+        LOGGER.debug("Find all news");
+        return newsDao.findAll();
+    }
+}
+/*package at.ac.tuwien.sepr.groupphase.backend.service.impl;
+
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.News;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.NewsRepository;
@@ -66,3 +130,4 @@ public class NewsServiceImpl implements NewsService {
     }
 
 }
+*/

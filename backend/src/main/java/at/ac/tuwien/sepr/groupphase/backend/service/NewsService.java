@@ -1,4 +1,4 @@
-package at.ac.tuwien.sepr.groupphase.backend.service;
+/*package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.News;
 
@@ -8,28 +8,35 @@ import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationExceptio
 
 public interface NewsService {
 
-    /**
-     * Find all news entries ordered by published at date (descending).
-     *
-     * @return ordered list of all news entries
-     */
+
     List<News> findAll();
 
 
-    /**
-     * Find a single news entry by id.
-     *
-     * @param id the id of the news entry
-     * @return the news entry
-     */
+
     News findOne(Long id);
 
-    /**
-     * Publish a single news entry.
-     *
-     * @param news to publish
-     * @return published news entry
-     */
+
     News publishNews(News news) throws ValidationException;
 
 }
+*/
+
+package at.ac.tuwien.sepr.groupphase.backend.service;
+
+import at.ac.tuwien.sepr.groupphase.backend.dto.NewsDto;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
+
+import java.io.IOException;
+import java.util.List;
+
+public interface NewsService {
+    NewsDto getNewsById(Long id) throws EntityNotFoundException;
+
+    NewsDto createNews(NewsDto newsDto) throws IOException, ValidationException;
+
+    List<NewsDto> getAllNews();
+}
+
+
+
