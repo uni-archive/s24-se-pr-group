@@ -57,4 +57,16 @@ public class NewsDto implements AbstractDto {
     public void setImage(byte[] image) {
         this.image = image;
     }
+
+    @Override
+    public String toString() {
+        return "NewsDto{"
+            + "id=" + id
+            + ", title='" + title + '\''
+            + ", summary='" + summary + '\''
+            + ", text='" + text + '\''
+            + ", publishedAt=" + publishedAt
+            + ", image=" + (image != null ? "present" : "null")
+            + '}';
+    }
 }
