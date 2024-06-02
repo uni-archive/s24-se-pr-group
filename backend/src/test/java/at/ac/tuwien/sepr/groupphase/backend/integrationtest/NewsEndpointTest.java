@@ -2,7 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 
 import at.ac.tuwien.sepr.groupphase.backend.basetest.TestData;
 import at.ac.tuwien.sepr.groupphase.backend.config.properties.SecurityProperties;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.SimpleNewsDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.NewsDto;
 import at.ac.tuwien.sepr.groupphase.backend.mapper.NewsMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.News;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.NewsRepository;
@@ -87,8 +87,8 @@ public class NewsEndpointTest implements TestData {
         assertEquals(HttpStatus.OK.value(), response.getStatus());
         assertEquals(MediaType.APPLICATION_JSON_VALUE, response.getContentType());
 
-        List<SimpleNewsDto> simpleNewsDtos = Arrays.asList(objectMapper.readValue(response.getContentAsString(),
-            SimpleNewsDto[].class));
+        List<NewsDto> simpleNewsDtos = Arrays.asList(objectMapper.readValue(response.getContentAsString(),
+            NewsDto[].class));
 
         assertEquals(0, simpleNewsDtos.size());
     }
@@ -107,11 +107,11 @@ public class NewsEndpointTest implements TestData {
         assertEquals(HttpStatus.OK.value(), response.getStatus());
         assertEquals(MediaType.APPLICATION_JSON_VALUE, response.getContentType());
 
-        List<SimpleNewsDto> simpleNewsDtos = Arrays.asList(objectMapper.readValue(response.getContentAsString(),
-            SimpleNewsDto[].class));
+        List<NewsDto> simpleNewsDtos = Arrays.asList(objectMapper.readValue(response.getContentAsString(),
+            NewsDto[].class));
 
         assertEquals(1, simpleNewsDtos.size());
-        SimpleNewsDto simpleNewsDto = simpleNewsDtos.get(0);
+        NewsDto simpleNewsDto = simpleNewsDtos.get(0);
         assertAll(
             () -> assertEquals(news.getId(), simpleNewsDto.getId()),
             () -> assertEquals(TEST_NEWS_TITLE, simpleNewsDto.getTitle()),
