@@ -1,11 +1,13 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.NewsDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsRequestDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.NewsEndpointMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.NewsService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,29 +29,31 @@ public class NewsEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final NewsService newsService;
+    private final NewsEndpointMapper newsEndpointMapper;
 
     @Autowired
-    public NewsEndpoint(NewsService newsService) {
+    public NewsEndpoint(NewsService newsService, NewsEndpointMapper newsEndpointMapper) {
         this.newsService = newsService;
+        this.newsEndpointMapper = newsEndpointMapper;
     }
 
     @Secured("ROLE_USER")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get list of news without details", security = @SecurityRequirement(name = "apiKey"))
-    public ResponseEntity<List<NewsDto>> findAll() {
+    @Operation(summary = "Get list of news without details")
+    public ResponseEntity<List<NewsResponseDto>> findAll() {
         LOGGER.info("GET /api/v1/news");
         List<NewsDto> newsList = newsService.getAllNews();
-        return ResponseEntity.ok(newsList);
+        return ResponseEntity.ok(newsEndpointMapper.toResponseList(newsList));
     }
 
     @Secured("ROLE_USER")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get detailed information about a specific news", security = @SecurityRequirement(name = "apiKey"))
-    public ResponseEntity<NewsDto> find(@PathVariable(name = "id") Long id) {
+    @Operation(summary = "Get detailed information about a specific news")
+    public ResponseEntity<NewsResponseDto> find(@PathVariable(name = "id") Long id) {
         LOGGER.info("GET /api/v1/news/{}", id);
         try {
             NewsDto newsDto = newsService.getNewsById(id);
-            return ResponseEntity.ok(newsDto);
+            return ResponseEntity.ok(newsEndpointMapper.toResponse(newsDto));
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
@@ -57,24 +61,27 @@ public class NewsEndpoint {
 
     @Secured("ROLE_ADMIN")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Publish a new news", security = @SecurityRequirement(name = "apiKey"))
-    public ResponseEntity<NewsDto> create(@RequestParam("image") MultipartFile file, @RequestParam("title") String title, @RequestParam("summary") String summary, @RequestParam("text") String text) {
-        NewsDto newsDto = new NewsDto();
-        newsDto.setTitle(title);
-        newsDto.setSummary(summary);
-        newsDto.setText(text);
+    @Operation(summary = "Publish a new news")
+    public ResponseEntity<NewsResponseDto> create(@RequestParam("image") MultipartFile file,
+                                                  @RequestParam("title") String title,
+                                                  @RequestParam("summary") String summary,
+                                                  @RequestParam("text") String text) {
+        NewsRequestDto newsRequestDto = new NewsRequestDto();
+        newsRequestDto.setTitle(title);
+        newsRequestDto.setSummary(summary);
+        newsRequestDto.setText(text);
 
         try {
-            newsDto.setImage(file.getBytes());
+            newsRequestDto.setImage(file.getBytes());
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
         }
 
-        LOGGER.info("POST /api/v1/news body: {}", newsDto);
+        LOGGER.info("POST /api/v1/news body: {}", newsRequestDto);
 
         try {
-            newsService.createNews(newsDto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(newsDto);
+            NewsDto createdNews = newsService.createNews(newsEndpointMapper.toDto(newsRequestDto));
+            return ResponseEntity.status(HttpStatus.CREATED).body(newsEndpointMapper.toResponse(createdNews));
         } catch (IOException | ValidationException e) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, e.getMessage(), e);
         }
