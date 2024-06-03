@@ -51,6 +51,7 @@ public class ArchTests {
         noClasses().should(ACCESS_STANDARD_STREAMS).check(classes);
     }
 
+
     @ArchTest
     private final ArchRule no_java_util_logging = NO_CLASSES_SHOULD_USE_JAVA_UTIL_LOGGING;
 
