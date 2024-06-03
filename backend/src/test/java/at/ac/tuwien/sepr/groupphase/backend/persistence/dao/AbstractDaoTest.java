@@ -1,6 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.persistence.dao;
 
-import at.ac.tuwien.sepr.groupphase.backend.mapper.BaseEntityMapper;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.BaseEntityMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.impl.AbstractDaoImpl;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.impl.AbstractDtoImpl;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.impl.AbstractEntityImpl;

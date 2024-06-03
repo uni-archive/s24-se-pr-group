@@ -6,8 +6,8 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDt
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserCreateRequest;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateInfoRequest;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ApplicationUserMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.UserMapper;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.MailNotSentException;
@@ -39,9 +39,9 @@ public class UserEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final UserService userService;
-    private final UserMapper userMapper;
+    private final ApplicationUserMapper userMapper;
 
-    public UserEndpoint(UserService userService, UserMapper userMapper) {
+    public UserEndpoint(UserService userService, ApplicationUserMapper userMapper) {
         this.userService = userService;
         this.userMapper = userMapper;
     }

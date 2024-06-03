@@ -1,7 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.persistence.dao;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.TicketMapper;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.TicketMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Ticket;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.TicketRepository;

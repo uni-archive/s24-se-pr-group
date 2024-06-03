@@ -190,6 +190,7 @@ public class UserEndpointTest {
         );
     }
 
+
     @Test
     @DirtiesContext(methodMode = MethodMode.BEFORE_METHOD)
     void searchUsersShouldReturnResultsForAdmin() throws Exception {

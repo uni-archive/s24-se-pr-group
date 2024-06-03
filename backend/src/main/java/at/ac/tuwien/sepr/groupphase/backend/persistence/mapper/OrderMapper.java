@@ -1,4 +1,4 @@
-package at.ac.tuwien.sepr.groupphase.backend.mapper;
+package at.ac.tuwien.sepr.groupphase.backend.persistence.mapper;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderSummaryDto;

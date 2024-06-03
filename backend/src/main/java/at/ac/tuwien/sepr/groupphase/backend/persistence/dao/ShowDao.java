@@ -1,17 +1,14 @@
 package at.ac.tuwien.sepr.groupphase.backend.persistence.dao;
 
-import at.ac.tuwien.sepr.groupphase.backend.dto.HallPlanDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowListDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowSearchDto;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.ArtistMapper;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.EventMapper;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.HallPlanMapper;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.ShowMapper;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.ArtistMapper;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.EventMapper;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.ShowMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Show;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.ArtistRepository;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallPlanRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.ShowRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
@@ -33,21 +30,13 @@ public class ShowDao extends AbstractDao<Show, ShowDto> {
     private final ArtistMapper artistMapper;
     private final EventMapper eventMapper;
 
-    private final HallPlanMapper hallPlanMapper;
-
-    private final HallPlanRepository hallPlanRepository;
-
     protected ShowDao(ShowRepository repository, EventMapper eventMapper, EventDao dao, ArtistRepository artrepo,
-        HallPlanMapper hallPlanMapper,
-        HallPlanRepository hallPlanRepository,
         ArtistMapper artmapper, ShowMapper mapper) {
         super(repository, mapper);
         this.artrepo = artrepo;
         this.artistMapper = artmapper;
         this.eventDao = dao;
         this.eventMapper = eventMapper;
-        this.hallPlanMapper = hallPlanMapper;
-        this.hallPlanRepository = hallPlanRepository;
     }
 
     @Transactional
@@ -92,10 +81,5 @@ public class ShowDao extends AbstractDao<Show, ShowDto> {
             list.add(showListDto);
         }
         return list;
-    }
-
-    @Transactional
-    public HallPlanDto getHallPlanByShowId(long showId) {
-        return hallPlanMapper.toDto(((HallPlanRepository) hallPlanRepository).getHallPlanByShowId(showId));
     }
 }

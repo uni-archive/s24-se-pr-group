@@ -20,6 +20,7 @@ public interface TestData {
 
     String NEWS_BASE_URI = BASE_URI + "/news";
     String USER_BASE_URI = BASE_URI + "/users";
+    String AUTHENTICATION_BASE_URI = BASE_URI + "/authentication";
 
 
     String ADMIN_USER = "admin@email.com";

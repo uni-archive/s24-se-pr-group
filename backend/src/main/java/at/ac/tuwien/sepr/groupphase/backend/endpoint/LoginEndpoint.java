@@ -21,6 +21,6 @@ public class LoginEndpoint {
     @PermitAll
     @PostMapping
     public String login(@RequestBody UserLoginDto userLoginDto) {
-        return userService.login(userLoginDto);
+        return userService.login(userLoginDto.getEmail(), userLoginDto.getPassword());
     }
 }
