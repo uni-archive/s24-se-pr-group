@@ -12,7 +12,7 @@
     </thead>
     <tbody>
     <tr *ngFor="let order of ordersPaged">
-      <th scope="row">{{order.id}}</th>
+      <th scope="row" [attr.data-testid]="'order-id-' + order.id">{{order.id}}</th>
       <td>{{formatDate(order.dateTime)}}</td>
       <td>{{order.ticketCount}}</td>
       <td>{{formatPrice(order.totalPrice)}}</td>

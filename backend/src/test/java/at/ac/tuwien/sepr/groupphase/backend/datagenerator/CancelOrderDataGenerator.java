@@ -94,6 +94,7 @@ public class CancelOrderDataGenerator {
         var artists = fakeManyArtists(5);
         var events = fakeManyEvents(5);
         var shows = fakeManyShows(events, artists, 5);
+        shows.forEach(s -> s.setDateTime(LocalDateTime.now().plusDays(1)));
         var hallplan = new HallPlan();
         var sectors = fakeManyHallSectors(hallplan, 5);
         var hallSpots = fakeManyHallSpots(sectors, 5);
