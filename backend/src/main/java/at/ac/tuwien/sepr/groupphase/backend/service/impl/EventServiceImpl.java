@@ -3,8 +3,9 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 import at.ac.tuwien.sepr.groupphase.backend.dto.EventDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.EventSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreationDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.EventMapper;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventResponse;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.EventResponseMapper;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.EventMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.EventDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.EventService;
@@ -21,9 +22,9 @@ public class EventServiceImpl implements EventService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private EventDao dao;
-    private EventMapper mapper;
+    private EventResponseMapper mapper;
 
-    public EventServiceImpl(EventDao eventDao, EventMapper mapper) {
+    public EventServiceImpl(EventDao eventDao, EventResponseMapper mapper) {
         this.dao = eventDao;
         this.mapper = mapper;
     }

@@ -1,4 +1,4 @@
-package at.ac.tuwien.sepr.groupphase.backend.mapper;
+package at.ac.tuwien.sepr.groupphase.backend.persistence.mapper;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.HallSeatDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.HallSpotDto;
@@ -6,7 +6,6 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSeat;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSpot;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
-import org.mapstruct.Named;
 import org.mapstruct.SubclassMapping;
 
 @Mapper
