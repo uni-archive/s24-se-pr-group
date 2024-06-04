@@ -10,6 +10,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.OrderService;
 import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.OrderValidator;
+import java.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -69,6 +70,16 @@ public class OrderServiceImpl implements OrderService {
 
         invoiceService.createCancellationInvoiceForOrder(order.getId());
         ticketService.invalidateAllTicketsForOrder(order.getId());
+    }
+
+    @Override
+    public OrderDetailsDto create(ApplicationUserDto user) throws ValidationException {
+        OrderDetailsDto orderDetailsDto = new OrderDetailsDto();
+        orderDetailsDto.setCustomer(user);
+        orderDetailsDto.setDateTime(LocalDateTime.now());
+
+        orderValidator.validateForCreate(orderDetailsDto);
+        return orderDao.create(orderDetailsDto);
     }
 
     private void addInvoicesToOrder(OrderDetailsDto order) {
