@@ -36,6 +36,8 @@ public interface NewsService {
     NewsDto createNews(NewsDto newsDto) throws IOException, ValidationException;
 
     List<NewsDto> getAllNews();
+
+    List<NewsDto> getUnseenNews() throws EntityNotFoundException;
 }
 
 

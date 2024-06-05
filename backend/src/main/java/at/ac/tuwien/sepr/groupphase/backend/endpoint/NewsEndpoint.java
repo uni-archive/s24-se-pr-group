@@ -40,9 +40,9 @@ public class NewsEndpoint {
     @Secured("ROLE_USER")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get list of news without details")
-    public ResponseEntity<List<NewsResponseDto>> findAll() {
+    public ResponseEntity<List<NewsResponseDto>> findAll() throws EntityNotFoundException {
         LOGGER.info("GET /api/v1/news");
-        List<NewsDto> newsList = newsService.getAllNews();
+        List<NewsDto> newsList = newsService.getUnseenNews();
         return ResponseEntity.ok(newsEndpointMapper.toResponseList(newsList));
     }
 

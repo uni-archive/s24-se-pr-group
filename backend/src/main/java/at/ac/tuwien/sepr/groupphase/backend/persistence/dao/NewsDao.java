@@ -44,5 +44,15 @@ public class NewsDao extends AbstractDao<News, NewsDto> {
         }
         repository.save(news);
     }
+
+    public List<NewsDto> findUnseenNewsByUser(Long userId) throws EntityNotFoundException {
+        ApplicationUser user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(userId));
+        List<News> unseenNews = repository.findAll().stream()
+            .filter(news -> !news.getUsers().contains(user))
+            .toList();
+        return unseenNews.stream()
+            .map(mapper::toDto)
+            .collect(Collectors.toList());
+    }
 }
 
