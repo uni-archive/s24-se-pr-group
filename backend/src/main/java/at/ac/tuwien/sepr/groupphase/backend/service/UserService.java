@@ -4,6 +4,8 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.MailNotSentException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
@@ -35,7 +37,7 @@ public interface UserService extends UserDetailsService {
      * @param email the email address
      * @return a application user
      */
-    ApplicationUserDto findApplicationUserByEmail(String email) throws NotFoundException;
+    ApplicationUserDto findApplicationUserByEmail(String email) throws DtoNotFoundException;
 
     /**
      * Log in a user.
@@ -86,7 +88,8 @@ public interface UserService extends UserDetailsService {
      * @throws ValidationException  if the user information is invalid
      * @throws MailNotSentException if the mail could not be sent
      */
-    ApplicationUserDto updateUserInfo(ApplicationUserDto userInfo) throws ValidationException, MailNotSentException;
+    ApplicationUserDto updateUserInfo(ApplicationUserDto userInfo)
+        throws ValidationException, MailNotSentException, DtoNotFoundException;
 
     /**
      * Find an application user based on the id.

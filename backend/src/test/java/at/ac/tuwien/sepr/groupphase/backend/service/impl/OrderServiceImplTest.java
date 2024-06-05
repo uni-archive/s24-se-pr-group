@@ -26,6 +26,7 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.OrderReposito
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.ShowRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.TicketRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.UserRepository;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.OrderValidator;
 import org.junit.jupiter.api.AfterEach;
@@ -210,7 +211,8 @@ public class OrderServiceImplTest {
     }
 
     @Test
-    void cancelling_anOrder_ShouldCreateANewCancellationInvoice_And_InvalidateAllAssociatedTickets() throws ValidationException, EntityNotFoundException {
+    void cancelling_anOrder_ShouldCreateANewCancellationInvoice_And_InvalidateAllAssociatedTickets()
+        throws ValidationException, EntityNotFoundException, DtoNotFoundException {
         var c = aCustomerUser()
             .setId(testOrder.getCustomer().getId());
 
@@ -233,7 +235,7 @@ public class OrderServiceImplTest {
     }
 
     @Test
-    void finding_anOrder_ShouldCallValidator() throws ValidationException, EntityNotFoundException {
+    void finding_anOrder_ShouldCallValidator() throws ValidationException, EntityNotFoundException, DtoNotFoundException {
         orderService.findById(testOrder.getId(), aCustomerUser());
         verify(orderValidator).validateForFindById(orderDto.capture(), applicationUserDto.capture());
     }

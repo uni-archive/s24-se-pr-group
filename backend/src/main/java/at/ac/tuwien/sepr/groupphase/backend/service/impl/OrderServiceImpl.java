@@ -8,6 +8,7 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFound
 import at.ac.tuwien.sepr.groupphase.backend.service.InvoiceService;
 import at.ac.tuwien.sepr.groupphase.backend.service.OrderService;
 import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.OrderValidator;
 import java.time.LocalDateTime;
@@ -39,9 +40,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderDetailsDto findById(long id, ApplicationUserDto user) throws EntityNotFoundException, ValidationException {
+    public OrderDetailsDto findById(long id, ApplicationUserDto user) throws DtoNotFoundException, ValidationException {
         LOGGER.trace("Get order details. Order-ID: {}, User: {}", id, user);
-        var found = orderDao.findById(id);
+        OrderDetailsDto found = null;
+        try {
+            found = orderDao.findById(id);
+        } catch (EntityNotFoundException e) {
+            throw new DtoNotFoundException(e);
+        }
 
         orderValidator.validateForFindById(found, user);
 
