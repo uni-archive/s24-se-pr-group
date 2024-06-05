@@ -11,6 +11,7 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFound
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.service.AddressService;
 import at.ac.tuwien.sepr.groupphase.backend.service.EmailSenderService;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.MailNotSentException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
@@ -204,7 +205,7 @@ class UserServiceImplTest {
         userInfo.setEmail("new@email.com");
 
         when(userDao.findById(1L)).thenReturn(user);
-        when(userDao.findByEmail("new@email.com")).thenThrow(new NotFoundException("Email not found"));
+        when(userDao.findByEmail("new@email.com")).thenReturn(null);
         when(emailChangeTokenDao.create(any(EmailChangeTokenDto.class))).thenReturn(emailChangeToken);
 
         doThrow(new MessagingException("Error sending mail")).when(emailSenderService).sendHtmlMail(any(MailBody.class));
@@ -224,7 +225,7 @@ class UserServiceImplTest {
 
         when(userDao.findById(1L)).thenThrow(new EntityNotFoundException(1L));
 
-        NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> {
+        DtoNotFoundException exception = Assertions.assertThrows(DtoNotFoundException.class, () -> {
             userService.updateUserInfo(userInfo);
         });
 
@@ -232,7 +233,8 @@ class UserServiceImplTest {
     }
 
     @Test
-    void updateUserInfoShouldUpdatePhoneNumberWhenNotNull() throws ValidationException, MailNotSentException, EntityNotFoundException, MessagingException {
+    void updateUserInfoShouldUpdatePhoneNumberWhenNotNull()
+        throws ValidationException, MailNotSentException, EntityNotFoundException, MessagingException, DtoNotFoundException {
         // Prepare the data
         ApplicationUserDto userToUpdate = ApplicationUserSupplier.anAdminUser();
         userToUpdate.setId(1L);

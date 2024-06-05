@@ -6,12 +6,12 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.OrderDetailsResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.OrderSummaryResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.HallSectorShowResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.OrderResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.OrderService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -44,8 +44,7 @@ public class OrderEndpoint {
     private final UserService userService;
     private final Auth auth;
 
-    public OrderEndpoint(OrderService orderService, OrderResponseMapper orderMapper, HallSectorShowResponseMapper fuck,
-        UserService userService,
+    public OrderEndpoint(OrderService orderService, OrderResponseMapper orderMapper, UserService userService,
         Auth auth) {
         this.orderService = orderService;
         this.orderMapper = orderMapper;
@@ -63,7 +62,7 @@ public class OrderEndpoint {
             var user = userService.findApplicationUserByEmail(username);
 
             order = orderMapper.toResponse(orderService.findById(id, user));
-        } catch (EntityNotFoundException e) {
+        } catch (DtoNotFoundException e) {
             throw new NotFoundException(e);
         } catch (ValidationException e) {
             throw new at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.ValidationException(e);
@@ -73,7 +72,7 @@ public class OrderEndpoint {
 
     @Secured("ROLE_USER")
     @GetMapping(path = "/myorders", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<OrderSummaryResponse>> findForUser() {
+    public ResponseEntity<List<OrderSummaryResponse>> findForUser() throws DtoNotFoundException {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         var username = authentication.getPrincipal().toString();
         var user = userService.findApplicationUserByEmail(username);
@@ -113,6 +112,10 @@ public class OrderEndpoint {
     private ApplicationUserDto getUserFromSecurityContext() throws NotFoundException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getPrincipal().toString();
-        return userService.findApplicationUserByEmail(username);
+        try {
+            return userService.findApplicationUserByEmail(username);
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        }
     }
 }

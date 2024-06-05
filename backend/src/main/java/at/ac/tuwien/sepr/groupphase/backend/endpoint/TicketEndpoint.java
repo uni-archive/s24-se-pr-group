@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.TicketDetailsResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.ValidationException;
@@ -8,6 +9,8 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
 import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
+import java.lang.invoke.MethodHandles;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -17,17 +20,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.lang.invoke.MethodHandles;
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/tickets")
 public class TicketEndpoint {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final TicketService ticketService;
@@ -57,7 +57,12 @@ public class TicketEndpoint {
     public ResponseEntity<List<TicketDetailsResponse>> findForUser() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         var username = authentication.getPrincipal().toString();
-        var user = userService.findApplicationUserByEmail(username);
+        ApplicationUserDto user = null;
+        try {
+            user = userService.findApplicationUserByEmail(username);
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        }
         var tickets = ticketService.findForUserById(user.getId());
         return ResponseEntity.ok(ticketMapper.toResponseList(tickets));
     }

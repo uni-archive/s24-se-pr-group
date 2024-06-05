@@ -26,6 +26,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -58,6 +59,7 @@ public class AddressEndpointTest {
     private LocationRepository locationRepository;
 
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     void createShouldCreateAddressAsAdmin() throws Exception {
         AddressCreateRequest createRequest = new AddressCreateRequest("123 Main St", "Vienna", "1010", "Austria");
 
@@ -102,6 +104,7 @@ public class AddressEndpointTest {
     }
 
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     void updateShouldUpdateAddressAsUser() throws Exception {
         Address address = new Address("Old Street", "Old City", "0000", "Old Country");
         address = addressRepository.save(address);

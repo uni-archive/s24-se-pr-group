@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderSummaryDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import java.util.List;
 
@@ -20,7 +21,7 @@ public interface OrderService {
      * @throws EntityNotFoundException if no order with this id exists.
      * @throws ValidationException     if the customer of the found order does not match with the provided user.
      */
-    OrderDetailsDto findById(long id, ApplicationUserDto user) throws EntityNotFoundException, ValidationException;
+    OrderDetailsDto findById(long id, ApplicationUserDto user) throws DtoNotFoundException, ValidationException;
 
 
     /**
