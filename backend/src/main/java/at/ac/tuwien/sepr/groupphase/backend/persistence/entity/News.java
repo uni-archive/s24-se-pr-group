@@ -36,6 +36,14 @@ public class News extends AbstractEntity {
     @ManyToMany(mappedBy = "news")
     private List<ApplicationUser> users;
 
+    public List<ApplicationUser> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<ApplicationUser> users) {
+        this.users = users;
+    }
+
     @ManyToOne
     @JoinColumn(name = "EVENT_ID")
     private Event event;
