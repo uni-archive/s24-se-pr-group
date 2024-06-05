@@ -85,6 +85,7 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
+    @Transactional
     public List<NewsDto> getAllNews() {
         LOGGER.debug("Find all news");
         return newsDao.findAllByOrderByPublishedAtDesc();

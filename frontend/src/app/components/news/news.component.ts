@@ -1,8 +1,8 @@
-import {ChangeDetectorRef, Component, OnInit, TemplateRef} from '@angular/core';
-import {NgbModal, NgbPaginationConfig} from '@ng-bootstrap/ng-bootstrap';
-import {UntypedFormBuilder} from '@angular/forms';
-import {AuthService} from '../../services/auth.service';
-import {DetailedNewsDto, NewsEndpointService, SimpleNewsDto} from "../../services/openapi";
+import { ChangeDetectorRef, Component, OnInit, TemplateRef } from '@angular/core';
+import { NgbModal, NgbPaginationConfig } from '@ng-bootstrap/ng-bootstrap';
+import { UntypedFormBuilder } from '@angular/forms';
+import { AuthService } from '../../services/auth.service';
+import { NewsResponseDto, NewsEndpointService } from "../../services/openapi";
 
 @Component({
   selector: 'app-news',
@@ -10,7 +10,6 @@ import {DetailedNewsDto, NewsEndpointService, SimpleNewsDto} from "../../service
   styleUrls: ['./news.component.scss']
 })
 export class NewsComponent implements OnInit {
-
   error = false;
   errorMessage = '';
   success = false;
@@ -18,22 +17,24 @@ export class NewsComponent implements OnInit {
 
   submitted = false;
 
-  currentNews: DetailedNewsDto;
-
-  private news: SimpleNewsDto[];
-
+  currentNews: NewsResponseDto;
+  news: NewsResponseDto[] = [];
+  allNews: NewsResponseDto[] = [];
+  unreadNews: NewsResponseDto[] = [];
+  newsMode: 'ALL' | 'UNREAD' = 'ALL';
   selectedFile: File;
 
-
-  constructor(private ngbPaginationConfig: NgbPaginationConfig,
-              private formBuilder: UntypedFormBuilder,
-              private cd: ChangeDetectorRef,
-              private authService: AuthService,
-              private modalService: NgbModal,
-              private newsServiceNew: NewsEndpointService) {
-  }
+  constructor(
+      private ngbPaginationConfig: NgbPaginationConfig,
+      private formBuilder: UntypedFormBuilder,
+      private cd: ChangeDetectorRef,
+      private authService: AuthService,
+      private modalService: NgbModal,
+      private newsService: NewsEndpointService
+  ) {}
 
   ngOnInit() {
+    this.newsMode = 'UNREAD';
     this.loadNews();
   }
 
@@ -53,19 +54,18 @@ export class NewsComponent implements OnInit {
     fileInput.click();
   }
 
-
   openAddModal(newsAddModal: TemplateRef<any>) {
-    this.currentNews = {} as DetailedNewsDto;
+    this.currentNews = {} as NewsResponseDto;
     this.selectedFile = null;
-    this.modalService.open(newsAddModal, {ariaLabelledBy: 'modal-basic-title'});
+    this.modalService.open(newsAddModal, { ariaLabelledBy: 'modal-basic-title' });
   }
 
   openExistingNewsModal(id: number, newsAddModal: TemplateRef<any>) {
-    this.newsServiceNew.find(id).subscribe({
+    this.newsService.find(id).subscribe({
       next: res => {
         this.currentNews = res;
-       // this.selectedFile = null;
-        this.modalService.open(newsAddModal, {ariaLabelledBy: 'modal-basic-title'});
+        // this.selectedFile = null;
+        this.modalService.open(newsAddModal, { ariaLabelledBy: 'modal-basic-title' });
       },
       error: err => {
         this.defaultServiceErrorHandling(err);
@@ -73,85 +73,40 @@ export class NewsComponent implements OnInit {
     });
   }
 
-  /**
-   * Starts form validation and builds a news dto for sending a creation request if the form is valid.
-   * If the procedure was successful, the form will be cleared.
-   */
-
-
   addNews(form) {
     this.submitted = true;
 
     if (form.valid && this.selectedFile) {
       this.createNews(this.currentNews);
       this.clearForm();
-
     }
-    /*
-  else {
-    this.errorMessage = 'Bitte fülle alle Felder aus und wähle ein Bild!';
-    this.error = true;
-  }
-  */
-
   }
 
   private clearForm() {
-    this.currentNews = {} as DetailedNewsDto;
+    this.currentNews = {} as NewsResponseDto;
     this.submitted = false;
-
-
   }
 
-
-  getNews(): DetailedNewsDto[] {
+  getNews(): NewsResponseDto[] {
     return this.news;
   }
 
-  /**
-   * Error flag will be deactivated, which clears the error news
-   */
   vanishError() {
     this.error = false;
   }
-  /**
-   * Success flag will be deactivated, which clears the success news
-   */
+
   vanishSuccess() {
     this.success = false;
   }
 
-
-
-
-  /**
-   * Sends news creation request
-   *
-   * @param news the news which should be created
-   */
-  private createNews2(news: DetailedNewsDto) {
-    console.log('NewsDto1:', news);
-
-
-    this.newsServiceNew.create(news.title, news.summary, news.text, this.selectedFile).subscribe({
-      next: () => {
-        this.loadNews();
-      },
-      error: error => {
-        this.defaultServiceErrorHandling(error);
-      }
-    });
-  }
-
-
-  private createNews(news: DetailedNewsDto) {
-    this.newsServiceNew.create(news.title, news.summary, news.text, this.selectedFile).subscribe({
+  private createNews(news: NewsResponseDto) {
+    this.newsService.create(news.title, news.summary, news.text, this.selectedFile).subscribe({
       next: () => {
         this.modalService.dismissAll();
         this.loadNews();
         this.successMessage = 'Die News wurde erfolgreich gespeichert.';
         this.success = true;
-                setTimeout(() => {
+        setTimeout(() => {
           this.success = false;
         }, 5000);
       },
@@ -162,20 +117,34 @@ export class NewsComponent implements OnInit {
     });
   }
 
+  loadNews() {
+    if (this.newsMode === 'ALL') {
+      this.newsService.findAll().subscribe({
+        next: (news: NewsResponseDto[]) => {
+          this.allNews = news;
+          this.news = this.allNews;
+        },
+        error: error => {
+          this.defaultServiceErrorHandling(error);
+        }
+      });
+    } else {
+      this.newsService.findUnread().subscribe({
+        next: (news: NewsResponseDto[]) => {
+          this.unreadNews = news;
+          this.news = this.unreadNews;
+        },
+        error: error => {
+          this.defaultServiceErrorHandling(error);
+        }
+      });
+    }
+  }
 
-  /**
-   * Loads the specified page of news from the backend
-   */
-  private loadNews() {
-    this.newsServiceNew.findAll()
-    .subscribe({
-      next: (news: SimpleNewsDto[]) => {
-        this.news = news;
-      },
-      error: error => {
-        this.defaultServiceErrorHandling(error);
-      }
-    });
+  switchMode(mode: 'ALL' | 'UNREAD') {
+    this.newsMode = mode;
+    this.news = [];
+    this.loadNews();
   }
 
   private defaultServiceErrorHandling(error: any) {
@@ -193,5 +162,4 @@ export class NewsComponent implements OnInit {
       this.errorMessage = 'Ein unbekannter Fehler ist aufgetreten.';
     }
   }
-
 }

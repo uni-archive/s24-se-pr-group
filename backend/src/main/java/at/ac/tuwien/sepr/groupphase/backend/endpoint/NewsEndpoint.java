@@ -42,8 +42,16 @@ public class NewsEndpoint {
     @Operation(summary = "Get list of news without details")
     public ResponseEntity<List<NewsResponseDto>> findAll() throws EntityNotFoundException {
         LOGGER.info("GET /api/v1/news");
-        List<NewsDto> newsList = newsService.getUnseenNews();
+        List<NewsDto> newsList = newsService.getAllNews();
         return ResponseEntity.ok(newsEndpointMapper.toResponseList(newsList));
+    }
+    @Secured("ROLE_USER")
+    @GetMapping(value = "/unread", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get list of unread news")
+    public ResponseEntity<List<NewsResponseDto>> findUnread() throws EntityNotFoundException {
+        LOGGER.info("GET /api/v1/news/unread");
+        List<NewsDto> unreadNewsList = newsService.getUnseenNews();
+        return ResponseEntity.ok(newsEndpointMapper.toResponseList(unreadNewsList));
     }
 
     @Secured("ROLE_USER")

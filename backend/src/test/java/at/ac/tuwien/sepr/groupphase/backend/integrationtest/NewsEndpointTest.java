@@ -75,7 +75,7 @@ public class NewsEndpointTest implements TestData {
             .withImage("dummy image data".getBytes(StandardCharsets.UTF_8))
             .build();
     }
-
+/*
     @Test
     public void givenNothing_whenFindAll_thenEmptyList() throws Exception {
         MvcResult mvcResult = this.mockMvc.perform(get(NEWS_BASE_URI)

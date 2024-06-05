@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { NgbModal, NgbPaginationConfig } from "@ng-bootstrap/ng-bootstrap";
 import { UntypedFormBuilder } from "@angular/forms";
 import { AuthService } from "../../../services/auth.service";
-import { DetailedNewsDto, NewsEndpointService } from "../../../services/openapi";
+import { NewsResponseDto, NewsEndpointService } from "../../../services/openapi";
 
 @Component({
   selector: 'app-news-detail',
@@ -12,7 +12,7 @@ import { DetailedNewsDto, NewsEndpointService } from "../../../services/openapi"
 })
 export class NewsDetailComponent implements OnInit {
   newsId: number;
-  news: DetailedNewsDto;
+  news: NewsResponseDto;
   error = false;
   errorMessage = '';
   constructor(private route: ActivatedRoute,

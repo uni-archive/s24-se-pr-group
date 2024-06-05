@@ -13,8 +13,7 @@ import { HttpHeaders }                                       from '@angular/comm
 
 import { Observable }                                        from 'rxjs';
 
-import { DetailedNewsDto } from '../model/models';
-import { SimpleNewsDto } from '../model/models';
+import { NewsResponseDto } from '../model/models';
 
 
 import { Configuration }                                     from '../configuration';
@@ -33,19 +32,25 @@ export interface NewsEndpointServiceInterface {
      * @param text 
      * @param image 
      */
-    create(title: string, summary: string, text: string, image: Blob, extraHttpRequestParams?: any): Observable<DetailedNewsDto>;
+    create(title: string, summary: string, text: string, image: Blob, extraHttpRequestParams?: any): Observable<NewsResponseDto>;
 
     /**
      * Get detailed information about a specific news
      * 
      * @param id 
      */
-    find(id: number, extraHttpRequestParams?: any): Observable<DetailedNewsDto>;
+    find(id: number, extraHttpRequestParams?: any): Observable<NewsResponseDto>;
 
     /**
      * Get list of news without details
      * 
      */
-    findAll(extraHttpRequestParams?: any): Observable<Array<SimpleNewsDto>>;
+    findAll(extraHttpRequestParams?: any): Observable<Array<NewsResponseDto>>;
+
+    /**
+     * Get list of unread news
+     * 
+     */
+    findUnread(extraHttpRequestParams?: any): Observable<Array<NewsResponseDto>>;
 
 }
