@@ -19,8 +19,8 @@ export interface ApplicationUserResponse {
     familyName?: string;
     phoneNumber?: string;
     accountLocked?: boolean;
-    isAdmin?: boolean;
-    isSuperAdmin?: boolean;
+    admin?: boolean;
+    superAdmin?: boolean;
     address?: AddressResponse;
 }
 
