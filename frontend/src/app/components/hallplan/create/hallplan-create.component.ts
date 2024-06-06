@@ -78,7 +78,7 @@ export class HallplanCreateComponent {
     this.hallplanService.createHallplan(this.mapHallplanToCreateDto()).subscribe({
       next: response => {
         this.messagingService.setMessage("Saalplan wurde erfolgreich erstellt", "success");
-        this.router.navigate(['/user/home']);
+        //this.router.navigate(['/user/home']);
         console.log('Response:', response);
       }
       ,

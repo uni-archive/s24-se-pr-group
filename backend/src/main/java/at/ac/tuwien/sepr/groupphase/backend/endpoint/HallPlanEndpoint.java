@@ -38,7 +38,7 @@ public class HallPlanEndpoint {
     @PostMapping(path = "/create")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> register(@RequestBody HallplanCreateRequest toCreate) throws ValidationException, ForbiddenException {
-        LOGGER.trace("Creating hallplan with name {}", toCreate.getName());
+        LOGGER.info("Creating hallplan {} {}", toCreate.getSectors().get(0).getStandingOnly(), toCreate.getSectors().get(0).getSpots());
         var retVal = hallplanService.create(hallPlanCreateRequestMapper.toDto(toCreate));
         return ResponseEntity.status(201)
             .body(retVal);
