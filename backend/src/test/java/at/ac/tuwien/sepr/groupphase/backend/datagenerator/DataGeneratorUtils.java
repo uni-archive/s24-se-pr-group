@@ -71,11 +71,19 @@ public class DataGeneratorUtils {
     }
 
     public static <T> T randomChoice(List<T> choices) {
+        if (choices.isEmpty()) {
+            return null;
+        }
+
         var idx = rng.nextInt(choices.size());
         return choices.get(idx);
     }
 
     public static <T> T randomChoice(T[] choices) {
+        if (choices.length == 0) {
+            return null;
+        }
+
         var idx = rng.nextInt(choices.length);
         return choices[idx];
     }
@@ -146,8 +154,8 @@ public class DataGeneratorUtils {
         shows.stream().collect(Collectors.toMap(
                 Show::getEvent,
                 s -> new ArrayList<Show>() {{
-                        add(s);
-                    }},
+                    add(s);
+                }},
                 (a, b) -> {
                     a.addAll(b);
                     return a;
@@ -193,8 +201,8 @@ public class DataGeneratorUtils {
         var sectorShowsChoiceMap = shows.stream().collect(Collectors.toConcurrentMap(
             s -> s,
             s -> new CopyOnWriteArrayList<HallSector>() {{
-                    addAll(sectors);
-                }}
+                addAll(sectors);
+            }}
         ));
 
         sectorShowsChosenMap.clear();
