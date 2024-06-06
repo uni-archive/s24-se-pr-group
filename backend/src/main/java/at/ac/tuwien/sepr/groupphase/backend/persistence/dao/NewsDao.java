@@ -5,8 +5,8 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.NewsDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.News;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.NewsMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.NewsRepository;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.NewsMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.UserRepository;
 import org.springframework.stereotype.Component;
 
