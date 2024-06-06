@@ -17,13 +17,18 @@ import java.util.stream.Stream;
 public interface HallSectorCreateRequestMapper extends BaseResponseMapper<HallSectorDto, HallplanSectionCreateRequest>, BaseEntityMapper<HallSector, HallSectorDto> {
 
     @Mapping(target = "seats", expression = "java(mapSpots(hallplanCreateDto))")
+    @Mapping(target = "name", expression = "java(mapName(hallplanCreateDto))")
     HallSectorDto toDto(HallplanSectionCreateRequest hallplanCreateDto);
 
+    default String mapName(HallplanSectionCreateRequest hallplanCreateDto) {
+        return "hallplanCreateDto.getName()";
+    }
+
     default List<HallSpotDto> mapSpots(HallplanSectionCreateRequest hallSectorCreateRequest) {
-        if (hallSectorCreateRequest.isStandingOnly()) {
+        if (hallSectorCreateRequest.getStandingOnly()) {
             // map spots for standingOnly case
             return Stream.generate(HallSpotDto::new)
-                    .limit(hallSectorCreateRequest.getSpots().size())
+                    .limit(hallSectorCreateRequest.getSpotCount())
                     .toList();
         } else {
             // map spots for non-standingOnly case

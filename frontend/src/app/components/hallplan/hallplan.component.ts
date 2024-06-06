@@ -130,14 +130,16 @@ export class HallplanComponent {
   finishSection() {
     const sectionPolygon = this.createHelper.getSectionPolygon();
     if (sectionPolygon.length > 2) {
+      const seats = CreateHelper.generateSeats(this.createHelper.getSectionPolygon(), this.ctx).map(pos => ({ pos }));
       this.sections.push({
         points: sectionPolygon,
         name: 'Section ' + (this.sections.length + 1),
         color: '#ff0000',
         price: 100,
 
-        seats: CreateHelper.generateSeats(this.createHelper.getSectionPolygon(), this.ctx).map(pos => ({ pos })),
-        isStandingOnly: false
+        seats: seats,
+        isStandingOnly: false,
+        spotCount: seats.length,
       });
       this.createHelper.disable();
       this.generateEntities();
@@ -193,6 +195,7 @@ export type HallSection = {
   name: string;
   color: string;
   price: number;
+  spotCount?: number,
 
   seats: HallSeat[];
   isStandingOnly: boolean;
