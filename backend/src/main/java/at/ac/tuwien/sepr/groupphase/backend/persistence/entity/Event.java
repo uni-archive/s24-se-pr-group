@@ -2,8 +2,8 @@ package at.ac.tuwien.sepr.groupphase.backend.persistence.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
-
 import java.util.List;
 
 @Entity
@@ -22,12 +22,17 @@ public class Event extends AbstractEntity {
     @Column(name = "DURATION")
     private Long duration;
 
-    @OneToMany(mappedBy = "event")
+    @OneToMany(mappedBy = "event", fetch = FetchType.LAZY)
     private List<Show> shows;
 
     @Override
     public String toString() {
-        return "Event{" + "title='" + title + '\'' + ", description='" + description + '\'' + ", eventType=" + eventType + ", duration=" + duration + ", shows=" + shows + '}';
+        return "Event{" +
+            "title='" + title + '\'' +
+            ", description='" + description + '\'' +
+            ", eventType=" + eventType +
+            ", duration=" + duration +
+            "} " + super.toString();
     }
 
     public String getTitle() {

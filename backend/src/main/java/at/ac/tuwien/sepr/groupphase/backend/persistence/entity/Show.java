@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.persistence.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -20,14 +21,14 @@ public class Show extends AbstractEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime dateTime;
 
-    @ManyToMany(mappedBy = "shows")
+    @ManyToMany(mappedBy = "shows", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Artist> artists;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "EVENT_ID")
     private Event event;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "LOCATION_ID")
     private Location location;
 
@@ -113,6 +114,6 @@ public class Show extends AbstractEntity {
 
     @Override
     public String toString() {
-        return "Show{" + "dateTime=" + dateTime + ", artists=" + artists + ", event=" + event + '}';
+        return "Show{" + "dateTime=" + dateTime + ", event=" + event + '}';
     }
 }

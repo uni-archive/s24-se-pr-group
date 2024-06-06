@@ -47,6 +47,8 @@ spring:
           auth: true
           starttls:
             enable: true
+  quartz:
+    job-store-type: jdbc
 
 security:
   auth:
