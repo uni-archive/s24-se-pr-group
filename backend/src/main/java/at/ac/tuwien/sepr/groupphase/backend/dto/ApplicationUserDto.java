@@ -11,8 +11,8 @@ public class ApplicationUserDto implements AbstractDto {
     private String salt;
     private int loginCount;
     private boolean accountLocked;
-    private boolean isAdmin;
-    private boolean isSuperAdmin;
+    private boolean admin;
+    private boolean superAdmin;
     private AddressDto address;
 
     public ApplicationUserDto(Long id, String email, String password, String firstName, String familyName,
@@ -27,8 +27,8 @@ public class ApplicationUserDto implements AbstractDto {
         this.salt = salt;
         this.loginCount = loginCount;
         this.accountLocked = accountLocked;
-        this.isAdmin = isAdmin;
-        this.isSuperAdmin = isSuperAdmin;
+        this.admin = isAdmin;
+        this.superAdmin = isSuperAdmin;
         this.address = address;
     }
 
@@ -117,12 +117,12 @@ public class ApplicationUserDto implements AbstractDto {
         return this;
     }
 
-    public boolean isAdmin() {
-        return isAdmin;
+    public boolean getAdmin() {
+        return admin;
     }
 
     public ApplicationUserDto setAdmin(boolean admin) {
-        isAdmin = admin;
+        this.admin = admin;
         return this;
     }
 
@@ -135,12 +135,12 @@ public class ApplicationUserDto implements AbstractDto {
         return this;
     }
 
-    public boolean isSuperAdmin() {
-        return isSuperAdmin;
+    public boolean getSuperAdmin() {
+        return superAdmin;
     }
 
     public ApplicationUserDto setSuperAdmin(boolean superAdmin) {
-        isSuperAdmin = superAdmin;
+        this.superAdmin = superAdmin;
         return this;
     }
 }
