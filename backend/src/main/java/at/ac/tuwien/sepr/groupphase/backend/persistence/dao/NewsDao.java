@@ -2,16 +2,17 @@ package at.ac.tuwien.sepr.groupphase.backend.persistence.dao;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.NewsDto;
+import at.ac.tuwien.sepr.groupphase.backend.mapper.NewsMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.News;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.NewsMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.NewsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class NewsDao extends AbstractDao<News, NewsDto> {
@@ -24,10 +25,9 @@ public class NewsDao extends AbstractDao<News, NewsDto> {
         this.userRepository = userRepository;
     }
 
-    public List<NewsDto> findAllByOrderByPublishedAtDesc() {
-        return newsRepository.findAllByOrderByPublishedAtDesc().stream()
-            .map(mapper::toDto)
-            .collect(Collectors.toList());
+    public Page<NewsDto> findAllByOrderByPublishedAtDesc(Pageable pageable) {
+        return newsRepository.findAllByOrderByPublishedAtDesc(pageable)
+            .map(mapper::toDto);
     }
 
     public void updateNewsWithUsers(NewsDto newsDto) throws EntityNotFoundException {
@@ -45,15 +45,12 @@ public class NewsDao extends AbstractDao<News, NewsDto> {
         repository.save(news);
     }
 
-    public List<NewsDto> findUnseenNewsByUser(Long userId) throws EntityNotFoundException {
+    public Page<NewsDto> findUnseenNewsByUser(Long userId, Pageable pageable) throws EntityNotFoundException {
         if (!userRepository.existsById(userId)) {
             throw new EntityNotFoundException(userId);
         }
-        List<News> unseenNews = newsRepository.findUnseenNewsByUser(userId);
-        return unseenNews.stream()
-            .map(mapper::toDto)
-            .collect(Collectors.toList());
+        return newsRepository.findUnseenNewsByUser(userId, pageable)
+            .map(mapper::toDto);
     }
-
 }
 

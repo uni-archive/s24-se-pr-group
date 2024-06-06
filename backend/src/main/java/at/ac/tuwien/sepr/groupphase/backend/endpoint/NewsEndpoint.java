@@ -16,6 +16,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -46,24 +48,24 @@ public class NewsEndpoint {
     @Secured("ROLE_USER")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get list of news without details")
-    public ResponseEntity<List<NewsResponseDto>> findAll() {
+    public ResponseEntity<Page<NewsResponseDto>> findAll(Pageable pageable)   {
         LOGGER.info("GET /api/v1/news");
-        List<NewsDto> newsList = newsService.getAllNews();
-        return ResponseEntity.ok(newsEndpointMapper.toResponseList(newsList));
+        Page<NewsDto> newsList = newsService.getAllNews(pageable);
+        return ResponseEntity.ok(newsList.map(newsEndpointMapper::toResponse));
     }
 
     @Secured("ROLE_USER")
     @GetMapping(value = "/unread", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get list of unread news")
-    public ResponseEntity<List<NewsResponseDto>> findUnread() {
+    public ResponseEntity<Page<NewsResponseDto>> findUnread(Pageable pageable)   {
         LOGGER.info("GET /api/v1/news/unread");
-        List<NewsDto> unreadNewsList = null;
+        Page<NewsDto> unreadNewsList = null;
         try {
-            unreadNewsList = newsService.getUnseenNews();
+            unreadNewsList = newsService.getUnseenNews(pageable);
         } catch (DtoNotFoundException e) {
             throw new NotFoundException(e);
         }
-        return ResponseEntity.ok(newsEndpointMapper.toResponseList(unreadNewsList));
+        return ResponseEntity.ok(unreadNewsList.map(newsEndpointMapper::toResponse));
     }
 
     @Secured("ROLE_USER")
