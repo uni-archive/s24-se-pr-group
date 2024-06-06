@@ -32,14 +32,7 @@ public class QuartzConfig {
         this.applicationContext = applicationContext;
     }
 
-    @Bean
-    public JobDetailFactoryBean reservationInvalidationJobDetailFactory() {
-        JobDetailFactoryBean jobDetailFactory = new JobDetailFactoryBean();
-        jobDetailFactory.setJobClass(InvalidateReservationJob.class);
-        jobDetailFactory.setDescription("Invoke Invalidation service...");
-        jobDetailFactory.setDurability(true);
-        return jobDetailFactory;
-    }
+
 
     @Bean
     public SimpleTriggerFactoryBean trigger(JobDetail job) {

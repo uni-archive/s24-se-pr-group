@@ -21,10 +21,8 @@ public class InvalidateReservationJob extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         try {
             ticketService.cancelReservedTicket(context.getMergedJobDataMap().getLong("ticketId"));
-        } catch (ValidationException e) {
-            throw new RuntimeException(e);
-        } catch (DtoNotFoundException e) {
-            throw new RuntimeException(e);
+        } catch (ValidationException | DtoNotFoundException e) {
+            throw new IllegalStateException(e);
         }
     }
 }

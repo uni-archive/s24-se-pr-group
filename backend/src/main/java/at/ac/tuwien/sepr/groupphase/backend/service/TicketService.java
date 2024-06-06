@@ -55,5 +55,14 @@ public interface TicketService {
      */
     void invalidateAllTicketsForOrder(long orderId);
 
+    /**
+     * Adds a ticket to an order.
+     *
+     * @param seatId
+     * @param showId
+     * @param orderId
+     * @return the created ticket
+     * @throws ValidationException
+     */
     TicketDetailsDto addTicketToOrder(Long seatId, Long showId, Long orderId) throws ValidationException;
 }
