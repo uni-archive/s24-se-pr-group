@@ -23,6 +23,11 @@ public interface UserMapper extends BaseEntityMapper<ApplicationUser, Applicatio
         return isAdmin ? UserType.ADMIN : UserType.CUSTOMER;
     }
 
+    @Named("userTypeToBoolean")
+    static boolean userTypeToBoolean(UserType type) {
+        return type == UserType.ADMIN;
+    }
+
     @Mapping(source = "addressCreateRequest", target = "address")
     ApplicationUserDto toDto(UserCreateRequest createRequest);
 
@@ -37,11 +42,5 @@ public interface UserMapper extends BaseEntityMapper<ApplicationUser, Applicatio
     ApplicationUser toEntity(ApplicationUserDto dto);
 
     @Override
-    @Mapping(source = "admin", target = "isAdmin")
     ApplicationUserResponse toResponse(ApplicationUserDto dto);
-
-    @Named("userTypeToBoolean")
-    static boolean userTypeToBoolean(UserType type) {
-        return type == UserType.ADMIN;
-    }
 }

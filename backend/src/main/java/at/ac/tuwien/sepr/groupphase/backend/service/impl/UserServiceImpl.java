@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
     private UserDetails getUserDetailsForUser(ApplicationUserDto applicationUser) {
         try {
             List<GrantedAuthority> grantedAuthorities;
-            if (applicationUser.isAdmin()) {
+            if (applicationUser.getAdmin()) {
                 grantedAuthorities = AuthorityUtils.createAuthorityList(Code.ADMIN, Code.USER);
             } else {
                 grantedAuthorities = AuthorityUtils.createAuthorityList(Code.USER);
@@ -146,6 +146,9 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new NotFoundException("Could not update the user with the email address " + toUpdate.getEmail()
                 + " because it does not exist");
+        }
+        if (user.getSuperAdmin()) {
+            throw new ValidationException("Cannot update the status of this user.");
         }
         try {
             user.setAccountLocked(toUpdate.isAccountLocked());
