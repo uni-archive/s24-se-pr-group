@@ -2,7 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.persistence.dao;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.ArtistDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistSearchDto;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.BaseEntityMapper;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.BaseEntityMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Artist;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.ArtistRepository;
 import jakarta.transaction.Transactional;

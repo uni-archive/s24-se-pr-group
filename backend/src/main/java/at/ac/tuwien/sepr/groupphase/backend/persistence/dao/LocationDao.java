@@ -2,7 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.persistence.dao;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.LocationDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.LocationSearch;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.LocationMapper;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.LocationMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Address;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Location;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;

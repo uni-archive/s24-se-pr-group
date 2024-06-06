@@ -2,8 +2,8 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.ArtistDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.EventDto;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.ArtistMapper;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.EventMapper;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.ArtistMapper;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.EventMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.EventDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.ArtistRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.EventRepository;

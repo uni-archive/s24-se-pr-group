@@ -20,6 +20,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.MailNotSentException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.UserValidator;
+import com.google.common.cache.Cache;
 import jakarta.mail.MessagingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -51,11 +53,12 @@ public class UserServiceImpl implements UserService {
     private final UserValidator userValidator;
     private final EmailSenderService emailSenderService;
     private final AddressService addressService;
+    private final Cache<String, Integer> loginAttemptCache;
 
     @Autowired
     public UserServiceImpl(UserDao userDao, EmailChangeTokenDao emailChangeTokenDao, PasswordEncoder passwordEncoder,
                            JwtTokenizer jwtTokenizer, UserValidator userValidator,
-                           EmailSenderService emailSenderService, AddressService addressService) {
+                           EmailSenderService emailSenderService, AddressService addressService, Cache<String, Integer> loginAttemptCache) {
         this.userDao = userDao;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
@@ -63,6 +66,7 @@ public class UserServiceImpl implements UserService {
         this.addressService = addressService;
         this.emailSenderService = emailSenderService;
         this.emailChangeTokenDao = emailChangeTokenDao;
+        this.loginAttemptCache = loginAttemptCache;
     }
 
     @Override
@@ -98,15 +102,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String login(UserLoginDto userLoginDto) {
+    public String login(String email, String password) {
         try {
-            ApplicationUserDto applicationUserDto = findApplicationUserByEmail(userLoginDto.getEmail());
+            Integer recentLoginAttempts = loginAttemptCache.get(email, () -> 0);
+            if (recentLoginAttempts > 3) {
+                throw new BadCredentialsException("Account is locked due to multiple failed login attempts. Please try again later.");
+            }
+            loginAttemptCache.put(email, recentLoginAttempts + 1);
+        } catch (ExecutionException e) {
+            throw new BadCredentialsException("Account is locked due to multiple failed login attempts. Please try again later.");
+        }
+        try {
+            ApplicationUserDto applicationUserDto = findApplicationUserByEmail(email);
             UserDetails userDetails = getUserDetailsForUser(applicationUserDto);
             if (userDetails != null
                 && userDetails.isAccountNonExpired()
                 && userDetails.isAccountNonLocked()
                 && userDetails.isCredentialsNonExpired()
-                && passwordEncoder.matches(userLoginDto.getPassword().concat(applicationUserDto.getSalt()),
+                && passwordEncoder.matches(password.concat(applicationUserDto.getSalt()),
                 userDetails.getPassword())
             ) {
                 List<String> roles = userDetails.getAuthorities()
@@ -287,7 +300,8 @@ public class UserServiceImpl implements UserService {
             .append("      .h3 { font-size: 1.75rem; margin-bottom: 0.5rem; }\n")
             .append("      .h5 { font-size: 1.25rem; }\n")
             .append("      .text-gray-700 { color: #6c757d; }\n")
-            .append("      .btn-primary { display: inline-block; font-weight: 400; color: #fff !important; text-align: center; vertical-align: middle; cursor: pointer; background-color: #007bff; border: 1px solid #007bff; padding: 0.375rem 0.75rem; font-size: 1rem; border-radius: 0.25rem; text-decoration: none; }\n")
+            .append(
+                "      .btn-primary { display: inline-block; font-weight: 400; color: #fff !important; text-align: center; vertical-align: middle; cursor: pointer; background-color: #007bff; border: 1px solid #007bff; padding: 0.375rem 0.75rem; font-size: 1rem; border-radius: 0.25rem; text-decoration: none; }\n")
             .append("   </style>\n")
             .append("</head>\n")
             .append("<body>\n")

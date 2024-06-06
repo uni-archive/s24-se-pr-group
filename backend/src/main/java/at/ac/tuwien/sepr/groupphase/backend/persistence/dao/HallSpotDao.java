@@ -1,7 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.persistence.dao;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.HallSpotDto;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.HallSpotMapper;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.HallSpotMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSpot;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallSpotRepository;
 import org.springframework.stereotype.Component;

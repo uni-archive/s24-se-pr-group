@@ -2,7 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.persistence.dao;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.UserMapper;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.UserMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.specification.UserSpecification;

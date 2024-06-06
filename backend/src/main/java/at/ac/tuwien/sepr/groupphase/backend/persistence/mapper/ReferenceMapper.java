@@ -1,4 +1,4 @@
-package at.ac.tuwien.sepr.groupphase.backend.mapper;
+package at.ac.tuwien.sepr.groupphase.backend.persistence.mapper;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

@@ -1,7 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.persistence.dao;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.HallSectorShowDto;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.HallSectorShowMapper;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.HallSectorShowMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSectorShow;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallSectorShowRepository;

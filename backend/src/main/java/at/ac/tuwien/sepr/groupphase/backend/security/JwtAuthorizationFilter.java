@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.security;
 
 import at.ac.tuwien.sepr.groupphase.backend.config.properties.SecurityProperties;
+import com.google.common.cache.Cache;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -29,9 +30,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final SecurityProperties securityProperties;
+    private final Cache<String, Integer> loginAttemptCache;
 
-    public JwtAuthorizationFilter(SecurityProperties securityProperties) {
+    public JwtAuthorizationFilter(SecurityProperties securityProperties, Cache<String, Integer> loginAttemptCache) {
         this.securityProperties = securityProperties;
+        this.loginAttemptCache = loginAttemptCache;
     }
 
     @Override

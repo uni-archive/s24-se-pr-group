@@ -3,9 +3,9 @@ package at.ac.tuwien.sepr.groupphase.backend.persistence.dao;
 import at.ac.tuwien.sepr.groupphase.backend.dto.EventDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.EventSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.BaseEntityMapper;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.EventMapper;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.ShowMapper;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.BaseEntityMapper;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.EventMapper;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.ShowMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Event;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Show;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
@@ -14,12 +14,8 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
 import java.lang.invoke.MethodHandles;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 

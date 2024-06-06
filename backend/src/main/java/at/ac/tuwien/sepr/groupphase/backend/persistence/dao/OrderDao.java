@@ -2,8 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.persistence.dao;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderSummaryDto;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.CycleAvoidingMappingContext;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.OrderMapper;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.OrderMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Order;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.OrderRepository;

@@ -40,11 +40,12 @@ public interface UserService extends UserDetailsService {
     /**
      * Log in a user.
      *
-     * @param userLoginDto login credentials
+     * @param email    the email
+     * @param password the password
      * @return the JWT, if successful
      * @throws org.springframework.security.authentication.BadCredentialsException if credentials are bad
      */
-    String login(UserLoginDto userLoginDto);
+    String login(String email, String password);
 
     /**
      * Create a new user.

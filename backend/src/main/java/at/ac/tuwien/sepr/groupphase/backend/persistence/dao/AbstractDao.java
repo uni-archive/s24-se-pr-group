@@ -1,7 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.persistence.dao;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.AbstractDto;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.BaseEntityMapper;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.BaseEntityMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.AbstractEntity;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import java.util.List;

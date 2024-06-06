@@ -1,9 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests;
 
-import at.ac.tuwien.sepr.groupphase.backend.datagenerator.EventGenerator;
 import at.ac.tuwien.sepr.groupphase.backend.dto.EventSearchDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreationDto;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.EventMapper;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.EventMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Event;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.EventType;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.EventRepository;
