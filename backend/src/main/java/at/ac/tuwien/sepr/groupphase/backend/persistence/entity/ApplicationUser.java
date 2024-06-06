@@ -217,5 +217,8 @@ public class ApplicationUser extends AbstractEntity {
         return this;
     }
 
+    public boolean isSuperAdmin() {
+        return superAdmin;
+    }
 
 }
