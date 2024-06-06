@@ -3,6 +3,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderSummaryDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.OrderDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.InvoiceService;
@@ -11,17 +12,17 @@ import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.OrderValidator;
+import java.lang.invoke.MethodHandles;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.invoke.MethodHandles;
-import java.util.List;
-
 @Service
 public class OrderServiceImpl implements OrderService {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final OrderDao orderDao;
 
@@ -31,7 +32,8 @@ public class OrderServiceImpl implements OrderService {
 
     private final InvoiceService invoiceService;
 
-    public OrderServiceImpl(OrderDao orderDao, OrderValidator orderValidator, TicketService ticketService, InvoiceService invoiceService) {
+    public OrderServiceImpl(OrderDao orderDao, OrderValidator orderValidator, TicketService ticketService,
+        InvoiceService invoiceService) {
         this.orderDao = orderDao;
         this.orderValidator = orderValidator;
         this.ticketService = ticketService;
@@ -87,6 +89,7 @@ public class OrderServiceImpl implements OrderService {
         orderValidator.validateForCreate(orderDetailsDto);
         return orderDao.create(orderDetailsDto);
     }
+
 
     private void addInvoicesToOrder(OrderDetailsDto order) {
         order.setInvoices(invoiceService.findByOrderId(order.getId()));

@@ -1,6 +1,12 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verify;
+
 import at.ac.tuwien.sepr.groupphase.backend.basetest.TestData;
+import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Event;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallPlan;
@@ -9,6 +15,7 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSectorShow;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSpot;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Show;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Ticket;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.ArtistRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.EventRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallPlanRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallSectorRepository;
@@ -16,30 +23,36 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallSectorSho
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallSpotRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.ShowRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.TicketRepository;
+import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.TicketValidator;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.quartz.JobKey;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.test.context.ActiveProfiles;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith({MockitoExtension.class})
 @SpringBootTest
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "generateData"})
 public class TicketServiceImplTest implements TestData {
 
     @MockBean
@@ -72,16 +85,30 @@ public class TicketServiceImplTest implements TestData {
     @Autowired
     private HallPlanRepository hallPlanRepository;
 
+    @Autowired
+    private OrderServiceImpl orderService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private SchedulerFactoryBean schedulerFactoryBean;
+
+
     private static Ticket testTicketValidReserved;
     private static Ticket testTicketInvalidReserved;
 
     private static Ticket testTicketValidNonReserved;
     private static Ticket testTicketInvalidNonReserved;
+    private static HallSpot hallSpot;
+    private static Show show;
+    @Autowired
+    private ArtistRepository artistRepository;
 
     @BeforeEach
     void setup() {
         var event = new Event();
-        var show = new Show();
+        show = new Show();
         show.setEvent(event);
         event.setShows(List.of(show));
         eventRepository.save(event);
@@ -109,6 +136,10 @@ public class TicketServiceImplTest implements TestData {
         var hallSpot4 = new HallSpot();
         hallSpot4.setSector(sector);
         hallSpotRepository.save(hallSpot4);
+
+        var hallSpot5 = new HallSpot();
+        hallSpot4.setSector(sector);
+        hallSpot = hallSpotRepository.save(hallSpot5);
 
         var sectorShow = new HallSectorShow();
         sectorShow.setSector(sector);
@@ -185,5 +216,36 @@ public class TicketServiceImplTest implements TestData {
     void cancelling_aReservation_ShouldCallValidator() throws ValidationException, DtoNotFoundException {
         ticketService.cancelReservedTicket(testTicketValidReserved.getId());
         verify(ticketValidator).validateForCancelReservation(ticketDto.capture());
+    }
+
+    @Test
+    void creating_aTicket_ShouldAddToOrderAndScheduleTask()
+        throws DtoNotFoundException, ValidationException, SchedulerException {
+        ApplicationUserDto user = userService.findApplicationUserByEmail(ADMIN_USER);
+        List<Ticket> previousTickets = ticketRepository.findTicketsByUserId(user.getId());
+        int ticketCount = previousTickets.size();
+        OrderDetailsDto orderDetailsDto = orderService.create(user);
+
+        TicketDetailsDto ticketDetailsDto = ticketService.addTicketToOrder(hallSpot.getId(), show.getId(),
+            orderDetailsDto.getId());
+
+        List<Ticket> newTickets = ticketRepository.findTicketsByUserId(user.getId());
+        assertThat(newTickets.size()).isEqualTo(ticketCount + 1);
+        Ticket ticket = newTickets.stream().filter(x -> !previousTickets.contains(x)).findFirst().get();
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(ticketDetailsDto.getHallSpot().getId(), hallSpot.getId()),
+            () -> Assertions.assertEquals(ticketDetailsDto.getShow().getId(), show.getId()),
+            () -> Assertions.assertEquals(ticketDetailsDto.getOrder().getId(), orderDetailsDto.getId()),
+            () -> Assertions.assertNotNull(ticketDetailsDto.getHash()),
+            () -> Assertions.assertEquals(ticketDetailsDto.getHash(), ticket.getHash())
+        );
+        JobKey jobKey = schedulerFactoryBean.getScheduler().getJobKeys(GroupMatcher.anyJobGroup()).stream()
+            .filter(x -> Objects.equals(x.getName(), "reservationJob-" + ticket.getId())).findFirst().get();
+        List<Trigger> triggers = (List<Trigger>) schedulerFactoryBean.getScheduler().getTriggersOfJob(jobKey);
+        assertThat(triggers.size()).isEqualTo(1);
+        Trigger actual = triggers.get(0);
+
+        assertThat(actual.getNextFireTime().before(Date.from(Instant.now().plus(30, ChronoUnit.MINUTES)))).isTrue();
+        assertThat(actual.getNextFireTime().after(Date.from(Instant.now().plus(29, ChronoUnit.MINUTES)))).isTrue();
     }
 }

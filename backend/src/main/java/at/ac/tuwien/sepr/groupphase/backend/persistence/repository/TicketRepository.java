@@ -1,14 +1,12 @@
 package at.ac.tuwien.sepr.groupphase.backend.persistence.repository;
 
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Ticket;
-import org.springframework.data.domain.Pageable;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
@@ -26,4 +24,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     @Modifying
     @Query("UPDATE Ticket t SET t.valid = false WHERE t.order.id = :orderId")
     void invalidateAllTicketsForOrder(@Param("orderId") long orderId);
+
+    @Query("SELECT COUNT(t) > 0 FROM Ticket t WHERE t.show.id = :showId AND t.hallSpot.id = :seatId AND (t.valid = true OR t.reserved = true)")
+    boolean existsValidTicketForShowAndSeat(long showId, long seatId);
 }

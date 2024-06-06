@@ -46,4 +46,8 @@ public class TicketDao extends AbstractDao<Ticket, TicketDetailsDto> {
     public void invalidateAllTicketsForOrder(long orderId) {
         ((TicketRepository) repository).invalidateAllTicketsForOrder(orderId);
     }
+
+    public boolean existsValidOrReservedTicketForShowAndSeat(long showId, long seatId) {
+        return ((TicketRepository) repository).existsValidTicketForShowAndSeat(showId, seatId);
+    }
 }
