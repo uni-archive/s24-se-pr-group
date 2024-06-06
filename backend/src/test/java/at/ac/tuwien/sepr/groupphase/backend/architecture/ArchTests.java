@@ -38,9 +38,10 @@ public class ArchTests {
         .layer("Endpoint").definedBy("at.ac.tuwien.sepr.groupphase.backend.endpoint..")
         .layer("Service").definedBy("at.ac.tuwien.sepr.groupphase.backend.service..")
         .layer("Persistence").definedBy("at.ac.tuwien.sepr.groupphase.backend.persistence..")
+        .layer("dto").definedBy("at.ac.tuwien.sepr.groupphase.backend.dto..")
         .whereLayer("Endpoint").mayNotBeAccessedByAnyLayer()
         .whereLayer("Service").mayOnlyBeAccessedByLayers("Endpoint")
-        .whereLayer("Persistence").mayOnlyBeAccessedByLayers("Service"));
+        .whereLayer("Persistence").mayOnlyBeAccessedByLayers("Service", "dto"));
 
     @ArchTest
     private final ArchRule no_access_to_standard_streams = NO_CLASSES_SHOULD_ACCESS_STANDARD_STREAMS;
@@ -49,7 +50,6 @@ public class ArchTests {
     private void no_access_to_standard_streams_as_method(JavaClasses classes) {
         noClasses().should(ACCESS_STANDARD_STREAMS).check(classes);
     }
-
 
     @ArchTest
     private final ArchRule no_java_util_logging = NO_CLASSES_SHOULD_USE_JAVA_UTIL_LOGGING;

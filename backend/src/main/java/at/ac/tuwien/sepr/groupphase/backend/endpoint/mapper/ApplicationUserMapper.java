@@ -14,7 +14,7 @@ public interface ApplicationUserMapper extends BaseResponseMapper<ApplicationUse
     ApplicationUserDto toDto(UserCreateRequest createRequest);
 
     @Override
-    @Mapping(source = "admin", target = "isAdmin")
+    @Mapping(source = "admin", target = "admin")
     ApplicationUserResponse toResponse(ApplicationUserDto dto);
 
     ApplicationUserDto toDto(UserUpdateInfoRequest updateRequest);
