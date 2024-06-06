@@ -1,5 +1,4 @@
 import { Component } from "@angular/core";
-import { debounceTime, Subject } from "rxjs";
 import { MessagingService } from "src/app/services/messaging.service";
 import {
   ApplicationUserDto,
@@ -13,19 +12,17 @@ import {
 })
 export class ManageUserComponent {
   filterConfig = {
-    firstName: '',
-    familyName: '',
-    email: '',
-    isLocked: false
+    firstName: "",
+    familyName: "",
+    email: "",
+    isLocked: false,
   };
   constructor(
     private userEndpointService: UserEndpointService,
     private messagingService: MessagingService
   ) {}
 
-  ngOnInit() {
-
-  }
+  ngOnInit() {}
 
   searchUsers = (criteria: any, page: number, size: number) => {
     return this.userEndpointService.searchUsers(
@@ -36,7 +33,7 @@ export class ManageUserComponent {
       page,
       size
     );
-  }
+  };
   shouldRefresh: boolean;
   triggerRefresh(): void {
     this.shouldRefresh = !this.shouldRefresh;
@@ -52,26 +49,30 @@ export class ManageUserComponent {
 
         if (user.id != currentUser.id) {
           if (user.superAdmin) {
+            console.error("Dieser Benutzer kann nicht gesperrt werden.");
             this.messagingService.setMessage(
-              "Super admin kann nicht aktualisiert werden.",
-              "danger"
+              "Dieser Benutzer kann nicht gesperrt werden.",
+              "warning"
             );
             return;
           }
 
-          user.accountLocked = status;
-          this.userEndpointService.updateUserStatusByEmail(user).subscribe({
-            next: (response) => {
-              user = response;
-              this.messagingService.setMessage(
-                `Benutzer ${user.firstName} wurde ${
-                  user.accountLocked ? "gesperrt" : "entsperrt"
-                }.`
-              );
-            },
-            error: (error) =>
-              console.error("Fehler beim Laden der Benutzer:", error),
-          });
+          let updatedUser = user;
+          updatedUser.accountLocked = status;
+          this.userEndpointService
+            .updateUserStatusByEmail(updatedUser)
+            .subscribe({
+              next: (response) => {
+                user = response;
+                this.messagingService.setMessage(
+                  `Benutzer ${user.firstName} wurde ${
+                    user.accountLocked ? "gesperrt" : "entsperrt"
+                  }.`
+                );
+              },
+              error: (error) =>
+                console.error("Fehler beim Laden der Benutzer:", error),
+            });
         } else {
           this.messagingService.setMessage(
             "Aktualisierung des eigenen Benutzers kann nicht durchgeführt werden.",
@@ -79,7 +80,8 @@ export class ManageUserComponent {
           );
         }
       },
-      error: (error) => console.error("Fehler beim Laden der Benutzer:", error),
+      error: (error) =>
+        console.error("Fehler beim Laden des Benutzers:", error),
     });
   }
 }
