@@ -3,13 +3,14 @@ import {OrderDetailsResponse, OrderEndpointService, TicketDetailsResponse} from 
 import {ActivatedRoute, Router} from "@angular/router";
 import {MessagingService} from "../../../services/messaging.service";
 import {TicketsTableComponent} from "../../tickets/tickets-table/tickets-table.component";
-import {lastValueFrom, Observable, Subject, } from "rxjs";
+import {Subject} from "rxjs";
 import {NgIf} from "@angular/common";
 import {
   ConfirmCancelTicketReservationDialogComponent
 } from "../../tickets/confirm-cancel-ticket-reservation-dialog/confirm-cancel-ticket-reservation-dialog.component";
 import {ConfirmCancelOrderDialogComponent} from "../confirm-cancel-order-dialog/confirm-cancel-order-dialog.component";
 import {PdfService} from "../../../services/pdf.service";
+import {HttpStatusCode} from "@angular/common/http";
 
 @Component({
   selector: 'app-orders-details-view',
@@ -25,7 +26,8 @@ import {PdfService} from "../../../services/pdf.service";
 })
 export class OrdersDetailsViewComponent implements OnInit {
   order: OrderDetailsResponse;
-  subj: Subject<TicketDetailsResponse[]> = new Subject<TicketDetailsResponse[]>();
+  loading: boolean = true;
+  loadTickets: Subject<TicketDetailsResponse[]> = new Subject<TicketDetailsResponse[]>();
   constructor(
     private orderService: OrderEndpointService,
     private route: ActivatedRoute,
@@ -48,17 +50,13 @@ export class OrdersDetailsViewComponent implements OnInit {
     this.orderService.findById1(orderId).subscribe({
       next: order => {
         this.order = order;
-        this.subj.next(order.tickets);
+        this.loadTickets.next(order.tickets);
       },
       error: err => {
         this.messagingService.setMessage("Die Bestellung konnte nicht geladen werden.", 'danger');
         this.router.navigate(["/my/orders"]);
       }
     });
-  }
-
-  loadTickets(): Observable<TicketDetailsResponse[]> {
-    return this.subj;
   }
 
   cancelOrder(): void {
@@ -69,7 +67,11 @@ export class OrdersDetailsViewComponent implements OnInit {
           this.loadOrder();
         },
         error: err => {
-          this.messagingService.setMessage("Konnte die Bestellung nicht stornieren. Bitte versuchen Sie es später erneut.", 'danger');
+          if(err.status === HttpStatusCode.UnprocessableEntity) {
+            this.messagingService.setMessage("Die Bestellung darf nicht storniert werden: Die Stornierfrist ist abgelaufen.", 'danger')
+          } else {
+            this.messagingService.setMessage("Konnte die Bestellung nicht stornieren. Bitte versuchen Sie es später erneut.", 'danger');
+          }
         }
       })
   }

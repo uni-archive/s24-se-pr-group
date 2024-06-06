@@ -1,16 +1,20 @@
 package at.ac.tuwien.sepr.groupphase.backend.dto;
 
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.type.InvoiceType;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class OrderDetailsDto implements AbstractDto {
     private Long id;
 
-    private List<TicketDetailsDto> tickets;
+    private List<TicketDetailsDto> tickets = new ArrayList<>();
 
     private ApplicationUserDto customer;
 
-    private List<InvoiceDto> invoices;
+    private List<InvoiceDto> invoices = new ArrayList<>();
 
     private LocalDateTime dateTime;
 
@@ -53,6 +57,14 @@ public class OrderDetailsDto implements AbstractDto {
 
     public void setDateTime(LocalDateTime dateTime) {
         this.dateTime = dateTime;
+    }
+
+    public InvoiceDto getPurchaseInvoice() {
+        return this.invoices.stream().filter(i -> i.getInvoiceType().equals(InvoiceType.PURCHASE)).findFirst().orElse(null);
+    }
+
+    public Optional<InvoiceDto> getCancellationInvoice() {
+        return this.invoices.stream().filter(i -> i.getInvoiceType().equals(InvoiceType.CANCELLATION)).findFirst();
     }
 
     public class OrderDetailsDtoBuilder {

@@ -18,13 +18,13 @@ export interface PageShowResponse {
     totalPages?: number;
     totalElements?: number;
     pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
     size?: number;
     content?: Array<ShowResponse>;
     number?: number;
     sort?: Array<SortObject>;
     numberOfElements?: number;
+    first?: boolean;
+    last?: boolean;
     empty?: boolean;
 }
 

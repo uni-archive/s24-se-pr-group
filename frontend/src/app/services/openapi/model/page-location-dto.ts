@@ -18,13 +18,13 @@ export interface PageLocationDto {
     totalPages?: number;
     totalElements?: number;
     pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
     size?: number;
     content?: Array<LocationDto>;
     number?: number;
     sort?: Array<SortObject>;
     numberOfElements?: number;
+    first?: boolean;
+    last?: boolean;
     empty?: boolean;
 }
 

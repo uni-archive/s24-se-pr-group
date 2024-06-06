@@ -2,6 +2,8 @@ package at.ac.tuwien.sepr.groupphase.backend.service.validator;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.InvoiceDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.type.InvoiceType;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import org.junit.jupiter.api.Test;
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static at.ac.tuwien.sepr.groupphase.backend.supplier.ApplicationUserSupplier.aCustomerUser;
@@ -22,11 +25,17 @@ public class OrderValidatorTest {
     private OrderValidator orderValidator;
 
     @Test
-    void validateForFindById_if_ProvidedUserAndFoundCustomerInOrderMatch_ThenDoNothing() throws ValidationException {
+    void validateForFindById_if_ValidOrder_ThenDoNothing() throws ValidationException {
         var user = aCustomerUser();
         user.setId(10L);
         var order = new OrderDetailsDto();
+        var invoice = new InvoiceDto();
+        invoice.setInvoiceType(InvoiceType.PURCHASE);
+        invoice.setDateTime(LocalDateTime.now());
         order.setCustomer(user);
+        order.setDateTime(LocalDateTime.now());
+        order.setInvoices(List.of(invoice));
+
         orderValidator.validateForFindById(order, user);
     }
 
@@ -35,7 +44,12 @@ public class OrderValidatorTest {
         var user = aCustomerUser();
         user.setId(10L);
         var order = new OrderDetailsDto();
+        var invoice = new InvoiceDto();
+        invoice.setInvoiceType(InvoiceType.PURCHASE);
+        invoice.setDateTime(LocalDateTime.now());
         order.setCustomer(user);
+        order.setDateTime(LocalDateTime.now());
+        order.setInvoices(List.of(invoice));
 
         var user2 = aCustomerUser();
         user2.setId(20L);
@@ -49,8 +63,13 @@ public class OrderValidatorTest {
         var user = aCustomerUser();
         user.setId(10L);
         var order = new OrderDetailsDto();
+        var invoice = new InvoiceDto();
+        invoice.setInvoiceType(InvoiceType.PURCHASE);
+        invoice.setDateTime(LocalDateTime.now());
         order.setCustomer(user);
-        order.setInvoices(List.of());
+        order.setInvoices(List.of(invoice));
+        order.setDateTime(LocalDateTime.now());
+
         orderValidator.validateForCancel(order, user);
     }
 
@@ -60,8 +79,13 @@ public class OrderValidatorTest {
         var user = aCustomerUser();
         user.setId(10L);
         var order = new OrderDetailsDto();
+        var invoice = new InvoiceDto();
+        invoice.setInvoiceType(InvoiceType.PURCHASE);
+        invoice.setDateTime(LocalDateTime.now());
         order.setCustomer(user);
-        order.setInvoices(List.of());
+        order.setInvoices(List.of(invoice));
+        order.setDateTime(LocalDateTime.now());
+
         var wrongUser = aCustomerUser().setId(20L);
         assertThatThrownBy(() -> orderValidator.validateForCancel(order, wrongUser))
             .hasMessageContaining("User-ID of order does not match with the given user.")
@@ -72,14 +96,55 @@ public class OrderValidatorTest {
     void validateForCancel_if_OrderAlreadyCancelled_ThenThrowValidationException() {
         var user = aCustomerUser();
         user.setId(10L);
+        var purchaseInvoice = new InvoiceDto();
+        purchaseInvoice.setInvoiceType(InvoiceType.PURCHASE);
+        purchaseInvoice.setDateTime(LocalDateTime.now());
         var cancellationInvoice = new InvoiceDto();
         cancellationInvoice.setInvoiceType(InvoiceType.CANCELLATION);
         var order = new OrderDetailsDto();
         order.setCustomer(user);
-        order.setInvoices(List.of(cancellationInvoice));
+        order.setInvoices(List.of(purchaseInvoice, cancellationInvoice));
+        order.setDateTime(LocalDateTime.now());
 
         assertThatThrownBy(() -> orderValidator.validateForCancel(order, user))
             .hasMessageContaining("Order already cancelled.")
+            .isInstanceOf(ValidationException.class);
+    }
+
+    @Test
+    void validateForCancel_if_OrderExceededValidationPeriod_ThenThrowValidationException() {
+        var user = aCustomerUser();
+        user.setId(10L);
+        var order = new OrderDetailsDto();
+        var exceededInvoice = new InvoiceDto();
+        exceededInvoice.setInvoiceType(InvoiceType.PURCHASE);
+        exceededInvoice.setDateTime(LocalDateTime.now().minusDays(15));
+        order.setCustomer(user);
+        order.setInvoices(List.of(exceededInvoice));
+
+        assertThatThrownBy(() -> orderValidator.validateForCancel(order, user))
+            .hasMessageContaining("Order exceeded cancellation period.")
+            .isInstanceOf(ValidationException.class);
+    }
+
+    @Test
+    void validateForCancel_if_ShowInOrderAlreadyStarted_ThenThrowValidationException() {
+        var user = aCustomerUser();
+        user.setId(10L);
+        var order = new OrderDetailsDto();
+        var invoice = new InvoiceDto();
+        invoice.setInvoiceType(InvoiceType.PURCHASE);
+        invoice.setDateTime(LocalDateTime.now());
+        order.setInvoices(List.of(invoice));
+        order.setCustomer(user);
+        var startedShow = new ShowDto();
+        startedShow.setDateTime(LocalDateTime.now());
+        var ticket = new TicketDetailsDto();
+        ticket.setShow(startedShow);
+        order.setTickets(List.of(ticket));
+
+        assertThatThrownBy(() -> orderValidator.validateForCancel(order, user))
+            .hasMessageContaining("At least one show has already started.")
             .isInstanceOf(ValidationException.class);
     }
 }

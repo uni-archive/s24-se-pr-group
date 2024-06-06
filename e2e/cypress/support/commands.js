@@ -8,6 +8,17 @@ Cypress.Commands.add('loginAdmin', () => {
     })
 })
 
+Cypress.Commands.add('loginUser', (username, password) => {
+    cy.fixture('settings').then(settings => {
+        cy.visit(settings.baseUrl);
+        cy.contains('a', 'Login').click();
+        cy.get('input[id="inputUsername"]').type(username);
+        cy.get('input[id="password"]').type(password);
+        cy.contains('button', 'Login').click();
+        cy.contains('Logout');
+    })
+})
+
 Cypress.Commands.add('createMessage', (msg) => {
     cy.fixture('settings').then(settings => {
         cy.contains('a', 'Message');
@@ -20,5 +31,16 @@ Cypress.Commands.add('createMessage', (msg) => {
 
         cy.contains('title' +  msg).should('be.visible');
         cy.contains('summary' +  msg).should('be.visible');
+    })
+})
+
+Cypress.Commands.add('cancelOrder', (orderId) => {
+    cy.fixture('settings').then(settings => {
+        cy.visit(`/#/my/orders/${orderId}`);
+        cy.get(":visible").contains("Bestellung stornieren").click();
+        cy.get('app-confirm-cancel-order-dialog')
+            .contains("Ja, stornieren")
+            .should('be.visible')
+            .click();
     })
 })

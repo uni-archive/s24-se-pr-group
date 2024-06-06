@@ -1,5 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.datagenerator;
 
+import com.github.javafaker.Faker;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
