@@ -248,4 +248,25 @@ public class TicketServiceImplTest implements TestData {
         assertThat(actual.getNextFireTime().before(Date.from(Instant.now().plus(30, ChronoUnit.MINUTES)))).isTrue();
         assertThat(actual.getNextFireTime().after(Date.from(Instant.now().plus(29, ChronoUnit.MINUTES)))).isTrue();
     }
+
+    @Test
+    void creating_aTicketOnOrderWithOtherTickets_ShouldRefreshJobsOnAllTickets()
+        throws DtoNotFoundException, ValidationException, InterruptedException, SchedulerException {
+        ApplicationUserDto user = userService.findApplicationUserByEmail(ADMIN_USER);
+        OrderDetailsDto orderDetailsDto = orderService.create(user);
+
+        TicketDetailsDto ticketDetailsDto1 = ticketService.addTicketToOrder(hallSpot.getId(), show.getId(),
+            orderDetailsDto.getId());
+        Thread.sleep(2000);
+        TicketDetailsDto ticketDetailsDto2 = ticketService.addTicketToOrder(hallSpot.getId(), show.getId(),
+            orderDetailsDto.getId());
+        JobKey jobKey = schedulerFactoryBean.getScheduler().getJobKeys(GroupMatcher.anyJobGroup()).stream()
+            .filter(x -> Objects.equals(x.getName(), "reservationJob-" + ticketDetailsDto1.getId())).findFirst().get();
+        List<Trigger> triggers = (List<Trigger>) schedulerFactoryBean.getScheduler().getTriggersOfJob(jobKey);
+        assertThat(triggers.size()).isEqualTo(1);
+        Trigger actual = triggers.get(0);
+
+        assertThat(actual.getNextFireTime().before(Date.from(Instant.now().plus(30, ChronoUnit.MINUTES)))).isTrue();
+        assertThat(actual.getNextFireTime().after(Date.from(Instant.now().plus(30, ChronoUnit.MINUTES).minus(2, ChronoUnit.SECONDS)))).isTrue();
+    }
 }
