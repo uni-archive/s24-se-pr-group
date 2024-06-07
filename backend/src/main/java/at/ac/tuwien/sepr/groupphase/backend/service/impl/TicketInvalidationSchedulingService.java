@@ -37,7 +37,7 @@ public class TicketInvalidationSchedulingService {
 
         JobDetail jobDetail = JobBuilder.newJob(InvalidateReservationJob.class)
             .withIdentity("reservationJob-" + reservationId, "reservationJobs")
-            .usingJobData("reservationId", reservationId)
+            .usingJobData("ticketId", reservationId)
             .storeDurably()
             .build();
 
@@ -51,7 +51,7 @@ public class TicketInvalidationSchedulingService {
         scheduler.scheduleJob(jobDetail, trigger);
     }
 
-    private void rescheduleReservationInvalidationJob(Long ticketId, Date newExecutionTime) throws SchedulerException {
+    public void rescheduleReservationInvalidationJob(Long ticketId, Date newExecutionTime) throws SchedulerException {
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
 
         TriggerKey triggerKey = new TriggerKey("trigger-" + ticketId, "reservationTriggers");
@@ -76,8 +76,10 @@ public class TicketInvalidationSchedulingService {
             throw new IllegalStateException("Could not find order for ticket", e);
         }
         for (TicketDetailsDto ticket : byId.getTickets()) {
-            rescheduleReservationInvalidationJob(ticket.getId(),
-                Date.from(Instant.now().plus(DEFAULT_RESERVATION_PERIOD, ChronoUnit.MINUTES)));
+            if (!ticket.getId().equals(ticketDetailsDto.getId())) {
+                rescheduleReservationInvalidationJob(ticket.getId(),
+                    Date.from(Instant.now().plus(DEFAULT_RESERVATION_PERIOD, ChronoUnit.MINUTES)));
+            }
         }
     }
 }

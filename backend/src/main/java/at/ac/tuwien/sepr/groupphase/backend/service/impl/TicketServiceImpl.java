@@ -85,7 +85,6 @@ public class TicketServiceImpl implements TicketService {
             var ticket = ticketDao.findById(id);
             ticketValidator.validateForCancelReservation(ticket);
             ticketDao.cancelReservedTicket(id);
-
         } catch (EntityNotFoundException e) {
             throw new DtoNotFoundException(e);
         }
