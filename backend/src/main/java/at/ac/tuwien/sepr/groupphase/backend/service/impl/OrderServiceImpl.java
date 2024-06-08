@@ -110,7 +110,7 @@ public class OrderServiceImpl implements OrderService {
         try {
             order = orderDao.findById(orderId);
         } catch (EntityNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new DtoNotFoundException(e);
         }
         orderValidator.validateForPurchase(order, user);
         invoiceService.createPurchaseInvoiceForOrder(orderId);
