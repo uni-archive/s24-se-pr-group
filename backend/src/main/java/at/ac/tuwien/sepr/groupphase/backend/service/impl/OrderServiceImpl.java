@@ -3,7 +3,6 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderSummaryDto;
-import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.OrderDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.InvoiceService;
@@ -15,6 +14,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.validator.OrderValidator;
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -88,6 +88,18 @@ public class OrderServiceImpl implements OrderService {
 
         orderValidator.validateForCreate(orderDetailsDto);
         return orderDao.create(orderDetailsDto);
+    }
+
+    @Override
+    public void confirmOrder(OrderDetailsDto orderDetailsDto) throws DtoNotFoundException {
+        try {
+            for (var ticket : orderDetailsDto.getTickets()) {
+                ticketService.confirmTicket(ticket);
+            }
+        }
+        catch (SchedulerException exception){
+            throw new IllegalStateException("Could not confirm order", exception);
+        }
     }
 
 

@@ -26,5 +26,5 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     void invalidateAllTicketsForOrder(@Param("orderId") long orderId);
 
     @Query("SELECT COUNT(t) > 0 FROM Ticket t WHERE t.show.id = :showId AND t.hallSpot.id = :seatId AND (t.valid = true OR t.reserved = true)")
-    boolean existsValidTicketForShowAndSeat(long showId, long seatId);
+    boolean existsValidTicketForShowAndSeat(@Param("showId") long showId, @Param("seatId") long seatId);
 }

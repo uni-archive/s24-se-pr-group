@@ -58,9 +58,7 @@ public class TicketValidator extends AbstractValidator<TicketDetailsDto> {
         if (Objects.isNull(spotId)) {
             errors.add("Spot id is null");
         }
-        try {
-            hallSpotDao.findById(spotId);
-        } catch (EntityNotFoundException e) {
+        if (!hallSpotDao.existsById(spotId)) {
             errors.add("Spot with id " + spotId + " does not exist.");
         }
         if (Objects.isNull(orderId)) {

@@ -33,7 +33,7 @@ public class HallPlan extends AbstractEntity {
 
     @Override
     public String toString() {
-        return "HallPlan{" + "backgroundImage=" + backgroundImage + ", sectors=" + sectors + '}';
+        return "HallPlan{" + "backgroundImage=" + backgroundImage +'}';
     }
 
     @Override

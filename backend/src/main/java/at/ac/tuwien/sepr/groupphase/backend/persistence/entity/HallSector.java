@@ -29,7 +29,7 @@ public class HallSector extends AbstractEntity {
 
     @Override
     public String toString() {
-        return "HallSector{" + "hallPlan=" + hallPlan + ", name='" + name + '\'' + ", frontendCoordinates='" + frontendCoordinates + '\'' + ", seats=" + seats + '}';
+        return "HallSector{" + "hallPlan=" + hallPlan + ", name='" + name + '\'' + ", frontendCoordinates='" + frontendCoordinates + '\'' + '}';
     }
 
     @Override
@@ -41,12 +41,12 @@ public class HallSector extends AbstractEntity {
             return false;
         }
         HallSector that = (HallSector) o;
-        return Objects.equals(hallPlan, that.hallPlan) && Objects.equals(name, that.name) && Objects.equals(frontendCoordinates, that.frontendCoordinates) && Objects.equals(seats, that.seats);
+        return Objects.equals(hallPlan, that.hallPlan) && Objects.equals(name, that.name) && Objects.equals(frontendCoordinates, that.frontendCoordinates);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), hallPlan, name, frontendCoordinates, seats);
+        return Objects.hash(getId(), hallPlan, name, frontendCoordinates);
     }
 
     public String getColor() {
