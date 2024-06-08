@@ -71,7 +71,7 @@ public class OrderEndpoint {
         return ResponseEntity.ok(order);
     }
 
-    @Secured("ROLE_USER")
+    @Secured(Code.USER)
     @GetMapping(path = "/myorders", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<OrderSummaryResponse>> findForUser() throws DtoNotFoundException {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -81,7 +81,7 @@ public class OrderEndpoint {
         return ResponseEntity.ok(orderMapper.toSummaryResponse(res));
     }
 
-    @Secured("ROLE_USER")
+    @Secured(Code.USER)
     @DeleteMapping(path = "/order/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void cancelOrder(@PathVariable("id") long orderId) {
@@ -95,7 +95,7 @@ public class OrderEndpoint {
         }
     }
 
-    @Secured("ROLE_USER")
+    @Secured(Code.USER)
     @PutMapping("/order/{id}")
     public void purchaseOrder(@PathVariable("id") long orderId) {
         var authentication = SecurityContextHolder.getContext().getAuthentication();

@@ -11,12 +11,27 @@
       </h5>
       <p class="text-black-50">{{formatPrice(sector.value[0].hallSpot.sector.hallSectorShow.price)}} pro Platz</p>
 
-      <div class="mx-3">
+      <div class="mx-3" *ngIf="sector.value[0].hallSpot.type === 'hallSeatResponse'">
         <div class="input-group mb-1" *ngFor="let ticket of sector.value">
           <input class="form-control" [value]="ticket.hallSpot.id" >
           <button class="btn btn-danger" type="button">
             <i class="bi bi-trash bg-danger" style="font-size: 20px"></i>
           </button>
+        </div>
+      </div>
+
+      <div class="mx-3" *ngIf="sector.value[0].hallSpot.type === 'HallSpotResponse'">
+        <div class="d-flex justify-content-between align-items-center">
+          <span>Platzanzahl</span>
+          <div class="d-flex btn-group">
+            <button class="btn btn-secondary" (click)="addStandSectorTicket(order.id, sector.key)">
+              <i class="bi bi-dash"></i>
+            </button>
+            <input class="form-control" [value]="sector.value.length" style="width: 40px; border-radius: 0">
+            <button class="btn btn-secondary" (click)="removeStandSectorTicket(order.id, sector.key)">
+              <i class="bi bi-plus-lg"></i>
+            </button>
+          </div>
         </div>
       </div>
     </li>
