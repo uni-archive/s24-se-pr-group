@@ -246,6 +246,7 @@ public class OrderServiceImplTest {
     private void setupPurchaseOrderTestData() {
         var event = new Event();
         var show = new Show();
+        show.setDateTime(LocalDateTime.now());
         show.setEvent(event);
         event.setShows(List.of(show));
         eventRepository.save(event);

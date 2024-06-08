@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
+import at.ac.tuwien.sepr.groupphase.backend.dto.OrderSummaryDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.HallSectorDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.HallSpotDao;
@@ -123,7 +124,14 @@ public class TicketServiceImpl implements TicketService {
             String hashData = seatId + ":" + showId + ":" + orderId + ":" + Instant.now().toString();
             String ticketHash = HashUtil.generateHMAC(hashData);
             ticket.setHash(ticketHash);
-            ticket.setOrder(orderDao.findSummaryById(orderId));
+            var refOrder = new OrderSummaryDto();
+            refOrder.setId(orderId);
+            ticket.setOrder(refOrder);
+            // Note: @Peter R. ich habe das bissl geändert weil ich auch ein findSummaryById hatte.
+            // Anundfürsich war die SummaryDto gedacht mit aggregtate Daten gefüllt zu sein, mein Request im Repository-Interface
+            // hat hier dadurch an der Stelle null geliefert wenn noch kein Ticket drinnen war.
+            // Das Replacement hier sollte aber prinzipiell gleichwertig sein für was du brauchst.
+            // ticket.setOrder(orderDao.findSummaryById(orderId));
         } catch (EntityNotFoundException e) {
             throw new IllegalStateException("Entity could not be found after validation", e);
         } catch (Exception e) {
