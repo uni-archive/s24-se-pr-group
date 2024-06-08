@@ -1,16 +1,17 @@
 package at.ac.tuwien.sepr.groupphase.backend.dto;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class OrderDetailsDto implements AbstractDto {
     private Long id;
 
-    private List<TicketDetailsDto> tickets;
+    private List<TicketDetailsDto> tickets = new ArrayList<>();
 
     private ApplicationUserDto customer;
 
-    private List<InvoiceDto> invoices;
+    private List<InvoiceDto> invoices = new ArrayList<>();
 
     private LocalDateTime dateTime;
 

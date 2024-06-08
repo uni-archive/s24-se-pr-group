@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static at.ac.tuwien.sepr.groupphase.backend.supplier.ApplicationUserSupplier.aCustomerUser;
@@ -22,11 +23,13 @@ public class OrderValidatorTest {
     private OrderValidator orderValidator;
 
     @Test
-    void validateForFindById_if_ProvidedUserAndFoundCustomerInOrderMatch_ThenDoNothing() throws ValidationException {
+    void validateForFindById_if_ValidOrder_ThenDoNothing() throws ValidationException {
         var user = aCustomerUser();
         user.setId(10L);
         var order = new OrderDetailsDto();
         order.setCustomer(user);
+        order.setDateTime(LocalDateTime.now());
+
         orderValidator.validateForFindById(order, user);
     }
 
@@ -36,6 +39,7 @@ public class OrderValidatorTest {
         user.setId(10L);
         var order = new OrderDetailsDto();
         order.setCustomer(user);
+        order.setDateTime(LocalDateTime.now());
 
         var user2 = aCustomerUser();
         user2.setId(20L);
@@ -51,6 +55,8 @@ public class OrderValidatorTest {
         var order = new OrderDetailsDto();
         order.setCustomer(user);
         order.setInvoices(List.of());
+        order.setDateTime(LocalDateTime.now());
+
         orderValidator.validateForCancel(order, user);
     }
 
@@ -62,6 +68,8 @@ public class OrderValidatorTest {
         var order = new OrderDetailsDto();
         order.setCustomer(user);
         order.setInvoices(List.of());
+        order.setDateTime(LocalDateTime.now());
+
         var wrongUser = aCustomerUser().setId(20L);
         assertThatThrownBy(() -> orderValidator.validateForCancel(order, wrongUser))
             .hasMessageContaining("User-ID of order does not match with the given user.")
@@ -77,9 +85,23 @@ public class OrderValidatorTest {
         var order = new OrderDetailsDto();
         order.setCustomer(user);
         order.setInvoices(List.of(cancellationInvoice));
+        order.setDateTime(LocalDateTime.now());
 
         assertThatThrownBy(() -> orderValidator.validateForCancel(order, user))
             .hasMessageContaining("Order already cancelled.")
+            .isInstanceOf(ValidationException.class);
+    }
+
+    @Test
+    void validateForCancel_if_OrderExceededValidationPeriod_ThenThrowValidationException() {
+        var user = aCustomerUser();
+        user.setId(10L);
+        var order = new OrderDetailsDto();
+        order.setCustomer(user);
+        order.setDateTime(LocalDateTime.now().minusDays(15));
+
+        assertThatThrownBy(() -> orderValidator.validateForCancel(order, user))
+            .hasMessageContaining("Order exceeded cancellation period.")
             .isInstanceOf(ValidationException.class);
     }
 }
