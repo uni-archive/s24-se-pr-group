@@ -45,4 +45,11 @@ export interface OrderEndpointServiceInterface {
      */
     findForUser1(extraHttpRequestParams?: any): Observable<Array<OrderSummaryResponse>>;
 
+    /**
+     * 
+     * 
+     * @param id 
+     */
+    purchaseOrder(id: number, extraHttpRequestParams?: any): Observable<{}>;
+
 }

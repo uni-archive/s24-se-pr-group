@@ -3,7 +3,7 @@ import {FormsModule} from "@angular/forms";
 import {BrowserModule} from "@angular/platform-browser";
 import {ShowSearchDto} from "../../../dtos/ShowSearchDto";
 import {DatepickerComponent} from "../datepicker/datepicker.component";
-import {ShowDto, ShowEndpointService, ShowListDto} from "../../../services/openapi";
+import {ShowEndpointService, ShowListDto} from "../../../services/openapi";
 import {formatDuration} from "../../../../formatters/durationFormatter";
 
 @Component({

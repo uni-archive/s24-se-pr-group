@@ -1,0 +1,28 @@
+<div class="jumbotron mt-5" xmlns="http://www.w3.org/1999/html">
+  <h1 class="display-4">Warenkorb</h1>
+</div>
+
+<div *ngFor="let event of ticketsBySectorsByEvent | keyvalue">
+  <h6>{{event.value.get(event.value.keys().next().value)[0].show.event.title}}</h6>
+  <ul class="list-group">
+    <li class="list-group-item p-3" *ngFor="let sector of event.value | keyvalue">
+      <h5>
+        Sector-Nr. {{sector.value[0].hallSpot.sector.id}}
+      </h5>
+      <p class="text-black-50">{{formatPrice(sector.value[0].hallSpot.sector.hallSectorShow.price)}} pro Platz</p>
+
+      <div class="mx-3">
+        <div class="input-group mb-1" *ngFor="let ticket of sector.value">
+          <input class="form-control" [value]="ticket.hallSpot.id" >
+          <button class="btn btn-danger" type="button">
+            <i class="bi bi-trash bg-danger" style="font-size: 20px"></i>
+          </button>
+        </div>
+      </div>
+    </li>
+    <li class="list-group-item list-group-item-secondary">
+      Card footer
+    </li>
+  </ul>
+  <br/>
+</div>

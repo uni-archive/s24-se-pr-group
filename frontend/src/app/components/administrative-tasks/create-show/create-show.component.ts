@@ -1,11 +1,7 @@
 import {Component} from '@angular/core';
-import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {NgForOf} from "@angular/common";
-import {AutocompleteTextfieldComponent} from "../autocomplete-textfield/autocomplete-textfield.component";
 import {LocationDto} from "../../../dtos/LocationDto";
-import {DatepickerComponent} from "../../searchpage-components/datepicker/datepicker.component";
 import {
-  Artist,
+  ArtistDto,
   ArtistEndpointService,
   EventDto,
   EventEndpointService,
@@ -13,8 +9,6 @@ import {
   ShowEndpointService
 } from "../../../services/openapi";
 import {MessagingService} from "../../../services/messaging.service";
-import {TagSearchComponent} from "../tag-search/tag-search.component";
-import {LocationAutocompleteComponent} from "../../location/location-autocomplete/location-autocomplete.component";
 
 @Component({
   selector: 'app-create-show',
@@ -26,7 +20,7 @@ export class CreateShowComponent {
   createDto: ShowCreationDto = {dateTime: null, eventid: null, artists: []};
   eventList: EventDto[] = [];
   locationList: LocationDto[] = [];
-  artistList: Artist[] = [];
+  artistList: ArtistDto[] = [];
 
   location: LocationDto | null = null;
 
@@ -37,13 +31,13 @@ export class CreateShowComponent {
     this.createDto.eventid = event.id;
   }
 
-  onArtistsChosen(artists: Artist) {
+  onArtistsChosen(artists: ArtistDto) {
     console.log("Chose artist" + artists.artistName);
     this.createDto.artists.push(artists);
     console.log(this.createDto.artists);
   }
 
-  onArtistRemoved(artist: Artist) {
+  onArtistRemoved(artist: ArtistDto) {
     console.log(artist);
     console.log(this.createDto.artists);
     this.createDto.artists = this.createDto.artists.filter(art => art.id !== artist.id);
