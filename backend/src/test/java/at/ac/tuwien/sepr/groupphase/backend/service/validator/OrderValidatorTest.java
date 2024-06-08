@@ -147,4 +147,57 @@ public class OrderValidatorTest {
             .hasMessageContaining("At least one show has already started.")
             .isInstanceOf(ValidationException.class);
     }
+
+    @Test
+    void validateForCancel_if_OrderHasNotBeenPurchasedYet_ThenThrowValidationException() {
+        var user = aCustomerUser();
+        user.setId(10L);
+        var order = new OrderDetailsDto();
+        order.setCustomer(user);
+
+        assertThatThrownBy(() -> orderValidator.validateForCancel(order, user))
+            .hasMessageContaining("Order hasn't been finalized yet.")
+            .isInstanceOf(ValidationException.class);
+    }
+
+    @Test
+    void validateForPurchase_if_ProvidedUserAndFoundCustomerInOrderDoNotMatch_ThenThrowValidationException() {
+        var user = aCustomerUser();
+        user.setId(10L);
+        var order = new OrderDetailsDto();
+        order.setCustomer(user);
+
+        var wrongUser = aCustomerUser();
+        wrongUser.setId(-1L);
+
+        assertThatThrownBy(() -> orderValidator.validateForPurchase(order, wrongUser))
+            .hasMessageContaining("User-ID of order does not match with the given user.")
+            .isInstanceOf(ValidationException.class);
+    }
+
+    @Test
+    void validateForPurchase_if_OrderHasAlreadyBeenPurchased_ThenThrowValidationException() {
+        var user = aCustomerUser();
+        user.setId(10L);
+        var order = new OrderDetailsDto();
+        order.setCustomer(user);
+        var purchaseInvoice = new InvoiceDto();
+        purchaseInvoice.setInvoiceType(InvoiceType.PURCHASE);
+        purchaseInvoice.setDateTime(LocalDateTime.now());
+        order.setInvoices(List.of(purchaseInvoice));
+
+        assertThatThrownBy(() -> orderValidator.validateForPurchase(order, user))
+            .hasMessageContaining("Order is already finalized.")
+            .isInstanceOf(ValidationException.class);
+    }
+
+    @Test
+    void validateForPurchase_if_PurchaseInformationIsCorrect_ThenDoNothing() throws ValidationException {
+        var user = aCustomerUser();
+        user.setId(10L);
+        var order = new OrderDetailsDto();
+        order.setCustomer(user);
+
+        orderValidator.validateForPurchase(order, user);
+    }
 }

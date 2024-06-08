@@ -29,6 +29,15 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public InvoiceDto createCancellationInvoiceForOrder(long orderId) {
+        LOGGER.trace("Create cancellation invoice for order. Order-ID: {}", orderId);
         return invoiceDao.createCancellationInvoiceForOrder(orderId);
     }
+
+    @Override
+    public InvoiceDto createPurchaseInvoiceForOrder(long orderId) {
+        LOGGER.trace("Create purchase invoice for order. Order-ID: {}", orderId);
+        return invoiceDao.createPurchaseInvoiceForOrder(orderId);
+    }
+
+
 }

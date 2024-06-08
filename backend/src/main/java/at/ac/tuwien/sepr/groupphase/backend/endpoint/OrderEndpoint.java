@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -88,6 +89,21 @@ public class OrderEndpoint {
         try {
             orderService.cancelOrder(orderId, user);
         } catch (EntityNotFoundException e) {
+            throw new NotFoundException(e);
+        } catch (ValidationException e) {
+            throw new at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.ValidationException(e);
+        }
+    }
+
+    @Secured("ROLE_USER")
+    @PutMapping("/order/{id}")
+    public void purchaseOrder(@PathVariable("id") long orderId) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var username = authentication.getPrincipal().toString();
+        try {
+            var user = userService.findApplicationUserByEmail(username);
+            orderService.purchaseOrder(orderId, user);
+        } catch (DtoNotFoundException e) {
             throw new NotFoundException(e);
         } catch (ValidationException e) {
             throw new at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.ValidationException(e);

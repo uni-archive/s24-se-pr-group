@@ -59,8 +59,8 @@ public class OrderDetailsDto implements AbstractDto {
         this.dateTime = dateTime;
     }
 
-    public InvoiceDto getPurchaseInvoice() {
-        return this.invoices.stream().filter(i -> i.getInvoiceType().equals(InvoiceType.PURCHASE)).findFirst().orElse(null);
+    public Optional<InvoiceDto> getPurchaseInvoice() {
+        return this.invoices.stream().filter(i -> i.getInvoiceType().equals(InvoiceType.PURCHASE)).findFirst();
     }
 
     public Optional<InvoiceDto> getCancellationInvoice() {

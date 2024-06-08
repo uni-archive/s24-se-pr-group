@@ -18,8 +18,6 @@ import java.util.Objects;
 @Table(name = "ORDERS")
 public class Order extends AbstractEntity {
 
-    // Viewing an order requires infos of tickets which is spread across the domain-model
-    // Therefore fetching everything about tickets here eagerly is most likely much better than doing it lazily.
     @OneToMany(mappedBy = "order")
     private List<Ticket> tickets;
 

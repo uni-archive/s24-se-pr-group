@@ -103,6 +103,20 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
+    @Override
+    public void purchaseOrder(long orderId, ApplicationUserDto user) throws DtoNotFoundException, ValidationException {
+        LOGGER.trace("Purchasing / Finalizing order. Order-ID: {}, User: {}", orderId, user);
+        OrderDetailsDto order;
+        try {
+            order = orderDao.findById(orderId);
+        } catch (EntityNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        orderValidator.validateForPurchase(order, user);
+        invoiceService.createPurchaseInvoiceForOrder(orderId);
+        ticketService.setValidAllTicketsForOrder(order.getId());
+    }
+
     private void addInvoicesToOrder(OrderDetailsDto order) {
         order.setInvoices(invoiceService.findByOrderId(order.getId()));
     }

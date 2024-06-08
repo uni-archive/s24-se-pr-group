@@ -73,6 +73,14 @@ public class OrderServiceImplTest {
     private static Ticket ticketToBuy;
     private static List<Invoice> testInvoices;
 
+    private static Order testCancelOrder;
+    private static List<Ticket> testCancelTickets;
+    private static List<Invoice> testCancelInvoices;
+
+    private static Order testPurchaseOrder;
+    private static List<Ticket> testPurchaseTickets;
+    private static List<Invoice> testPurchaseInvoices;
+
     @MockBean
     private OrderValidator orderValidator;
     @Captor
@@ -112,6 +120,11 @@ public class OrderServiceImplTest {
 
     @BeforeEach
     void setup() {
+        setupCancelOrderTestData();
+        setupPurchaseOrderTestData();
+    }
+
+    private void setupCancelOrderTestData() {
         var event = new Event();
         var show = new Show();
         show.setEvent(event);
@@ -161,9 +174,9 @@ public class OrderServiceImplTest {
         testCustomer.setEmail(faker.internet().emailAddress());
         userRepository.save(testCustomer);
 
-        testOrder = new Order();
-        testOrder.setCustomer(testCustomer);
-        orderRepository.save(testOrder);
+        testCancelOrder = new Order();
+        testCancelOrder.setCustomer(testCustomer);
+        orderRepository.save(testCancelOrder);
 
         var t1 = new Ticket();
         t1.setHash("hash");
@@ -171,7 +184,7 @@ public class OrderServiceImplTest {
         t1.setValid(true);
         t1.setHallSpot(hallSpot1);
         t1.setShow(show);
-        t1.setOrder(testOrder);
+        t1.setOrder(testCancelOrder);
 
         var t2 = new Ticket();
         t2.setHash("hash");
@@ -179,7 +192,7 @@ public class OrderServiceImplTest {
         t2.setValid(false);
         t2.setHallSpot(hallSpot2);
         t2.setShow(show);
-        t2.setOrder(testOrder);
+        t2.setOrder(testCancelOrder);
 
         var t3 = new Ticket();
         t3.setHash("hash");
@@ -187,7 +200,7 @@ public class OrderServiceImplTest {
         t3.setValid(true);
         t3.setHallSpot(hallSpot3);
         t3.setShow(show);
-        t3.setOrder(testOrder);
+        t3.setOrder(testCancelOrder);
 
         var t4 = new Ticket();
         t4.setHash("hash");
@@ -195,8 +208,9 @@ public class OrderServiceImplTest {
         t4.setValid(false);
         t4.setHallSpot(hallSpot4);
         t4.setShow(show);
-        t4.setOrder(testOrder);
+        t4.setOrder(testCancelOrder);
 
+        testCancelTickets = List.of(t1, t2, t3, t4);
         var t5 = new Ticket();
         t5.setHash("hash");
         t5.setReserved(false);
@@ -217,14 +231,86 @@ public class OrderServiceImplTest {
         ticketToBuy = t5;
         reservedTicket = t6;
 
+        ticketRepository.saveAll(testCancelTickets);
+
         ticketRepository.saveAll(testTickets);
         var invoice1 = new Invoice();
         invoice1.setInvoiceType(InvoiceType.PURCHASE);
-        invoice1.setOrder(testOrder);
+        invoice1.setOrder(testCancelOrder);
 
-        testInvoices = List.of(invoice1);
+        testCancelInvoices = List.of(invoice1);
 
-        invoiceRepository.saveAll(testInvoices);
+        invoiceRepository.saveAll(testCancelInvoices);
+    }
+
+    private void setupPurchaseOrderTestData() {
+        var event = new Event();
+        var show = new Show();
+        show.setEvent(event);
+        event.setShows(List.of(show));
+        eventRepository.save(event);
+        showRepository.save(show);
+
+        var hallplan = new HallPlan();
+        hallPlanRepository.save(hallplan);
+
+        var sector = new HallSector();
+        sector.setHallPlan(hallplan);
+        hallSectorRepository.save(sector);
+
+        var hallSpot1 = new HallSpot();
+        hallSpot1.setSector(sector);
+        hallSpotRepository.save(hallSpot1);
+
+        var hallSpot2 = new HallSpot();
+        hallSpot2.setSector(sector);
+        hallSpotRepository.save(hallSpot2);
+
+        var hallSpot3 = new HallSpot();
+        hallSpot3.setSector(sector);
+        hallSpotRepository.save(hallSpot3);
+
+        var hallSpot4 = new HallSpot();
+        hallSpot4.setSector(sector);
+        hallSpotRepository.save(hallSpot4);
+
+        var sectorShow = new HallSectorShow();
+        sectorShow.setSector(sector);
+        sectorShow.setShow(show);
+        sectorShow.setPrice(100);
+        hallSectorShowRepository.save(sectorShow);
+
+        testPurchaseOrder = new Order();
+        testPurchaseOrder.setCustomer(testCustomer);
+        orderRepository.save(testPurchaseOrder);
+
+        var t1 = new Ticket();
+        t1.setHash("hash");
+        t1.setReserved(true);
+        t1.setValid(false);
+        t1.setHallSpot(hallSpot1);
+        t1.setShow(show);
+        t1.setOrder(testPurchaseOrder);
+
+        var t2 = new Ticket();
+        t2.setHash("hash");
+        t2.setReserved(true);
+        t2.setValid(false);
+        t2.setHallSpot(hallSpot2);
+        t2.setShow(show);
+        t2.setOrder(testPurchaseOrder);
+
+        var t3 = new Ticket();
+        t3.setHash("hash");
+        t3.setReserved(false);
+        t3.setValid(false);
+        t3.setHallSpot(hallSpot3);
+        t3.setShow(show);
+        t3.setOrder(testPurchaseOrder);
+
+        testPurchaseTickets = List.of(t1, t2, t3);
+
+        ticketRepository.saveAll(testPurchaseTickets);
     }
 
     @AfterEach
@@ -245,17 +331,17 @@ public class OrderServiceImplTest {
         var found = orderService.findForUser(testCustomer.getId());
         assertThat(found)
             .isNotNull()
-            .hasSize(1);
+            .hasSize(2);
 
-        var order = found.get(0);
-        assertThat(order)
+        var cancelOrder = found.get(0);
+        assertThat(cancelOrder)
             .isNotNull();
 
-        assertThat(order.getTotalPrice()).isEqualTo(200);
-        assertThat(order.getTicketCount()).isEqualTo(4);
+        assertThat(cancelOrder.getTotalPrice()).isEqualTo(200);
+        assertThat(cancelOrder.getTicketCount()).isEqualTo(4);
 
-        var expectedInvoiceIds = testInvoices.stream().map(Invoice::getId).toArray(Long[]::new);
-        assertThat(order.getInvoices())
+        var expectedInvoiceIds = testCancelInvoices.stream().map(Invoice::getId).toArray(Long[]::new);
+        assertThat(cancelOrder.getInvoices())
             .isNotNull()
             .hasSize(1)
             .map(InvoiceDto::getId)
@@ -266,10 +352,10 @@ public class OrderServiceImplTest {
     void cancelling_anOrder_ShouldCreateANewCancellationInvoice_And_InvalidateAllAssociatedTickets()
         throws ValidationException, EntityNotFoundException, DtoNotFoundException {
         var c = aCustomerUser()
-            .setId(testOrder.getCustomer().getId());
+            .setId(testCancelOrder.getCustomer().getId());
 
-        orderService.cancelOrder(testOrder.getId(), c);
-        var found = orderService.findById(testOrder.getId(), c);
+        orderService.cancelOrder(testCancelOrder.getId(), c);
+        var found = orderService.findById(testCancelOrder.getId(), c);
 
         assertThat(found.getInvoices())
             .hasSize(2);
@@ -289,15 +375,45 @@ public class OrderServiceImplTest {
     @Test
     void finding_anOrder_ShouldCallValidator()
         throws ValidationException, EntityNotFoundException, DtoNotFoundException {
-        orderService.findById(testOrder.getId(), aCustomerUser());
+        orderService.findById(testCancelOrder.getId(), aCustomerUser());
         verify(orderValidator).validateForFindById(orderDto.capture(), applicationUserDto.capture());
     }
 
     @Test
     void cancelling_anOrder_ShouldCallValidator() throws ValidationException, EntityNotFoundException {
-        orderService.cancelOrder(testOrder.getId(), aCustomerUser());
+        orderService.cancelOrder(testCancelOrder.getId(), aCustomerUser());
         verify(orderValidator).validateForCancel(orderDto.capture(), applicationUserDto.capture());
     }
+
+    @Test
+    void purchasing_anOrder_ShouldCreate_aPurchaseInvoice_And_SetAllAssociatedTicketsAsValid()
+        throws ValidationException, EntityNotFoundException, DtoNotFoundException {
+        var c = aCustomerUser()
+            .setId(testPurchaseOrder.getCustomer().getId());
+
+        orderService.purchaseOrder(testPurchaseOrder.getId(), c);
+
+        assertThat(testPurchaseOrder.getInvoices())
+            .isNull(); // TODO: maybe we should change this behaviour to return an empty list instead.
+
+        var found = orderService.findById(testPurchaseOrder.getId(), c);
+
+        assertThat(found.getInvoices())
+            .hasSize(1);
+
+        var purchaseInvoice = found.getInvoices().get(0);
+
+        assertThat(purchaseInvoice)
+            .isNotNull();
+
+        assertThat(purchaseInvoice.getInvoiceType())
+            .isEqualTo(InvoiceType.PURCHASE);
+
+        assertThat(found.getTickets())
+            .allMatch(TicketDetailsDto::isValid);
+    }
+
+
 
     @Test
     void confirmOrderShouldScheduleJobsTo30MinutesBeforeTheShow()
