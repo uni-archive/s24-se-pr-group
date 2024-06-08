@@ -7,12 +7,25 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderSummaryDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.ShowDao;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallPlan;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSector;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSpot;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Show;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Ticket;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.HallSpotMapperImpl;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.ShowMapperImpl;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallPlanRepository;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallSectorRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallSpotRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.OrderRepository;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.ShowRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.TicketRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
+import at.ac.tuwien.sepr.groupphase.backend.supplier.HallSpotSupplier;
+import at.ac.tuwien.sepr.groupphase.backend.supplier.ShowSupplier;
+import com.github.javafaker.Faker;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -56,8 +69,23 @@ class TicketInvalidationSchedulingServiceTest {
 
     @Autowired
     private TicketRepository ticketRepository;
+
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private ShowRepository showRepository;
+
+    private static final Faker faker = new Faker();
+    @Autowired
+    private ShowMapperImpl showMapperImpl;
+    @Autowired
+    private HallSpotMapperImpl hallSpotMapperImpl;
+    @Autowired
+    private HallSectorRepository hallSectorRepository;
+    @Autowired
+    private HallPlanRepository hallPlanRepository;
+
 
     @Test
     void scheduleInvalidationShouldResultInTicketBeingDeletedAfterTimePassed()

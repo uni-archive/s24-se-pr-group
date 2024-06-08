@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.HallSectorDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.HallSpotDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.OrderDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.ShowDao;
@@ -34,10 +35,11 @@ public class TicketServiceImpl implements TicketService {
     private final HallSectorShowService hallSectorShowService;
     private final OrderDao orderDao;
     private final TicketInvalidationSchedulingService ticketInvalidationSchedulingService;
+    private final HallSectorDao hallSectorDao;
 
     public TicketServiceImpl(TicketDao ticketDao, HallSpotDao hallSpotDao, ShowDao showDao,
         TicketValidator ticketValidator, HallSectorShowService hallSectorShowService, OrderDao orderDao,
-        TicketInvalidationSchedulingService ticketInvalidationSchedulingService) {
+        TicketInvalidationSchedulingService ticketInvalidationSchedulingService, HallSectorDao hallSectorDao) {
         this.ticketDao = ticketDao;
         this.hallSpotDao = hallSpotDao;
         this.showDao = showDao;
@@ -45,6 +47,7 @@ public class TicketServiceImpl implements TicketService {
         this.hallSectorShowService = hallSectorShowService;
         this.orderDao = orderDao;
         this.ticketInvalidationSchedulingService = ticketInvalidationSchedulingService;
+        this.hallSectorDao = hallSectorDao;
     }
 
     @Override
@@ -96,8 +99,9 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public TicketDetailsDto addTicketToOrder(Long seatId, Long showId, Long orderId) throws ValidationException {
-        TicketDetailsDto ticketDetailsDto = createTicket(seatId, showId, orderId);
+    public TicketDetailsDto addTicketToOrder(Long seatId, Long showId, Long orderId, boolean reservationOnly)
+        throws ValidationException {
+        TicketDetailsDto ticketDetailsDto = createTicket(seatId, showId, orderId, reservationOnly);
         try {
             ticketInvalidationSchedulingService.scheduleReservationInvalidationsForNewlyAddedTicket(ticketDetailsDto);
         } catch (SchedulerException e) {
@@ -107,13 +111,14 @@ public class TicketServiceImpl implements TicketService {
     }
 
 
-    private TicketDetailsDto createTicket(Long seatId, Long showId, Long orderId) throws ValidationException {
+    private TicketDetailsDto createTicket(Long seatId, Long showId, Long orderId, boolean reservationOnly)
+        throws ValidationException {
         TicketDetailsDto ticket = new TicketDetailsDto();
         ticketValidator.validateForCreate(showId, seatId, orderId);
         try {
             ticket.setHallSpot(hallSpotDao.findById(seatId));
             ticket.setShow(showDao.findById(showId));
-            ticket.setReserved(true);
+            ticket.setReserved(reservationOnly);
             ticket.setValid(false);
             String hashData = seatId + ":" + showId + ":" + orderId + ":" + Instant.now().toString();
             String ticketHash = HashUtil.generateHMAC(hashData);
@@ -125,5 +130,20 @@ public class TicketServiceImpl implements TicketService {
             throw new IllegalStateException("Error generating ticket hash", e);
         }
         return ticketDao.create(ticket);
+    }
+
+    @Override
+    public void confirmTicket(TicketDetailsDto ticketDetailsDto) throws SchedulerException, DtoNotFoundException {
+        if (ticketDetailsDto.isReserved()) {
+            ticketInvalidationSchedulingService.rescheduleReservationInvalidationJobForConfirmedOrder(ticketDetailsDto);
+        } else {
+            ticketInvalidationSchedulingService.cancelReservationInvalidationJob(ticketDetailsDto.getId());
+        }
+        ticketDetailsDto.setValid(true);
+        try {
+            ticketDao.update(ticketDetailsDto);
+        } catch (EntityNotFoundException e) {
+            throw new DtoNotFoundException(e);
+        }
     }
 }

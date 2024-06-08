@@ -28,6 +28,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundExcepti
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.TicketValidator;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
@@ -109,6 +110,7 @@ public class TicketServiceImplTest implements TestData {
     void setup() {
         var event = new Event();
         show = new Show();
+        show.setDateTime(LocalDateTime.of(2025, 01, 01, 12, 0));
         show.setEvent(event);
         event.setShows(List.of(show));
         eventRepository.save(event);
@@ -227,7 +229,7 @@ public class TicketServiceImplTest implements TestData {
         OrderDetailsDto orderDetailsDto = orderService.create(user);
 
         TicketDetailsDto ticketDetailsDto = ticketService.addTicketToOrder(hallSpot.getId(), show.getId(),
-            orderDetailsDto.getId());
+            orderDetailsDto.getId(), false);
 
         List<Ticket> newTickets = ticketRepository.findTicketsByUserId(user.getId());
         assertThat(newTickets.size()).isEqualTo(ticketCount + 1);
@@ -256,10 +258,10 @@ public class TicketServiceImplTest implements TestData {
         OrderDetailsDto orderDetailsDto = orderService.create(user);
 
         TicketDetailsDto ticketDetailsDto1 = ticketService.addTicketToOrder(hallSpot.getId(), show.getId(),
-            orderDetailsDto.getId());
+            orderDetailsDto.getId(), false);
         Thread.sleep(2000);
         TicketDetailsDto ticketDetailsDto2 = ticketService.addTicketToOrder(hallSpot.getId(), show.getId(),
-            orderDetailsDto.getId());
+            orderDetailsDto.getId(), false);
         JobKey jobKey = schedulerFactoryBean.getScheduler().getJobKeys(GroupMatcher.anyJobGroup()).stream()
             .filter(x -> Objects.equals(x.getName(), "reservationJob-" + ticketDetailsDto1.getId())).findFirst().get();
         List<Trigger> triggers = (List<Trigger>) schedulerFactoryBean.getScheduler().getTriggersOfJob(jobKey);
@@ -267,6 +269,7 @@ public class TicketServiceImplTest implements TestData {
         Trigger actual = triggers.get(0);
 
         assertThat(actual.getNextFireTime().before(Date.from(Instant.now().plus(30, ChronoUnit.MINUTES)))).isTrue();
-        assertThat(actual.getNextFireTime().after(Date.from(Instant.now().plus(30, ChronoUnit.MINUTES).minus(2, ChronoUnit.SECONDS)))).isTrue();
+        assertThat(actual.getNextFireTime()
+            .after(Date.from(Instant.now().plus(30, ChronoUnit.MINUTES).minus(2, ChronoUnit.SECONDS)))).isTrue();
     }
 }

@@ -3,7 +3,6 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderSummaryDto;
-import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
@@ -53,4 +52,12 @@ public interface OrderService {
      */
     OrderDetailsDto create(ApplicationUserDto user) throws ValidationException;
 
+
+    /**
+     * Confirms payment on an order. This will cancel all Invalidation Jobs, and mark the tickets as valid. Reserved
+     * Tickets will be invalidated 30 minutes before the show.
+     *
+     * @param orderDetailsDto the order to confirm
+     */
+    void confirmOrder(OrderDetailsDto orderDetailsDto) throws DtoNotFoundException;
 }

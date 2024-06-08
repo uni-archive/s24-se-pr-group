@@ -17,7 +17,7 @@ import java.util.Objects;
 
 @Entity
 public class Show extends AbstractEntity {
-    @Column(name = "dateTime")
+    @Column(name = "dateTime", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime dateTime;
 

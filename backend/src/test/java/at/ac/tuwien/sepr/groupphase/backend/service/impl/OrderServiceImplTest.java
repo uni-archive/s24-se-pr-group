@@ -1,5 +1,10 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
+import static at.ac.tuwien.sepr.groupphase.backend.supplier.ApplicationUserSupplier.aCustomerUser;
+import static java.util.function.Predicate.not;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.InvoiceDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
@@ -29,6 +34,16 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.UserRepositor
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.OrderValidator;
+import com.github.javafaker.Faker;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,26 +51,28 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.quartz.JobKey;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.test.context.ActiveProfiles;
-
-import java.util.List;
-
-import static at.ac.tuwien.sepr.groupphase.backend.supplier.ApplicationUserSupplier.aCustomerUser;
-import static java.util.function.Predicate.not;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith({MockitoExtension.class})
 @SpringBootTest
 @ActiveProfiles("test")
 public class OrderServiceImplTest {
+
     private static ApplicationUser testCustomer;
     private static Order testOrder;
     private static List<Ticket> testTickets;
+    private static Ticket reservedTicket;
+    private static Ticket ticketToBuy;
     private static List<Invoice> testInvoices;
+
     @MockBean
     private OrderValidator orderValidator;
     @Captor
@@ -84,12 +101,21 @@ public class OrderServiceImplTest {
     private UserRepository userRepository;
     @Autowired
     private InvoiceRepository invoiceRepository;
+    @Autowired
+    private TicketServiceImpl ticketService;
+    @Autowired
+    private SchedulerFactoryBean schedulerFactoryBean;
+    @Autowired
+    private UserServiceImpl userService;
+
+    private static Faker faker = new Faker();
 
     @BeforeEach
     void setup() {
         var event = new Event();
         var show = new Show();
         show.setEvent(event);
+        show.setDateTime(LocalDateTime.of(2025, 1, 1, 12, 0));
         event.setShows(List.of(show));
         eventRepository.save(event);
         showRepository.save(show);
@@ -117,6 +143,14 @@ public class OrderServiceImplTest {
         hallSpot4.setSector(sector);
         hallSpotRepository.save(hallSpot4);
 
+        var hallSpot5 = new HallSpot();
+        hallSpot5.setSector(sector);
+        hallSpotRepository.save(hallSpot5);
+
+        var hallSpot6 = new HallSpot();
+        hallSpot6.setSector(sector);
+        hallSpotRepository.save(hallSpot6);
+
         var sectorShow = new HallSectorShow();
         sectorShow.setSector(sector);
         sectorShow.setShow(show);
@@ -124,6 +158,7 @@ public class OrderServiceImplTest {
         hallSectorShowRepository.save(sectorShow);
 
         testCustomer = new ApplicationUser();
+        testCustomer.setEmail(faker.internet().emailAddress());
         userRepository.save(testCustomer);
 
         testOrder = new Order();
@@ -162,10 +197,27 @@ public class OrderServiceImplTest {
         t4.setShow(show);
         t4.setOrder(testOrder);
 
+        var t5 = new Ticket();
+        t5.setHash("hash");
+        t5.setReserved(false);
+        t5.setValid(false);
+        t5.setHallSpot(hallSpot5);
+        t5.setShow(show);
+        t5.setOrder(testOrder);
+
+        var t6 = new Ticket();
+        t6.setHash("hash");
+        t6.setReserved(true);
+        t6.setValid(false);
+        t6.setHallSpot(hallSpot6);
+        t6.setShow(show);
+        t6.setOrder(testOrder);
+
         testTickets = List.of(t1, t2, t3, t4);
+        ticketToBuy = t5;
+        reservedTicket = t6;
 
         ticketRepository.saveAll(testTickets);
-
         var invoice1 = new Invoice();
         invoice1.setInvoiceType(InvoiceType.PURCHASE);
         invoice1.setOrder(testOrder);
@@ -235,7 +287,8 @@ public class OrderServiceImplTest {
     }
 
     @Test
-    void finding_anOrder_ShouldCallValidator() throws ValidationException, EntityNotFoundException, DtoNotFoundException {
+    void finding_anOrder_ShouldCallValidator()
+        throws ValidationException, EntityNotFoundException, DtoNotFoundException {
         orderService.findById(testOrder.getId(), aCustomerUser());
         verify(orderValidator).validateForFindById(orderDto.capture(), applicationUserDto.capture());
     }
@@ -244,5 +297,40 @@ public class OrderServiceImplTest {
     void cancelling_anOrder_ShouldCallValidator() throws ValidationException, EntityNotFoundException {
         orderService.cancelOrder(testOrder.getId(), aCustomerUser());
         verify(orderValidator).validateForCancel(orderDto.capture(), applicationUserDto.capture());
+    }
+
+    @Test
+    void confirmOrderShouldScheduleJobsTo30MinutesBeforeTheShow()
+        throws DtoNotFoundException, ValidationException, SchedulerException {
+        // given
+        ApplicationUserDto user = userService.findApplicationUserByEmail(testCustomer.getEmail());
+        OrderDetailsDto orderDetailsDto = orderService.create(user);
+
+        TicketDetailsDto ticketDtoToBuy = ticketService.addTicketToOrder(ticketToBuy.getHallSpot().getId(),
+            ticketToBuy.getShow().getId(),
+            orderDetailsDto.getId(), false);
+        TicketDetailsDto reservedTicketDto = ticketService.addTicketToOrder(reservedTicket.getHallSpot().getId(),
+            reservedTicket.getShow().getId(),
+            orderDetailsDto.getId(), true);
+
+        orderDetailsDto = orderService.findById(orderDetailsDto.getId(), user);
+
+        // when
+        orderService.confirmOrder(orderDetailsDto);
+
+        // then
+        assertThat(schedulerFactoryBean.getScheduler().getJobKeys(GroupMatcher.anyJobGroup()).stream()
+            .filter(x -> Objects.equals(x.getName(), "reservationJob-" + ticketDtoToBuy.getId())).findFirst())
+            .isEmpty();
+        JobKey jobKey = schedulerFactoryBean.getScheduler().getJobKeys(GroupMatcher.anyJobGroup()).stream()
+            .filter(x -> Objects.equals(x.getName(), "reservationJob-" + reservedTicketDto.getId())).findFirst().get();
+        List<Trigger> triggers = (List<Trigger>) schedulerFactoryBean.getScheduler().getTriggersOfJob(jobKey);
+        assertThat(triggers.size()).isEqualTo(1);
+        Trigger actual = triggers.get(0);
+
+        assertThat(actual.getNextFireTime().before(Date.from(reservedTicket.getShow().getDateTime().minus(30, ChronoUnit.MINUTES).plus(2, ChronoUnit.SECONDS).toInstant(
+            ZoneOffset.UTC)))).isTrue();
+        assertThat(actual.getNextFireTime()
+            .after(Date.from(reservedTicket.getShow().getDateTime().minusMinutes(30).minusSeconds(2).toInstant(ZoneOffset.UTC)))).isTrue();
     }
 }

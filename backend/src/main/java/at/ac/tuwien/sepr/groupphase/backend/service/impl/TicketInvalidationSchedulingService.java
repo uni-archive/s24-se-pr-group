@@ -6,10 +6,13 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.OrderDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.job.InvalidateReservationJob;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleScheduleBuilder;
@@ -80,6 +83,24 @@ public class TicketInvalidationSchedulingService {
                 rescheduleReservationInvalidationJob(ticket.getId(),
                     Date.from(Instant.now().plus(DEFAULT_RESERVATION_PERIOD, ChronoUnit.MINUTES)));
             }
+        }
+    }
+
+    public void rescheduleReservationInvalidationJobForConfirmedOrder(TicketDetailsDto ticketDetailsDto)
+        throws SchedulerException {
+        LocalDateTime rescheduleTime = ticketDetailsDto.getShow().getDateTime()
+            .minus(DEFAULT_RESERVATION_PERIOD, ChronoUnit.MINUTES);
+        rescheduleReservationInvalidationJob(ticketDetailsDto.getId(),
+            Date.from(rescheduleTime.toInstant(ZoneOffset.UTC)));
+
+    }
+
+    public void cancelReservationInvalidationJob(Long id) {
+        try {
+            Scheduler scheduler = schedulerFactoryBean.getScheduler();
+            scheduler.deleteJob(new JobKey("reservationJob-" + id, "reservationJobs"));
+        } catch (SchedulerException e) {
+            throw new IllegalStateException("Could not cancel reservation invalidation job", e);
         }
     }
 }
