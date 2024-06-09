@@ -30,6 +30,7 @@ export * from './order-details-response';
 export * from './order-summary-response';
 export * from './page-application-user-response';
 export * from './page-location-dto';
+export * from './page-news-response-dto';
 export * from './page-show-response';
 export * from './page-ticket-details-response';
 export * from './pageable-object';

@@ -24,6 +24,12 @@ export class NewsComponent implements OnInit {
   newsMode: 'ALL' | 'UNREAD' = 'ALL';
   selectedFile: File;
 
+  totalElements: number = 0;
+  pageSize: number = 9;
+  currentPage: number = 1;
+
+
+
   constructor(
       private ngbPaginationConfig: NgbPaginationConfig,
       private formBuilder: UntypedFormBuilder,
@@ -118,21 +124,24 @@ export class NewsComponent implements OnInit {
   }
 
   loadNews() {
+    const page = this.currentPage - 1; // Page index starts from 0 at backend
+    const size = this.pageSize;
+
     if (this.newsMode === 'ALL') {
-      this.newsService.findAll().subscribe({
-        next: (news: NewsResponseDto[]) => {
-          this.allNews = news;
-          this.news = this.allNews;
+      this.newsService.findAll(page, size).subscribe({
+        next: (response: any) => {
+          this.news = response.content;
+          this.totalElements = response.totalElements;
         },
         error: error => {
           this.defaultServiceErrorHandling(error);
         }
       });
     } else {
-      this.newsService.findUnread().subscribe({
-        next: (news: NewsResponseDto[]) => {
-          this.unreadNews = news;
-          this.news = this.unreadNews;
+      this.newsService.findUnread(page, size).subscribe({
+        next: (response: any) => {
+          this.news = response.content;
+          this.totalElements = response.totalElements;
         },
         error: error => {
           this.defaultServiceErrorHandling(error);
@@ -141,11 +150,14 @@ export class NewsComponent implements OnInit {
     }
   }
 
+
+
   switchMode(mode: 'ALL' | 'UNREAD') {
     this.newsMode = mode;
-    this.news = [];
+    this.currentPage = 1;
     this.loadNews();
   }
+
 
   private defaultServiceErrorHandling(error: any) {
     console.log(error);
@@ -161,5 +173,11 @@ export class NewsComponent implements OnInit {
     } else {
       this.errorMessage = 'Ein unbekannter Fehler ist aufgetreten.';
     }
+  }
+
+
+  onPageChange(page: number) {
+    this.currentPage = page;
+    this.loadNews();
   }
 }
