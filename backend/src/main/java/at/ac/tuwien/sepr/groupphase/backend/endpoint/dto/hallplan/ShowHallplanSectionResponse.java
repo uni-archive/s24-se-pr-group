@@ -7,7 +7,7 @@ public record ShowHallplanSectionResponse(
     String name,
     String color,
     boolean standingOnly,
-    long price,
+    int price,
     String frontendCoordinates,
     int spotCount,
     int availableSpotCount,

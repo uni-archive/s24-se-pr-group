@@ -70,6 +70,13 @@ public class TicketServiceImpl implements TicketService {
         return tickets;
     }
 
+    @Override
+    public List<TicketDetailsDto> findForShowById(long showId) {
+        var tickets = ticketDao.findForShowById(showId);
+        tickets.forEach(this::loadSectorShowForTicket);
+        return tickets;
+    }
+
     public void loadSectorShowForTicket(TicketDetailsDto ticket) {
         try {
             // handle cyclic dependencies between sectors and shows that apply to each ticket

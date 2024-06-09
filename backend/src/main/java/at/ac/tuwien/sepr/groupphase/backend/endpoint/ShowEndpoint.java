@@ -4,6 +4,8 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.ShowListDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowResponse;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.hallplan.ShowHallplanResponse;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ShowHallPlanResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ShowResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.ShowMapper;
@@ -75,4 +77,19 @@ public class ShowEndpoint {
         return ResponseEntity.ok(
             service.findByLocation(locationId, true, PageRequest.of(page, size)).map(showMapper::toResponse));
     }
+
+    @PermitAll
+    @GetMapping("/{id}/available-seats")
+    public ResponseEntity<ShowHallplanResponse> getAvailableSeatsByShowId(@PathVariable("id") Long id) {
+        LOGGER.trace("Getting available hallplan for show with id {}", id);
+        return ResponseEntity.ok(service.getAvailableSeatsByShowId(id));
+    }
+
+    @PermitAll
+    @GetMapping("/{id}")
+    public ResponseEntity<ShowResponse> getShowById(@PathVariable("id") Long id) throws EntityNotFoundException {
+        LOGGER.trace("Getting show with id {}", id);
+        return ResponseEntity.ok(showMapper.toResponse(service.getById(id)));
+    }
+
 }
