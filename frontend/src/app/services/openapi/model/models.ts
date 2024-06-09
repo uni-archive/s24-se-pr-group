@@ -33,6 +33,7 @@ export * from './show-response';
 export * from './show-search-dto';
 export * from './simple-news-dto';
 export * from './sort-object';
+export * from './ticket-creation-request';
 export * from './ticket-details-response';
 export * from './ticket-details-response-hall-spot';
 export * from './user-create-request';

@@ -66,6 +66,7 @@ model/show-response.ts
 model/show-search-dto.ts
 model/simple-news-dto.ts
 model/sort-object.ts
+model/ticket-creation-request.ts
 model/ticket-details-response-hall-spot.ts
 model/ticket-details-response.ts
 model/user-create-request.ts

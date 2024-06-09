@@ -41,10 +41,9 @@ export class UserCartComponent implements OnInit {
 
   loadOrder(): void {
     // TODO: Order-Cookie
-    this.orderService.findById1(7).subscribe({
+    this.orderService.getCurrentOrder().subscribe({
       next: order => {
         this.order = order;
-        console.log(order);
         this.ticketsBySectorsByEvent = this.createEventToTicketMap();
       },
       error: error => {
@@ -76,6 +75,7 @@ export class UserCartComponent implements OnInit {
   }
 
   addStandSectorTicket(orderId: number, sectorId: number): void {
+/*
     this.orderService.addStandTicket(orderId, sectorId).subscribe({
       next: () => {
         this.ticketsBySectorsByEvent.get(orderId).get(sectorId).length++;
@@ -87,10 +87,12 @@ export class UserCartComponent implements OnInit {
         this.messagingService.setMessage("Weitere Stehplätze sind leider bereits ausgebucht.", "danger");
       }
     });
+*/
   }
 
 
   removeStandSectorTicket(orderId: number, sectorId: number): void {
+/*
     this.orderService.removeStandTicket(orderId, sectorId).subscribe({
       next: () => {
         this.ticketsBySectorsByEvent
@@ -99,6 +101,7 @@ export class UserCartComponent implements OnInit {
           this.messagingService.setMessage("Stehplatz konnte nicht freigegeben werden. Bitte versuchen Sie es später erneut.", "danger");
       }
     });
+*/
   }
 
   protected readonly formatPrice = formatPrice;

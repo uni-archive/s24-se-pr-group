@@ -35,6 +35,12 @@ export interface OrderEndpointServiceInterface {
     /**
      * 
      * 
+     */
+    createOrder(extraHttpRequestParams?: any): Observable<OrderDetailsResponse>;
+
+    /**
+     * 
+     * 
      * @param id 
      */
     findById1(id: number, extraHttpRequestParams?: any): Observable<OrderDetailsResponse>;
@@ -44,6 +50,12 @@ export interface OrderEndpointServiceInterface {
      * 
      */
     findForUser1(extraHttpRequestParams?: any): Observable<Array<OrderSummaryResponse>>;
+
+    /**
+     * 
+     * 
+     */
+    getCurrentOrder(extraHttpRequestParams?: any): Observable<OrderDetailsResponse>;
 
     /**
      * 
