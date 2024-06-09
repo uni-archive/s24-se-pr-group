@@ -78,12 +78,12 @@
             </div>
         </div>
         <div class="row mt-4">
-            <div class="form-group">
+            <div class="form-group col-12">
                 <button
                         type="submit"
-                        class="btn"
-                        [ngClass]="{ 'btn-success': newsForm.valid, 'btn-danger': !newsForm.valid }"
-                        [disabled]="!newsForm.valid"
+                        class="btn btn-block w-100"
+                        [ngClass]="{ 'btn-success': newsForm.valid && selectedFile, 'btn-danger': !newsForm.valid || !selectedFile }"
+                        [disabled]="!newsForm.valid || !selectedFile"
                 >
                     Erstellen
                 </button>
@@ -91,13 +91,13 @@
         </div>
     </form>
     <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1200;">
-        <ngb-toast *ngIf="error" header="Fehler!" [autohide]="false" class="error-toast">
+        <ngb-toast *ngIf="error" header="Fehler!" [autohide]="false" class="bg-danger text-white">
             {{ errorMessage }}
             <button type="button" class="close" (click)="vanishError()" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
         </ngb-toast>
-        <ngb-toast *ngIf="success" header="Erfolg!" [autohide]="true" [delay]="5000" class="success-toast">
+        <ngb-toast *ngIf="success" header="Erfolg!" [autohide]="true" [delay]="5000" class="bg-success text-white">
             {{ successMessage }}
             <button type="button" class="close" (click)="vanishSuccess()" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
