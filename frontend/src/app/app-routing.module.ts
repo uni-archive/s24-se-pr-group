@@ -40,6 +40,9 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     component: NewsDetailComponent,
   },
+  {path: 'news', canActivate: [AuthGuard], component: NewsComponent},
+  {path: 'news-detail/:id', canActivate: [AuthGuard], component: NewsDetailComponent},
+  {path: 'news-create', canActivate: [AuthGuard], component: NewsCreateComponent},
   {
     path: "my",
     canActivate: mapToCanActivate([AuthGuard]),

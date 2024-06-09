@@ -1,0 +1,107 @@
+<div class="container mt-5">
+    <h2>Neuen News-Eintrag erstellen</h2>
+    <form (ngSubmit)="addNews(newsForm)" #newsForm="ngForm" class="container">
+        <div class="row">
+            <div class="form-group col-12">
+                <label for="inputTitle">Titel:</label>
+                <input
+                        type="text"
+                        id="inputTitle"
+                        name="title"
+                        class="form-control"
+                        placeholder="Titel der News"
+                        [(ngModel)]="currentNews.title"
+                        required
+                        minlength="3"
+                        maxlength="100"
+                        [ngClass]="{ 'is-invalid': submitted && newsForm.controls.title?.invalid }"
+                />
+                <div *ngIf="submitted && newsForm.controls.title?.invalid" class="invalid-feedback">
+                    <small class="form-text text-danger" *ngIf="newsForm.controls.title?.errors?.required">Ein Titel ist erforderlich!</small>
+                    <small class="form-text text-danger" *ngIf="newsForm.controls.title?.errors?.minlength">Der Titel muss mindestens 3 Zeichen lang sein!</small>
+                    <small class="form-text text-danger" *ngIf="newsForm.controls.title?.errors?.maxlength">Der Titel darf höchstens 100 Zeichen lang sein!</small>
+                </div>
+            </div>
+            <div class="form-group col-12">
+                <label for="inputSummary">Zusammenfassung:</label>
+                <textarea
+                        id="inputSummary"
+                        name="summary"
+                        class="form-control"
+                        placeholder="Zusammenfassung"
+                        [(ngModel)]="currentNews.summary"
+                        required
+                        minlength="3"
+                        maxlength="500"
+                        [ngClass]="{ 'is-invalid': submitted && newsForm.controls.summary?.invalid }"
+                ></textarea>
+                <div *ngIf="submitted && newsForm.controls.summary?.invalid" class="invalid-feedback">
+                    <small class="form-text text-danger" *ngIf="newsForm.controls.summary?.errors?.required">Eine Zusammenfassung ist erforderlich!</small>
+                    <small class="form-text text-danger" *ngIf="newsForm.controls.summary?.errors?.minlength">Die Zusammenfassung muss mindestens 3 Zeichen lang sein!</small>
+                    <small class="form-text text-danger" *ngIf="newsForm.controls.summary?.errors?.maxlength">Die Zusammenfassung darf höchstens 500 Zeichen lang sein!</small>
+                </div>
+            </div>
+            <div class="form-group col-12">
+                <label for="inputText">Text:</label>
+                <textarea
+                        id="inputText"
+                        name="text"
+                        class="form-control"
+                        placeholder="Text"
+                        rows="6"
+                        [(ngModel)]="currentNews.text"
+                        required
+                        minlength="3"
+                        maxlength="10000"
+                        [ngClass]="{ 'is-invalid': submitted && newsForm.controls.text?.invalid }"
+                ></textarea>
+                <div *ngIf="submitted && newsForm.controls.text?.invalid" class="invalid-feedback">
+                    <small class="form-text text-danger" *ngIf="newsForm.controls.text?.errors?.required">Ein Text ist erforderlich!</small>
+                    <small class="form-text text-danger" *ngIf="newsForm.controls.text?.errors?.minlength">Der Text muss mindestens 3 Zeichen lang sein!</small>
+                    <small class="form-text text-danger" *ngIf="newsForm.controls.text?.errors?.maxlength">Der Text darf höchstens 10.000 Zeichen lang sein!</small>
+                </div>
+            </div>
+            <div class="form-group col-12">
+                <label for="inputImage">Bild hochladen:</label>
+                <input
+                        type="file"
+                        id="inputImage"
+                        name="image"
+                        class="form-control"
+                        (change)="onFileSelected($event)"
+                        required
+                        [ngClass]="{ 'is-invalid': submitted && !selectedFile }"
+                />
+                <div *ngIf="submitted && !selectedFile" class="invalid-feedback">
+                    <small class="form-text text-danger">Ein Bild ist erforderlich!</small>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="form-group">
+                <button
+                        type="submit"
+                        class="btn"
+                        [ngClass]="{ 'btn-success': newsForm.valid, 'btn-danger': !newsForm.valid }"
+                        [disabled]="!newsForm.valid"
+                >
+                    Erstellen
+                </button>
+            </div>
+        </div>
+    </form>
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1200;">
+        <ngb-toast *ngIf="error" header="Fehler!" [autohide]="false" class="error-toast">
+            {{ errorMessage }}
+            <button type="button" class="close" (click)="vanishError()" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </ngb-toast>
+        <ngb-toast *ngIf="success" header="Erfolg!" [autohide]="true" [delay]="5000" class="success-toast">
+            {{ successMessage }}
+            <button type="button" class="close" (click)="vanishSuccess()" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </ngb-toast>
+    </div>
+</div>

@@ -37,7 +37,10 @@
            routerLink="/showcreation" routerLinkActive="active">Erstelle Vorführung</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" *ngIf="authService.isLoggedIn() && authService.getUserRole()==='ADMIN'"
+        <a class="nav-link" *ngIf="authService.isLoggedIn() && authService.getUserRole()==='ADMIN'" routerLink="/news-create" routerLinkActive="active">Erstelle News</a>
+      </li>
+      <li class="nav-item">
+      <a class="nav-link" *ngIf="authService.isLoggedIn() && authService.getUserRole()==='ADMIN'"
            routerLink="/locations" routerLinkActive="active">Aufführungsorte</a>
       </li>
       <li>

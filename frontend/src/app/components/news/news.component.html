@@ -27,9 +27,15 @@
 
     <div class="mt-4 container">
         <div class="row p-2 mb-4">
+
+            <!--
             <div class="float-left">
                 <button *ngIf="isAdmin()" type="button" class="btn btn-sm mr-4 d-inline-block bg-dark text-light" (click)="openAddModal(newsAddModal)">News erstellen</button>
             </div>
+
+
+            <button *ngIf="isAdmin()" type="button" class="btn btn-sm mr-4 d-inline-block bg-dark text-light" [routerLink]="['/news-create']">News erstellen</button>
+-->
 
             <ng-template #newsAddModal let-modal>
                 <div class="modal-header custom-header d-flex justify-content-between bg-dark text-light">
