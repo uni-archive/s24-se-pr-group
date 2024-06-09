@@ -2,6 +2,12 @@ package at.ac.tuwien.sepr.groupphase.backend.datagenerator;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.AddressDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.LocationDto;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Address;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallPlan;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Location;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.AddressRepository;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallPlanRepository;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.LocationRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.LocationService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
@@ -17,24 +23,34 @@ import java.util.Random;
 @Component
 public class LocationDataGenerator {
 
+    @Autowired
+    private LocationRepository locationRepository;
 
     @Autowired
-    private LocationService locationService;
+    private AddressRepository addressRepository;
+
+    @Autowired
+    private HallPlanRepository hallPlanRepository;
 
 
     @PostConstruct
     private void generateData() throws ForbiddenException, ValidationException {
         Faker faker = new Faker();
         Random random = new Random();
+        HallPlan hallPlan = hallPlanRepository.findByName("Open Air").getFirst();
         for (int i = 1; i <= 40; i++) {
-            LocationDto locationDto = new LocationDto();
-            locationDto.setName(faker.company().name());
-            locationDto.setAddress(new AddressDto()
-                .setStreet(faker.address().streetAddress())
-                .setZip(String.valueOf(random.nextInt(99999)))
-                .setCity(faker.address().city())
-                .setCountry(faker.address().country()));
-            locationService.create(locationDto);
+            Address address = new Address();
+            address.setStreet(faker.address().streetAddress());
+            address.setZip(String.valueOf(random.nextInt(99999)));
+            address.setCity(faker.address().city());
+            address.setCountry(faker.address().country());
+            addressRepository.saveAndFlush(address);
+
+            Location location = new Location();
+            location.setName(faker.company().name());
+            location.setAddress(address);
+            location.setHallPlan(hallPlan);
+            locationRepository.save(location);
         }
     }
 }
