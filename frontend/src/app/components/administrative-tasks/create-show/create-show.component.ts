@@ -54,7 +54,7 @@ export class CreateShowComponent {
 
   onArtistChange(search: string) {
     if (search !== null) {
-      this.artistService.search({ artistName: search }).subscribe({
+      this.artistService.search({ artistName: search , firstName:"", lastName: ""}).subscribe({
         next: (data) => {
           console.log(data);
           this.artistList = data.filter((artist) => {
