@@ -5,8 +5,13 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowListDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowCreationDto;
+//import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ShowHallPlanResponseMapper;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.hallplan.ShowHallplanResponse;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ShowHallPlanResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.EventDao;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.HallPlanDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.ShowDao;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.TicketDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.ShowService;
 import jakarta.transaction.Transactional;
@@ -27,10 +32,16 @@ public class ShowServiceImpl implements ShowService {
 
     private final ShowDao dao;
     private final EventDao eventDao;
+    private ShowHallPlanResponseMapper showHallPlanResponseMapper;
+    private final TicketDao ticketDao;
 
-    public ShowServiceImpl(ShowDao dao, EventDao eventDao) {
+//    private final ShowHallPlanResponseMapper showHallPlanMapper;
+
+    public ShowServiceImpl(ShowDao dao, EventDao eventDao, HallPlanDao hallPlanDao, TicketDao ticketDao, ShowHallPlanResponseMapper showHallPlanResponseMapper) {
         this.eventDao = eventDao;
         this.dao = dao;
+        this.ticketDao = ticketDao;
+        this.showHallPlanResponseMapper = showHallPlanResponseMapper;
     }
 
     @Override
@@ -58,6 +69,13 @@ public class ShowServiceImpl implements ShowService {
     }
 
     @Override
+    public ShowHallplanResponse getAvailableSeatsByShowId(Long showId) {
+        var tickets = ticketDao.findForShowById(showId);
+        var hallPlan = dao.getHallPlanByShowId(showId);
+        return showHallPlanResponseMapper.toResponse(hallPlan);
+    }
+
+    @Override
     public List<ShowListDto> searchShows(ShowSearchDto searchDto) throws EntityNotFoundException {
         return dao.searchShows(searchDto);
     }
@@ -65,5 +83,11 @@ public class ShowServiceImpl implements ShowService {
     @Override
     public Page<ShowDto> findByLocation(Long locationId, boolean onlyFutureShows, Pageable pageable) {
         return dao.findByLocationId(locationId, pageable);
+    }
+
+    @Override
+    @Transactional
+    public ShowDto getById(Long id) throws EntityNotFoundException {
+        return dao.findById(id);
     }
 }

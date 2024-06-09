@@ -26,6 +26,8 @@ public interface TicketService {
      */
     List<TicketDetailsDto> findForUserById(long userId);
 
+    List<TicketDetailsDto> findForShowById(long showId);
+
     /**
      * A ticket is assigned for a seat which is in a (sector, show) tuple.
      * Additional information specific to this tuple (e.g. the price of the ticket, which depends on the sector as well as the given show) can be fetched with this method.

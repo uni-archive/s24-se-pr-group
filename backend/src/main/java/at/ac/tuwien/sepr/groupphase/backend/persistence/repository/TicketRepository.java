@@ -16,6 +16,9 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     @Query("SELECT t FROM Ticket t INNER JOIN t.order o INNER JOIN o.customer c WHERE c.id = :userId")
     List<Ticket> findTicketsByUserId(@Param("userId") long userId);
 
+    @Query("SELECT t FROM Ticket t INNER JOIN t.show s WHERE s.id = :showId")
+    List<Ticket> findTicketsByShowId(@Param("showId") long showId);
+
     @Modifying
     @Query("DELETE Ticket t WHERE t.id = :id")
     void cancelReservedTicket(@Param("id") long id);

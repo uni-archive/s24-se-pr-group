@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import java.util.List;
@@ -22,6 +23,10 @@ public class Location extends AbstractEntity {
 
     @OneToMany(mappedBy = "location", fetch = FetchType.EAGER)
     private List<Show> shows;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "HALLPLAN_ID")
+    private HallPlan hallPlan;
 
 
     public Location(String name, Address address) {
@@ -73,6 +78,15 @@ public class Location extends AbstractEntity {
     @Override
     public int hashCode() {
         return Objects.hash(name);
+    }
+
+    public HallPlan getHallPlan() {
+        return hallPlan;
+    }
+
+    public Location setHallPlan(HallPlan hallPlan) {
+        this.hallPlan = hallPlan;
+        return this;
     }
 
     @Override

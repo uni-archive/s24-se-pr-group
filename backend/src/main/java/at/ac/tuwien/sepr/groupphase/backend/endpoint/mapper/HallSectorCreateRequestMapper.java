@@ -17,12 +17,7 @@ import java.util.stream.Stream;
 public interface HallSectorCreateRequestMapper extends BaseResponseMapper<HallSectorDto, HallplanSectionCreateRequest>, BaseEntityMapper<HallSector, HallSectorDto> {
 
     @Mapping(target = "seats", expression = "java(mapSpots(hallplanCreateDto))")
-    @Mapping(target = "name", expression = "java(mapName(hallplanCreateDto))")
     HallSectorDto toDto(HallplanSectionCreateRequest hallplanCreateDto);
-
-    default String mapName(HallplanSectionCreateRequest hallplanCreateDto) {
-        return "hallplanCreateDto.getName()";
-    }
 
     default List<HallSpotDto> mapSpots(HallplanSectionCreateRequest hallSectorCreateRequest) {
         if (hallSectorCreateRequest.getStandingOnly()) {

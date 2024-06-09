@@ -6,14 +6,11 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFound
 import at.ac.tuwien.sepr.groupphase.backend.service.HallSectorShowService;
 import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.service.exception.TicketNotCancellable;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.TicketValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
@@ -48,6 +45,13 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public List<TicketDetailsDto> findForUserById(long userId) {
         var tickets = ticketDao.findByUserId(userId);
+        tickets.forEach(this::loadSectorShowForTicket);
+        return tickets;
+    }
+
+    @Override
+    public List<TicketDetailsDto> findForShowById(long showId) {
+        var tickets = ticketDao.findForShowById(showId);
         tickets.forEach(this::loadSectorShowForTicket);
         return tickets;
     }

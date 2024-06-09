@@ -22,9 +22,10 @@ public class HallPlan extends AbstractEntity {
     @OneToMany(mappedBy = "hallPlan", cascade = CascadeType.ALL)
     private List<HallSector> sectors;
 
-    public HallPlan(String backgroundImage, List<HallSector> sectors) {
+    public HallPlan(String backgroundImage, String name, List<HallSector> sectors) {
         this.backgroundImage = backgroundImage;
         this.sectors = sectors;
+        this.name = name;
     }
 
     public HallPlan() {

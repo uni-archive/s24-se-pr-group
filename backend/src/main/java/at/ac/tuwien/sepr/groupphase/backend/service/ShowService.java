@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowListDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowCreationDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.hallplan.ShowHallplanResponse;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -52,5 +53,9 @@ public interface ShowService {
      * @return all shows that are at the
      */
     Page<ShowDto> findByLocation(Long locationId, boolean onlyFutureShows, Pageable pageable);
+
+    ShowHallplanResponse getAvailableSeatsByShowId(Long showId);
+
+    ShowDto getById(Long id) throws EntityNotFoundException;
 }
 
