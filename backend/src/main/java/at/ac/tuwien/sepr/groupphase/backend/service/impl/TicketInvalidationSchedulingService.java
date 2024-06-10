@@ -1,5 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
+import static at.ac.tuwien.sepr.groupphase.backend.service.job.InvalidateReservationJob.RESERVATION_JOB_HASH_VARIABLE;
+
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.OrderDao;
@@ -19,7 +21,6 @@ import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
-import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +42,7 @@ public class TicketInvalidationSchedulingService {
 
         JobDetail jobDetail = JobBuilder.newJob(InvalidateReservationJob.class)
             .withIdentity("reservationJob-" + reservationId, "reservationJobs")
-            .usingJobData("ticketId", reservationId)
+            .usingJobData(RESERVATION_JOB_HASH_VARIABLE, reservationId)
             .storeDurably()
             .build();
 

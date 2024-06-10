@@ -46,6 +46,8 @@ public interface TicketService {
     void cancelReservedTicket(long id) throws ValidationException, DtoNotFoundException;
 
 
+    void deleteTicket(long id) throws DtoNotFoundException;
+
     /**
      * Invalidates all tickets of an order. Does nothing if the order does not exist.
      *
@@ -73,4 +75,11 @@ public interface TicketService {
      * @param ticketDetailsDto the ticket to be confirmed
      */
     void confirmTicket(TicketDetailsDto ticketDetailsDto) throws SchedulerException, DtoNotFoundException;
+
+    /**
+     * Finds a ticket by its hash.
+     *
+     * @param ticketHash the hash of the ticket
+     */
+    TicketDetailsDto findByHash(String ticketHash) throws DtoNotFoundException;
 }

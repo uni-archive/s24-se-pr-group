@@ -49,6 +49,8 @@ spring:
             enable: true
   quartz:
     job-store-type: jdbc
+    jdbc:
+      initialize-schema: always
 
 security:
   auth:

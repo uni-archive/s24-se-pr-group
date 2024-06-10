@@ -5,7 +5,6 @@ import {AutocompleteTextfieldComponent} from "../autocomplete-textfield/autocomp
 import {LocationDto} from "../../../dtos/LocationDto";
 import {DatepickerComponent} from "../../searchpage-components/datepicker/datepicker.component";
 import {
-  Artist,
   ArtistEndpointService,
   EventDto,
   EventEndpointService,
@@ -15,6 +14,7 @@ import {
 import {MessagingService} from "../../../services/messaging.service";
 import {TagSearchComponent} from "../tag-search/tag-search.component";
 import {LocationAutocompleteComponent} from "../../location/location-autocomplete/location-autocomplete.component";
+import {Artist} from "../../../services/openapi/model/artist";
 
 @Component({
   selector: 'app-create-show',

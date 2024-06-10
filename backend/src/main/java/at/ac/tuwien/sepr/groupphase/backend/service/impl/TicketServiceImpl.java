@@ -87,7 +87,16 @@ public class TicketServiceImpl implements TicketService {
         try {
             var ticket = ticketDao.findById(id);
             ticketValidator.validateForCancelReservation(ticket);
-            ticketDao.cancelReservedTicket(id);
+            ticketDao.cancelReservedTicket(ticket.getId());
+        } catch (EntityNotFoundException e) {
+            throw new DtoNotFoundException(e);
+        }
+    }
+
+    @Override
+    public void deleteTicket(long id) throws DtoNotFoundException {
+        try {
+            ticketDao.deleteById(id);
         } catch (EntityNotFoundException e) {
             throw new DtoNotFoundException(e);
         }
@@ -142,6 +151,15 @@ public class TicketServiceImpl implements TicketService {
         ticketDetailsDto.setValid(true);
         try {
             ticketDao.update(ticketDetailsDto);
+        } catch (EntityNotFoundException e) {
+            throw new DtoNotFoundException(e);
+        }
+    }
+
+    @Override
+    public TicketDetailsDto findByHash(String ticketHash) throws DtoNotFoundException {
+        try {
+            return ticketDao.findByHash(ticketHash);
         } catch (EntityNotFoundException e) {
             throw new DtoNotFoundException(e);
         }

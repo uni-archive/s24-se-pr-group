@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.job;
 
+import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class InvalidateReservationJob extends QuartzJobBean {
 
+    public static final String RESERVATION_JOB_HASH_VARIABLE = "ticketHash";
     private final TicketService ticketService;
 
     public InvalidateReservationJob(TicketService ticketService) {
@@ -20,8 +22,10 @@ public class InvalidateReservationJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         try {
-            ticketService.cancelReservedTicket(context.getMergedJobDataMap().getLong("ticketId"));
-        } catch (ValidationException | DtoNotFoundException e) {
+            TicketDetailsDto ticket = ticketService.findByHash(
+                context.getMergedJobDataMap().getString(RESERVATION_JOB_HASH_VARIABLE));
+            ticketService.deleteTicket(ticket.getId());
+        } catch (DtoNotFoundException e) {
             throw new IllegalStateException(e);
         }
     }

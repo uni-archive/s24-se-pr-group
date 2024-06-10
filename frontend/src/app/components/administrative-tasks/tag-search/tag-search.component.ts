@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {NgForOf} from "@angular/common";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {Artist, EventDto} from "../../../services/openapi";
+import {Artist} from "../../../services/openapi/model/artist";
 
 @Component({
   selector: 'app-tag-search',

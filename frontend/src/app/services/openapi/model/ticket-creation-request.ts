@@ -9,15 +9,12 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { SortObject } from './sort-object';
 
 
-export interface PageableObject { 
-    pageNumber?: number;
-    pageSize?: number;
-    offset?: number;
-    sort?: Array<SortObject>;
-    paged?: boolean;
-    unpaged?: boolean;
+export interface TicketCreationRequest { 
+    spotId?: number;
+    orderId?: number;
+    showId?: number;
+    reservationOnly?: boolean;
 }
 
