@@ -91,7 +91,10 @@ public class TicketEndpoint {
     public TicketDetailsResponse addTicket(@RequestBody TicketCreationRequest ticketCreationRequest)
         throws at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException {
         return ticketMapper.toResponse(
-            ticketService.addTicketToOrder(ticketCreationRequest.orderId(), ticketCreationRequest.spotId(),
-                ticketCreationRequest.showId(), ticketCreationRequest.reservationOnly()));
+            ticketService.addTicketToOrder(
+                ticketCreationRequest.spotId(),
+                ticketCreationRequest.showId(),
+                ticketCreationRequest.orderId(),
+                ticketCreationRequest.reservationOnly()));
     }
 }

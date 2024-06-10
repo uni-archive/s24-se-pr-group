@@ -319,11 +319,11 @@ public class OrderServiceImplTest {
         orderService.confirmOrder(orderDetailsDto);
 
         // then
-        assertThat(schedulerFactoryBean.getScheduler().getJobKeys(GroupMatcher.anyJobGroup()).stream()
-            .filter(x -> Objects.equals(x.getName(), "reservationJob-" + ticketDtoToBuy.getId())).findFirst())
-            .isEmpty();
+        assertThat(schedulerFactoryBean.getScheduler().getJobKeys(GroupMatcher.jobGroupEquals("reservationJobs"))
+            .stream()
+            .filter(x -> Objects.equals(x.getName(), "reservationJob-" + ticketDtoToBuy.getHash())).findFirst()).isEmpty();
         JobKey jobKey = schedulerFactoryBean.getScheduler().getJobKeys(GroupMatcher.anyJobGroup()).stream()
-            .filter(x -> Objects.equals(x.getName(), "reservationJob-" + reservedTicketDto.getId())).findFirst().get();
+            .filter(x -> Objects.equals(x.getName(), "reservationJob-" + reservedTicketDto.getHash())).findFirst().get();
         List<Trigger> triggers = (List<Trigger>) schedulerFactoryBean.getScheduler().getTriggersOfJob(jobKey);
         assertThat(triggers.size()).isEqualTo(1);
         Trigger actual = triggers.get(0);

@@ -105,7 +105,7 @@ public class TicketServiceImpl implements TicketService {
         try {
             ticketInvalidationSchedulingService.scheduleReservationInvalidationsForNewlyAddedTicket(ticketDetailsDto);
         } catch (SchedulerException e) {
-            throw new IllegalStateException("Could not schedule reservation invalidation job", e);
+            throw new IllegalStateException("Could not schedule reservation invalidation job" + e.getMessage(), e);
         }
         return ticketDetailsDto;
     }
@@ -137,7 +137,7 @@ public class TicketServiceImpl implements TicketService {
         if (ticketDetailsDto.isReserved()) {
             ticketInvalidationSchedulingService.rescheduleReservationInvalidationJobForConfirmedOrder(ticketDetailsDto);
         } else {
-            ticketInvalidationSchedulingService.cancelReservationInvalidationJob(ticketDetailsDto.getId());
+            ticketInvalidationSchedulingService.cancelReservationInvalidationJob(ticketDetailsDto.getHash());
         }
         ticketDetailsDto.setValid(true);
         try {

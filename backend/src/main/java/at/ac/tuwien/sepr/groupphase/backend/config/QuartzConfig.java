@@ -1,23 +1,16 @@
 package at.ac.tuwien.sepr.groupphase.backend.config;
 
-import at.ac.tuwien.sepr.groupphase.backend.service.job.InvalidateReservationJob;
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.IOException;
 import java.util.Properties;
 import javax.sql.DataSource;
 import org.quartz.JobDetail;
-import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.quartz.QuartzDataSource;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
@@ -31,7 +24,6 @@ public class QuartzConfig {
     public QuartzConfig(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
-
 
 
     @Bean
@@ -61,7 +53,8 @@ public class QuartzConfig {
         properties.setProperty("org.quartz.scheduler.instanceName", "MyScheduler");
         properties.setProperty("org.quartz.scheduler.instanceId", "AUTO");
         properties.setProperty("org.quartz.jobStore.class", "org.quartz.impl.jdbcjobstore.JobStoreTX");
-        properties.setProperty("org.quartz.jobStore.driverDelegateClass", "org.quartz.impl.jdbcjobstore.StdJDBCDelegate");
+        properties.setProperty("org.quartz.jobStore.driverDelegateClass",
+            "org.quartz.impl.jdbcjobstore.StdJDBCDelegate");
         properties.setProperty("org.quartz.jobStore.dataSource", "quartzDataSource");
         properties.setProperty("org.quartz.jobStore.tablePrefix", "QRTZ_");
         properties.setProperty("org.quartz.jobStore.isClustered", "true");

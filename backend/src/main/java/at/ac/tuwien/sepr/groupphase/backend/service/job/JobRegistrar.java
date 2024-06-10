@@ -15,4 +15,13 @@ public class JobRegistrar {
         jobDetailFactory.setDurability(true);
         return jobDetailFactory;
     }
+
+    @Bean
+    public JobDetailFactoryBean unlockUserJobDetailFactory() {
+        JobDetailFactoryBean jobDetailFactory = new JobDetailFactoryBean();
+        jobDetailFactory.setJobClass(UnlockUserJob.class);
+        jobDetailFactory.setDescription("Invoke UnlockUser service...");
+        jobDetailFactory.setDurability(true);
+        return jobDetailFactory;
+    }
 }

@@ -58,7 +58,7 @@ export class LoginComponent implements OnInit {
         } else {
           this.errorMessage = error.error;
         }
-        this.messagingService.setMessage('Login failed: ' + this.errorMessage, 'danger')
+        this.messagingService.setMessage('Login failed. Incorrect username or password!', 'danger')
       }
     });
   }

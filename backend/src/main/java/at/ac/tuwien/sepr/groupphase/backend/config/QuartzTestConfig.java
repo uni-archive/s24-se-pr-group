@@ -1,6 +1,5 @@
 package at.ac.tuwien.sepr.groupphase.backend.config;
 
-import at.ac.tuwien.sepr.groupphase.backend.service.job.InvalidateReservationJob;
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.IOException;
 import java.util.Properties;
@@ -11,8 +10,6 @@ import org.springframework.boot.autoconfigure.quartz.QuartzDataSource;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
@@ -54,7 +51,8 @@ public class QuartzTestConfig {
         properties.setProperty("org.quartz.scheduler.instanceName", "MyScheduler");
         properties.setProperty("org.quartz.scheduler.instanceId", "AUTO");
         properties.setProperty("org.quartz.jobStore.class", "org.quartz.impl.jdbcjobstore.JobStoreTX");
-        properties.setProperty("org.quartz.jobStore.driverDelegateClass", "org.quartz.impl.jdbcjobstore.StdJDBCDelegate");
+        properties.setProperty("org.quartz.jobStore.driverDelegateClass",
+            "org.quartz.impl.jdbcjobstore.StdJDBCDelegate");
         properties.setProperty("org.quartz.jobStore.dataSource", "quartzDataSource");
         properties.setProperty("org.quartz.jobStore.tablePrefix", "QRTZ_");
         properties.setProperty("org.quartz.jobStore.isClustered", "true");

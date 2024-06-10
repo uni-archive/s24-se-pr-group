@@ -18,6 +18,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.MailNotSentException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.UserLockedException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.UserValidator;
 import com.google.common.cache.Cache;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,12 +55,13 @@ public class UserServiceImpl implements UserService {
     private final EmailSenderService emailSenderService;
     private final AddressService addressService;
     private final Cache<String, Integer> loginAttemptCache;
+    private final UserUnlockSchedulingService userUnlockSchedulingService;
 
     @Autowired
     public UserServiceImpl(UserDao userDao, EmailChangeTokenDao emailChangeTokenDao, PasswordEncoder passwordEncoder,
         JwtTokenizer jwtTokenizer, UserValidator userValidator,
         EmailSenderService emailSenderService, AddressService addressService,
-        Cache<String, Integer> loginAttemptCache) {
+        Cache<String, Integer> loginAttemptCache, UserUnlockSchedulingService userUnlockSchedulingService) {
         this.userDao = userDao;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
@@ -67,6 +70,7 @@ public class UserServiceImpl implements UserService {
         this.emailSenderService = emailSenderService;
         this.emailChangeTokenDao = emailChangeTokenDao;
         this.loginAttemptCache = loginAttemptCache;
+        this.userUnlockSchedulingService = userUnlockSchedulingService;
     }
 
     @Override
@@ -107,17 +111,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String login(String email, String password) {
+    public String login(String email, String password) throws UserLockedException {
         try {
             Integer recentLoginAttempts = loginAttemptCache.get(email, () -> 0);
-            if (recentLoginAttempts > 3) {
-                throw new BadCredentialsException(
+            if (recentLoginAttempts > 5) {
+                ApplicationUserDto byEmail = userDao.findByEmail(email);
+                if (byEmail != null) {
+                    byEmail.setAccountLocked(true);
+                    userDao.update(byEmail);
+                    userUnlockSchedulingService.scheduleUnlockUser(byEmail.getEmail());
+                }
+                throw new UserLockedException(
                     "Account is locked due to multiple failed login attempts. Please try again later.");
             }
             loginAttemptCache.put(email, recentLoginAttempts + 1);
         } catch (ExecutionException e) {
             throw new BadCredentialsException(
                 "Account is locked due to multiple failed login attempts. Please try again later.");
+        } catch (EntityNotFoundException | SchedulerException e) {
+            throw new BadCredentialsException("Username or password is incorrect or account is locked");
         }
         try {
             ApplicationUserDto applicationUserDto = findApplicationUserByEmail(email);

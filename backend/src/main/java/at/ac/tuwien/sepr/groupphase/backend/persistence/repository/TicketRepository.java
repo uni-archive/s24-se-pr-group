@@ -1,5 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.persistence.repository;
 
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Event;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Show;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Ticket;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;

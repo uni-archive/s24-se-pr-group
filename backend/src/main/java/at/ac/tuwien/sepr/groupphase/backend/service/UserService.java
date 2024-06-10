@@ -8,6 +8,7 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFound
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.MailNotSentException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.UserLockedException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -47,7 +48,7 @@ public interface UserService extends UserDetailsService {
      * @return the JWT, if successful
      * @throws org.springframework.security.authentication.BadCredentialsException if credentials are bad
      */
-    String login(String email, String password);
+    String login(String email, String password) throws UserLockedException;
 
     /**
      * Create a new user.

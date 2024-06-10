@@ -242,7 +242,7 @@ public class TicketServiceImplTest implements TestData {
             () -> Assertions.assertEquals(ticketDetailsDto.getHash(), ticket.getHash())
         );
         JobKey jobKey = schedulerFactoryBean.getScheduler().getJobKeys(GroupMatcher.anyJobGroup()).stream()
-            .filter(x -> Objects.equals(x.getName(), "reservationJob-" + ticket.getId())).findFirst().get();
+            .filter(x -> Objects.equals(x.getName(), "reservationJob-" + ticket.getHash())).findFirst().get();
         List<Trigger> triggers = (List<Trigger>) schedulerFactoryBean.getScheduler().getTriggersOfJob(jobKey);
         assertThat(triggers.size()).isEqualTo(1);
         Trigger actual = triggers.get(0);
@@ -263,7 +263,7 @@ public class TicketServiceImplTest implements TestData {
         TicketDetailsDto ticketDetailsDto2 = ticketService.addTicketToOrder(hallSpot.getId(), show.getId(),
             orderDetailsDto.getId(), false);
         JobKey jobKey = schedulerFactoryBean.getScheduler().getJobKeys(GroupMatcher.anyJobGroup()).stream()
-            .filter(x -> Objects.equals(x.getName(), "reservationJob-" + ticketDetailsDto1.getId())).findFirst().get();
+            .filter(x -> Objects.equals(x.getName(), "reservationJob-" + ticketDetailsDto1.getHash())).findFirst().get();
         List<Trigger> triggers = (List<Trigger>) schedulerFactoryBean.getScheduler().getTriggersOfJob(jobKey);
         assertThat(triggers.size()).isEqualTo(1);
         Trigger actual = triggers.get(0);
