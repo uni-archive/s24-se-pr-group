@@ -13,6 +13,7 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.HallPlanDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.ShowDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.TicketDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.HallSectorShowService;
 import at.ac.tuwien.sepr.groupphase.backend.service.ShowService;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ShowServiceImpl implements ShowService {
@@ -33,14 +35,18 @@ public class ShowServiceImpl implements ShowService {
     private final ShowDao dao;
     private final EventDao eventDao;
     private ShowHallPlanResponseMapper showHallPlanResponseMapper;
+    private HallSectorShowService hallSectorShowService;
     private final TicketDao ticketDao;
 
 //    private final ShowHallPlanResponseMapper showHallPlanMapper;
 
-    public ShowServiceImpl(ShowDao dao, EventDao eventDao, HallPlanDao hallPlanDao, TicketDao ticketDao, ShowHallPlanResponseMapper showHallPlanResponseMapper) {
+    public ShowServiceImpl(ShowDao dao, EventDao eventDao, HallPlanDao hallPlanDao, TicketDao ticketDao,
+                           HallSectorShowService hallSectorShowService,
+                           ShowHallPlanResponseMapper showHallPlanResponseMapper) {
         this.eventDao = eventDao;
         this.dao = dao;
         this.ticketDao = ticketDao;
+        this.hallSectorShowService = hallSectorShowService;
         this.showHallPlanResponseMapper = showHallPlanResponseMapper;
     }
 
@@ -70,9 +76,12 @@ public class ShowServiceImpl implements ShowService {
 
     @Override
     public ShowHallplanResponse getAvailableSeatsByShowId(Long showId) {
-        var tickets = ticketDao.findForShowById(showId);
+        var tickets = ticketDao.findForShowById(showId); // todo implement reserved tickets
         var hallPlan = dao.getHallPlanByShowId(showId);
-        return showHallPlanResponseMapper.toResponse(hallPlan);
+        var hallSectorShowList = hallSectorShowService.findByShowId(showId);
+        var response = showHallPlanResponseMapper.toResponse(hallPlan, hallSectorShowList);
+
+        return response;
     }
 
     @Override

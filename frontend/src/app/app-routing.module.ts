@@ -22,6 +22,7 @@ import {NewsComponent} from "./components/news/news.component";
 import {NewsDetailComponent} from './components/news/news-detail/news-detail.component';
 import {LocationDetailsComponent} from "./components/location/location-details/location-details.component";
 import {UserCartComponent} from "./components/user/user-cart/user-cart.component";
+import {TicketSelectComponent} from "./components/ticket-select/ticket-select.component";
 
 
 const routes: Routes = [
@@ -65,8 +66,8 @@ const routes: Routes = [
     path: "location/:id",
     component: LocationDetailsComponent,
   },
-  {path: 'hallplan/create', component: HallplanCreateComponent},
-  {path: 'news', canActivate: [AuthGuard], component: NewsComponent}
+  {path: 'news', canActivate: [AuthGuard], component: NewsComponent},
+  {path: "show/:id/ticket-select", component: TicketSelectComponent},
 ];
 
 @NgModule({
