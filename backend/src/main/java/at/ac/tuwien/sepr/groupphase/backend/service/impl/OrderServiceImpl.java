@@ -11,14 +11,15 @@ import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.OrderValidator;
-import java.lang.invoke.MethodHandles;
-import java.time.LocalDateTime;
-import java.util.List;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.lang.invoke.MethodHandles;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -33,7 +34,7 @@ public class OrderServiceImpl implements OrderService {
     private final InvoiceService invoiceService;
 
     public OrderServiceImpl(OrderDao orderDao, OrderValidator orderValidator, TicketService ticketService,
-        InvoiceService invoiceService) {
+                            InvoiceService invoiceService) {
         this.orderDao = orderDao;
         this.orderValidator = orderValidator;
         this.ticketService = ticketService;
@@ -96,8 +97,7 @@ public class OrderServiceImpl implements OrderService {
             for (var ticket : orderDetailsDto.getTickets()) {
                 ticketService.confirmTicket(ticket);
             }
-        }
-        catch (SchedulerException exception){
+        } catch (SchedulerException exception) {
             throw new IllegalStateException("Could not confirm order", exception);
         }
     }

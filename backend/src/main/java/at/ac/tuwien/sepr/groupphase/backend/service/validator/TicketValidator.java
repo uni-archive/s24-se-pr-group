@@ -1,10 +1,12 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.validator;
 
+import at.ac.tuwien.sepr.groupphase.backend.dto.HallSeatDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.HallSpotDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.OrderDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.ShowDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.TicketDao;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSeat;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import java.util.ArrayList;
@@ -69,7 +71,9 @@ public class TicketValidator extends AbstractValidator<TicketDetailsDto> {
         } catch (EntityNotFoundException e) {
             errors.add("Order with id " + orderId + " does not exist.");
         }
-        if (ticketDao.existsValidOrReservedTicketForShowAndSeat(showId, spotId)) {
+
+        var hallSpot = hallSpotDao.findById(spotId);
+        if (ticketDao.existsValidOrReservedTicketForShowAndSeat(showId, spotId) && hallSpot instanceof HallSeatDto) {
             errors.add("Ticket for show with id " + showId + " and spot with id " + spotId + " already exists.");
         }
         endValidation(errors);
