@@ -55,4 +55,9 @@ public class TicketDao extends AbstractDao<Ticket, TicketDetailsDto> {
     public void setValidAllTicketsForOrder(long orderId) {
         ((TicketRepository) repository).setValidAllTicketsForOrder(orderId);
     }
+
+    @Transactional
+    public void changeTicketReserved(long ticketId, boolean setReserved) {
+        ((TicketRepository) repository).changeTicketReserved(ticketId, setReserved);
+    }
 }

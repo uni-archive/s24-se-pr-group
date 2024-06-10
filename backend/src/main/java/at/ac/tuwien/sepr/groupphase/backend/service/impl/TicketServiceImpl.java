@@ -14,13 +14,14 @@ import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.TicketValidator;
-import java.lang.invoke.MethodHandles;
-import java.time.Instant;
-import java.util.List;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import java.lang.invoke.MethodHandles;
+import java.time.Instant;
+import java.util.List;
 
 @Service
 public class TicketServiceImpl implements TicketService {
@@ -39,8 +40,8 @@ public class TicketServiceImpl implements TicketService {
     private final HallSectorDao hallSectorDao;
 
     public TicketServiceImpl(TicketDao ticketDao, HallSpotDao hallSpotDao, ShowDao showDao,
-        TicketValidator ticketValidator, HallSectorShowService hallSectorShowService, OrderDao orderDao,
-        TicketInvalidationSchedulingService ticketInvalidationSchedulingService, HallSectorDao hallSectorDao) {
+                             TicketValidator ticketValidator, HallSectorShowService hallSectorShowService, OrderDao orderDao,
+                             TicketInvalidationSchedulingService ticketInvalidationSchedulingService, HallSectorDao hallSectorDao) {
         this.ticketDao = ticketDao;
         this.hallSpotDao = hallSpotDao;
         this.showDao = showDao;
@@ -158,5 +159,19 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public void setValidAllTicketsForOrder(long orderId) {
         ticketDao.setValidAllTicketsForOrder(orderId);
+    }
+
+    @Override
+    public void changeTicketReserved(long ticketId, boolean setReserved) throws ValidationException {
+        ticketDao.changeTicketReserved(ticketId, setReserved);
+    }
+
+    @Override
+    public void deleteTicket(long ticketId) throws ValidationException {
+        try {
+            ticketDao.deleteById(ticketId);
+        } catch (EntityNotFoundException ignored) {
+            // ignored
+        }
     }
 }

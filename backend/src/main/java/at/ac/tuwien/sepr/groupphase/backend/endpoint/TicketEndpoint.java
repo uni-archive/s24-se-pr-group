@@ -3,6 +3,7 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.TicketCreationRequest;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.TicketDetailsResponse;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.TicketRemovalRequest;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.TicketResponseMapper;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -71,7 +73,7 @@ public class TicketEndpoint {
     }
 
     @Secured(Code.USER)
-    @DeleteMapping(path = "/ticket/{id}")
+    @DeleteMapping(path = "/ticket/{id}/cancel")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void cancelReservedTicket(
         @PathVariable("id") long id
@@ -96,5 +98,19 @@ public class TicketEndpoint {
                 ticketCreationRequest.showId(),
                 ticketCreationRequest.orderId(),
                 ticketCreationRequest.reservationOnly()));
+    }
+
+    @Secured(Code.USER)
+    @DeleteMapping("/ticket/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeTicket(@PathVariable("id") long ticketId) throws at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException {
+        ticketService.deleteTicket(ticketId);
+    }
+
+    @Secured(Code.USER)
+    @PutMapping("/ticket/{id}")
+    public void changeTicketReserved(@PathVariable("id") long ticketId, @RequestBody boolean setReserved)
+        throws at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException {
+        ticketService.changeTicketReserved(ticketId, setReserved);
     }
 }

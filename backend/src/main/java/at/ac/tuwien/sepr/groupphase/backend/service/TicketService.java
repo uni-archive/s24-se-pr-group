@@ -85,4 +85,8 @@ public interface TicketService {
      * @param orderId The id of the order.
      */
     void setValidAllTicketsForOrder(long orderId);
+
+    void changeTicketReserved(long ticketId, boolean setReserved) throws ValidationException;
+
+    void deleteTicket(long ticketId) throws ValidationException;
 }

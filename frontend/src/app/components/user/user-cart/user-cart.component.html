@@ -3,41 +3,53 @@
 </div>
 
 <div *ngFor="let event of ticketsBySectorsByEvent | keyvalue">
-  <h6>{{event.value.get(event.value.keys().next().value)[0].show.event.title}}</h6>
+  <h5>{{getEventById(event.key).title}}</h5>
   <ul class="list-group">
     <li class="list-group-item p-3" *ngFor="let sector of event.value | keyvalue">
       <h5>
         Sector-Nr. {{sector.value[0].hallSpot.sector.id}}
+        {{sector.value[0].hallSpot.type === 'HallSpotResponse' ? '(Stehplätze)' : '(Sitzplätze)'}}
       </h5>
       <p class="text-black-50">{{formatPrice(sector.value[0].hallSpot.sector.hallSectorShow.price)}} pro Platz</p>
 
-      <div class="mx-3" *ngIf="sector.value[0].hallSpot.type === 'hallSeatResponse'">
-        <div class="input-group mb-1" *ngFor="let ticket of sector.value">
-          <input class="form-control" [value]="ticket.hallSpot.id" >
-          <button class="btn btn-danger" type="button">
-            <i class="bi bi-trash bg-danger" style="font-size: 20px"></i>
-          </button>
-        </div>
-      </div>
-
-      <div class="mx-3" *ngIf="sector.value[0].hallSpot.type === 'HallSpotResponse'">
-        <div class="d-flex justify-content-between align-items-center">
-          <span>Platzanzahl</span>
-          <div class="d-flex btn-group">
-            <button class="btn btn-secondary" (click)="addStandSectorTicket(order.id, sector.key)">
-              <i class="bi bi-dash"></i>
+      <div class="m-1" *ngFor="let ticket of sector.value">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="input-group w-75 mb-1">
+            <input *ngIf="ticket.reserved" class="form-control" readonly
+                   [value]="'Platz-Nr. ' + ticket.hallSpot.id + ' (reserviert)'">
+            <input *ngIf="!ticket.reserved" class="form-control" readonly [value]="'Platz-Nr. ' + ticket.hallSpot.id">
+            <button class="btn btn-danger" type="button" (click)="removeTicket(ticket.id)">
+              <i class="bi bi-trash bg-danger" style="font-size: 20px"></i>
             </button>
-            <input class="form-control" [value]="sector.value.length" style="width: 40px; border-radius: 0">
-            <button class="btn btn-secondary" (click)="removeStandSectorTicket(order.id, sector.key)">
-              <i class="bi bi-plus-lg"></i>
+          </div>
+          <div class="input-group w-auto">
+            <button (click)="changeTicketReserved(ticket.id, true)" class="btn btn-outline-primary {{(ticket.reserved?('active'):(''))}}"
+                    type="button">Reservieren
+            </button>
+            <button (click)="changeTicketReserved(ticket.id, false)" class="btn btn-outline-primary {{(!ticket.reserved?('active'):(''))}}"
+                    type="button">Kaufen
             </button>
           </div>
         </div>
       </div>
+
     </li>
     <li class="list-group-item list-group-item-secondary">
-      Card footer
+      <div class="d-flex justify-content-between">
+        <span>Zwischenpreis:</span>
+        <span>{{getSubtotalForEvent(event.key)}}</span>
+      </div>
     </li>
   </ul>
   <br/>
+</div>
+
+<div class="d-flex justify-content-end">
+  <h4 class="fw-bold">
+    Gesamtpreis: {{getTotalPrice()}}
+  </h4>
+</div>
+
+<div class="d-flex justify-content-end">
+  <button class="btn btn-primary" (click)="purchaseOrder()">Jetzt zahlen</button>
 </div>

@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {
+  EventResponse,
   OrderDetailsResponse,
   OrderEndpointService,
   TicketDetailsResponse,
@@ -40,13 +41,73 @@ export class UserCartComponent implements OnInit {
     this.loadOrder();
   }
 
-  orderCookie(): string {
-    return this.cookieService.get('order');
+  changeTicketReserved(ticketId: number, setReserved: boolean): void {
+    const ticket = this.order.tickets.find(t => t.id === ticketId);
+    if(ticket.reserved === setReserved) {
+      return;
+    }
+
+    this.ticketService.changeTicketReserved(ticketId, setReserved).subscribe({
+      next: t => {
+        this.loadOrder();
+      },
+      error: err => {
+        console.log(err);
+      }
+    });
+  }
+
+  removeTicket(ticketId: number): void {
+    this.ticketService.removeTicket(ticketId).subscribe({
+      next: () => {
+        this.loadOrder();
+      },
+      error: err => {
+        console.log(err);
+      }
+    })
+  }
+
+  getEventById(eventId: number): EventResponse {
+    return this.order.tickets
+      .map(t => t.show.event)
+      .find(e => e.id === eventId);
+  }
+
+  getSubtotalForEvent(eventId: number): string {
+    const ticketsForEvent = this.ticketsBySectorsByEvent.get(eventId);
+    let sum = 0;
+    for(const tickets of ticketsForEvent.values()) {
+      sum += tickets
+        .filter(t => !t.reserved)
+        .map(t => t.hallSpot.sector.hallSectorShow.price)
+        .reduce((p1, p2) => p1 + p2, 0);
+    }
+    return formatPrice(sum);
+  }
+
+  getTotalPrice(): string {
+    const total = this.order.tickets
+      .filter(t => !t.reserved)
+      .map(t => t.hallSpot.sector.hallSectorShow.price)
+      .reduce((p1, p2) => p1 + p2, 0);
+    return formatPrice(total);
+  }
+
+  purchaseOrder(): void {
+    this.orderService.purchaseOrder(this.order.id).subscribe({
+      next: () => {
+        this.messagingService.setMessage("Die Bestellung war erfolgreich!");
+        this.router.navigate(["/"]);
+      },
+      error: err => {
+        console.log(err);
+      }
+    });
   }
 
   loadOrder(): void {
     this.orderService.configuration.withCredentials = true;
-    const orderCookie = this.orderCookie();
     this.orderService.getCurrentOrder().subscribe({
       next: order => {
         this.order = order;
@@ -66,10 +127,10 @@ export class UserCartComponent implements OnInit {
             }
           })
 
+        } else {
+          this.messagingService.setMessage("Ihre Bestellung konnte nicht geladen werden. Bitte versuchen Sie es später erneut.", 'danger');
         }
 
-        this.messagingService.setMessage("Ihre Bestellung konnte nicht geladen werden. Bitte versuchen Sie es später erneut.", 'danger');
-        // this.router.navigate(["/"]);
       }
     });
 
