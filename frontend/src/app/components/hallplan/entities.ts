@@ -6,14 +6,16 @@ export class SectionEntity extends DrawableEntity implements InteractableEntity 
   isHighlighted = false;
   isSelected = false;
   data: HallSection;
+  canEdit = true;
 
-  constructor(section: HallSection) {
+  constructor(section: HallSection, canEdit: boolean) {
     super();
     this.points = section.points;
+    this.canEdit = canEdit;
   }
 
   draw(ctx: CanvasRenderingContext2D, calculateScaledPoint: CalculateScaledPoint) {
-    ctx.fillStyle = this.data.color;
+    ctx.fillStyle = this.data.color + "66";
     ctx.beginPath();
     this.points.forEach((point, index) => {
       // move to points with respect to scale and pos
@@ -42,6 +44,9 @@ export class SectionEntity extends DrawableEntity implements InteractableEntity 
   }
 
   isInside(point: Point2D, ctx: CanvasRenderingContext2D): boolean {
+    if (! this.canEdit) {
+      return false;
+    }
     let isInside = false;
     const x = point.x;
     const y = point.y;

@@ -3,7 +3,7 @@
 <div class="container">
   <div class="row align-items-start">
     <div class="col">
-      <app-hallplan #hallplan/>
+      <app-hallplan #hallplan [editMode]="true"/>
     </div>
     <div class="col">
       <form class="container" [formGroup]="mainForm" (ngSubmit)="onSubmit()">

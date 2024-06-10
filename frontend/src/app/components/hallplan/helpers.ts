@@ -309,12 +309,14 @@ export class InteractionHelper extends Helper {
   highlightedEntities: InteractableEntity[] = [];
   selectedEntities: InteractableEntity[] = [];
   onSelectionChange: ((entities: InteractableEntity[]) => void) | null = null;
+  editMode: boolean;
 
-  constructor(drawHelper: DrawHelper, canvas: HTMLCanvasElement, entities: InteractableEntity[]) {
+  constructor(drawHelper: DrawHelper, canvas: HTMLCanvasElement, entities: InteractableEntity[], editMode: boolean) {
     super();
     this.entities = entities;
     this.canvas = canvas;
     this.drawHelper = drawHelper;
+    this.editMode = editMode;
   }
 
   setEntities(entities: InteractableEntity[]) {
@@ -356,9 +358,11 @@ export class InteractionHelper extends Helper {
         ! this.selectedEntities.includes(entity) &&
         entity.isInside(mouseWorldPos, this.canvas.getContext('2d')));
     // only select the last entity
-    newSelectedEntities.splice(0, newSelectedEntities.length - 1);
-    // const unselectedEntities = this.selectedEntities.filter(entity => entity.isInside(mouseWorldPos, this.canvas.getContext('2d')));
-    const unselectedEntities = this.selectedEntities; // unselect all previous entities
+    if (this.editMode) {
+      newSelectedEntities.splice(0, newSelectedEntities.length - 1);
+    }
+    const unselectedEntities = this.editMode ? this.selectedEntities : this.selectedEntities.filter(entity => entity.isInside(mouseWorldPos, this.canvas.getContext('2d')));
+    // const unselectedEntities = this.selectedEntities; // unselect all previous entities
     newSelectedEntities.forEach(entity => entity.onHighlight(true));
     unselectedEntities.forEach(entity => entity.onHighlightEnd());
     this.selectedEntities = [...newSelectedEntities, ...this.selectedEntities.filter(entity => !unselectedEntities.includes(entity))];

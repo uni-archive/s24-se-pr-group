@@ -1,0 +1,56 @@
+<div class="title d-flex align-items-baseline">
+  <h1>{{showResponse?.event.title}}</h1>
+  <p class="ms-3">am {{date}} um {{time}}</p>
+</div>
+<div class="subtitle d-flex flex-column">
+  <p class="my-2">in {{showResponse?.location.name}}, {{showResponse?.location.address.zip}} {{showResponse?.location.address.city}}</p>
+  <p>{{showResponse?.location.address.street}}</p>
+</div>
+
+<div class="side-by-side d-flex gap-3">
+  <div class="left w-60">
+    <app-hallplan #hallplan/>
+    <div class="sectors">
+      <p *ngFor="let sector of showHallplan?.sectors">{{sector.name}}</p>
+    </div>
+  </div>
+
+  <div class="right">
+    <p>Folgende Plätze wurden ausgewählt:</p>
+
+    <div class="card">
+      <div class="card-body">
+        <div *ngFor="let sector of visibleSectors">
+          <h5 class="card-title">{{sector.name}}</h5>
+          <p class="card-text">{{sector.price}}€ pro Platz</p>
+          <ul class="list-group" *ngIf="! sector.isStandingOnly">
+            <li class="list-group-item flex-column ">
+              <div class="d-flex w-100 justify-content-between" *ngFor="let seat of sectorSeatMap[sector.id]">
+
+                Sitz #{{seat.id}}
+
+                <button type="button" class="btn btn-danger">Löschen</button>
+              </div>
+            </li>
+          </ul>
+          <div class="form-group col-12" *ngIf="sector.isStandingOnly">
+            <label for="title">Anzahl gewählte Plätze:</label>
+            <input type="number" min="0" [max]="sector.availableSpotCount" id="title" value="1" class="form-control" placeholder="Platzanzahl" formControlName="hallname">
+            <!--<div *ngIf="mainForm.get('hallname').invalid && mainForm.get('hallname').touched"
+                 class="invalid-feedback">
+              Bitte geben Sie einen Namen an.
+            </div>-->
+          </div>
+        </div>
+      </div>
+      <div class="card-footer text-muted d-flex justify-content-center">
+        <h3 class="w-auto">Gesamtpreis:</h3>
+        <p class="ms-4">{{calcPrice}}€</p>
+      </div>
+    </div>
+    <div class="buttons">
+      <button type="button" class="btn btn-outline-primary">Reservieren</button>
+      <button type="button" class="btn btn-primary">Bezahlen</button>
+    </div>
+  </div>
+</div>

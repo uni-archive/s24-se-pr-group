@@ -3,13 +3,16 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowListDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.HallSectorShowResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.hallplan.ShowHallplanResponse;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.HallSectorShowResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ShowHallPlanResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
 import at.ac.tuwien.sepr.groupphase.backend.mapper.ShowMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.HallSectorShowService;
 import at.ac.tuwien.sepr.groupphase.backend.service.ShowService;
 import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
@@ -40,10 +43,15 @@ public class ShowEndpoint {
 
     private ShowService service;
     private final ShowMapper showMapper;
+    private final HallSectorShowService hallSectorShowService;
+    private final HallSectorShowResponseMapper hallSectorShowResponseMapper;
 
-    public ShowEndpoint(ShowService showService, ShowMapper showMapper, ShowHallPlanResponseMapper showHallPlanResponseMapper) {
+    public ShowEndpoint(ShowService showService, ShowMapper showMapper, HallSectorShowResponseMapper hallSectorShowResponseMapper,
+                        HallSectorShowService hallSectorShowService) {
         this.service = showService;
         this.showMapper = showMapper;
+        this.hallSectorShowResponseMapper = hallSectorShowResponseMapper;
+        this.hallSectorShowService = hallSectorShowService;
     }
 
     @Secured(Code.ADMIN)
