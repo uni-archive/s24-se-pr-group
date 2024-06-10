@@ -16,8 +16,6 @@ export class NewsCreateComponent implements OnInit {
   successMessage = '';
 
   submitted = false;
-
-  currentNews: NewsResponseDto = {} as NewsResponseDto;
   newsForm: FormGroup;
   selectedFile: File | null = null;
 
@@ -38,15 +36,20 @@ export class NewsCreateComponent implements OnInit {
     });
   }
 
-  get f() {
+  get formControls() {
     return this.newsForm.controls;
   }
 
   onFileSelected(event): void {
     const file = event.target.files[0];
-    if (file) {
+    if (file && file.type.startsWith('image/')) {
       this.selectedFile = file;
       this.newsForm.patchValue({ image: file });
+    } else {
+      this.newsForm.patchValue({ image: null });
+      this.selectedFile = null;
+      this.errorMessage = 'Nur Bilddateien sind erlaubt.';
+      this.error = true;
     }
   }
 
