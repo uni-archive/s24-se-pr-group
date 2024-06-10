@@ -1,7 +1,7 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { NewsEndpointService, NewsResponseDto } from "../../../services/openapi";
 import { NgbPaginationConfig } from "@ng-bootstrap/ng-bootstrap";
-import { UntypedFormBuilder } from "@angular/forms";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { AuthService } from "../../../services/auth.service";
 
 @Component({
@@ -9,7 +9,7 @@ import { AuthService } from "../../../services/auth.service";
   templateUrl: './news-create.component.html',
   styleUrls: ['./news-create.component.scss']
 })
-export class NewsCreateComponent {
+export class NewsCreateComponent implements OnInit {
   error = false;
   errorMessage = '';
   success = false;
@@ -18,61 +18,46 @@ export class NewsCreateComponent {
   submitted = false;
 
   currentNews: NewsResponseDto = {} as NewsResponseDto;
-  news: NewsResponseDto[] = [];
-  allNews: NewsResponseDto[] = [];
-  unreadNews: NewsResponseDto[] = [];
-  newsMode: 'ALL' | 'UNREAD' = 'ALL';
-  selectedFile: File;
-
-  totalElements: number = 0;
-  pageSize: number = 9;
-  currentPage: number = 1;
+  newsForm: FormGroup;
+  selectedFile: File | null = null;
 
   constructor(
       private ngbPaginationConfig: NgbPaginationConfig,
-      private formBuilder: UntypedFormBuilder,
+      private formBuilder: FormBuilder,
       private cd: ChangeDetectorRef,
       private authService: AuthService,
       private newsService: NewsEndpointService
   ) {}
 
   ngOnInit() {
-    this.currentNews = {} as NewsResponseDto;
+    this.newsForm = this.formBuilder.group({
+      title: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
+      summary: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(500)]],
+      text: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(10000)]],
+      image: [null, Validators.required]
+    });
   }
 
-  isAdmin(): boolean {
-    return this.authService.getUserRole() === 'ADMIN';
+  get f() {
+    return this.newsForm.controls;
   }
 
   onFileSelected(event): void {
-    this.selectedFile = event.target.files[0];
-  }
-
-  selectImage(): void {
-    const fileInput = document.getElementById('inputImage');
-    fileInput.click();
-  }
-
-  addNews(form): void {
-    this.submitted = true;
-
-    if (form.valid && this.selectedFile) {
-      this.createNews(this.currentNews);
-      this.clearForm();
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      this.newsForm.patchValue({ image: file });
     }
   }
 
-  private clearForm(): void {
-    this.currentNews = {} as NewsResponseDto;
-    this.submitted = false;
-  }
+  addNews(): void {
+    this.submitted = true;
 
-  vanishError(): void {
-    this.error = false;
-  }
+    if (this.newsForm.invalid || !this.selectedFile) {
+      return;
+    }
 
-  vanishSuccess(): void {
-    this.success = false;
+    this.createNews(this.newsForm.value);
   }
 
   private createNews(news: NewsResponseDto): void {
@@ -89,6 +74,14 @@ export class NewsCreateComponent {
         this.success = false;
       }
     });
+  }
+
+  vanishError(): void {
+    this.error = false;
+  }
+
+  vanishSuccess(): void {
+    this.success = false;
   }
 
   private defaultServiceErrorHandling(error: any): void {
