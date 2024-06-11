@@ -4,11 +4,8 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.NewsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsRequestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.NewsEndpointMapper;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.NewsService;
-import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -65,7 +62,7 @@ public class NewsEndpoint {
     @Operation(summary = "Get list of unread news")
     public ResponseEntity<Page<NewsResponseDto>> findUnread(
         @RequestParam(name = "page", defaultValue = "0") Integer page,
-        @RequestParam(name = "size", defaultValue = "9") Integer size) throws EntityNotFoundException {
+        @RequestParam(name = "size", defaultValue = "9") Integer size) {
         LOGGER.info("GET /api/v1/news/unread");
         PageRequest pageable = PageRequest.of(page, size);
         Page<NewsDto> unreadNewsList = null;

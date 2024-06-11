@@ -2,7 +2,6 @@ package at.ac.tuwien.sepr.groupphase.backend.persistence.dao;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.NewsDto;
-import at.ac.tuwien.sepr.groupphase.backend.mapper.NewsMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.News;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
