@@ -17,14 +17,14 @@ import { SortObject } from './sort-object';
 export interface PageNewsResponseDto { 
     totalPages?: number;
     totalElements?: number;
-    pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
     size?: number;
     content?: Array<NewsResponseDto>;
     number?: number;
     sort?: Array<SortObject>;
+    first?: boolean;
+    last?: boolean;
     numberOfElements?: number;
+    pageable?: PageableObject;
     empty?: boolean;
 }
 

@@ -9,6 +9,7 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { EventDto } from './event-dto';
 
 
 export interface NewsResponseDto { 
@@ -18,5 +19,6 @@ export interface NewsResponseDto {
     text?: string;
     publishedAt?: string;
     image?: Array<string>;
+    eventDto?: EventDto;
 }
 

@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+import at.ac.tuwien.sepr.groupphase.backend.dto.EventDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.NewsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsRequestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsResponseDto;
@@ -8,10 +9,13 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.NewsEndpointMapper;
 import at.ac.tuwien.sepr.groupphase.backend.service.NewsService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
+
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,9 +52,7 @@ public class NewsEndpoint {
     @Secured("ROLE_USER")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get list of news without details")
-    public ResponseEntity<Page<NewsResponseDto>> findAll(
-        @RequestParam(name = "page", defaultValue = "0") Integer page,
-        @RequestParam(name = "size", defaultValue = "9") Integer size)   {
+    public ResponseEntity<Page<NewsResponseDto>> findAll(@RequestParam(name = "page", defaultValue = "0") Integer page, @RequestParam(name = "size", defaultValue = "9") Integer size) {
         LOGGER.info("GET /api/v1/news");
         PageRequest pageable = PageRequest.of(page, size);
         Page<NewsDto> newsList = newsService.getAllNews(pageable);
@@ -60,9 +62,7 @@ public class NewsEndpoint {
     @Secured("ROLE_USER")
     @GetMapping(value = "/unread", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get list of unread news")
-    public ResponseEntity<Page<NewsResponseDto>> findUnread(
-        @RequestParam(name = "page", defaultValue = "0") Integer page,
-        @RequestParam(name = "size", defaultValue = "9") Integer size) {
+    public ResponseEntity<Page<NewsResponseDto>> findUnread(@RequestParam(name = "page", defaultValue = "0") Integer page, @RequestParam(name = "size", defaultValue = "9") Integer size) {
         LOGGER.info("GET /api/v1/news/unread");
         PageRequest pageable = PageRequest.of(page, size);
         Page<NewsDto> unreadNewsList = null;
@@ -92,9 +92,11 @@ public class NewsEndpoint {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Publish a new news")
     public ResponseEntity<NewsResponseDto> create(@RequestParam("image") MultipartFile file,
-        @RequestParam("title") String title,
-        @RequestParam("summary") String summary,
-        @RequestParam("text") String text) {
+                                                  @RequestParam("title") String title,
+                                                  @RequestParam("summary") String summary,
+                                                  @RequestParam("text") String text,
+                                                  @RequestParam("event") String event) {
+
         NewsRequestDto newsRequestDto = new NewsRequestDto();
         newsRequestDto.setTitle(title);
         newsRequestDto.setSummary(summary);
@@ -103,8 +105,15 @@ public class NewsEndpoint {
         try {
             newsRequestDto.setImage(file.getBytes());
         } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid image data", e);
         }
+        EventDto eventDto;
+        try {
+            eventDto = new ObjectMapper().readValue(event, EventDto.class);
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid event data", e);
+        }
+        newsRequestDto.setEventDto(eventDto);
 
         LOGGER.info("POST /api/v1/news body: {}", newsRequestDto);
 

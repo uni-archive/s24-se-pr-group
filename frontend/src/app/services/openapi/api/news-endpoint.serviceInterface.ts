@@ -31,9 +31,10 @@ export interface NewsEndpointServiceInterface {
      * @param title 
      * @param summary 
      * @param text 
+     * @param event 
      * @param image 
      */
-    create(title: string, summary: string, text: string, image: Blob, extraHttpRequestParams?: any): Observable<NewsResponseDto>;
+    create(title: string, summary: string, text: string, event: string, image: Blob, extraHttpRequestParams?: any): Observable<NewsResponseDto>;
 
     /**
      * Get detailed information about a specific news

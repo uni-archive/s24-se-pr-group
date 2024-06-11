@@ -2,25 +2,27 @@ package at.ac.tuwien.sepr.groupphase.backend.persistence.mapper;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.NewsDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.News;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.BaseEntityMapper;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.CycleAvoidingMappingContext;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
-@Mapper(componentModel = "spring", implementationName = "backendNewsMapperImpl")
+@Mapper(componentModel = "spring", uses = EventMapper.class, implementationName = "backendNewsMapperImpl")
 public interface NewsMapper extends BaseEntityMapper<News, NewsDto> {
 
+    @Mapping(source = "event", target = "eventDto")
     @Named("newsToDto")
     NewsDto toDto(News news);
 
+    @Mapping(source = "eventDto", target = "event")
     @Named("dtoToNews")
     News toEntity(NewsDto newsDto);
 
+    @Mapping(source = "event", target = "eventDto")
     @Named("newsToDtoWithContext")
-    NewsDto toDto(News entity, @Context CycleAvoidingMappingContext context);
+    NewsDto toDtoWithContext(News entity, @Context CycleAvoidingMappingContext context);
 
+    @Mapping(source = "eventDto", target = "event")
     @Named("dtoToNewsWithContext")
-    News toEntity(NewsDto dto, @Context CycleAvoidingMappingContext context);
+    News toEntityWithContext(NewsDto dto, @Context CycleAvoidingMappingContext context);
 }
-

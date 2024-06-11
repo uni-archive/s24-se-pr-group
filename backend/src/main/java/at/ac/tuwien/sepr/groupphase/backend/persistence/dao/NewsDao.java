@@ -51,5 +51,6 @@ public class NewsDao extends AbstractDao<News, NewsDto> {
         return newsRepository.findUnseenNewsByUser(userId, pageable)
             .map(mapper::toDto);
     }
+    
 }
 

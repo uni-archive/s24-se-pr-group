@@ -11,13 +11,13 @@ public class NewsDto implements AbstractDto {
     private String text;
     private LocalDateTime publishedAt;
     private byte[] image;
+    private EventDto eventDto;
     private List<ApplicationUserDto> users;
 
     public NewsDto() {
         this.users = new ArrayList<>();
     }
 
-    // Getter und Setter für id
     public Long getId() {
         return id;
     }
@@ -26,7 +26,6 @@ public class NewsDto implements AbstractDto {
         this.id = id;
     }
 
-    // Getter und Setter für title
     public String getTitle() {
         return title;
     }
@@ -35,7 +34,6 @@ public class NewsDto implements AbstractDto {
         this.title = title;
     }
 
-    // Getter und Setter für summary
     public String getSummary() {
         return summary;
     }
@@ -44,7 +42,6 @@ public class NewsDto implements AbstractDto {
         this.summary = summary;
     }
 
-    // Getter und Setter für text
     public String getText() {
         return text;
     }
@@ -53,7 +50,6 @@ public class NewsDto implements AbstractDto {
         this.text = text;
     }
 
-    // Getter und Setter für publishedAt
     public LocalDateTime getPublishedAt() {
         return publishedAt;
     }
@@ -62,7 +58,6 @@ public class NewsDto implements AbstractDto {
         this.publishedAt = publishedAt;
     }
 
-    // Getter und Setter für image
     public byte[] getImage() {
         return image;
     }
@@ -71,7 +66,14 @@ public class NewsDto implements AbstractDto {
         this.image = image;
     }
 
-    // Getter und Setter für users
+    public EventDto getEventDto() {
+        return eventDto;
+    }
+
+    public void setEventDto(EventDto eventDto) {
+        this.eventDto = eventDto;
+    }
+
     public List<ApplicationUserDto> getUsers() {
         return users;
     }
@@ -89,6 +91,7 @@ public class NewsDto implements AbstractDto {
             + ", text='" + text + '\''
             + ", publishedAt=" + publishedAt
             + ", image=" + (image != null ? "present" : "null")
+            + ", eventDto=" + eventDto
             + ", users=" + users
             + '}';
     }

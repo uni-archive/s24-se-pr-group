@@ -115,14 +115,15 @@ export class NewsEndpointService implements NewsEndpointServiceInterface {
      * @param title 
      * @param summary 
      * @param text 
+     * @param event 
      * @param image 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public create(title: string, summary: string, text: string, image: Blob, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<NewsResponseDto>;
-    public create(title: string, summary: string, text: string, image: Blob, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<NewsResponseDto>>;
-    public create(title: string, summary: string, text: string, image: Blob, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<NewsResponseDto>>;
-    public create(title: string, summary: string, text: string, image: Blob, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public create(title: string, summary: string, text: string, event: string, image: Blob, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<NewsResponseDto>;
+    public create(title: string, summary: string, text: string, event: string, image: Blob, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<NewsResponseDto>>;
+    public create(title: string, summary: string, text: string, event: string, image: Blob, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<NewsResponseDto>>;
+    public create(title: string, summary: string, text: string, event: string, image: Blob, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (title === null || title === undefined) {
             throw new Error('Required parameter title was null or undefined when calling create.');
         }
@@ -131,6 +132,9 @@ export class NewsEndpointService implements NewsEndpointServiceInterface {
         }
         if (text === null || text === undefined) {
             throw new Error('Required parameter text was null or undefined when calling create.');
+        }
+        if (event === null || event === undefined) {
+            throw new Error('Required parameter event was null or undefined when calling create.');
         }
         if (image === null || image === undefined) {
             throw new Error('Required parameter image was null or undefined when calling create.');
@@ -148,6 +152,10 @@ export class NewsEndpointService implements NewsEndpointServiceInterface {
         if (text !== undefined && text !== null) {
           localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
             <any>text, 'text');
+        }
+        if (event !== undefined && event !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>event, 'event');
         }
 
         let localVarHeaders = this.defaultHeaders;

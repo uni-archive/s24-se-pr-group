@@ -1,8 +1,8 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { NewsEndpointService, NewsResponseDto } from "../../../services/openapi";
-import { NgbPaginationConfig } from "@ng-bootstrap/ng-bootstrap";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { AuthService } from "../../../services/auth.service";
+import { EventDto, NewsEndpointService, NewsResponseDto } from '../../../services/openapi';
+import { NgbPaginationConfig } from '@ng-bootstrap/ng-bootstrap';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-news-create',
@@ -18,6 +18,7 @@ export class NewsCreateComponent implements OnInit {
   submitted = false;
   newsForm: FormGroup;
   selectedFile: File | null = null;
+  selectedEvent: EventDto | null = null;
 
   constructor(
       private ngbPaginationConfig: NgbPaginationConfig,
@@ -32,12 +33,18 @@ export class NewsCreateComponent implements OnInit {
       title: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
       summary: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(500)]],
       text: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(10000)]],
-      image: [null, Validators.required]
+      image: [null, Validators.required],
+      event: [null, Validators.required]
     });
   }
 
   get formControls() {
     return this.newsForm.controls;
+  }
+
+  onEventSelected(eventDto: EventDto) {
+    this.selectedEvent = eventDto;
+    this.newsForm.patchValue({ event: eventDto });
   }
 
   onFileSelected(event): void {
@@ -56,18 +63,21 @@ export class NewsCreateComponent implements OnInit {
   addNews(): void {
     this.submitted = true;
 
-    if (this.newsForm.invalid || !this.selectedFile) {
+    if (this.newsForm.invalid || !this.selectedFile || !this.selectedEvent) {
       return;
     }
 
-    this.createNews(this.newsForm.value);
+    const news = this.newsForm.value;
+
+    this.createNews(news);
   }
 
   private createNews(news: NewsResponseDto): void {
-    this.newsService.create(news.title, news.summary, news.text, this.selectedFile).subscribe({
+    this.newsService.create(news.title, news.summary, news.text, JSON.stringify(this.selectedEvent), this.selectedFile).subscribe({
       next: () => {
         this.successMessage = 'Die News wurde erfolgreich gespeichert.';
         this.success = true;
+        this.resetForm();
         setTimeout(() => {
           this.success = false;
         }, 5000);
@@ -77,6 +87,26 @@ export class NewsCreateComponent implements OnInit {
         this.success = false;
       }
     });
+  }
+
+  resetForm(): void {
+    this.newsForm.reset();
+    this.selectedFile = null;
+    this.selectedEvent = null;
+    this.newsForm.patchValue({ image: null, event: null });
+    this.submitted = false;
+
+
+    const fileInput = document.getElementById('inputImage') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+
+
+    const eventInput = document.querySelector('app-autocomplete-textfield') as any;
+    if (eventInput && eventInput.clear) {
+      eventInput.clear();
+    }
   }
 
   vanishError(): void {

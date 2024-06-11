@@ -106,7 +106,7 @@ export class NewsComponent implements OnInit {
   }
 
   private createNews(news: NewsResponseDto) {
-    this.newsService.create(news.title, news.summary, news.text, this.selectedFile).subscribe({
+  /*  this.newsService.create(news.title, news.summary, news.text, this.selectedFile).subscribe({
       next: () => {
         this.modalService.dismissAll();
         this.loadNews();
@@ -121,6 +121,8 @@ export class NewsComponent implements OnInit {
         this.success = false;
       }
     });
+
+   */
   }
 
   loadNews() {

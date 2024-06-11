@@ -9,13 +9,13 @@
             <form [formGroup]="newsForm" (ngSubmit)="addNews()">
                 <div class="row">
                     <div class="form-group col-12">
-                        <label for="inputTitle">Titel:</label>
+                        <label for="inputTitle">Titel</label>
                         <input
                                 type="text"
                                 id="inputTitle"
                                 formControlName="title"
                                 class="form-control"
-                                placeholder="Titel der News"
+                                placeholder="Titel eingeben"
                                 [ngClass]="{ 'is-invalid': formControls.title.invalid && (formControls.title.dirty || formControls.title.touched) }"
                         />
                         <div *ngIf="formControls.title.invalid && (formControls.title.dirty || formControls.title.touched)" class="invalid-feedback">
@@ -25,12 +25,12 @@
                         </div>
                     </div>
                     <div class="form-group col-12">
-                        <label for="inputSummary">Zusammenfassung:</label>
+                        <label for="inputSummary">Zusammenfassung</label>
                         <textarea
                                 id="inputSummary"
                                 formControlName="summary"
                                 class="form-control"
-                                placeholder="Zusammenfassung"
+                                placeholder="Zusammenfassung eingeben"
                                 [ngClass]="{ 'is-invalid': formControls.summary.invalid && (formControls.summary.dirty || formControls.summary.touched) }"
                         ></textarea>
                         <div *ngIf="formControls.summary.invalid && (formControls.summary.dirty || formControls.summary.touched)" class="invalid-feedback">
@@ -40,12 +40,12 @@
                         </div>
                     </div>
                     <div class="form-group col-12">
-                        <label for="inputText">Text:</label>
+                        <label for="inputText">Text</label>
                         <textarea
                                 id="inputText"
                                 formControlName="text"
                                 class="form-control"
-                                placeholder="Text"
+                                placeholder="Text eingeben"
                                 rows="6"
                                 [ngClass]="{ 'is-invalid': formControls.text.invalid && (formControls.text.dirty || formControls.text.touched) }"
                         ></textarea>
@@ -55,6 +55,16 @@
                             <small class="form-text text-danger" *ngIf="formControls.text.errors.maxlength">Der Text darf höchstens 10.000 Zeichen lang sein!</small>
                         </div>
                     </div>
+                    <div class="form-group col-12">
+                        <app-autocomplete-textfield
+                                (selectedEvent)="onEventSelected($event)"
+                                [ngClass]="{ 'is-invalid': submitted && !selectedEvent }"
+                        ></app-autocomplete-textfield>
+                        <div *ngIf="submitted && !selectedEvent" class="invalid-feedback">
+                            <small class="form-text text-danger">Ein Event ist erforderlich!</small>
+                        </div>
+                    </div>
+
                     <div class="form-group col-12">
                         <label for="inputImage">Bild hochladen:</label>
                         <input
@@ -75,8 +85,8 @@
                         <button
                                 type="submit"
                                 class="btn btn-block w-100"
-                                [ngClass]="{ 'btn-success': newsForm.valid && selectedFile, 'btn-danger': !newsForm.valid || !selectedFile }"
-                                [disabled]="!newsForm.valid || !selectedFile"
+                                [ngClass]="{ 'btn-success': newsForm.valid && selectedFile && selectedEvent, 'btn-danger': !newsForm.valid || !selectedFile || !selectedEvent }"
+                                [disabled]="!newsForm.valid || !selectedFile || !selectedEvent"
                         >
                             Erstellen
                         </button>

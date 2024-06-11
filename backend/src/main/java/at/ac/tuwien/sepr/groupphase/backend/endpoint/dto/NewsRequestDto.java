@@ -1,5 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
+import at.ac.tuwien.sepr.groupphase.backend.dto.EventDto;
+
 import java.time.LocalDateTime;
 
 public class NewsRequestDto {
@@ -9,6 +11,7 @@ public class NewsRequestDto {
     private String text;
     private LocalDateTime publishedAt;
     private byte[] image;
+    private EventDto eventDto;
 
     public Long getId() {
         return id;
@@ -56,5 +59,13 @@ public class NewsRequestDto {
 
     public void setImage(byte[] image) {
         this.image = image;
+    }
+
+    public EventDto getEventDto() {
+        return eventDto;
+    }
+
+    public void setEventDto(EventDto eventDto) {
+        this.eventDto = eventDto;
     }
 }
