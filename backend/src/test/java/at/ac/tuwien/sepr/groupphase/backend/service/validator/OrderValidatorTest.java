@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static at.ac.tuwien.sepr.groupphase.backend.supplier.ApplicationUserSupplier.aCustomerUser;
@@ -134,7 +135,7 @@ public class OrderValidatorTest {
         var order = new OrderDetailsDto();
         var invoice = new InvoiceDto();
         invoice.setInvoiceType(InvoiceType.PURCHASE);
-        invoice.setDateTime(LocalDateTime.now());
+        invoice.setDateTime(LocalDateTime.now().minusSeconds(1));
         order.setInvoices(List.of(invoice));
         order.setCustomer(user);
         var startedShow = new ShowDto();

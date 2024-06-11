@@ -284,4 +284,33 @@ public class TicketValidatorTest {
             .isInstanceOf(ValidationException.class);
     }
 
+
+    @Test
+    void validateForValidation_ShouldThrowException_WhenTicketIsNull() {
+        assertThatThrownBy(() -> ticketValidator.validateForValidation(null))
+            .hasMessageContaining("Ticket is null")
+            .isInstanceOf(ValidationException.class);
+    }
+
+    @Test
+    void validateForValidation_ShouldThrowException_WhenTicketIsValid() {
+        var t = new TicketDetailsDto();
+        t.setReserved(true);
+        t.setValid(true);
+
+        assertThatThrownBy(() -> ticketValidator.validateForValidation(t))
+            .hasMessageContaining("Cannot validate valid ticket.")
+            .isInstanceOf(ValidationException.class);
+    }
+
+    @Test
+    void validateForValidation_ShouldThrowException_WhenTicketIsNotReserved() {
+        var t = new TicketDetailsDto();
+        t.setReserved(false);
+        t.setValid(false);
+
+        assertThatThrownBy(() -> ticketValidator.validateForValidation(t))
+            .hasMessageContaining("Cannot validate not-reserved ticket.")
+            .isInstanceOf(ValidationException.class);
+    }
 }

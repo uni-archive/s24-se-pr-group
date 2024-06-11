@@ -48,7 +48,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles({"test", "generateData"})
+@ActiveProfiles({"test"})
 @AutoConfigureMockMvc
 public class AuthenticationEndpointTest {
 
@@ -63,24 +63,11 @@ public class AuthenticationEndpointTest {
     private UserRepository userRepository;
 
     @Autowired
-    private AddressRepository addressRepository;
-
-    @Autowired
-    private JwtTokenizer jwtTokenizer;
-
-    @Autowired
-    private SecurityProperties securityProperties;
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
     private SchedulerFactoryBean schedulerFactoryBean;
-    @Autowired
-    private UserDataGenerator userDataGenerator;
-    @Autowired
-    private OrderRepository orderRepository;
-    @Autowired
-    private InvoiceRepository invoiceRepository;
+
 
     @BeforeEach
     void setUp() {

@@ -44,7 +44,23 @@ public class TicketValidator extends AbstractValidator<TicketDetailsDto> {
         if (Objects.nonNull(ticket) && !ticket.isReserved()) {
             errors.add("Cannot cancel non-reserved ticket.");
         }
+        endValidation(errors);
+    }
 
+    public void validateForValidation(TicketDetailsDto ticket) throws ValidationException {
+        List<String> errors = new ArrayList<>();
+
+        if (ticket == null) {
+            errors.add("Ticket is null");
+        }
+
+        if (Objects.nonNull(ticket) && ticket.isValid()) {
+            errors.add("Cannot validate valid ticket.");
+        }
+
+        if (Objects.nonNull(ticket) && !ticket.isReserved()) {
+            errors.add("Cannot validate not-reserved ticket.");
+        }
         endValidation(errors);
     }
 

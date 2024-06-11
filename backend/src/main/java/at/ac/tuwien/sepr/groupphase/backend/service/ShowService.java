@@ -4,12 +4,10 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.HallSectorShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowListDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowSearchDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
-import jakarta.transaction.Transactional;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -55,5 +53,13 @@ public interface ShowService {
      * @return all shows that are at the
      */
     Page<ShowDto> findByLocation(Long locationId, boolean onlyFutureShows, Pageable pageable);
+
+    /**
+     * Get a show by its id.
+     *
+     * @param showId the id of the show
+     * @return the show
+     */
+    ShowDto findById(Long showId) throws DtoNotFoundException;
 }
 

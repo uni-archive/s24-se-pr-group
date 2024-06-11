@@ -4,22 +4,21 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.HallSectorShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowListDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowSearchDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.HallSectorShowCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowResponse;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.HallSectorShowResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ShowResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.HallSectorShowMapper;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.ShowMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.ShowService;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,6 +35,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/api/v1/show")
 public class ShowEndpoint {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private ShowService service;
@@ -43,7 +43,7 @@ public class ShowEndpoint {
     private final HallSectorShowResponseMapper hallSectorShowMapper;
 
     public ShowEndpoint(ShowService showService, ShowResponseMapper showMapper,
-        HallSectorShowResponseMapper hallSectorShowMapper) {
+                        HallSectorShowResponseMapper hallSectorShowMapper) {
         this.service = showService;
         this.showMapper = showMapper;
         this.hallSectorShowMapper = hallSectorShowMapper;
@@ -81,10 +81,20 @@ public class ShowEndpoint {
     @PermitAll
     @GetMapping("/location/{locationId}")
     public ResponseEntity<Page<ShowResponse>> getShowByLocation(@PathVariable("locationId") Long locationId,
-        @RequestParam(value = "onlyFutureShows", required = false, defaultValue = "true") boolean onlyFutureShows,
-        @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-        @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+                                                                @RequestParam(value = "onlyFutureShows", required = false, defaultValue = "true") boolean onlyFutureShows,
+                                                                @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                                                @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         return ResponseEntity.ok(
             service.findByLocation(locationId, true, PageRequest.of(page, size)).map(showMapper::toResponse));
+    }
+
+    @PermitAll
+    @GetMapping("/{showId}")
+    public ResponseEntity<ShowResponse> getShowById(@PathVariable("showId") Long showId) {
+        try {
+            return ResponseEntity.ok(showMapper.toResponse(service.findById(showId)));
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        }
     }
 }

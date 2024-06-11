@@ -9,6 +9,7 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { OrderDetailsResponse } from './order-details-response';
 import { ShowResponse } from './show-response';
 import { TicketDetailsResponseHallSpot } from './ticket-details-response-hall-spot';
 
@@ -20,5 +21,6 @@ export interface TicketDetailsResponse {
     valid?: boolean;
     hallSpot?: TicketDetailsResponseHallSpot;
     show?: ShowResponse;
+    order?: OrderDetailsResponse;
 }
 

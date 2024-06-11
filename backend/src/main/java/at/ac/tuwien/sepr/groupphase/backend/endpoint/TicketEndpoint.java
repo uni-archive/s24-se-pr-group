@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.TicketCreationRequest;
+import at.ac.tuwien.sepr.groupphase.backend.dto.TicketSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.TicketDetailsResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.ValidationException;
@@ -13,6 +14,8 @@ import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundExcepti
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -140,6 +144,34 @@ public class TicketEndpoint {
 
         try {
             ticketService.changeTicketReserved(ticketId, setReserved, user);
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        }
+    }
+
+    @GetMapping(path = "/show/{id}")
+    @Secured(Code.ADMIN)
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Page<TicketDetailsResponse>> searchTicketsInShow(@PathVariable("id") long id,
+        @RequestParam(value = "firstName", defaultValue = "") String firstName,
+        @RequestParam(value = "familyName", defaultValue = "") String familyName,
+        @RequestParam(value = "reservedOnly", defaultValue = "true") boolean reservedOnly,
+        @RequestParam(value = "valid", defaultValue = "false") boolean valid,
+        @RequestParam(value = "page", defaultValue = "0") int page,
+        @RequestParam(value = "size", defaultValue = "10") int size) {
+        return ResponseEntity.ok(
+            ticketService.search(new TicketSearchDto(id, firstName, familyName, reservedOnly, valid, PageRequest.of(page, size)))
+                .map(ticketMapper::toResponse));
+    }
+
+    @PostMapping(path = "/{id}/validate")
+    @Secured(Code.ADMIN)
+    @ResponseStatus(HttpStatus.OK)
+    public void validateTicket(@PathVariable("id") long id) throws NotFoundException, ValidationException {
+        try {
+            ticketService.validateTicket(id);
+        } catch (at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException e) {
+            throw new ValidationException(e);
         } catch (DtoNotFoundException e) {
             throw new NotFoundException(e);
         }

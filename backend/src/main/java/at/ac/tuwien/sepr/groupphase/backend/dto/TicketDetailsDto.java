@@ -75,7 +75,7 @@ public class TicketDetailsDto implements AbstractDto {
         private boolean valid;
         private HallSpotDto hallSpot;
         private ShowDto show;
-        private OrderDetailsDto orderDetailsDto;
+        private OrderDetailsDto orderDto;
 
         public TicketDetailsDtoBuilder withHash(String hash) {
             this.hash = hash;
@@ -102,8 +102,8 @@ public class TicketDetailsDto implements AbstractDto {
             return this;
         }
 
-        public TicketDetailsDtoBuilder withOrderSummaryDto(OrderDetailsDto orderDetailsDto) {
-            this.orderDetailsDto = orderDetailsDto;
+        public TicketDetailsDtoBuilder withOrder(OrderDetailsDto orderDto) {
+            this.orderDto = orderDto;
             return this;
         }
 
@@ -114,7 +114,7 @@ public class TicketDetailsDto implements AbstractDto {
             ticketDetailsDto.setValid(valid);
             ticketDetailsDto.setHallSpot(hallSpot);
             ticketDetailsDto.setShow(show);
-            ticketDetailsDto.setOrder(orderDetailsDto);
+            ticketDetailsDto.setOrder(orderDto);
             return ticketDetailsDto;
         }
     }

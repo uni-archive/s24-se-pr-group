@@ -40,6 +40,9 @@
         <a class="nav-link" *ngIf="authService.isLoggedIn() && authService.getUserRole()==='ADMIN'"
            routerLink="/locations" routerLinkActive="active">Aufführungsorte</a>
       </li>
+      <li>
+        <a class="nav-link" *ngIf="authService.isLoggedIn() && authService.getUserRole()==='ADMIN'" routerLink="/pickup-ticket-show-select" routerLinkActive="active">Ticketabholung</a>
+      </li>
     </ul>
     <!-- Right-aligned nav items -->
     <ul class="navbar-nav ms-auto">

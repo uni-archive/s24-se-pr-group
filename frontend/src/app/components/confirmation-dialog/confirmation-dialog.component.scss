@@ -1,0 +1,25 @@
+/* confirmation-dialog.component.scss */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-dialog {
+  max-width: 600px; /* Increase the modal width */
+  margin: 2rem; /* Increase the margins */
+}
+
+.modal-content {
+  padding: 2rem; /* Increase the padding */
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, .2);
+  border-radius: .3rem;
+  box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .5);
+}

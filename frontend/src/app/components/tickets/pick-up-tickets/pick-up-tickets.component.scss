@@ -1,0 +1,12 @@
+/* styles.css or the component's CSS file */
+.table-striped tbody tr td {
+  vertical-align: middle; /* Vertically center text in the table cells */
+}
+
+.table-striped thead th, .table-striped tbody tr td {
+  white-space: nowrap; /* Prevents text wrapping */
+}
+
+.btn-lg {
+  padding: 10px 16px; /* Make the button larger */
+}

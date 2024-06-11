@@ -1,0 +1,49 @@
+<!-- pick-up-tickets.component.html -->
+<app-paginated-list
+  [filterTemplate]="filterTemplate"
+  [resultTemplate]="resultTemplate"
+  [searchFunction]="searchTickets"
+  [filterConfig]="filterConfig"
+  [showPaginationButtons]="true"
+  [createButtonEnabled]="false"
+  [heading]="getHeading()"
+></app-paginated-list>
+
+<ng-template #filterTemplate let-form="form">
+  <form [formGroup]="form" class="form-inline">
+    <div class="row align-items-center mb-2">
+      <div class="col-12 col-xl-6 mb-2">
+        <input type="text" class="form-control w-100" placeholder="Vorname" formControlName="firstName">
+      </div>
+      <div class="col-12 col-xl-6 mb-2">
+        <input type="text" class="form-control w-100" placeholder="Nachname" formControlName="familyName">
+      </div>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #resultTemplate let-items="items">
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead class="thead-light">
+      <tr>
+        <th>Vorname</th>
+        <th>Nachname</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let ticket of items" class="align-middle">
+        <td>{{ ticket.order.customer.firstName }}</td>
+        <td>{{ ticket.order.customer.familyName }}</td>
+        <td class="d-flex justify-content-end">
+          <button class="btn btn-success btn-lg" (click)="markAsPickedUp(ticket)">
+            <i class="bi bi-check"></i>
+          </button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</ng-template>
+
+<app-confirmation-dialog *ngIf="showConfirmationDialog" [customerName]="customerNameToDisplay" (confirm)="onConfirm($event)"></app-confirmation-dialog>

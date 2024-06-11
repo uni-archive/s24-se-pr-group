@@ -1,25 +1,19 @@
-import {Component, OnInit} from "@angular/core";
-import {FormsModule} from "@angular/forms";
-import {BrowserModule} from "@angular/platform-browser";
+import { Component } from '@angular/core';
 import {ShowSearchDto} from "../../../dtos/ShowSearchDto";
-import {DatepickerComponent} from "../datepicker/datepicker.component";
 import {ShowEndpointService, ShowListDto} from "../../../services/openapi";
-import {formatDuration} from "../../../../formatters/durationFormatter";
 import {Router} from "@angular/router";
+import { formatDuration } from 'src/formatters/durationFormatter';
 
 @Component({
-  selector: "app-show-search",
-  standalone: true,
-  imports: [FormsModule, BrowserModule, DatepickerComponent],
-  templateUrl: "./show-search.component.html",
-  styleUrl: "./show-search.component.scss",
+  selector: 'app-pick-up-ticket-show-select',
+  templateUrl: './pick-up-ticket-show-select.component.html',
+  styleUrl: './pick-up-ticket-show-select.component.scss'
 })
-export class ShowSearchComponent implements OnInit {
+export class PickUpTicketShowSelectComponent {
+
   searchData: ShowSearchDto = new ShowSearchDto();
   time: Date = null;
   shows: ShowListDto[] = [];
-  protected readonly formatDuration = formatDuration;
-  protected readonly Date = Date;
 
   constructor(private service: ShowEndpointService, private router: Router) {
   }
@@ -36,7 +30,6 @@ export class ShowSearchComponent implements OnInit {
       price: this.searchData.price * 100,
       eventId: this.searchData.eventId,
       location: null
-    ,
     };
     this.service.searchShows(dto).subscribe({
       next: (data) => {
@@ -45,7 +38,7 @@ export class ShowSearchComponent implements OnInit {
       error: (err) => {
         //TODO: INFORM USER
         console.log(err);
-      },
+      }
     });
   }
 
@@ -65,8 +58,11 @@ export class ShowSearchComponent implements OnInit {
     let splitDatetime = date.split("T");
     let splitDate = splitDatetime[0].split("-");
     let splitTime = splitDatetime[1].split(":");
-    return (splitDate[2] + "." + splitDate[1] + "." + splitDate[0] + " " + splitTime[0] + ":" + splitTime[1]);
+    return splitDate[2] + "." + splitDate[1] + "." + splitDate[0] + " " + splitTime[0] + ":" + splitTime[1];
   }
+
+  protected readonly formatDuration = formatDuration;
+  protected readonly Date = Date;
 
   navigateToPickup(id: number) {
     this.router.navigate(['tickets/pickup', id]);
