@@ -1,7 +1,7 @@
 import {Component, ViewChild} from '@angular/core';
 import {HallplanComponent, HallSeat, HallSection} from "../hallplan/hallplan.component";
 import {
-  HallPlanEndpointService, HallSector,
+  HallPlanEndpointService, OrderEndpointService,
   ShowEndpointService, ShowHallplanResponse,
   ShowResponse,
   TicketEndpointService
@@ -11,6 +11,8 @@ import {ActivatedRoute} from "@angular/router";
 import {NgForOf, NgIf} from "@angular/common";
 import {SeatEntity, SectionEntity} from "../hallplan/entities";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {HallSector} from "../../services/openapi/model/hall-sector";
+import {HttpStatusCode} from "@angular/common/http";
 
 @Component({
   selector: 'app-ticket-select',
@@ -35,11 +37,13 @@ export class TicketSelectComponent {
   selectedSectors: number[] = [];
   visibleSectors: HallSector[] = [];
   sectorSeatMap: ({ [key: number]: HallSeat[] }) = {};
+  orderId: number | null = null;
 
   constructor(
     private route: ActivatedRoute,
     private showService: ShowEndpointService,
-    private hallplanService: HallPlanEndpointService,
+    private ticketService: TicketEndpointService,
+    private orderService: OrderEndpointService,
     private messagingService: MessagingService
   ) {
   }
@@ -49,6 +53,9 @@ export class TicketSelectComponent {
   }
 
   ngOnInit(): void {
+    this.loadOrderCookie();
+    this.ticketService.configuration.withCredentials = true;
+
     this.showService.getShowById(this.route.snapshot.params.id)
       .subscribe({
         next: show => {
@@ -88,6 +95,7 @@ export class TicketSelectComponent {
                 return {
                   id: seat.id,
                   sectorId: section.id,
+                  isAvailable: ! seat.isReserved,
                   pos: JSON.parse(seat.frontendCoordinates),
                 }
               })
@@ -103,12 +111,67 @@ export class TicketSelectComponent {
       });
   }
 
+  loadOrderCookie(): void {
+    this.orderService.configuration.withCredentials = true;
+    this.orderService.getCurrentOrder().subscribe({
+      next: order => {
+        this.orderId = order.id;
+        console.log("current", order);
+      },
+      error: err => {
+        if(err.status === HttpStatusCode.BadRequest) {
+          this.orderService.createOrder().subscribe({
+            next: order => {
+              this.orderId = order.id;
+              console.log("create", order);
+            },
+            error: err => {
+              this.messagingService.setMessage("Ihre Bestellung konnte nicht geladen werden. Bitte versuchen Sie es später erneut.", 'danger');
+              console.log(err);
+            }
+          })
+
+        } else {
+          this.messagingService.setMessage("Ihre Bestellung konnte nicht geladen werden. Bitte versuchen Sie es später erneut.", 'danger');
+        }
+
+      }
+    });
+  }
+
   findSeatById(seatId: number, sectorId: number) {
     return this.findSectorById(sectorId).seats.find(seat => seat.id === seatId);
   }
 
   findSectorById(sectorId: number): HallSection {
     return this.hallplan.sections.find(section => section.id === sectorId);
+  }
+
+  /*
+
+    spotId?: number;
+    orderId?: number;
+    showId?: number;
+    reservationOnly?: boolean;
+   */
+
+  addToCart(isReservation: boolean) {
+    this.selectedSeats.forEach(seat => {
+      this.ticketService.addTicket({
+        spotId: seat.id,
+        orderId: this.orderId,
+        showId: this.showResponse.id,
+        reservationOnly: isReservation
+      }).subscribe({
+        next: order => {
+          console.log("create", order);
+        },
+        error: err => {
+          this.messagingService.setMessage("Ihre Bestellung konnte nicht geladen werden. Bitte versuchen Sie es später erneut.", 'danger');
+          console.log(err);
+        }
+      })
+    })
   }
 
   ngAfterViewInit() {

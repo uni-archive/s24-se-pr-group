@@ -32,8 +32,7 @@ export class UserCartComponent implements OnInit {
     private orderService: OrderEndpointService,
     private ticketService: TicketEndpointService,
     private messagingService: MessagingService,
-    private router: Router,
-    private cookieService: CookieService
+    private router: Router
   ) {
   }
 
@@ -111,7 +110,7 @@ export class UserCartComponent implements OnInit {
     this.orderService.getCurrentOrder().subscribe({
       next: order => {
         this.order = order;
-        console.log(this.order);
+        console.log("current", this.order);
         this.ticketsBySectorsByEvent = this.createEventToTicketMap();
       },
       error: err => {
@@ -119,6 +118,7 @@ export class UserCartComponent implements OnInit {
           this.orderService.createOrder().subscribe({
             next: order => {
               this.order = order;
+              console.log("create", this.order);
               this.ticketsBySectorsByEvent = this.createEventToTicketMap();
             },
             error: err => {

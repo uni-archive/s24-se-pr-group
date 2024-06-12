@@ -89,7 +89,8 @@ public class ShowEndpoint {
     @PermitAll
     @GetMapping("/{id}/available-seats")
     public ResponseEntity<ShowHallplanResponse> getAvailableSeatsByShowId(@PathVariable("id") Long id) {
-        LOGGER.trace("Getting available hallplan for show with id {}", id);
+        LOGGER.info("Getting available hallplan for show with id {}", id);
+        LOGGER.info("{}", service.getAvailableSeatsByShowId(id));
         return ResponseEntity.ok(service.getAvailableSeatsByShowId(id));
     }
 

@@ -81,6 +81,8 @@ public class ShowDataGenerator {
             showRepository.saveAndFlush(show);
 
             for (HallSector sector : location.getHallPlan().getSectors()) {
+                if (hallSectorShowRepository.findByShowIdAndSectorId(show.getId(), sector.getId()).isPresent())
+                    continue;
                 var hss = new HallSectorShow(show, sector, random.nextInt(50, 1000));
                 hallSectorShowRepository.save(hss);
             }

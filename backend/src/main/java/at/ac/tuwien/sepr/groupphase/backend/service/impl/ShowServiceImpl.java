@@ -76,12 +76,10 @@ public class ShowServiceImpl implements ShowService {
 
     @Override
     public ShowHallplanResponse getAvailableSeatsByShowId(Long showId) {
-        var tickets = ticketDao.findForShowById(showId); // todo implement reserved tickets
+        var tickets = ticketDao.findForShowById(showId);
         var hallPlan = dao.getHallPlanByShowId(showId);
         var hallSectorShowList = hallSectorShowService.findByShowId(showId);
-        var response = showHallPlanResponseMapper.toResponse(hallPlan, hallSectorShowList);
-
-        return response;
+        return showHallPlanResponseMapper.toResponse(hallPlan, hallSectorShowList, tickets);
     }
 
     @Override

@@ -14,6 +14,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.TicketValidator;
+import jakarta.transaction.Transactional;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,6 +108,7 @@ public class TicketServiceImpl implements TicketService {
         ticketDao.invalidateAllTicketsForOrder(orderId);
     }
 
+    @Transactional
     @Override
     public TicketDetailsDto addTicketToOrder(Long seatId, Long showId, Long orderId, boolean reservationOnly)
         throws ValidationException {
@@ -120,7 +122,8 @@ public class TicketServiceImpl implements TicketService {
     }
 
 
-    private TicketDetailsDto createTicket(Long seatId, Long showId, Long orderId, boolean reservationOnly)
+    @Transactional
+    protected TicketDetailsDto createTicket(Long seatId, Long showId, Long orderId, boolean reservationOnly)
         throws ValidationException {
         TicketDetailsDto ticket = new TicketDetailsDto();
         ticketValidator.validateForCreate(showId, seatId, orderId);

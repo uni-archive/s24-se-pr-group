@@ -208,6 +208,7 @@ export type HallSeat = {
   id?: number;
   sectorId?: number;
   pos: Point2D;
+  isAvailable?: boolean;
 }
 
 export type Point2D = {
