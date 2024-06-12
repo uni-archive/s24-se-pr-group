@@ -23,15 +23,12 @@
 
     <div class="row">
         <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 p-2" *ngFor="let news of getNews()">
-            <div class="card h-100">
+            <div class="card h-100" [routerLink]="['/news-detail', news.id]">
                 <img class="news-image-preview" [src]="'data:image/jpeg;base64,'+news.image" alt="news">
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">{{ news.title }}</h5>
                     <h6 class="card-subtitle mb-2 text-muted">{{ news.publishedAt | date: 'dd.MM.yyyy HH:mm' }}</h6>
                     <p class="card-text flex-grow-1">{{ news.summary }}</p>
-                    <div class="mt-2">
-                        <button [routerLink]="['/news-detail', news.id]" class="btn bg-dark text-light">Details</button>
-                    </div>
                 </div>
             </div>
         </div>

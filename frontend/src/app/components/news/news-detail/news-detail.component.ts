@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {NewsResponseDto, NewsEndpointService, EventDto} from "../../../services/openapi";
 
 @Component({
@@ -20,9 +20,11 @@ export class NewsDetailComponent implements OnInit {
     };
     error = false;
     errorMessage = '';
+    hover = false;
 
     constructor(private route: ActivatedRoute,
-                private newsServiceNew: NewsEndpointService) {
+                private newsServiceNew: NewsEndpointService,
+                private router: Router) {
     }
 
     ngOnInit(): void {
@@ -49,6 +51,10 @@ export class NewsDetailComponent implements OnInit {
         });
     }
 
+    navigateToEvent(eventId: number): void {
+        this.router.navigate(['/event', eventId]);
+    }
+
     getParagraphs(text: string): string[] {
         return text.split('\n');
     }
@@ -62,4 +68,5 @@ export class NewsDetailComponent implements OnInit {
             this.errorMessage = error.error;
         }
     }
+
 }

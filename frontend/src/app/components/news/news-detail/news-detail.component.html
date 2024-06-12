@@ -24,12 +24,6 @@
 
         <div class="col-lg-11">
             <div *ngIf="news">
-                <div class="d-flex justify-content-between mb-3">
-                    <a routerLink="/news" class="btn bg-dark text-light">Zurück</a>
-                    <button *ngIf="news.eventDto" [routerLink]="['/event', news.eventDto.id]"
-                            class="btn bg-dark text-light">Zeige Veranstaltung: {{ news.eventDto.title }}
-                    </button>
-                </div>
                 <div class="card mb-3 custom-bg-color">
                     <div class="card-body">
                         <div *ngFor="let paragraph of getParagraphs(news.summary)">
@@ -45,6 +39,15 @@
                         </div>
                     </div>
                 </div>
+
+                <div *ngIf="news.eventDto" class="card mb-3 event-card-color hover-card" (click)="navigateToEvent(news.eventDto.id)">
+                    <div class="card-body">
+                        <h5 class="card-title">Suche Tickets für: {{ news.eventDto.title }}</h5>
+                        <p class="card-text"> {{ news.eventDto.eventType }}</p>
+                        <p class="card-text"> {{ news.eventDto.description }}</p>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
