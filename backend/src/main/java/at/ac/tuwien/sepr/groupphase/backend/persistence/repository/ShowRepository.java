@@ -37,4 +37,6 @@ public interface ShowRepository extends JpaRepository<Show, Long> {
     @Query("SELECT s from Show s")
     List<Show> getAllShows();
 
+    @EntityGraph(attributePaths = {"artists", "event", "location"})
+    Show findById(long id);
 }

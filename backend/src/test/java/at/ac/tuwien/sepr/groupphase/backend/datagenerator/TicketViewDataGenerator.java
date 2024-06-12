@@ -52,6 +52,10 @@ public class TicketViewDataGenerator {
     private static final int HALLSPOTS_COUNT = 500 * COUNT_FACTOR;
     private static final int SECTORS_SHOWS_COUNT = 100 * COUNT_FACTOR;
     private static final int TICKETS_COUNT = 100 * COUNT_FACTOR;
+
+    private static final Random rng = new Random();
+    private static final Faker faker = new Faker();
+
     @Autowired
     private OrderRepository orderRepository;
     @Autowired

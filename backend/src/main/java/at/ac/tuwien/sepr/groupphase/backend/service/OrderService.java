@@ -4,13 +4,12 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderSummaryDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
-
 import java.util.List;
 
 /**
- * Handles creating, cancelling and fetching of orders made
- * by a user.
+ * Handles creating, cancelling and fetching of orders made by a user.
  */
 public interface OrderService {
 
@@ -22,7 +21,7 @@ public interface OrderService {
      * @throws EntityNotFoundException if no order with this id exists.
      * @throws ValidationException     if the customer of the found order does not match with the provided user.
      */
-    OrderDetailsDto findById(long id, ApplicationUserDto user) throws EntityNotFoundException, ValidationException;
+    OrderDetailsDto findById(long id, ApplicationUserDto user) throws DtoNotFoundException, ValidationException;
 
 
     /**
@@ -35,7 +34,8 @@ public interface OrderService {
 
 
     /**
-     * Cancels an order. This creates a cancellation-invoice and invalidates all tickets that are associated with this order.
+     * Cancels an order. This creates a cancellation-invoice and invalidates all tickets that are associated with this
+     * order.
      *
      * @param id   the id of the order.
      * @param user the user who wants to cancel their order.
@@ -43,4 +43,21 @@ public interface OrderService {
      * @throws ValidationException     if the user is not permitted to cancel the given order.
      */
     void cancelOrder(long id, ApplicationUserDto user) throws EntityNotFoundException, ValidationException;
+
+    /**
+     * Creates an order for the given user.
+     *
+     * @param user the user for which the order should be created - usually the logged in user
+     * @return the created order
+     */
+    OrderDetailsDto create(ApplicationUserDto user) throws ValidationException;
+
+
+    /**
+     * Confirms payment on an order. This will cancel all Invalidation Jobs, and mark the tickets as valid. Reserved
+     * Tickets will be invalidated 30 minutes before the show.
+     *
+     * @param orderDetailsDto the order to confirm
+     */
+    void confirmOrder(OrderDetailsDto orderDetailsDto) throws DtoNotFoundException;
 }

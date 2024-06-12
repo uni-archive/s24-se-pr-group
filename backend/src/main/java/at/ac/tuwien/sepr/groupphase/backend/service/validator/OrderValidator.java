@@ -15,6 +15,8 @@ import java.time.temporal.TemporalUnit;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import org.springframework.stereotype.Component;
 
 @Component
 public class OrderValidator extends AbstractValidator<OrderDetailsDto> {
@@ -55,6 +57,21 @@ public class OrderValidator extends AbstractValidator<OrderDetailsDto> {
             errors.add("At least one show has already started.");
         }
 
+        endValidation(errors);
+    }
+
+    @Override
+    public void validateForCreate(OrderDetailsDto object) throws ValidationException {
+        List<String> errors = new ArrayList<>();
+        if (Objects.isNull(object.getCustomer())) {
+            errors.add("Customer must not be null");
+        }
+        if (Objects.isNull(object.getDateTime())) {
+            errors.add("DateTime must not be null");
+        }
+        if (Objects.nonNull(object.getDateTime()) && object.getDateTime().isAfter(LocalDateTime.now())) {
+            errors.add("Order date must not be in the future.");
+        }
         endValidation(errors);
     }
 }

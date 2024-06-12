@@ -9,6 +9,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ApplicationUserMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.MailNotSentException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
@@ -72,7 +73,11 @@ public class UserEndpoint {
     @GetMapping(path = "/current", produces = MediaType.APPLICATION_JSON_VALUE)
     public ApplicationUserResponse getUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return userMapper.toResponse(userService.findApplicationUserByEmail(authentication.getName()));
+        try {
+            return userMapper.toResponse(userService.findApplicationUserByEmail(authentication.getName()));
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        }
     }
 
     @Secured(Code.ADMIN)
@@ -112,7 +117,11 @@ public class UserEndpoint {
         if (!authentication.getName().equals(user.getEmail())) {
             throw new ValidationException("User can only update their own information.");
         }
-        return userMapper.toResponse(userService.updateUserInfo(userMapper.toDto(userInfo)));
+        try {
+            return userMapper.toResponse(userService.updateUserInfo(userMapper.toDto(userInfo)));
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        }
     }
 
     @PermitAll

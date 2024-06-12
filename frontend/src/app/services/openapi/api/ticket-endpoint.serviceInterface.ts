@@ -13,6 +13,7 @@ import { HttpHeaders }                                       from '@angular/comm
 
 import { Observable }                                        from 'rxjs';
 
+import { TicketCreationRequest } from '../model/models';
 import { TicketDetailsResponse } from '../model/models';
 
 
@@ -23,6 +24,13 @@ import { Configuration }                                     from '../configurat
 export interface TicketEndpointServiceInterface {
     defaultHeaders: HttpHeaders;
     configuration: Configuration;
+
+    /**
+     * 
+     * 
+     * @param ticketCreationRequest 
+     */
+    addTicket(ticketCreationRequest: TicketCreationRequest, extraHttpRequestParams?: any): Observable<TicketDetailsResponse>;
 
     /**
      * 

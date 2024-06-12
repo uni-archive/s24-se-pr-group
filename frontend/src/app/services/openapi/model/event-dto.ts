@@ -9,7 +9,6 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { ShowDto } from './show-dto';
 
 
 export interface EventDto { 
@@ -18,7 +17,6 @@ export interface EventDto {
     duration?: number;
     title?: string;
     eventType?: EventDto.EventTypeEnum;
-    shows?: Array<ShowDto>;
 }
 export namespace EventDto {
     export type EventTypeEnum = 'CONCERT' | 'THEATER' | 'PLAY';

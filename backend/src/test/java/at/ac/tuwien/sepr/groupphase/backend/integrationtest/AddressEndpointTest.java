@@ -60,6 +60,7 @@ public class AddressEndpointTest {
     private LocationRepository locationRepository;
 
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     void createShouldCreateAddressAsAdmin() throws Exception {
         AddressCreateRequest createRequest = new AddressCreateRequest("123 Main St", "Vienna", "1010", "Austria");
 
@@ -104,6 +105,7 @@ public class AddressEndpointTest {
     }
 
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     void updateShouldUpdateAddressAsUser() throws Exception {
         Address address = new Address("Old Street", "Old City", "0000", "Old Country");
         address = addressRepository.save(address);

@@ -3,23 +3,21 @@ package at.ac.tuwien.sepr.groupphase.backend.persistence.dao;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowListDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowSearchDto;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.ArtistMapper;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.EventMapper;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.ShowMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Show;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.ArtistMapper;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.ShowMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.ArtistRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.ShowRepository;
 import jakarta.transaction.Transactional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Repository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class ShowDao extends AbstractDao<Show, ShowDto> {
@@ -28,15 +26,13 @@ public class ShowDao extends AbstractDao<Show, ShowDto> {
     private final ArtistRepository artrepo;
     private final EventDao eventDao;
     private final ArtistMapper artistMapper;
-    private final EventMapper eventMapper;
 
-    protected ShowDao(ShowRepository repository, EventMapper eventMapper, EventDao dao, ArtistRepository artrepo,
+    protected ShowDao(ShowRepository repository, EventDao dao, ArtistRepository artrepo,
         ArtistMapper artmapper, ShowMapper mapper) {
         super(repository, mapper);
         this.artrepo = artrepo;
         this.artistMapper = artmapper;
         this.eventDao = dao;
-        this.eventMapper = eventMapper;
     }
 
     @Transactional
@@ -81,5 +77,11 @@ public class ShowDao extends AbstractDao<Show, ShowDto> {
             list.add(showListDto);
         }
         return list;
+    }
+
+    @Override
+    public ShowDto findById(Long id) throws EntityNotFoundException {
+        return mapper.toDto(((ShowRepository) repository).findById(id)
+            .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException(id.toString())));
     }
 }

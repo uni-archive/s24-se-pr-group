@@ -1,5 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.datagenerator;
 
+import static at.ac.tuwien.sepr.groupphase.backend.supplier.ApplicationUserSupplier.aUserEntity;
+
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Address;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Artist;
@@ -14,12 +16,11 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Order;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Show;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Ticket;
 import com.github.javafaker.Faker;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -28,8 +29,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import static at.ac.tuwien.sepr.groupphase.backend.supplier.ApplicationUserSupplier.aUserEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class DataGeneratorUtils {
 
@@ -71,8 +71,11 @@ public class DataGeneratorUtils {
     }
 
     public static <T> T randomChoice(List<T> choices) {
-        var idx = rng.nextInt(choices.size());
-        return choices.get(idx);
+        if (choices.size() > 0) {
+            var idx = rng.nextInt(choices.size());
+            return choices.get(idx);
+        }
+        return null;
     }
 
     public static <T> T randomChoice(T[] choices) {
@@ -146,8 +149,8 @@ public class DataGeneratorUtils {
         shows.stream().collect(Collectors.toMap(
                 Show::getEvent,
                 s -> new ArrayList<Show>() {{
-                        add(s);
-                    }},
+                    add(s);
+                }},
                 (a, b) -> {
                     a.addAll(b);
                     return a;
@@ -193,8 +196,8 @@ public class DataGeneratorUtils {
         var sectorShowsChoiceMap = shows.stream().collect(Collectors.toConcurrentMap(
             s -> s,
             s -> new CopyOnWriteArrayList<HallSector>() {{
-                    addAll(sectors);
-                }}
+                addAll(sectors);
+            }}
         ));
 
         sectorShowsChosenMap.clear();
@@ -209,15 +212,17 @@ public class DataGeneratorUtils {
             sectorShow.setShow(show);
             sectorShow.setSector(sector);
 
-            sectorShowsChosenMap.putIfAbsent(sector, new ArrayList<>());
-            sectorShowsChosenMap.get(sector).add(show);
-
+            if (Objects.nonNull(sector)) {
+                sectorShowsChosenMap.putIfAbsent(sector, new ArrayList<>());
+                sectorShowsChosenMap.get(sector).add(show);
+            }
             sectorShow.setPrice(faker.random().nextInt(100, 500 * 100));
             return sectorShow;
         }, count);
     }
 
-    public static List<Ticket> fakeManyTickets(List<HallSpot> hallSpots, ConcurrentHashMap<HallSector, List<Show>> sectorShowsChosenMap, int count) {
+    public static List<Ticket> fakeManyTickets(List<HallSpot> hallSpots,
+        ConcurrentHashMap<HallSector, List<Show>> sectorShowsChosenMap, int count) {
         return fakeMany(() -> {
             var ticket = new Ticket();
             ticket.setHash(faker.random().hex());

@@ -1,7 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {NgForOf} from "@angular/common";
 import {FormsModule} from "@angular/forms";
-import {Artist, EventDto, ShowDto} from "../../../services/openapi";
+import {EventDto} from "../../../dtos/EventDto";
+import {Artist} from "../../../services/openapi/model/artist";
 
 @Component({
   selector: 'app-autocomplete-textfield',

@@ -1,12 +1,14 @@
 package at.ac.tuwien.sepr.groupphase.backend.dto;
 
 public class TicketDetailsDto implements AbstractDto {
+
     private Long id;
     private String hash;
     private boolean reserved;
     private boolean valid;
     private HallSpotDto hallSpot;
     private ShowDto show;
+    private OrderSummaryDto order;
 
     @Override
     public Long getId() {
@@ -57,12 +59,23 @@ public class TicketDetailsDto implements AbstractDto {
         this.show = show;
     }
 
+    public OrderSummaryDto getOrder() {
+        return order;
+    }
+
+    public TicketDetailsDto setOrder(OrderSummaryDto order) {
+        this.order = order;
+        return this;
+    }
+
     public class TicketDetailsDtoBuilder {
+
         private String hash;
         private boolean reserved;
         private boolean valid;
         private HallSpotDto hallSpot;
         private ShowDto show;
+        private OrderSummaryDto orderSummaryDto;
 
         public TicketDetailsDtoBuilder withHash(String hash) {
             this.hash = hash;
@@ -89,6 +102,11 @@ public class TicketDetailsDto implements AbstractDto {
             return this;
         }
 
+        public TicketDetailsDtoBuilder withOrderSummaryDto(OrderSummaryDto orderSummaryDto) {
+            this.orderSummaryDto = orderSummaryDto;
+            return this;
+        }
+
         public TicketDetailsDto build() {
             var ticketDetailsDto = new TicketDetailsDto();
             ticketDetailsDto.setHash(hash);
@@ -96,6 +114,7 @@ public class TicketDetailsDto implements AbstractDto {
             ticketDetailsDto.setValid(valid);
             ticketDetailsDto.setHallSpot(hallSpot);
             ticketDetailsDto.setShow(show);
+            ticketDetailsDto.setOrder(orderSummaryDto);
             return ticketDetailsDto;
         }
     }

@@ -4,8 +4,11 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.MailNotSentException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.UserLockedException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,7 +38,7 @@ public interface UserService extends UserDetailsService {
      * @param email the email address
      * @return a application user
      */
-    ApplicationUserDto findApplicationUserByEmail(String email);
+    ApplicationUserDto findApplicationUserByEmail(String email) throws DtoNotFoundException;
 
     /**
      * Log in a user.
@@ -45,7 +48,7 @@ public interface UserService extends UserDetailsService {
      * @return the JWT, if successful
      * @throws org.springframework.security.authentication.BadCredentialsException if credentials are bad
      */
-    String login(String email, String password);
+    String login(String email, String password) throws UserLockedException;
 
     /**
      * Create a new user.
@@ -86,7 +89,8 @@ public interface UserService extends UserDetailsService {
      * @throws ValidationException  if the user information is invalid
      * @throws MailNotSentException if the mail could not be sent
      */
-    ApplicationUserDto updateUserInfo(ApplicationUserDto userInfo) throws ValidationException, MailNotSentException;
+    ApplicationUserDto updateUserInfo(ApplicationUserDto userInfo)
+        throws ValidationException, MailNotSentException, DtoNotFoundException;
 
     /**
      * Find an application user based on the id.

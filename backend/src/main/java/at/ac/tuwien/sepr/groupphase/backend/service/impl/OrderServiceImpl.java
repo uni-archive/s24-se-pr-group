@@ -8,18 +8,21 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFound
 import at.ac.tuwien.sepr.groupphase.backend.service.InvoiceService;
 import at.ac.tuwien.sepr.groupphase.backend.service.OrderService;
 import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.OrderValidator;
+import java.lang.invoke.MethodHandles;
+import java.time.LocalDateTime;
+import java.util.List;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.invoke.MethodHandles;
-import java.util.List;
-
 @Service
 public class OrderServiceImpl implements OrderService {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final OrderDao orderDao;
 
@@ -29,7 +32,8 @@ public class OrderServiceImpl implements OrderService {
 
     private final InvoiceService invoiceService;
 
-    public OrderServiceImpl(OrderDao orderDao, OrderValidator orderValidator, TicketService ticketService, InvoiceService invoiceService) {
+    public OrderServiceImpl(OrderDao orderDao, OrderValidator orderValidator, TicketService ticketService,
+        InvoiceService invoiceService) {
         this.orderDao = orderDao;
         this.orderValidator = orderValidator;
         this.ticketService = ticketService;
@@ -38,9 +42,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderDetailsDto findById(long id, ApplicationUserDto user) throws EntityNotFoundException, ValidationException {
+    public OrderDetailsDto findById(long id, ApplicationUserDto user) throws DtoNotFoundException, ValidationException {
         LOGGER.trace("Get order details. Order-ID: {}, User: {}", id, user);
-        var found = orderDao.findById(id);
+        OrderDetailsDto found = null;
+        try {
+            found = orderDao.findById(id);
+        } catch (EntityNotFoundException e) {
+            throw new DtoNotFoundException(e);
+        }
 
         orderValidator.validateForFindById(found, user);
 
@@ -70,6 +79,29 @@ public class OrderServiceImpl implements OrderService {
         invoiceService.createCancellationInvoiceForOrder(order.getId());
         ticketService.invalidateAllTicketsForOrder(order.getId());
     }
+
+    @Override
+    public OrderDetailsDto create(ApplicationUserDto user) throws ValidationException {
+        OrderDetailsDto orderDetailsDto = new OrderDetailsDto();
+        orderDetailsDto.setCustomer(user);
+        orderDetailsDto.setDateTime(LocalDateTime.now());
+
+        orderValidator.validateForCreate(orderDetailsDto);
+        return orderDao.create(orderDetailsDto);
+    }
+
+    @Override
+    public void confirmOrder(OrderDetailsDto orderDetailsDto) throws DtoNotFoundException {
+        try {
+            for (var ticket : orderDetailsDto.getTickets()) {
+                ticketService.confirmTicket(ticket);
+            }
+        }
+        catch (SchedulerException exception){
+            throw new IllegalStateException("Could not confirm order", exception);
+        }
+    }
+
 
     private void addInvoicesToOrder(OrderDetailsDto order) {
         order.setInvoices(invoiceService.findByOrderId(order.getId()));

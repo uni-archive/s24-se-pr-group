@@ -6,6 +6,7 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.OrderMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Order;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.OrderRepository;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,5 +40,11 @@ public class OrderDao extends AbstractDao<Order, OrderDetailsDto> {
             res.add(mapped);
         }
         return res;
+    }
+
+    public OrderSummaryDto findSummaryById(long id) throws EntityNotFoundException{
+        Optional<Order> order = ((OrderRepository) repository).findById(id);
+        Order found = order.orElseThrow(() -> new EntityNotFoundException(id));
+        return ((OrderMapper) mapper).toSummaryDto(found);
     }
 }

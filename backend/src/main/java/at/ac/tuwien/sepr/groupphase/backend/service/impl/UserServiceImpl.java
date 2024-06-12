@@ -5,7 +5,6 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.EmailChangeTokenDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.MailBody;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.EmailChangeTokenDao;
@@ -16,12 +15,21 @@ import at.ac.tuwien.sepr.groupphase.backend.security.SecurityUtil;
 import at.ac.tuwien.sepr.groupphase.backend.service.AddressService;
 import at.ac.tuwien.sepr.groupphase.backend.service.EmailSenderService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.MailNotSentException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.UserLockedException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.UserValidator;
 import com.google.common.cache.Cache;
 import jakarta.mail.MessagingException;
+import java.lang.invoke.MethodHandles;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,13 +43,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.lang.invoke.MethodHandles;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -54,11 +55,13 @@ public class UserServiceImpl implements UserService {
     private final EmailSenderService emailSenderService;
     private final AddressService addressService;
     private final Cache<String, Integer> loginAttemptCache;
+    private final UserUnlockSchedulingService userUnlockSchedulingService;
 
     @Autowired
     public UserServiceImpl(UserDao userDao, EmailChangeTokenDao emailChangeTokenDao, PasswordEncoder passwordEncoder,
-                           JwtTokenizer jwtTokenizer, UserValidator userValidator,
-                           EmailSenderService emailSenderService, AddressService addressService, Cache<String, Integer> loginAttemptCache) {
+        JwtTokenizer jwtTokenizer, UserValidator userValidator,
+        EmailSenderService emailSenderService, AddressService addressService,
+        Cache<String, Integer> loginAttemptCache, UserUnlockSchedulingService userUnlockSchedulingService) {
         this.userDao = userDao;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
@@ -67,12 +70,18 @@ public class UserServiceImpl implements UserService {
         this.emailSenderService = emailSenderService;
         this.emailChangeTokenDao = emailChangeTokenDao;
         this.loginAttemptCache = loginAttemptCache;
+        this.userUnlockSchedulingService = userUnlockSchedulingService;
     }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         LOGGER.debug("Load all user by email");
-        ApplicationUserDto applicationUser = findApplicationUserByEmail(email);
+        ApplicationUserDto applicationUser = null;
+        try {
+            applicationUser = findApplicationUserByEmail(email);
+        } catch (DtoNotFoundException e) {
+            throw new UsernameNotFoundException(e.getMessage(), e);
+        }
         return getUserDetailsForUser(applicationUser);
     }
 
@@ -92,25 +101,35 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ApplicationUserDto findApplicationUserByEmail(String email) {
+    public ApplicationUserDto findApplicationUserByEmail(String email) throws DtoNotFoundException {
         LOGGER.debug("Find application user by email");
         ApplicationUserDto applicationUser = userDao.findByEmail(email);
         if (applicationUser != null) {
             return applicationUser;
         }
-        throw new NotFoundException(String.format("Could not find the user with the email address %s", email));
+        throw new DtoNotFoundException(String.format("Could not find the user with the email address %s", email));
     }
 
     @Override
-    public String login(String email, String password) {
+    public String login(String email, String password) throws UserLockedException {
         try {
             Integer recentLoginAttempts = loginAttemptCache.get(email, () -> 0);
-            if (recentLoginAttempts > 3) {
-                throw new BadCredentialsException("Account is locked due to multiple failed login attempts. Please try again later.");
+            if (recentLoginAttempts > 5) {
+                ApplicationUserDto byEmail = userDao.findByEmail(email);
+                if (byEmail != null) {
+                    byEmail.setAccountLocked(true);
+                    userDao.update(byEmail);
+                    userUnlockSchedulingService.scheduleUnlockUser(byEmail.getEmail());
+                }
+                throw new UserLockedException(
+                    "Account is locked due to multiple failed login attempts. Please try again later.");
             }
             loginAttemptCache.put(email, recentLoginAttempts + 1);
         } catch (ExecutionException e) {
-            throw new BadCredentialsException("Account is locked due to multiple failed login attempts. Please try again later.");
+            throw new BadCredentialsException(
+                "Account is locked due to multiple failed login attempts. Please try again later.");
+        } catch (EntityNotFoundException | SchedulerException e) {
+            throw new BadCredentialsException("Username or password is incorrect or account is locked");
         }
         try {
             ApplicationUserDto applicationUserDto = findApplicationUserByEmail(email);
@@ -128,7 +147,7 @@ public class UserServiceImpl implements UserService {
                     .toList();
                 return jwtTokenizer.getAuthToken(userDetails.getUsername(), roles);
             }
-        } catch (NotFoundException e) {
+        } catch (DtoNotFoundException e) {
             throw new BadCredentialsException("Username or password is incorrect or account is locked");
         }
         throw new BadCredentialsException("Username or password is incorrect or account is locked");
@@ -173,14 +192,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ApplicationUserDto updateUserInfo(ApplicationUserDto userInfo) throws ValidationException,
-        MailNotSentException {
+        MailNotSentException, DtoNotFoundException {
         LOGGER.debug("Update user info: {}", userInfo);
         ApplicationUserDto user;
 
         try {
             user = userDao.findById(userInfo.getId());
         } catch (EntityNotFoundException e) {
-            throw new NotFoundException("Could not update the user because it does not exist.");
+            throw new DtoNotFoundException("Could not update the user because it does not exist.");
         }
 
         // Update phone number if it is not null or empty
@@ -197,7 +216,7 @@ public class UserServiceImpl implements UserService {
             ApplicationUserDto userByEmail = null;
             try {
                 userByEmail = findApplicationUserByEmail(userInfo.getEmail());
-            } catch (NotFoundException e) {
+            } catch (DtoNotFoundException e) {
                 // Do nothing
             }
             if (userByEmail != null) {
@@ -295,7 +314,8 @@ public class UserServiceImpl implements UserService {
             .append("   <style>\n")
             .append("      body { background-color: #f8f9fa; font-family: Arial, sans-serif; }\n")
             .append("      .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; }\n")
-            .append("      .card { background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 0.25rem; padding: 20px; }\n")
+            .append(
+                "      .card { background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 0.25rem; padding: 20px; }\n")
             .append("      .card-body { padding: 20px; }\n")
             .append("      .h3 { font-size: 1.75rem; margin-bottom: 0.5rem; }\n")
             .append("      .h5 { font-size: 1.25rem; }\n")
@@ -315,7 +335,8 @@ public class UserServiceImpl implements UserService {
             .append("            <p class=\"text-gray-700\">Wir möchten bestätigen, dass du ")
             .append(userInfo.getEmail())
             .append(" als deine E-Mail für TicketLine bevorzugst.</p>\n")
-            .append("            <p class=\"text-gray-700\">Falls du deine E-Mail-Adresse nicht ändern und weiterhin die ")
+            .append(
+                "            <p class=\"text-gray-700\">Falls du deine E-Mail-Adresse nicht ändern und weiterhin die ")
             .append("aktuelle E-Mail-Adresse ").append(user.getEmail())
             .append(" verwenden möchtest, ignoriere einfach diese E-Mail.</p>\n")
             .append("            <p class=\"text-gray-700\">Bis du diese Änderung bestätigst, musst du deine aktuelle ")
@@ -324,7 +345,8 @@ public class UserServiceImpl implements UserService {
             .append("          <a class=\"btn btn-primary\" href=\"").append(url)
             .append("\" target=\"_blank\" style=\"color: #fff !important;\">E-Mail Adresse bestätigen</a>\n")
             .append("            <p class=\"text-gray-700\">Dieser Link ist für die nächsten 10 Minuten gültig.</p>\n")
-            .append("            <p class=\"text-gray-700\">Dies ist eine automatisch generierte E-Mail – bitte antworte nicht auf diese E-Mail.</p>\n")
+            .append(
+                "            <p class=\"text-gray-700\">Dies ist eine automatisch generierte E-Mail – bitte antworte nicht auf diese E-Mail.</p>\n")
             .append("          </div>\n")
             .append("        </div>\n")
             .append("      </div>\n")
