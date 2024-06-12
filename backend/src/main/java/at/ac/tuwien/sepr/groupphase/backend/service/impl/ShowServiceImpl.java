@@ -88,6 +88,7 @@ public class ShowServiceImpl implements ShowService {
     }
 
     @Override
+    @Transactional
     public Page<ShowDto> findByLocation(Long locationId, boolean onlyFutureShows, Pageable pageable) {
         return dao.findByLocationId(locationId, pageable);
     }
