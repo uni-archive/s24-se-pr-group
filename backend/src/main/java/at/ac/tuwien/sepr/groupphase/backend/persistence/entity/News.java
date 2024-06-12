@@ -125,7 +125,7 @@ public class News extends AbstractEntity {
         private String summary;
         private String text;
         private byte[] image;
-
+        private Event event;
         private NewsBuilder() {
         }
 
@@ -163,6 +163,11 @@ public class News extends AbstractEntity {
             return this;
         }
 
+        public NewsBuilder withEvent(Event event) {
+            this.event = event;
+            return this;
+        }
+
         public News build() {
             News news = new News();
             news.setId(id);
@@ -171,6 +176,7 @@ public class News extends AbstractEntity {
             news.setSummary(summary);
             news.setText(text);
             news.setImage(image);
+            news.setEvent(event);
             return news;
         }
     }

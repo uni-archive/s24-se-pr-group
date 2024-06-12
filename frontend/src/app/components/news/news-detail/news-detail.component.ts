@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { NgbModal, NgbPaginationConfig } from "@ng-bootstrap/ng-bootstrap";
 import { UntypedFormBuilder } from "@angular/forms";
 import { AuthService } from "../../../services/auth.service";
-import { NewsResponseDto, NewsEndpointService } from "../../../services/openapi";
+import { NewsResponseDto, NewsEndpointService, EventDto } from "../../../services/openapi";
 
 @Component({
   selector: 'app-news-detail',
@@ -12,7 +12,15 @@ import { NewsResponseDto, NewsEndpointService } from "../../../services/openapi"
 })
 export class NewsDetailComponent implements OnInit {
   newsId: number;
-  news: NewsResponseDto;
+  news: NewsResponseDto & { eventDto?: EventDto } = {
+    id: 0,
+    title: '',
+    summary: '',
+    text: '',
+    image: [],
+    publishedAt: '',
+    eventDto: null
+  };
   error = false;
   errorMessage = '';
   constructor(private route: ActivatedRoute,
@@ -34,6 +42,12 @@ export class NewsDetailComponent implements OnInit {
   loadNews(newsId: number): void {
     this.newsServiceNew.find(newsId).subscribe({
       next: res => {
+        console.log('API Response:', res);
+        if (!res.hasOwnProperty('eventDto')) {
+          console.warn('eventDto field is missing in the API response!');
+        } else if (res.eventDto === null) {
+          console.warn('eventDto is null! API Response:', res);
+        }
         this.news = res;
       },
       error: err => {
@@ -41,7 +55,6 @@ export class NewsDetailComponent implements OnInit {
       }
     });
   }
-
   getParagraphs(text: string): string[] {
     return text.split('\n');
   }

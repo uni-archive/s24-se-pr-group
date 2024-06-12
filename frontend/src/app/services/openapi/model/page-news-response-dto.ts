@@ -21,9 +21,9 @@ export interface PageNewsResponseDto {
     content?: Array<NewsResponseDto>;
     number?: number;
     sort?: Array<SortObject>;
+    numberOfElements?: number;
     first?: boolean;
     last?: boolean;
-    numberOfElements?: number;
     pageable?: PageableObject;
     empty?: boolean;
 }

@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.datagenerator;
 
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Event;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.News;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.NewsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.NewsRepository;
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.Random;
 
 @Profile("generateData")
 @Component
@@ -51,7 +53,8 @@ public class NewsDataGenerator {
 
     @PostConstruct
     private void generateNews() throws IOException {
-        if (newsRepository.findAll().size() > 0) {
+        Random random = new Random();
+        if (!newsRepository.findAll().isEmpty()) {
             LOGGER.debug("news already generated");
         } else {
             LOGGER.debug("generating {} news entries", dataGenerationConfig.newsAmount);
@@ -59,11 +62,12 @@ public class NewsDataGenerator {
                 LOGGER.info("generating news entry {} of {}", i, dataGenerationConfig.newsAmount);
                 byte[] dummyImage = DummyImageGenerator.createDummyImage();
                 News news = News.NewsBuilder.aNews()
-                    .withTitle(TEST_NEWS_TITLE + " " + i)
+                    .withTitle(TEST_NEWS_TITLE + " " + i )
                     .withSummary(TEST_NEWS_SUMMARY)
                     .withText(TEST_NEWS_TEXT)
                     .withImage(dummyImage)
                     .withPublishedAt(LocalDateTime.now().minusMonths(i))
+                    .withEvent(event)
                     .build();
                 LOGGER.debug("saving news {}", news);
                 newsRepository.save(news);
