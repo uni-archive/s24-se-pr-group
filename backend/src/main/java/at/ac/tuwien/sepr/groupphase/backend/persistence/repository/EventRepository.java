@@ -3,6 +3,7 @@ package at.ac.tuwien.sepr.groupphase.backend.persistence.repository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Event;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.EventType;
 import org.h2.command.query.Select;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,5 +27,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query("SELECT s.event FROM Artist a INNER JOIN a.shows s WHERE a.id = :artistId")
     List<Event> findByArtist(@Param("artistId") long artistId);
+
+    @Query("SELECT e FROM Ticket t JOIN t.show s JOIN s.event e GROUP BY e.id ORDER BY COUNT(t) DESC")
+    List<Event> findMaximumBoughtShows(Pageable pageable);
 
 }

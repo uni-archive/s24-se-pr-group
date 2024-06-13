@@ -65,4 +65,10 @@ public class EventEndpoint {
         var mapped = mapper.toResponseList(found);
         return ResponseEntity.ok(mapped);
     }
+
+    @Secured("ROLE_USER")
+    @GetMapping("/top10")
+    public List<EventDto> getTop10Events() {
+        return service.getTop10EventsWithMostTickets();
+    }
 }

@@ -15,8 +15,8 @@ import { SimpleNewsResponseDto } from './simple-news-response-dto';
 
 
 export interface PageSimpleNewsResponseDto { 
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
     size?: number;
     content?: Array<SimpleNewsResponseDto>;
     number?: number;

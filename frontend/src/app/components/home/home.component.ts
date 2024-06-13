@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
-import { SimpleNewsResponseDto, NewsEndpointService } from '../../services/openapi';
+import { SimpleNewsResponseDto, NewsEndpointService, EventDto, EventEndpointService } from '../../services/openapi';
 
 @Component({
   selector: 'app-home',
@@ -9,26 +9,40 @@ import { SimpleNewsResponseDto, NewsEndpointService } from '../../services/opena
 })
 export class HomeComponent implements OnInit {
   news: SimpleNewsResponseDto[] = [];
+  events: EventDto[] = [];
   itemsPerPage: number = 3;
 
   @ViewChild('scrollContainer', { static: false }) scrollContainer: ElementRef;
 
   constructor(
       public authService: AuthService,
-      private newsService: NewsEndpointService
+      private newsService: NewsEndpointService,
+      private eventService: EventEndpointService
   ) {}
 
   ngOnInit() {
     this.loadNews();
+    this.loadEvents();
   }
 
   loadNews() {
-    this.newsService.findUnread(0, 9).subscribe({
+    this.newsService.findUnread(0, 12).subscribe({
       next: (response: any) => {
         this.news = response.content;
       },
       error: error => {
         console.error('Error loading news', error);
+      }
+    });
+  }
+
+  loadEvents() {
+    this.eventService.getTop10Events().subscribe({
+      next: (response: any) => {
+        this.events = response;
+      },
+      error: error => {
+        console.error('Error loading events', error);
       }
     });
   }

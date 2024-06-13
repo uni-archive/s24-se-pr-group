@@ -51,6 +51,12 @@ export interface EventEndpointServiceInterface {
     /**
      * 
      * 
+     */
+    getTop10Events(extraHttpRequestParams?: any): Observable<Array<EventDto>>;
+
+    /**
+     * 
+     * 
      * @param eventSearchDto 
      */
     searchEvents(eventSearchDto: EventSearchDto, extraHttpRequestParams?: any): Observable<Array<EventDto>>;

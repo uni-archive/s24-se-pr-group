@@ -1,4 +1,21 @@
+<div class="jumbotron mt-5">
+    <h1 class="display-4">TicketLine Home</h1>
+</div>
+
 <div class="mt-4 container">
+    <h2>Top 10 Events</h2>
+    <div class="row">
+        <div class="col-md-4" *ngFor="let event of events">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ event.title }}</h5>
+                    <p class="card-text">{{ event.description }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2>News</h2>
     <div class="news-carousel">
         <button class="carousel-control-prev" (click)="prevNews()">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -6,8 +23,8 @@
         <div class="scroll-container no-scrollbar" #scrollContainer>
             <div class="row flex-nowrap">
                 <div class="col-4 p-2" *ngFor="let newsItem of news">
-                    <div class="card h-100" [routerLink]="['/news-detail', newsItem.id]">
-                        <img class="news-image-preview" [src]="'data:image/jpeg;base64,'+newsItem.image" alt="news">
+                    <div class="card h-100">
+                        <img class="news-image-preview" [src]="'data:image/jpeg;base64,' + newsItem.image" alt="news">
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title">{{ newsItem.title }}</h5>
                             <h6 class="card-subtitle mb-2 text-muted">{{ newsItem.publishedAt | date: 'dd.MM.yyyy HH:mm' }}</h6>
