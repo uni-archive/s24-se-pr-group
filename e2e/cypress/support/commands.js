@@ -1,22 +1,33 @@
 Cypress.Commands.add('loginAdmin', () => {
     cy.fixture('settings').then(settings => {
-        cy.visit(settings.baseUrl);
-        cy.contains('a', 'Login').click();
-        cy.get('input[id="inputUsername"]').type(settings.adminUser);
-        cy.get('input[id="password"]').type(settings.adminPw);
-        cy.contains('button', 'Login').click();
+        cy.gotoLogin();
+        cy.fillLoginForm(settings.adminUser, settings.adminPw);
+        cy.contains('Logout');
     })
 })
 
 Cypress.Commands.add('loginUser', (username, password) => {
+    cy.gotoLogin();
+    cy.fillLoginForm(username, password);
+    cy.contains('Logout');
+});
+
+Cypress.Commands.add('gotoLogin', () => {
     cy.fixture('settings').then(settings => {
         cy.visit(settings.baseUrl);
         cy.contains('a', 'Login').click();
-        cy.get('input[id="inputUsername"]').type(username);
-        cy.get('input[id="password"]').type(password);
-        cy.contains('button', 'Login').click();
-        cy.contains('Logout');
-    })
+    });
+});
+
+Cypress.Commands.add('fillLoginForm', (username, password) => {
+    cy.get('input[id="inputUsername"]').type(username);
+    cy.get('input[id="password"]').type(password);
+    cy.contains('button', 'Login').click();
+});
+
+Cypress.Commands.add('clearLoginForm', () => {
+    cy.get('input[id="inputUsername"]').clear();
+    cy.get('input[id="password"]').clear();
 })
 
 Cypress.Commands.add('createMessage', (msg) => {
