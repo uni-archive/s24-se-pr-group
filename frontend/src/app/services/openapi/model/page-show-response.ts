@@ -17,7 +17,6 @@ import { SortObject } from './sort-object';
 export interface PageShowResponse { 
     totalPages?: number;
     totalElements?: number;
-    pageable?: PageableObject;
     size?: number;
     content?: Array<ShowResponse>;
     number?: number;
@@ -25,6 +24,7 @@ export interface PageShowResponse {
     numberOfElements?: number;
     first?: boolean;
     last?: boolean;
+    pageable?: PageableObject;
     empty?: boolean;
 }
 

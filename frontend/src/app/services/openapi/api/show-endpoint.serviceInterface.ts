@@ -15,7 +15,9 @@ import { Observable }                                        from 'rxjs';
 
 import { PageShowResponse } from '../model/models';
 import { ShowCreationDto } from '../model/models';
+import { ShowHallplanResponse } from '../model/models';
 import { ShowListDto } from '../model/models';
+import { ShowResponse } from '../model/models';
 import { ShowSearchDto } from '../model/models';
 
 
@@ -33,6 +35,20 @@ export interface ShowEndpointServiceInterface {
      * @param showCreationDto 
      */
     createShow(showCreationDto: ShowCreationDto, extraHttpRequestParams?: any): Observable<string>;
+
+    /**
+     * 
+     * 
+     * @param id 
+     */
+    getAvailableSeatsByShowId(id: number, extraHttpRequestParams?: any): Observable<ShowHallplanResponse>;
+
+    /**
+     * 
+     * 
+     * @param id 
+     */
+    getShowById(id: number, extraHttpRequestParams?: any): Observable<ShowResponse>;
 
     /**
      * 

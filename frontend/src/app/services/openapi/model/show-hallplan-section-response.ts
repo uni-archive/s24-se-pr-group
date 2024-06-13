@@ -9,14 +9,18 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { EventResponse } from './event-response';
-import { LocationResponse } from './location-response';
+import { ShowHallplanSpotResponse } from './show-hallplan-spot-response';
 
 
-export interface ShowResponse { 
+export interface ShowHallplanSectionResponse { 
     id?: number;
-    dateTime?: string;
-    event?: EventResponse;
-    location?: LocationResponse;
+    name?: string;
+    color?: string;
+    standingOnly?: boolean;
+    price?: number;
+    frontendCoordinates?: string;
+    spotCount?: number;
+    availableSpotCount?: number;
+    spots?: Array<ShowHallplanSpotResponse>;
 }
 

@@ -25,7 +25,7 @@ public class HallSpotDao extends AbstractDao<HallSpot, HallSpotDto> {
 
     public HallSpotDto findById(Long spotId){
         Optional<HallSpot> spot = ((HallSpotRepository) repository).findById(spotId);
-        if(spot.isEmpty()){
+        if (spot.isEmpty()) {
             throw new EntityNotFoundException("HallSpot with id " + spotId + " not found");
         }
         return mapper.toDto(spot.get());

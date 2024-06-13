@@ -9,15 +9,12 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { HallplanSeatCreateRequest } from './hallplan-seat-create-request';
+import { AddressResponse } from './address-response';
 
 
-export interface HallplanSectionCreateRequest { 
-    name: string;
-    color: string;
-    spotCount: number;
-    standingOnly: boolean;
-    frontendCoordinates: string;
-    spots: Array<HallplanSeatCreateRequest>;
+export interface LocationResponse { 
+    id?: number;
+    name?: string;
+    address?: AddressResponse;
 }
 

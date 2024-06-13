@@ -53,6 +53,7 @@ model/hallplan-section-create-request.ts
 model/invoice-response.ts
 model/location-create-request.ts
 model/location-dto.ts
+model/location-response.ts
 model/models.ts
 model/order-details-response.ts
 model/order-summary-response.ts
@@ -61,6 +62,9 @@ model/page-location-dto.ts
 model/page-show-response.ts
 model/pageable-object.ts
 model/show-creation-dto.ts
+model/show-hallplan-response.ts
+model/show-hallplan-section-response.ts
+model/show-hallplan-spot-response.ts
 model/show-list-dto.ts
 model/show-response.ts
 model/show-search-dto.ts
