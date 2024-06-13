@@ -119,8 +119,8 @@ public class NewsEndpoint {
         LOGGER.info("POST /api/v1/news body: {}", newsRequestDto);
 
         try {
-            NewsDto createdNews = newsService.createNews(newsEndpointMapper.toDto(newsRequestDto));
-            return ResponseEntity.status(HttpStatus.CREATED).body(newsEndpointMapper.toResponse(createdNews));
+            newsService.createNews(newsEndpointMapper.toDto(newsRequestDto));
+            return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (IOException | ValidationException e) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, e.getMessage(), e);
         }

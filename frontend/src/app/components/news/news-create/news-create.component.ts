@@ -65,9 +65,8 @@ export class NewsCreateComponent implements OnInit {
         this.createNews(news);
     }
 
-    private createNews(news: NewsResponseDto): void {
-        this.newsService.create(news.title, news.summary, news.text, JSON.stringify(this.selectedEvent),
-            this.selectedFile).subscribe({
+    private createNews(news: any): void {
+        this.newsService.create(news.title, news.summary, news.text, JSON.stringify(this.selectedEvent), this.selectedFile).subscribe({
             next: () => {
                 this.successMessage = 'Die News wurde erfolgreich gespeichert.';
                 this.success = true;

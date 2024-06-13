@@ -21,10 +21,10 @@ export interface PageApplicationUserResponse {
     content?: Array<ApplicationUserResponse>;
     number?: number;
     sort?: Array<SortObject>;
-    pageable?: PageableObject;
-    numberOfElements?: number;
     first?: boolean;
     last?: boolean;
+    numberOfElements?: number;
+    pageable?: PageableObject;
     empty?: boolean;
 }
 
