@@ -7,12 +7,13 @@ import {
   TicketEndpointService
 } from "../../services/openapi";
 import {MessagingService} from "../../services/messaging.service";
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {NgForOf, NgIf} from "@angular/common";
 import {SeatEntity, SectionEntity} from "../hallplan/entities";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {HallSector} from "../../services/openapi/model/hall-sector";
 import {HttpStatusCode} from "@angular/common/http";
+import {forkJoin} from "rxjs";
 
 @Component({
   selector: 'app-ticket-select',
@@ -37,6 +38,7 @@ export class TicketSelectComponent {
   selectedSectors: number[] = [];
   visibleSectors: HallSector[] = [];
   sectorSeatMap: ({ [key: number]: HallSeat[] }) = {};
+  selectedSectorSpots: ({ [key: string]: number }) = {};
   orderId: number | null = null;
 
   constructor(
@@ -44,12 +46,14 @@ export class TicketSelectComponent {
     private showService: ShowEndpointService,
     private ticketService: TicketEndpointService,
     private orderService: OrderEndpointService,
-    private messagingService: MessagingService
+    private messagingService: MessagingService,
+    private router: Router,
   ) {
   }
 
   get calcPrice(): number {
-    return this.selectedSeats.reduce((acc, seat) => acc + this.findSectorById(seat.sectorId).price, 0);
+    return this.selectedSeats.reduce((acc, seat) => acc + this.findSectorById(seat.sectorId).price, 0) +
+    this.selectedSectors.reduce((acc, sectorId) => acc + this.findSectorById(sectorId).price * (this.selectedSectorSpots[String(sectorId)]), 0);
   }
 
   ngOnInit(): void {
@@ -139,6 +143,15 @@ export class TicketSelectComponent {
     });
   }
 
+  updateSectorSpotCount(event: any, sectorId: number) {
+    console.log("event fired", event)
+    this.selectedSectorSpots[String(sectorId)] = Number(event.target.value);
+  }
+
+  deselectSeat(seat: HallSeat) {
+    this.hallplan.deselectSeat(seat.id);
+  }
+
   findSeatById(seatId: number, sectorId: number) {
     return this.findSectorById(sectorId).seats.find(seat => seat.id === seatId);
   }
@@ -156,22 +169,22 @@ export class TicketSelectComponent {
    */
 
   addToCart(isReservation: boolean) {
-    this.selectedSeats.forEach(seat => {
-      this.ticketService.addTicket({
-        spotId: seat.id,
-        orderId: this.orderId,
-        showId: this.showResponse.id,
-        reservationOnly: isReservation
-      }).subscribe({
-        next: order => {
-          console.log("create", order);
-        },
-        error: err => {
-          this.messagingService.setMessage("Ihre Bestellung konnte nicht geladen werden. Bitte versuchen Sie es später erneut.", 'danger');
-          console.log(err);
-        }
-      })
-    })
+    forkJoin(this.selectedSeats.map(seat => this.ticketService.addTicket({
+      spotId: seat.id,
+      orderId: this.orderId,
+      showId: this.showResponse.id,
+      reservationOnly: isReservation
+    }))).subscribe({
+      next: () => {
+        this.messagingService.setMessage("Ihre Tickets wurden erfolgreich hinzugefügt.", 'success');
+        this.router.navigate(['/user/cart']);
+      },
+      error: err => {
+        this.messagingService.setMessage("Ihre Tickets konnten nicht hinzugefügt werden. Bitte versuchen Sie es später erneut.", 'danger');
+        this.router.navigate(['/user/cart']);
+        console.log(err);
+      }
+    });
   }
 
   ngAfterViewInit() {
@@ -190,6 +203,8 @@ export class TicketSelectComponent {
       this.selectedSectors = selectedEntities.filter(entity => entity.constructor.name === 'SectionEntity')
         .filter(entity => (entity as SectionEntity).data.isStandingOnly)
         .map(entity => (entity as SectionEntity).data.id);
+
+      this.selectedSectors.forEach(sectorId => this.selectedSectorSpots[String(sectorId)] = 1);
 
       this.visibleSectors = [...Object.keys(this.sectorSeatMap).map(sectorId => this.findSectorById(Number(sectorId))),
         ...this.selectedSectors.map(sectorId => this.findSectorById(sectorId))];

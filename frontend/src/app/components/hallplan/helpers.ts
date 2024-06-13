@@ -319,6 +319,13 @@ export class InteractionHelper extends Helper {
     this.editMode = editMode;
   }
 
+  deselectEntity(entity: InteractableEntity) {
+    entity.onHighlightEnd();
+    this.selectedEntities = this.selectedEntities.filter(e => e !== entity);
+    this.setFrameHasChanged();
+    this.onSelectionChange?.(this.selectedEntities);
+  }
+
   setEntities(entities: InteractableEntity[]) {
     this.entities = entities;
   }

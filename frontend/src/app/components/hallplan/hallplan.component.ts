@@ -66,6 +66,12 @@ export class HallplanComponent {
     });
   }
 
+  deselectSeat(seatId: number) {
+    this.interactionHelper.deselectEntity(
+      this.entities.find(entity => entity instanceof SeatEntity && entity.data.id === seatId) as
+        unknown as InteractableEntity);
+  }
+
   async ngAfterViewInit() {
     // After the view has been initialized, you can access the canvas element here
     this.backgroundImage = await this.loadImage(this.backgroundImageUrl);
