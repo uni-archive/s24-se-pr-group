@@ -7,6 +7,7 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFound
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 public abstract class AbstractDao<T extends AbstractEntity, D extends AbstractDto> {
 

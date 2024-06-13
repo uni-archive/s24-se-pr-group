@@ -21,6 +21,8 @@ import {EventDatailpageComponent} from "./components/event-datailpage/event-data
 import {NewsComponent} from "./components/news/news.component";
 import {NewsDetailComponent} from './components/news/news-detail/news-detail.component';
 import {LocationDetailsComponent} from "./components/location/location-details/location-details.component";
+import {UserCartComponent} from "./components/user/user-cart/user-cart.component";
+import {UserCheckoutComponent} from "./components/user/user-checkout/user-checkout.component";
 
 
 const routes: Routes = [
@@ -39,6 +41,8 @@ const routes: Routes = [
       ]
   },
   {path: "user/home", component: UserHomeComponent},
+  { path: "user/cart", component: UserCartComponent },
+  { path: "user/cart/checkout", component: UserCheckoutComponent },
   {
     path: "locations", canActivate: mapToCanActivate([AdminGuard]),
     children:

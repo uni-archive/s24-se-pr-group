@@ -23,4 +23,13 @@ public interface InvoiceService {
      * @return the created invoice.
      */
     InvoiceDto createCancellationInvoiceForOrder(long orderId);
+
+
+    /**
+     * Creates a new purchase invoice for an order.
+     *
+     * @param orderId the id of the order.
+     * @return the created invoice.
+     */
+    InvoiceDto createPurchaseInvoiceForOrder(long orderId);
 }

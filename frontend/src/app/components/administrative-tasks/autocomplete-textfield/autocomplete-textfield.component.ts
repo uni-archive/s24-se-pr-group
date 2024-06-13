@@ -1,8 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {NgForOf} from "@angular/common";
-import {FormsModule} from "@angular/forms";
-import {EventDto} from "../../../dtos/EventDto";
-import {Artist} from "../../../services/openapi/model/artist";
+import {ArtistDto, EventDto} from "../../../services/openapi";
 
 @Component({
   selector: 'app-autocomplete-textfield',
@@ -15,7 +12,7 @@ export class AutocompleteTextfieldComponent {
   @Input() placeholder: string;
   @Input() Label: string;
   @Output() search: EventEmitter<string> = new EventEmitter<string>();
-  @Output() eventChosen : EventEmitter<EventDto|Artist> = new EventEmitter<EventDto|Artist>();
+  @Output() eventChosen : EventEmitter<EventDto|ArtistDto> = new EventEmitter<EventDto|ArtistDto>();
   public text: string = "";
   onChange() {
     console.log(this.autoCompleteList);

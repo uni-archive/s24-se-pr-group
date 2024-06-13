@@ -1,0 +1,72 @@
+@import "bootstrap";
+
+.exp-wrapper {
+  position: relative;
+  border: var(--bs-border-width) solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+  display: flex;
+  width: 120px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  font-size: 24px !important;
+}
+
+.exp-wrapper-invalid {
+  @extend .is-invalid;
+
+  padding-right: 0 !important;
+  position: relative;
+  border-radius: var(--bs-border-radius);
+  display: flex;
+  width: 120px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  font-size: 24px !important;
+}
+
+.exp-wrapper-valid {
+  @extend .is-valid;
+
+  padding-right: 0 !important;
+  position: relative;
+  border-radius: var(--bs-border-radius);
+  display: flex;
+  width: 120px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  font-size: 24px !important;
+}
+
+// big hack coming up:
+.exp-wrapper:focus-within {
+  outline: 0;
+  box-shadow: 0 0 0 5px var(--bs-focus-ring-color);
+}
+
+.exp-wrapper-invalid:focus-within {
+  @extend .focus-ring;
+  @extend .focus-ring-danger;
+  box-shadow: 0 0 0 5px var(--bs-focus-ring-color);
+}
+
+.exp-wrapper-valid:focus-within {
+  @extend .focus-ring;
+  @extend .focus-ring-success;
+  box-shadow: 0 0 0 5px var(--bs-focus-ring-color);
+}
+
+
+input.exp {
+  font-family: monospace;
+  border: 0;
+  width: 24px;
+  outline: none;
+  appearance: none;
+  font-size: 16px;
+}
+
+.exp-delim {
+  align-self: center;
+  font-family: monospace;
+  font-size: 16px;
+}

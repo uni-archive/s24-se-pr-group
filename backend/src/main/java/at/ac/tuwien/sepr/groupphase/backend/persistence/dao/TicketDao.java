@@ -45,6 +45,16 @@ public class TicketDao extends AbstractDao<Ticket, TicketDetailsDto> {
         return ((TicketRepository) repository).existsValidTicketForShowAndSeat(showId, seatId);
     }
 
+    @Transactional
+    public void setValidAllTicketsForOrder(long orderId) {
+        ((TicketRepository) repository).setValidAllTicketsForOrder(orderId);
+    }
+
+    @Transactional
+    public void changeTicketReserved(long ticketId, boolean setReserved) {
+        ((TicketRepository) repository).changeTicketReserved(ticketId, setReserved);
+    }
+
     public TicketDetailsDto findByHash(String hash) throws EntityNotFoundException {
         return mapper.toDto(((TicketRepository) repository).findByHash(hash));
     }

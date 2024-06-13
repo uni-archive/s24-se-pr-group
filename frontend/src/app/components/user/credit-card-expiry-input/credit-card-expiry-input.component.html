@@ -1,0 +1,23 @@
+<div
+  class="{{ markInvalid ? 'exp-wrapper-invalid' : 'exp-wrapper' }} {{ markValid ? 'exp-wrapper-valid' : '' }} form-control"
+>
+  <div class="d-flex">
+    <input
+      name="monthaweofij"
+      autocomplete="off" class="exp" id="month" maxlength="2" pattern="[0-9]*" inputmode="numerical"
+      placeholder="MM" type="text" data-pattern-validate
+      (focusout)="onTouched()"
+      [ngModel]="month"
+      (ngModelChange)="formatMonth($event)"
+    >
+    <div class="exp-delim">/</div>
+    <input autocomplete="off" class="exp" id="year" maxlength="2" pattern="[0-9]*" inputmode="numerical"
+           placeholder="YY" type="text" data-pattern-validate
+           (focusout)="onTouched()"
+           [ngModel]="year"
+           (ngModelChange)="formatYear($event)"
+           name="year"
+    >
+  </div>
+
+</div>

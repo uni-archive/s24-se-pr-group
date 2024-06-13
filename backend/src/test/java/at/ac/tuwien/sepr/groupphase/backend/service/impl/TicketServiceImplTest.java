@@ -1,18 +1,23 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
+import static at.ac.tuwien.sepr.groupphase.backend.supplier.ApplicationUserSupplier.aCustomerUser;
+import static at.ac.tuwien.sepr.groupphase.backend.supplier.ApplicationUserSupplier.aUserEntity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
 import at.ac.tuwien.sepr.groupphase.backend.basetest.TestData;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.TicketAddToOrderDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Event;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallPlan;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSector;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSectorShow;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSpot;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Order;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Show;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Ticket;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.ArtistRepository;
@@ -21,18 +26,24 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallPlanRepos
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallSectorRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallSectorShowRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallSpotRepository;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.InvoiceRepository;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.OrderRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.ShowRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.TicketRepository;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.TicketValidator;
+
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,6 +72,13 @@ public class TicketServiceImplTest implements TestData {
 
     @Captor
     private ArgumentCaptor<TicketDetailsDto> ticketDto;
+
+    @Captor
+    private ArgumentCaptor<OrderDetailsDto> orderDto;
+
+    private long orderId;
+
+    private ApplicationUserDto testUser;
 
     @Autowired
     private TicketServiceImpl ticketService;
@@ -93,6 +111,16 @@ public class TicketServiceImplTest implements TestData {
     private UserService userService;
 
     @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private InvoiceRepository invoiceRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+
+    @Autowired
     private SchedulerFactoryBean schedulerFactoryBean;
 
 
@@ -103,14 +131,12 @@ public class TicketServiceImplTest implements TestData {
     private static Ticket testTicketInvalidNonReserved;
     private static HallSpot hallSpot;
     private static Show show;
-    @Autowired
-    private ArtistRepository artistRepository;
 
     @BeforeEach
     void setup() {
         var event = new Event();
         show = new Show();
-        show.setDateTime(LocalDateTime.of(2025, 01, 01, 12, 0));
+        show.setDateTime(LocalDateTime.of(2025, 1, 1, 12, 0));
         show.setEvent(event);
         event.setShows(List.of(show));
         eventRepository.save(event);
@@ -165,12 +191,25 @@ public class TicketServiceImplTest implements TestData {
         testTicketInvalidReserved.setShow(show);
         ticketRepository.save(testTicketInvalidReserved);
 
+        var user = aUserEntity();
+        user.setEmail("foobar@test.com");
+        userRepository.save(user);
+
+        testUser = new ApplicationUserDto();
+        testUser.setId(user.getId());
+
+        var order = new Order();
+        order.setCustomer(user);
+        orderRepository.save(order);
+        orderId = order.getId();
+
         testTicketValidNonReserved = new Ticket();
         testTicketValidNonReserved.setHash("hash");
         testTicketValidNonReserved.setReserved(false);
         testTicketValidNonReserved.setValid(true);
         testTicketValidNonReserved.setHallSpot(hallSpot3);
         testTicketValidNonReserved.setShow(show);
+        testTicketValidNonReserved.setOrder(order);
         ticketRepository.save(testTicketValidNonReserved);
 
         testTicketInvalidNonReserved = new Ticket();
@@ -180,6 +219,7 @@ public class TicketServiceImplTest implements TestData {
         testTicketInvalidNonReserved.setHallSpot(hallSpot4);
         testTicketInvalidNonReserved.setShow(show);
         ticketRepository.save(testTicketInvalidNonReserved);
+
     }
 
     @AfterEach
@@ -191,6 +231,8 @@ public class TicketServiceImplTest implements TestData {
         hallPlanRepository.deleteAll();
         showRepository.deleteAll();
         eventRepository.deleteAll();
+        orderRepository.deleteById(orderId);
+        userRepository.deleteById(testUser.getId());
     }
 
     @Test
@@ -222,14 +264,18 @@ public class TicketServiceImplTest implements TestData {
 
     @Test
     void creating_aTicket_ShouldAddToOrderAndScheduleTask()
-        throws DtoNotFoundException, ValidationException, SchedulerException {
+        throws DtoNotFoundException, ValidationException, SchedulerException, ForbiddenException {
         ApplicationUserDto user = userService.findApplicationUserByEmail(ADMIN_USER);
         List<Ticket> previousTickets = ticketRepository.findTicketsByUserId(user.getId());
         int ticketCount = previousTickets.size();
         OrderDetailsDto orderDetailsDto = orderService.create(user);
 
-        TicketDetailsDto ticketDetailsDto = ticketService.addTicketToOrder(hallSpot.getId(), show.getId(),
-            orderDetailsDto.getId(), false);
+        TicketDetailsDto ticketDetailsDto = ticketService.addTicketToOrder(new TicketAddToOrderDto(
+            hallSpot.getId(),
+            orderDetailsDto.getId(),
+            show.getId(),
+            false
+        ), user);
 
         List<Ticket> newTickets = ticketRepository.findTicketsByUserId(user.getId());
         assertThat(newTickets.size()).isEqualTo(ticketCount + 1);
@@ -253,15 +299,25 @@ public class TicketServiceImplTest implements TestData {
 
     @Test
     void creating_aTicketOnOrderWithOtherTickets_ShouldRefreshJobsOnAllTickets()
-        throws DtoNotFoundException, ValidationException, InterruptedException, SchedulerException {
+        throws DtoNotFoundException, ValidationException, InterruptedException, SchedulerException, ForbiddenException {
         ApplicationUserDto user = userService.findApplicationUserByEmail(ADMIN_USER);
         OrderDetailsDto orderDetailsDto = orderService.create(user);
 
-        TicketDetailsDto ticketDetailsDto1 = ticketService.addTicketToOrder(hallSpot.getId(), show.getId(),
-            orderDetailsDto.getId(), false);
+        TicketDetailsDto ticketDetailsDto1 = ticketService.addTicketToOrder(new TicketAddToOrderDto(
+            hallSpot.getId(),
+            orderDetailsDto.getId(),
+            show.getId(),
+            false
+        ), user);
+
         Thread.sleep(2000);
-        TicketDetailsDto ticketDetailsDto2 = ticketService.addTicketToOrder(hallSpot.getId(), show.getId(),
-            orderDetailsDto.getId(), false);
+        TicketDetailsDto ticketDetailsDto2 = ticketService.addTicketToOrder(new TicketAddToOrderDto(
+            hallSpot.getId(),
+            orderDetailsDto.getId(),
+            show.getId(),
+            false
+        ), user);
+
         JobKey jobKey = schedulerFactoryBean.getScheduler().getJobKeys(GroupMatcher.anyJobGroup()).stream()
             .filter(x -> Objects.equals(x.getName(), "reservationJob-" + ticketDetailsDto1.getHash())).findFirst().get();
         List<Trigger> triggers = (List<Trigger>) schedulerFactoryBean.getScheduler().getTriggersOfJob(jobKey);
@@ -271,5 +327,83 @@ public class TicketServiceImplTest implements TestData {
         assertThat(actual.getNextFireTime().before(Date.from(Instant.now().plus(30, ChronoUnit.MINUTES)))).isTrue();
         assertThat(actual.getNextFireTime()
             .after(Date.from(Instant.now().plus(30, ChronoUnit.MINUTES).minus(2, ChronoUnit.SECONDS)))).isTrue();
+    }
+
+    @Test
+    void removing_aTicket_ShouldCallValidator() throws ValidationException, ForbiddenException {
+        ticketService.deleteTicket(testTicketValidNonReserved.getId(), testUser);
+        verify(ticketValidator).validateForDelete(eq(testTicketValidNonReserved.getId()), orderDto.capture());
+    }
+
+    @Test
+    void changing_theReservedStateOf_aTicket_ShouldCallValidator() throws ValidationException, ForbiddenException, DtoNotFoundException {
+        ticketService.changeTicketReserved(testTicketValidNonReserved.getId(), false, testUser);
+        verify(ticketValidator).validateForChangeTicketReserved(eq(testTicketValidNonReserved.getId()), orderDto.capture());
+    }
+
+    @Test
+    void adding_aTicket_ShouldCallValidator() throws ValidationException, ForbiddenException {
+        var addTicket = new TicketAddToOrderDto(
+            hallSpot.getId(),
+            orderId,
+            show.getId(),
+            false
+        );
+        ticketService.addTicketToOrder(addTicket, testUser);
+        verify(ticketValidator).validateForCreate(eq(addTicket));
+    }
+
+    @Test
+    void adding_aTicket_WithWrongUser_ThrowsForbiddenException() {
+        var addTicket = new TicketAddToOrderDto(
+            hallSpot.getId(),
+            orderId,
+            show.getId(),
+            false
+        );
+
+        var wrongUser = aCustomerUser();
+        wrongUser.setId(-10L);
+
+        assertThatThrownBy(() -> ticketService.addTicketToOrder(addTicket, wrongUser))
+            .isInstanceOf(ForbiddenException.class);
+    }
+
+
+    @Test
+    void removing_aTicket_WithWrongUser_ThrowsForbiddenException() {
+        var wrongUser = aCustomerUser();
+        wrongUser.setId(-10L);
+
+        assertThatThrownBy(() -> ticketService.deleteTicket(testTicketValidNonReserved.getId(), wrongUser))
+            .isInstanceOf(ForbiddenException.class);
+    }
+
+    @Test
+    void changing_setReserved_of_aTicket_persistsThatChangeInTheDb() throws DtoNotFoundException, ValidationException, ForbiddenException {
+        var ticketId = testTicketValidNonReserved.getId();
+        var reservedState = testTicketValidNonReserved.isReserved();
+        assertThat(ticketService.findById(ticketId).isReserved())
+            .isEqualTo(reservedState);
+
+        ticketService.changeTicketReserved(ticketId, !reservedState, testUser);
+
+        assertThat(ticketService.findById(ticketId).isReserved())
+            .isEqualTo(!reservedState);
+
+        ticketService.changeTicketReserved(ticketId, reservedState, testUser);
+
+        assertThat(ticketService.findById(ticketId).isReserved())
+            .isEqualTo(reservedState);
+    }
+
+    @Test
+    void changing_setReserved_of_aTicket_withTheWrongUser_ThrowsForbiddenException() {
+        var wrongUser = aCustomerUser();
+        wrongUser.setId(-10L);
+        var ticketId = testTicketValidNonReserved.getId();
+
+        assertThatThrownBy(() -> ticketService.changeTicketReserved(ticketId, false, wrongUser))
+            .isInstanceOf(ForbiddenException.class);
     }
 }

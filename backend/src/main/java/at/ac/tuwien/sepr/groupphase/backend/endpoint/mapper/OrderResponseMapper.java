@@ -8,7 +8,7 @@ import org.mapstruct.Mapper;
 
 import java.util.List;
 
-@Mapper
+@Mapper(uses = TicketResponseMapper.class)
 public interface OrderResponseMapper extends BaseResponseMapper<OrderDetailsDto, OrderDetailsResponse> {
     OrderSummaryDto toDtoFromSummary(OrderSummaryResponse dto);
 

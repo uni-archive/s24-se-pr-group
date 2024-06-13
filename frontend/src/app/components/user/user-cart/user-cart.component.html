@@ -1,0 +1,61 @@
+<div class="jumbotron mt-5" xmlns="http://www.w3.org/1999/html">
+  <h1 class="display-4">Warenkorb</h1>
+</div>
+
+<div *ngFor="let event of ticketsBySectorsByEvent | keyvalue">
+  <h5>{{getEventById(event.key).title}}</h5>
+  <ul class="list-group">
+    <li class="list-group-item p-3" *ngFor="let sector of event.value | keyvalue">
+      <h5>
+        Sector-Nr. {{sector.value[0].hallSpot.sector.id}}
+        {{sector.value[0].hallSpot.type === 'HallSpotResponse' ? '(Stehplätze)' : '(Sitzplätze)'}}
+      </h5>
+      <p class="text-black-50">{{formatPrice(sector.value[0].hallSpot.sector.hallSectorShow.price)}} pro Platz</p>
+
+      <div class="m-1" *ngFor="let ticket of sector.value">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="input-group w-75 mb-1">
+            <input *ngIf="ticket.reserved" class="form-control" readonly
+                   [value]="'Platz-Nr. ' + ticket.hallSpot.id + ' (reserviert)'">
+            <input *ngIf="!ticket.reserved" class="form-control" readonly [value]="'Platz-Nr. ' + ticket.hallSpot.id">
+            <button class="btn btn-danger" type="button" (click)="removeTicket(ticket.id)">
+              <i class="bi bi-trash bg-danger" style="font-size: 20px"></i>
+            </button>
+          </div>
+          <div class="input-group w-auto">
+            <button (click)="changeTicketReserved(ticket.id, true)" class="btn btn-outline-primary {{(ticket.reserved?('active'):(''))}}"
+                    type="button">Reservieren
+            </button>
+            <button (click)="changeTicketReserved(ticket.id, false)" class="btn btn-outline-primary {{(!ticket.reserved?('active'):(''))}}"
+                    type="button">Kaufen
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </li>
+    <li class="list-group-item list-group-item-secondary">
+      <div class="d-flex justify-content-between">
+        <span>Zwischenpreis:</span>
+        <span>{{getSubtotalForEvent(event.key)}}</span>
+      </div>
+    </li>
+  </ul>
+  <br/>
+</div>
+
+<div *ngIf="order && order.tickets.length > 0">
+  <div class="d-flex justify-content-end">
+    <h4 class="fw-bold">
+      Gesamtpreis: {{getTotalPrice()}}
+    </h4>
+  </div>
+
+  <div class="d-flex justify-content-end">
+    <button class="btn btn-primary" (click)="gotoCheckout()">Jetzt zahlen</button>
+  </div>
+</div>
+
+<div *ngIf="!order || order.tickets.length === 0">
+  <p class="text-black-50">Du hast noch keine Tickets in deinem Warenkorb.</p>
+</div>

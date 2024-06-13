@@ -71,14 +71,19 @@ public class DataGeneratorUtils {
     }
 
     public static <T> T randomChoice(List<T> choices) {
-        if (choices.size() > 0) {
-            var idx = rng.nextInt(choices.size());
-            return choices.get(idx);
+        if (choices.isEmpty()) {
+            return null;
         }
-        return null;
+
+        var idx = rng.nextInt(choices.size());
+        return choices.get(idx);
     }
 
     public static <T> T randomChoice(T[] choices) {
+        if (choices.length == 0) {
+            return null;
+        }
+
         var idx = rng.nextInt(choices.length);
         return choices[idx];
     }

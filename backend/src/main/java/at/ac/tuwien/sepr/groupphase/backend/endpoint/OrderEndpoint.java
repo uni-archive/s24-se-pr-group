@@ -13,22 +13,28 @@ import at.ac.tuwien.sepr.groupphase.backend.service.OrderService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -70,7 +76,7 @@ public class OrderEndpoint {
         return ResponseEntity.ok(order);
     }
 
-    @Secured("ROLE_USER")
+    @Secured(Code.USER)
     @GetMapping(path = "/myorders", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<OrderSummaryResponse>> findForUser() throws DtoNotFoundException {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -80,7 +86,7 @@ public class OrderEndpoint {
         return ResponseEntity.ok(orderMapper.toSummaryResponse(res));
     }
 
-    @Secured("ROLE_USER")
+    @Secured(Code.USER)
     @DeleteMapping(path = "/order/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void cancelOrder(@PathVariable("id") long orderId) {
@@ -88,6 +94,21 @@ public class OrderEndpoint {
         try {
             orderService.cancelOrder(orderId, user);
         } catch (EntityNotFoundException e) {
+            throw new NotFoundException(e);
+        } catch (ValidationException e) {
+            throw new at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.ValidationException(e);
+        }
+    }
+
+    @Secured(Code.USER)
+    @PutMapping("/order/{id}")
+    public void purchaseOrder(@PathVariable("id") long orderId) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var username = authentication.getPrincipal().toString();
+        try {
+            var user = userService.findApplicationUserByEmail(username);
+            orderService.purchaseOrder(orderId, user);
+        } catch (DtoNotFoundException e) {
             throw new NotFoundException(e);
         } catch (ValidationException e) {
             throw new at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.ValidationException(e);
@@ -107,6 +128,40 @@ public class OrderEndpoint {
         OrderDetailsDto orderDetailsDto = orderService.create(user);
         response.addCookie(new Cookie("order", orderDetailsDto.getId().toString()));
         return ResponseEntity.status(HttpStatus.CREATED).body(orderMapper.toResponse(orderDetailsDto));
+    }
+
+    @Secured(Code.USER)
+    @GetMapping("/myorders/current")
+    public ResponseEntity<OrderDetailsResponse> getCurrentOrder(
+        @Parameter(
+            name = "orderCookie",
+            in = ParameterIn.COOKIE,
+            schema = @Schema(implementation = String.class),
+            hidden = true
+        )
+        @CookieValue("order") String orderCookie) throws NotFoundException {
+        ApplicationUserDto user;
+        try {
+            user = getUserFromSecurityContext();
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        long orderId;
+        try {
+            orderId = Long.parseLong(orderCookie);
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        try {
+            var order = orderService.findById(orderId, user);
+            return ResponseEntity.ok(orderMapper.toResponse(order));
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        } catch (ValidationException e) {
+            throw new at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.ValidationException(e);
+        }
     }
 
     private ApplicationUserDto getUserFromSecurityContext() throws NotFoundException {
