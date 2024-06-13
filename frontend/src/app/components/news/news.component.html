@@ -1,5 +1,5 @@
-<div class="mt-2 container">
-    <div class="input-group justify-content-center" id="searchRadio">
+<div class="mt-4 container">
+    <div class="input-group justify-content-center mb-4" id="searchRadio">
         <button (click)="switchMode('UNREAD')"
                 class="btn"
                 [ngClass]="{'btn-dark': newsMode === 'UNREAD', 'btn-light text-dark': newsMode !== 'UNREAD'}"
@@ -35,7 +35,7 @@
     </div>
 </div>
 
-<div class="row">
+<div class="row mt-4">
     <div class="col-12 d-flex justify-content-center">
         <ngb-pagination
                 [collectionSize]="totalElements"

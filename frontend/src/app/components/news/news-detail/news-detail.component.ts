@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {NewsResponseDto, NewsEndpointService, EventDto} from "../../../services/openapi";
+import {Location} from '@angular/common';
 
 @Component({
     selector: 'app-news-detail',
@@ -24,7 +25,8 @@ export class NewsDetailComponent implements OnInit {
 
     constructor(private route: ActivatedRoute,
                 private newsServiceNew: NewsEndpointService,
-                private router: Router) {
+                private router: Router,
+                private location: Location) {
     }
 
     ngOnInit(): void {
@@ -69,4 +71,7 @@ export class NewsDetailComponent implements OnInit {
         }
     }
 
+    goBack() {
+        this.location.back();
+    }
 }
