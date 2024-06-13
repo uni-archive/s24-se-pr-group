@@ -14,7 +14,7 @@ import { HttpHeaders }                                       from '@angular/comm
 import { Observable }                                        from 'rxjs';
 
 import { NewsResponseDto } from '../model/models';
-import { PageNewsResponseDto } from '../model/models';
+import { PageSimpleNewsResponseDto } from '../model/models';
 
 
 import { Configuration }                                     from '../configuration';
@@ -49,14 +49,14 @@ export interface NewsEndpointServiceInterface {
      * @param page 
      * @param size 
      */
-    findAll(page?: number, size?: number, extraHttpRequestParams?: any): Observable<PageNewsResponseDto>;
+    findAll(page?: number, size?: number, extraHttpRequestParams?: any): Observable<PageSimpleNewsResponseDto>;
 
     /**
-     * Get list of unread news
+     * Get list of unread news without details
      * 
      * @param page 
      * @param size 
      */
-    findUnread(page?: number, size?: number, extraHttpRequestParams?: any): Observable<PageNewsResponseDto>;
+    findUnread(page?: number, size?: number, extraHttpRequestParams?: any): Observable<PageSimpleNewsResponseDto>;
 
 }

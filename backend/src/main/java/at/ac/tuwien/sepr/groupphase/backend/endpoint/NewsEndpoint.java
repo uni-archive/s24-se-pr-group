@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.EventDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.NewsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsRequestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.SimpleNewsResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.NewsEndpointMapper;
 import at.ac.tuwien.sepr.groupphase.backend.service.NewsService;
@@ -52,26 +53,26 @@ public class NewsEndpoint {
     @Secured("ROLE_USER")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get list of news without details")
-    public ResponseEntity<Page<NewsResponseDto>> findAll(@RequestParam(name = "page", defaultValue = "0") Integer page, @RequestParam(name = "size", defaultValue = "9") Integer size) {
+    public ResponseEntity<Page<SimpleNewsResponseDto>> findAll(@RequestParam(name = "page", defaultValue = "0") Integer page, @RequestParam(name = "size", defaultValue = "9") Integer size) {
         LOGGER.info("GET /api/v1/news");
         PageRequest pageable = PageRequest.of(page, size);
         Page<NewsDto> newsList = newsService.getAllNews(pageable);
-        return ResponseEntity.ok(newsList.map(newsEndpointMapper::toResponse));
+        return ResponseEntity.ok(newsList.map(newsEndpointMapper::toSimpleResponse));
     }
 
     @Secured("ROLE_USER")
     @GetMapping(value = "/unread", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get list of unread news")
-    public ResponseEntity<Page<NewsResponseDto>> findUnread(@RequestParam(name = "page", defaultValue = "0") Integer page, @RequestParam(name = "size", defaultValue = "9") Integer size) {
+    @Operation(summary = "Get list of unread news without details")
+    public ResponseEntity<Page<SimpleNewsResponseDto>> findUnread(@RequestParam(name = "page", defaultValue = "0") Integer page, @RequestParam(name = "size", defaultValue = "9") Integer size) {
         LOGGER.info("GET /api/v1/news/unread");
         PageRequest pageable = PageRequest.of(page, size);
-        Page<NewsDto> unreadNewsList = null;
+        Page<NewsDto> unreadNewsList;
         try {
             unreadNewsList = newsService.getUnseenNews(pageable);
         } catch (DtoNotFoundException e) {
             throw new NotFoundException(e);
         }
-        return ResponseEntity.ok(unreadNewsList.map(newsEndpointMapper::toResponse));
+        return ResponseEntity.ok(unreadNewsList.map(newsEndpointMapper::toSimpleResponse));
     }
 
 

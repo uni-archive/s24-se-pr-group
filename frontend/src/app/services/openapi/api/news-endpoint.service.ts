@@ -21,7 +21,7 @@ import { Observable }                                        from 'rxjs';
 // @ts-ignore
 import { NewsResponseDto } from '../model/news-response-dto';
 // @ts-ignore
-import { PageNewsResponseDto } from '../model/page-news-response-dto';
+import { PageSimpleNewsResponseDto } from '../model/page-simple-news-response-dto';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -303,9 +303,9 @@ export class NewsEndpointService implements NewsEndpointServiceInterface {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public findAll(page?: number, size?: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageNewsResponseDto>;
-    public findAll(page?: number, size?: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageNewsResponseDto>>;
-    public findAll(page?: number, size?: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageNewsResponseDto>>;
+    public findAll(page?: number, size?: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageSimpleNewsResponseDto>;
+    public findAll(page?: number, size?: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageSimpleNewsResponseDto>>;
+    public findAll(page?: number, size?: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageSimpleNewsResponseDto>>;
     public findAll(page?: number, size?: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarQueryParameters = new HttpParams({encoder: this.encoder});
@@ -355,7 +355,7 @@ export class NewsEndpointService implements NewsEndpointServiceInterface {
         }
 
         let localVarPath = `/api/v1/news`;
-        return this.httpClient.request<PageNewsResponseDto>('get', `${this.configuration.basePath}${localVarPath}`,
+        return this.httpClient.request<PageSimpleNewsResponseDto>('get', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 params: localVarQueryParameters,
@@ -370,15 +370,15 @@ export class NewsEndpointService implements NewsEndpointServiceInterface {
     }
 
     /**
-     * Get list of unread news
+     * Get list of unread news without details
      * @param page 
      * @param size 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public findUnread(page?: number, size?: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageNewsResponseDto>;
-    public findUnread(page?: number, size?: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageNewsResponseDto>>;
-    public findUnread(page?: number, size?: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageNewsResponseDto>>;
+    public findUnread(page?: number, size?: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageSimpleNewsResponseDto>;
+    public findUnread(page?: number, size?: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageSimpleNewsResponseDto>>;
+    public findUnread(page?: number, size?: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageSimpleNewsResponseDto>>;
     public findUnread(page?: number, size?: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarQueryParameters = new HttpParams({encoder: this.encoder});
@@ -428,7 +428,7 @@ export class NewsEndpointService implements NewsEndpointServiceInterface {
         }
 
         let localVarPath = `/api/v1/news/unread`;
-        return this.httpClient.request<PageNewsResponseDto>('get', `${this.configuration.basePath}${localVarPath}`,
+        return this.httpClient.request<PageSimpleNewsResponseDto>('get', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 params: localVarQueryParameters,

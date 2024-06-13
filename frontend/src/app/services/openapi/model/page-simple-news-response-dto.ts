@@ -11,14 +11,14 @@
  */
 import { PageableObject } from './pageable-object';
 import { SortObject } from './sort-object';
-import { LocationDto } from './location-dto';
+import { SimpleNewsResponseDto } from './simple-news-response-dto';
 
 
-export interface PageLocationDto { 
+export interface PageSimpleNewsResponseDto { 
     totalPages?: number;
     totalElements?: number;
     size?: number;
-    content?: Array<LocationDto>;
+    content?: Array<SimpleNewsResponseDto>;
     number?: number;
     sort?: Array<SortObject>;
     pageable?: PageableObject;

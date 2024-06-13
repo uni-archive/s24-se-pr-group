@@ -9,15 +9,13 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { SortObject } from './sort-object';
 
 
-export interface PageableObject { 
-    offset?: number;
-    sort?: Array<SortObject>;
-    pageSize?: number;
-    pageNumber?: number;
-    unpaged?: boolean;
-    paged?: boolean;
+export interface SimpleNewsResponseDto { 
+    id?: number;
+    title?: string;
+    summary?: string;
+    publishedAt?: string;
+    image?: Array<string>;
 }
 

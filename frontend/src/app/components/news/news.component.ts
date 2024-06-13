@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {NewsResponseDto, NewsEndpointService} from "../../services/openapi";
+import {SimpleNewsResponseDto, NewsEndpointService} from "../../services/openapi";
 
 @Component({
     selector: 'app-news',
@@ -9,7 +9,7 @@ import {NewsResponseDto, NewsEndpointService} from "../../services/openapi";
 export class NewsComponent implements OnInit {
     error = false;
     errorMessage = '';
-    news: NewsResponseDto[] = [];
+    news: SimpleNewsResponseDto[] = [];
     newsMode: 'ALL' | 'UNREAD' = 'ALL';
     totalElements: number = 0;
     pageSize: number = 9;
@@ -25,7 +25,7 @@ export class NewsComponent implements OnInit {
         this.loadNews();
     }
 
-    getNews(): NewsResponseDto[] {
+    getNews(): SimpleNewsResponseDto[] {
         return this.news;
     }
 
