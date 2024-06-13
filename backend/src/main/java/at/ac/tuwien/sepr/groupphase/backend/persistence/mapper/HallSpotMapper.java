@@ -14,7 +14,7 @@ public interface HallSpotMapper extends BaseEntityMapper<HallSpot, HallSpotDto> 
 
     @Override
     @SubclassMapping(source = HallSeatDto.class, target = HallSeat.class)
-    HallSpot toEntity(HallSpotDto dto);
+    HallSpot toEntity(HallSpotDto dto, @Context CycleAvoidingMappingContext cycleAvoidingMappingContext);
 
     @Override
     @SubclassMapping(source = HallSeat.class, target = HallSeatDto.class)

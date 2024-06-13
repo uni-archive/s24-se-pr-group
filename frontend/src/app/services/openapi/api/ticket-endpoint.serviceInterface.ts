@@ -43,6 +43,14 @@ export interface TicketEndpointServiceInterface {
      * 
      * 
      * @param id 
+     * @param body 
+     */
+    changeTicketReserved(id: number, body: boolean, extraHttpRequestParams?: any): Observable<{}>;
+
+    /**
+     * 
+     * 
+     * @param id 
      */
     findById(id: number, extraHttpRequestParams?: any): Observable<TicketDetailsResponse>;
 
@@ -51,5 +59,12 @@ export interface TicketEndpointServiceInterface {
      * 
      */
     findForUser(extraHttpRequestParams?: any): Observable<Array<TicketDetailsResponse>>;
+
+    /**
+     * 
+     * 
+     * @param id 
+     */
+    removeTicket(id: number, extraHttpRequestParams?: any): Observable<{}>;
 
 }

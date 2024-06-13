@@ -60,4 +60,15 @@ public interface OrderService {
      * @param orderDetailsDto the order to confirm
      */
     void confirmOrder(OrderDetailsDto orderDetailsDto) throws DtoNotFoundException;
+
+
+    /**
+     * Purchases an order. This creates a purchase-invoice and sets all tickets as valid that are associated with this order.
+     *
+     * @param id   the id of the order.
+     * @param user the user who wants to purchase their order.
+     * @throws DtoNotFoundException    if no order with the given ID was found.
+     * @throws ValidationException     if the user is not permitted to purchase the given order.
+     */
+    void purchaseOrder(long id, ApplicationUserDto user) throws DtoNotFoundException, ValidationException;
 }

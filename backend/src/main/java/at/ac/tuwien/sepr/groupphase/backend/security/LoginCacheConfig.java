@@ -11,9 +11,9 @@ import java.util.concurrent.TimeUnit;
 public class LoginCacheConfig {
 
     @Bean
-    public Cache<String, Integer> loginAttemptCache(){
+    public Cache<String, Integer> loginAttemptCache() {
         return CacheBuilder.newBuilder()
-                .expireAfterWrite(1, TimeUnit.MINUTES)
-                .build();
+            .expireAfterWrite(1, TimeUnit.MINUTES)
+            .build();
     }
 }

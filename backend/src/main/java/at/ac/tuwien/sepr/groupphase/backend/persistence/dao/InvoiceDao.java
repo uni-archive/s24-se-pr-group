@@ -23,11 +23,19 @@ public class InvoiceDao extends AbstractDao<Invoice, InvoiceDto> {
     }
 
     public InvoiceDto createCancellationInvoiceForOrder(long orderId) {
+        return createInvoiceForOrder(orderId, InvoiceType.CANCELLATION);
+    }
+
+    public InvoiceDto createPurchaseInvoiceForOrder(long orderId) {
+        return createInvoiceForOrder(orderId, InvoiceType.PURCHASE);
+    }
+
+    private InvoiceDto createInvoiceForOrder(long orderId, InvoiceType invoiceType) {
         var refOrder = new Order();
         refOrder.setId(orderId);
         var invoice = new Invoice();
         invoice.setOrder(refOrder);
-        invoice.setInvoiceType(InvoiceType.CANCELLATION);
+        invoice.setInvoiceType(invoiceType);
         invoice.setDateTime(LocalDateTime.now());
 
         var res = repository.save(invoice);

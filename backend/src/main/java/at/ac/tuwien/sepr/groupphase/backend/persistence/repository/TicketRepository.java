@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -24,8 +25,16 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     @Query("UPDATE Ticket t SET t.valid = false WHERE t.order.id = :orderId")
     void invalidateAllTicketsForOrder(@Param("orderId") long orderId);
 
-    @Query("SELECT COUNT(t) > 0 FROM Ticket t WHERE t.show.id = :showId AND t.hallSpot.id = :seatId AND (t.valid = true OR t.reserved = true)")
+    @Modifying
+    @Query("UPDATE Ticket t SET t.valid = true WHERE t.order.id = :orderId")
+    void setValidAllTicketsForOrder(@Param("orderId") long orderId);
+
+    @Query("SELECT COUNT(t) > 0 FROM Ticket t WHERE t.show.id = :showId AND t.hallSpot.id = :seatId")
     boolean existsValidTicketForShowAndSeat(@Param("showId") long showId, @Param("seatId") long seatId);
 
     Ticket findByHash(String hash);
+
+    @Modifying
+    @Query("UPDATE Ticket t SET t.reserved = :setReserved WHERE t.id = :ticketId")
+    void changeTicketReserved(@Param("ticketId") long ticketId, @Param("setReserved") boolean setReserved);
 }

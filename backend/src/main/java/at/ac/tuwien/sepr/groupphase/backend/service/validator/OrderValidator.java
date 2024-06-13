@@ -4,7 +4,13 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.type.InvoiceType;
+import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import org.springframework.stereotype.Component;
 
@@ -13,10 +19,15 @@ import java.time.LocalDateTime;
 import java.time.temporal.TemporalAmount;
 import java.time.temporal.TemporalUnit;
 import java.time.temporal.WeekFields;
+import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.stereotype.Component;
+import java.util.Objects;
 
 @Component
 public class OrderValidator extends AbstractValidator<OrderDetailsDto> {
@@ -44,8 +55,12 @@ public class OrderValidator extends AbstractValidator<OrderDetailsDto> {
             errors.add("Order already cancelled.");
         }
 
+        if (order.getPurchaseInvoice().isEmpty()) {
+            errors.add("Order hasn't been finalized yet.");
+        }
+
         var now = LocalDateTime.now();
-        if (order.getPurchaseInvoice().getDateTime().plus(ORDER_CANCELLATION_PERIOD).isBefore(now)) {
+        if (order.getPurchaseInvoice().isPresent() && order.getPurchaseInvoice().get().getDateTime().plus(ORDER_CANCELLATION_PERIOD).isBefore(now)) {
             errors.add("Order exceeded cancellation period.");
         }
 
@@ -72,6 +87,20 @@ public class OrderValidator extends AbstractValidator<OrderDetailsDto> {
         if (Objects.nonNull(object.getDateTime()) && object.getDateTime().isAfter(LocalDateTime.now())) {
             errors.add("Order date must not be in the future.");
         }
+        endValidation(errors);
+    }
+
+    public void validateForPurchase(OrderDetailsDto order, ApplicationUserDto user) throws ValidationException {
+        List<String> errors = new ArrayList<>();
+
+        if (order.getPurchaseInvoice().isPresent()) {
+            errors.add("Order is already finalized.");
+        }
+
+        if (!order.getCustomer().getId().equals(user.getId())) {
+            errors.add("User-ID of order does not match with the given user.");
+        }
+
         endValidation(errors);
     }
 }

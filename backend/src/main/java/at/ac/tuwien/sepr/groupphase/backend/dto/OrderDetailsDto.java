@@ -59,15 +59,15 @@ public class OrderDetailsDto implements AbstractDto {
         this.dateTime = dateTime;
     }
 
-    public InvoiceDto getPurchaseInvoice() {
-        return this.invoices.stream().filter(i -> i.getInvoiceType().equals(InvoiceType.PURCHASE)).findFirst().orElse(null);
+    public Optional<InvoiceDto> getPurchaseInvoice() {
+        return this.invoices.stream().filter(i -> i.getInvoiceType().equals(InvoiceType.PURCHASE)).findFirst();
     }
 
     public Optional<InvoiceDto> getCancellationInvoice() {
         return this.invoices.stream().filter(i -> i.getInvoiceType().equals(InvoiceType.CANCELLATION)).findFirst();
     }
 
-    public class OrderDetailsDtoBuilder {
+    public static class OrderDetailsDtoBuilder {
         private List<TicketDetailsDto> tickets;
         private ApplicationUserDto customer;
         private List<InvoiceDto> invoices;

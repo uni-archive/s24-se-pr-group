@@ -34,7 +34,7 @@ public class InvoiceDto implements AbstractDto {
         this.dateTime = dateTime;
     }
 
-    public class InvoiceDtoBuilder {
+    public static class InvoiceDtoBuilder {
         private InvoiceType invoiceType;
         private LocalDateTime dateTime;
 

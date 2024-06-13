@@ -14,26 +14,31 @@
 
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav me-auto">
-        <li class="nav-item">
-            <a class="nav-link" *ngIf="authService.isLoggedIn()" routerLink="/news" routerLinkActive="active">News</a>
+      <li class="nav-item">
+        <a class="nav-link" *ngIf="authService.isLoggedIn()" routerLink="/news" routerLinkActive="active">News</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" routerLink="/search" routerLinkActive="active">Suche</a>
       </li>
       <li class="nav-item">
-      <a class="nav-link" *ngIf="authService.isLoggedIn()" routerLink="/my/tickets" routerLinkActive="active">Meine Tickets</a>
+        <a class="nav-link" *ngIf="authService.isLoggedIn()" routerLink="/my/tickets" routerLinkActive="active">Meine
+          Tickets</a>
       </li>
       <li class="nav-item">
-      <a class="nav-link" *ngIf="authService.isLoggedIn()" routerLink="/my/orders" routerLinkActive="active">Meine Bestellungen</a>
+        <a class="nav-link" *ngIf="authService.isLoggedIn()" routerLink="/my/orders" routerLinkActive="active">Meine
+          Bestellungen</a>
       </li>
       <li class="nav-item">
-      <a class="nav-link" *ngIf="authService.isLoggedIn() && authService.getUserRole()==='ADMIN'" routerLink="/eventcreation" routerLinkActive="active">Erstelle Veranstaltung</a>
+        <a class="nav-link" *ngIf="authService.isLoggedIn() && authService.getUserRole()==='ADMIN'"
+           routerLink="/eventcreation" routerLinkActive="active">Erstelle Veranstaltung</a>
       </li>
       <li class="nav-item">
-      <a class="nav-link" *ngIf="authService.isLoggedIn() && authService.getUserRole()==='ADMIN'" routerLink="/showcreation" routerLinkActive="active">Erstelle Vorführung</a>
+        <a class="nav-link" *ngIf="authService.isLoggedIn() && authService.getUserRole()==='ADMIN'"
+           routerLink="/showcreation" routerLinkActive="active">Erstelle Vorführung</a>
       </li>
       <li class="nav-item">
-      <a class="nav-link" *ngIf="authService.isLoggedIn() && authService.getUserRole()==='ADMIN'" routerLink="/locations" routerLinkActive="active">Aufführungsorte</a>
+        <a class="nav-link" *ngIf="authService.isLoggedIn() && authService.getUserRole()==='ADMIN'"
+           routerLink="/locations" routerLinkActive="active">Aufführungsorte</a>
       </li>
     </ul>
     <!-- Right-aligned nav items -->
@@ -41,13 +46,16 @@
       <!-- Show login button when not logged in -->
       <li class="nav-item" *ngIf="!authService.isLoggedIn()">
         <a class="nav-link" routerLink="/login" routerLinkActive="active"
-          >Login</a
+        >Login</a
         >
       </li>
       <li
         class="nav-item d-flex align-items-center"
         *ngIf="authService.isLoggedIn()"
       >
+        <a class="nav-link" routerLink="/user/cart" routerLinkActive="active">
+          <i class="bi bi-cart2"></i>
+        </a>
         <a
           class="nav-link"
           *ngIf="getName()"
@@ -58,7 +66,7 @@
           {{ getName() }}
         </a>
         <a class="nav-link" routerLink="/" (click)="authService.logoutUser()"
-          >Logout</a
+        >Logout</a
         >
       </li>
     </ul>

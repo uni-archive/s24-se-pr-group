@@ -81,9 +81,9 @@ class TicketInvalidationSchedulingServiceTest {
         entity.setHash(faker.internet().uuid());
         Ticket save = ticketRepository.save(entity);
 
-        OrderSummaryDto summaryDto = new OrderSummaryDto();
-        summaryDto.setId(orderDetailsDto.getId());
-        ticketDetailsDto.setOrder(summaryDto);
+        OrderDetailsDto detailsDto = new OrderDetailsDto();
+        detailsDto.setId(orderDetailsDto.getId());
+        ticketDetailsDto.setOrder(detailsDto);
         ticketDetailsDto.setId(save.getId());
         ticketDetailsDto.setHash(save.getHash());
         ticketInvalidationSchedulingService.scheduleReservationInvalidationsForNewlyAddedTicket(ticketDetailsDto);

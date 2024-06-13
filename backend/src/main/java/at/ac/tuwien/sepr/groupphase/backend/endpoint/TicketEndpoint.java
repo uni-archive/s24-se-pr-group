@@ -10,8 +10,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
 import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
-import java.lang.invoke.MethodHandles;
-import java.util.List;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -22,10 +21,14 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/tickets")
@@ -71,7 +74,7 @@ public class TicketEndpoint {
     }
 
     @Secured(Code.USER)
-    @DeleteMapping(path = "/ticket/{id}")
+    @DeleteMapping(path = "/ticket/{id}/cancel")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void cancelReservedTicket(
         @PathVariable("id") long id
@@ -89,12 +92,56 @@ public class TicketEndpoint {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public TicketDetailsResponse addTicket(@RequestBody TicketCreationRequest ticketCreationRequest)
-        throws at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException {
-        return ticketMapper.toResponse(
-            ticketService.addTicketToOrder(
-                ticketCreationRequest.spotId(),
-                ticketCreationRequest.showId(),
-                ticketCreationRequest.orderId(),
-                ticketCreationRequest.reservationOnly()));
+        throws at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException, ForbiddenException {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var username = authentication.getPrincipal().toString();
+        ApplicationUserDto user = null;
+        try {
+            user = userService.findApplicationUserByEmail(username);
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        }
+        try {
+            return ticketMapper.toResponse(ticketService.addTicketToOrder(ticketMapper.toDto(ticketCreationRequest), user));
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        }
+    }
+
+    @Secured(Code.USER)
+    @DeleteMapping("/ticket/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeTicket(@PathVariable("id") long ticketId)
+        throws at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException, ForbiddenException {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var username = authentication.getPrincipal().toString();
+        ApplicationUserDto user = null;
+        try {
+            user = userService.findApplicationUserByEmail(username);
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        }
+
+        ticketService.deleteTicket(ticketId, user);
+    }
+
+    @Secured(Code.USER)
+    @PutMapping("/ticket/{id}")
+    public void changeTicketReserved(@PathVariable("id") long ticketId, @RequestBody boolean setReserved)
+        throws at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException, ForbiddenException {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var username = authentication.getPrincipal().toString();
+        ApplicationUserDto user = null;
+        try {
+            user = userService.findApplicationUserByEmail(username);
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        }
+
+        try {
+            ticketService.changeTicketReserved(ticketId, setReserved, user);
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        }
     }
 }

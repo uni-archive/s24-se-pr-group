@@ -12,7 +12,11 @@ public class CycleAvoidingMappingContext {
 
     @BeforeMapping
     public <T> T getMappedInstance(Object source, @TargetType Class<T> targetType) {
-        return (T) knownInstances.get(source);
+        var found = knownInstances.get(source);
+        if (targetType.isInstance(found)) {
+           return (T) found;
+        }
+        return null;
     }
 
     @BeforeMapping

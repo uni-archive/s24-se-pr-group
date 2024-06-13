@@ -93,10 +93,10 @@ public class CancelOrderDataGenerator {
 
         var artists = fakeManyArtists(5);
         var events = fakeManyEvents(5);
-        var shows = fakeManyShows(events, artists, 5);
+        var shows = fakeManyShows(events, artists, 10);
         shows.forEach(s -> s.setDateTime(LocalDateTime.now().plusDays(1)));
         var hallplan = new HallPlan();
-        var sectors = fakeManyHallSectors(hallplan, 5);
+        var sectors = fakeManyHallSectors(hallplan, 10);
         var hallSpots = fakeManyHallSpots(sectors, 5);
         var sectorShowsChosenMap = new ConcurrentHashMap<HallSector, List<Show>>();
         var sectorShows = fakeManyHallSectorShows(shows, sectors, sectorShowsChosenMap, 10);

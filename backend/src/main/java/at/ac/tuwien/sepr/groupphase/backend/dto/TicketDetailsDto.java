@@ -8,7 +8,7 @@ public class TicketDetailsDto implements AbstractDto {
     private boolean valid;
     private HallSpotDto hallSpot;
     private ShowDto show;
-    private OrderSummaryDto order;
+    private OrderDetailsDto order;
 
     @Override
     public Long getId() {
@@ -59,11 +59,11 @@ public class TicketDetailsDto implements AbstractDto {
         this.show = show;
     }
 
-    public OrderSummaryDto getOrder() {
+    public OrderDetailsDto getOrder() {
         return order;
     }
 
-    public TicketDetailsDto setOrder(OrderSummaryDto order) {
+    public TicketDetailsDto setOrder(OrderDetailsDto order) {
         this.order = order;
         return this;
     }
@@ -75,7 +75,7 @@ public class TicketDetailsDto implements AbstractDto {
         private boolean valid;
         private HallSpotDto hallSpot;
         private ShowDto show;
-        private OrderSummaryDto orderSummaryDto;
+        private OrderDetailsDto orderDetailsDto;
 
         public TicketDetailsDtoBuilder withHash(String hash) {
             this.hash = hash;
@@ -102,8 +102,8 @@ public class TicketDetailsDto implements AbstractDto {
             return this;
         }
 
-        public TicketDetailsDtoBuilder withOrderSummaryDto(OrderSummaryDto orderSummaryDto) {
-            this.orderSummaryDto = orderSummaryDto;
+        public TicketDetailsDtoBuilder withOrderSummaryDto(OrderDetailsDto orderDetailsDto) {
+            this.orderDetailsDto = orderDetailsDto;
             return this;
         }
 
@@ -114,7 +114,7 @@ public class TicketDetailsDto implements AbstractDto {
             ticketDetailsDto.setValid(valid);
             ticketDetailsDto.setHallSpot(hallSpot);
             ticketDetailsDto.setShow(show);
-            ticketDetailsDto.setOrder(orderSummaryDto);
+            ticketDetailsDto.setOrder(orderDetailsDto);
             return ticketDetailsDto;
         }
     }
