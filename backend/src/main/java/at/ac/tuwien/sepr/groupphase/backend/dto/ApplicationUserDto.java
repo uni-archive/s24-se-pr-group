@@ -1,5 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.dto;
 
+import java.util.Objects;
+
 public class ApplicationUserDto implements AbstractDto {
 
     private Long id;

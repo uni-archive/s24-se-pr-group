@@ -53,7 +53,7 @@ public class NewsServiceImpl implements NewsService {
         String username = authentication.getName();
         ApplicationUserDto userDto = userDao.findByEmail(username);
 
-        NewsDto newsDto = null;
+        NewsDto newsDto;
         try {
             newsDto = newsDao.findById(id);
         } catch (EntityNotFoundException e) {
