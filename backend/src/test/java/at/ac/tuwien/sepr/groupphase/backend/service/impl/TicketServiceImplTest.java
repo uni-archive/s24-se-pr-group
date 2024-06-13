@@ -21,6 +21,7 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallPlanRepos
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallSectorRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallSectorShowRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallSpotRepository;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.LocationRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.ShowRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.TicketRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
@@ -67,6 +68,9 @@ public class TicketServiceImplTest implements TestData {
 
     @Autowired
     private TicketRepository ticketRepository;
+
+    @Autowired
+    private LocationRepository locationRepository;
 
     @Autowired
     private ShowRepository showRepository;
@@ -186,11 +190,12 @@ public class TicketServiceImplTest implements TestData {
     void teardown() {
         ticketRepository.deleteAll();
         hallSectorShowRepository.deleteAll();
+        showRepository.deleteAll();
+        eventRepository.deleteAll();
+        locationRepository.deleteAll();
         hallSpotRepository.deleteAll();
         hallSectorRepository.deleteAll();
         hallPlanRepository.deleteAll();
-        showRepository.deleteAll();
-        eventRepository.deleteAll();
     }
 
     @Test
