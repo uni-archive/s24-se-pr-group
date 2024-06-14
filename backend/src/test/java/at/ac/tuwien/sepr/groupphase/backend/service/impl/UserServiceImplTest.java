@@ -3,9 +3,11 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.EmailChangeTokenDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.MailBody;
+import at.ac.tuwien.sepr.groupphase.backend.dto.NewPasswordTokenDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.EmailChangeTokenDao;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.PasswordResetTokenDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.UserDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
@@ -35,8 +37,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -70,6 +70,9 @@ class UserServiceImplTest {
 
     @Mock
     private EmailChangeTokenDao emailChangeTokenDao;
+
+    @Mock
+    private PasswordResetTokenDao passwordResetTokenDao;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -375,5 +378,59 @@ class UserServiceImplTest {
         Assertions.assertEquals("new@email.com", result.getEmail());
     }
 
+    @Test
+    void sendEmailForNewPasswordShouldLogWarningAndReturnIfUserNotFound() throws MessagingException {
+        // Arrange
+        String email = "nonexistent@example.com";
+
+        // Mock the behavior of userDao to return null
+        when(userDao.findByEmail(email)).thenReturn(null);
+
+        // Act and Assert
+        Assertions.assertDoesNotThrow(() -> userService.sendEmailForNewPassword(email, true));
+
+        // Verify that no email was sent
+        verify(emailSenderService, never()).sendHtmlMail(any(MailBody.class));
+    }
+
+    @Test
+    void sendEmailForResetPasswordWhenUserFoundShouldSendEmail() throws NotFoundException, MailNotSentException,
+        MessagingException {
+        String email = "test@example.com";
+        ApplicationUserDto user = new ApplicationUserDto();
+        user.setEmail(email);
+        when(userDao.findByEmail(email)).thenReturn(user);
+
+        String token = "token";
+        NewPasswordTokenDto newPasswordTokenDto = new NewPasswordTokenDto();
+        newPasswordTokenDto.setToken(token);
+        when(passwordResetTokenDao.create(Mockito.any(NewPasswordTokenDto.class))).thenReturn(newPasswordTokenDto);
+
+        userService.sendEmailForNewPassword(email, true);
+
+        verify(userDao).findByEmail(email);
+        verify(passwordResetTokenDao).create(Mockito.any(NewPasswordTokenDto.class));
+        verify(emailSenderService).sendHtmlMail(Mockito.any(MailBody.class));
+    }
+
+    @Test
+    void sendEmailForChangePasswordWhenUserFoundShouldSendEmail() throws NotFoundException, MailNotSentException,
+        MessagingException {
+        String email = "test@example.com";
+        ApplicationUserDto user = new ApplicationUserDto();
+        user.setEmail(email);
+        when(userDao.findByEmail(email)).thenReturn(user);
+
+        String token = "token";
+        NewPasswordTokenDto newPasswordTokenDto = new NewPasswordTokenDto();
+        newPasswordTokenDto.setToken(token);
+        when(passwordResetTokenDao.create(Mockito.any(NewPasswordTokenDto.class))).thenReturn(newPasswordTokenDto);
+
+        userService.sendEmailForNewPassword(email, false);
+
+        verify(userDao).findByEmail(email);
+        verify(passwordResetTokenDao).create(Mockito.any(NewPasswordTokenDto.class));
+        verify(emailSenderService).sendHtmlMail(Mockito.any(MailBody.class));
+    }
 
 }
