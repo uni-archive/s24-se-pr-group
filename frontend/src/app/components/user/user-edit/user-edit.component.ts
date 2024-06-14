@@ -142,4 +142,17 @@ export class UserEditComponent implements OnInit {
       ],
     });
   }
+
+  changePassword() {
+    this.userEndpointService
+      .sendEmailForPasswordChange(this.user.email)
+      .subscribe({
+        next: (response) => {
+          this.messagingService.setMessage(response.message, "success");
+        },
+        error: (error) => {
+          this.messagingService.setMessage(error.error.message, "danger");
+        },
+      });
+  }
 }
