@@ -8,21 +8,26 @@ import {
   ShowEndpointService,
   LocationDto
 } from "../../../services/openapi";
+import {Artist} from "src/app/services/openapi/model/artist";
 import {MessagingService} from "../../../services/messaging.service";
 import {ShowCreateDto} from "../../../dtos/ShowCreateDto";
 
 @Component({
-  selector: 'app-create-show',
-  templateUrl: './create-show.component.html',
-  styleUrl: './create-show.component.scss'
+  selector: "app-create-show",
+  templateUrl: "./create-show.component.html",
+  styleUrl: "./create-show.component.scss",
 })
 export class CreateShowComponent {
-
   createDto: ShowCreationDto = {dateTime: null, event: null, artistList: [], location: null, sectorShowList: []};
   artistList: ArtistDto[] = [];
   location: LocationDto | null = null;
 
-  constructor(private showService: ShowEndpointService,private hallSectorService : HallSectorEndpointService, private messagingService: MessagingService, private eventService: EventEndpointService, private artistService: ArtistEndpointService) {
+  constructor(
+    private showService: ShowEndpointService,
+    private hallSectorService : HallSectorEndpointService, privatemessagingService: MessagingService,
+    private eventService: EventEndpointService,
+    private artistService: ArtistEndpointService
+  ) {
   }
 
 
@@ -35,32 +40,31 @@ export class CreateShowComponent {
   onArtistRemoved(artist: ArtistDto) {
     console.log(artist);
     console.log(this.createDto.artistList);
-    this.createDto.artistList = this.createDto.artistList.filter(art => art.id !== artist.id);
+    this.createDto.artistList = this.createDto.artistList.filter(
+      (art) => art.id !== artist.id
+    );
     console.log(this.createDto.artistList);
   }
 
   onArtistChange(search: string) {
     if (search !== null) {
-      this.artistService.search({artistName: search}).subscribe(
-        {
-          next: (data) => {
-            console.log(data);
-            this.artistList = data.filter(artist => {
-              let ret = true;
-              this.createDto.artistList.forEach(art => {
-                if (art.id === artist.id) {
-                  ret = false;
-                }
-                ;
-              });
-              return ret;
+      this.artistService.search({artistName: search}).subscribe({
+        next: (data) => {
+          console.log(data);
+          this.artistList = data.filter((artist) => {
+            let ret = true;
+            this.createDto.artistList.forEach((art) => {
+              if (art.id === artist.id) {
+                ret = false;
+              }
             });
-          },
-          error: err => {
-            console.log(err);
-          }
-        }
-      );
+            return ret;
+          });
+        },
+        error: (err) => {
+          console.log(err);
+        },
+      });
     }
   }
 

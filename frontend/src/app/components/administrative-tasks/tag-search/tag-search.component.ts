@@ -4,25 +4,21 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {ArtistDto} from "../../../services/openapi";
 
 @Component({
-  selector: 'app-tag-search',
+  selector: "app-tag-search",
   standalone: true,
-  imports: [
-    NgForOf,
-    ReactiveFormsModule,
-    FormsModule,
+  imports: [NgForOf, ReactiveFormsModule, FormsModule,
     NgTemplateOutlet
   ],
-  templateUrl: './tag-search.component.html',
-  styleUrl: './tag-search.component.scss'
+  templateUrl: "./tag-search.component.html",
+  styleUrl: "./tag-search.component.scss",
 })
 export class TagSearchComponent {
-
-  @Input() autoCompleteList :Iterable<ArtistDto>;
+  @Input() autoCompleteList: Iterable<ArtistDto>;
   @Input() placeholder: string;
   @Input() Label: string;
-  @Input() chosenArtists : ArtistDto[];
+  @Input() chosenArtists: ArtistDto[];
   @Output() search: EventEmitter<string> = new EventEmitter<string>();
-  @Output() itemChosen : EventEmitter<ArtistDto> = new EventEmitter<ArtistDto>();
+  @Output() itemChosen: EventEmitter<ArtistDto> = new EventEmitter<ArtistDto>();
   @Output() artistRemoved: EventEmitter<ArtistDto> = new EventEmitter<ArtistDto>();
   public text: string = "";
   onChange() {
@@ -30,11 +26,11 @@ export class TagSearchComponent {
     this.search.emit(this.text);
   }
 
-  removeArtist(delart:ArtistDto) {
+  removeArtist(delart: ArtistDto) {
     this.artistRemoved.emit(delart);
   }
 
-  eventClicked(event : ArtistDto) {
+  eventClicked(event: ArtistDto) {
     this.itemChosen.emit(event);
     this.text = "";
     this.autoCompleteList = [];
