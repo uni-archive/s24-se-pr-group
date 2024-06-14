@@ -7,7 +7,7 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.NewPasswordTokenDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.EmailChangeTokenDao;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.PasswordResetTokenDao;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.NewPasswordTokenDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.UserDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
@@ -72,7 +72,7 @@ class UserServiceImplTest {
     private EmailChangeTokenDao emailChangeTokenDao;
 
     @Mock
-    private PasswordResetTokenDao passwordResetTokenDao;
+    private NewPasswordTokenDao newPasswordTokenDao;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -404,12 +404,12 @@ class UserServiceImplTest {
         String token = "token";
         NewPasswordTokenDto newPasswordTokenDto = new NewPasswordTokenDto();
         newPasswordTokenDto.setToken(token);
-        when(passwordResetTokenDao.create(Mockito.any(NewPasswordTokenDto.class))).thenReturn(newPasswordTokenDto);
+        when(newPasswordTokenDao.create(Mockito.any(NewPasswordTokenDto.class))).thenReturn(newPasswordTokenDto);
 
         userService.sendEmailForNewPassword(email, true);
 
         verify(userDao).findByEmail(email);
-        verify(passwordResetTokenDao).create(Mockito.any(NewPasswordTokenDto.class));
+        verify(newPasswordTokenDao).create(Mockito.any(NewPasswordTokenDto.class));
         verify(emailSenderService).sendHtmlMail(Mockito.any(MailBody.class));
     }
 
@@ -424,12 +424,12 @@ class UserServiceImplTest {
         String token = "token";
         NewPasswordTokenDto newPasswordTokenDto = new NewPasswordTokenDto();
         newPasswordTokenDto.setToken(token);
-        when(passwordResetTokenDao.create(Mockito.any(NewPasswordTokenDto.class))).thenReturn(newPasswordTokenDto);
+        when(newPasswordTokenDao.create(Mockito.any(NewPasswordTokenDto.class))).thenReturn(newPasswordTokenDto);
 
         userService.sendEmailForNewPassword(email, false);
 
         verify(userDao).findByEmail(email);
-        verify(passwordResetTokenDao).create(Mockito.any(NewPasswordTokenDto.class));
+        verify(newPasswordTokenDao).create(Mockito.any(NewPasswordTokenDto.class));
         verify(emailSenderService).sendHtmlMail(Mockito.any(MailBody.class));
     }
 
