@@ -9,10 +9,9 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { PageableObject } from './pageable-object';
-import { ShowResponse } from './show-response';
-import { SortObject } from './sort-object';
-
+import { PageableObject } from "./pageable-object";
+import { ShowResponse } from "./show-response";
+import { SortObject } from "./sort-object";
 
 export interface PageShowResponse {
     totalElements?: number;
@@ -27,4 +26,3 @@ export interface PageShowResponse {
     pageable?: PageableObject;
     empty?: boolean;
 }
-
