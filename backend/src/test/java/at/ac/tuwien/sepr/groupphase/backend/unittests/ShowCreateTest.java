@@ -1,11 +1,13 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.EventDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.EventType;
 import at.ac.tuwien.sepr.groupphase.backend.service.EventService;
 import at.ac.tuwien.sepr.groupphase.backend.service.ShowService;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -40,7 +42,8 @@ public class ShowCreateTest {
         EventCreationDto eventdto = new EventCreationDto("EventTest", 60, "Cool event WOW!", EventType.CONCERT);
         eventService.createEvent(eventdto);
 
-        service.createShow(new ShowCreationDto(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay(), 1L,null));
+        service.createShow(new ShowDto(null, LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay(), null,null,null),
+            List.of());
 
         assertEquals(1, service.getAllShows().size());
     }

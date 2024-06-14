@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {NgForOf} from "@angular/common";
+import {NgForOf, NgTemplateOutlet} from "@angular/common";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {ArtistDto} from "../../../services/openapi";
 
@@ -9,7 +9,8 @@ import {ArtistDto} from "../../../services/openapi";
   imports: [
     NgForOf,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    NgTemplateOutlet
   ],
   templateUrl: './tag-search.component.html',
   styleUrl: './tag-search.component.scss'

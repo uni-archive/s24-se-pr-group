@@ -2,36 +2,43 @@
   <h2>Vorstellung erstellen</h2>
   <div class="form-group input-fields">
     <div class="row g-3 align-items-center">
-      <div class="col-12 col-md-6 form-group">
+      <div class="col-12 col-md-4 form-group">
         <app-autocomplete-textfield
-          [autoCompleteList]="eventList"
-          (eventChosen)="onEventChosen($event)"
-          (search)="onEventChange($event)"
-          placeholder="Veranstaltung"
-          Label="Veranstaltung">
+          (selectedEvent)="onEventSelected($event)"
+        >
         </app-autocomplete-textfield>
       </div>
-      <div class="col-12 col-md-6 form-group">
-        <app-autocomplete-textfield
-          [autoCompleteList]="locationList"
-          placeholder="Ort"
-          Label="Ort">
-        </app-autocomplete-textfield>
-      </div>
-    </div>
-
-    <div class="row g-3 align-items-center">
-      <div class="col-12 col-md-6 form-group">
+      <div class="col-12 col-md-4 form-group">
         <app-location-autocomplete
           (selectedLocation)="handleLocationSelected($event)">
         </app-location-autocomplete>
       </div>
-      <div class="col-12 col-md-6 form-group">
+      <div class="col-12 col-md-4 form-group">
         <label for="timeinput">Uhrzeit</label>
         <input id="timeinput" name="datetime" [(ngModel)]="createDto.dateTime" class="form-control" type="datetime-local">
       </div>
     </div>
+
+    <div class="row g-3 align-items-center">
+      <div class="col-auto flex-grow-1">
+        <app-tag-search [autoCompleteList]="artistList" [chosenArtists]="this.createDto.artistList" (artistRemoved)="onArtistRemoved($event)" (itemChosen)="onArtistsChosen($event)" (search)="onArtistChange($event)" placeholder="Künstler" Label="Künstler" ></app-tag-search>
+      </div>
+    </div>
+    <div class="row g-3 align-items-center sector-cards justify-content-center">
+      <div *ngFor="let sector of createDto.sectorShowList" class="card sector-siglecard col-12 col-md-5 justify-content-around">
+        <div class="card-header flex-row">
+            <div class="flex-grow-0 inline-sektor-labels d-inline-block"> <b>Sektorname</b> {{sector.sectorDto.name}} </div>
+            <div class="flex-grow-0 d-inline-block"> <b>Sitzanzahl</b> {{sector.sectorDto.seats.length}} </div>
+        </div>
+          <div class="form-group flex-grow-0">
+            <label for="sector-price-{{sector.sectorDto.id}}">Preis</label>
+            <input class="form-control" name="sector{{sector.sectorDto.id}}price" [(ngModel)]="createDto.sectorShowList[createDto.sectorShowList.indexOf(sector)].price" placeholder="preis in €" type="number" min="0" id="sector-price-{{sector.sectorDto.id}}">
+          </div>
+
+      </div>
+    </div>
   </div>
+
 
   <button type="submit" class="btn btn-primary">Erstelle Vorstellung</button>
 </form>

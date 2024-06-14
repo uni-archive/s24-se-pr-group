@@ -1,10 +1,12 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
+import at.ac.tuwien.sepr.groupphase.backend.dto.HallSectorShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowListDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +22,7 @@ public interface ShowService {
      * @param creationDto given parameters
      * @return rest response entity
      */
-    ResponseEntity<String> createShow(ShowCreationDto creationDto);
+    String createShow(ShowDto creationDto, List<HallSectorShowDto> sectorShowList);
 
     /**
      * Get a list of all shows.
@@ -28,6 +30,7 @@ public interface ShowService {
      * @return ShowDto
      */
     List<ShowDto> getAllShows();
+
 
     /**
      * Get list of Shows that are part of a certain event.

@@ -5,20 +5,20 @@ import {EventSearch} from "../../../dtos/EventSearchDto";
 import {EventService} from "../../../services/event.service";
 import {EventDto, EventResponse} from "../../../services/openapi";
 import {formatDuration} from "../../../../formatters/durationFormatter";
-
-
+import {NgForOf, NgIf} from "@angular/common";
 @Component({
   selector: 'app-event-search',
   templateUrl: './event-search.component.html',
   standalone: true,
   imports: [
     FormsModule,
-    BrowserModule
+    NgIf,
+    NgForOf,
   ],
   styleUrl: './event-search.component.scss'
 })
 export class EventSearchComponent implements OnInit{
-  public eventTypes: String[] = [null, "CONCERT","THEATER", "PLAY"];
+  public eventTypes: String[] = ["CONCERT","THEATER", "PLAY"];
   searchData : EventSearch = new EventSearch();
   events : EventDto[] = [];
 
@@ -30,7 +30,11 @@ export class EventSearchComponent implements OnInit{
     this.refreshEvents();
   }
 
+
   refreshEvents() {
+    if (this.searchData.dauer == null) {
+      this.searchData.dauer = 0;
+    }
     this.service.getEvents(this.searchData).pipe().subscribe(
       {
         next:(data)=> {

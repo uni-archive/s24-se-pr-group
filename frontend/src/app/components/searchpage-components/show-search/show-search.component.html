@@ -1,19 +1,17 @@
-<form class="search-form" #SearchForm="ngForm" (ngSubmit)="onSubmit()">
+<h2>Aufführungen</h2>
+<form class="search-form" #SearchForm="ngForm" (change)="onSubmit()">
 <div class="row form-group align-items-end">
-  <div class="col-auto" >
-    <label for="preis">Preis in € (+-30%)</label>
+  <div class="col-12 col-xl-6 mb-2" >
+    <!-- <label for="preis">Preis in € (+-30%)</label> -->
     <input id="preis" class="form-control" [(ngModel)]="searchData.price" type="number" name="preis" step="0.01" placeholder="price estimate" min="0">
 
   </div>
 
-  <div class="col-auto">
+  <div class="col-12 col-xl-6 mb-2">
     <div>
-      <label for="timeinput">Datum/Uhrzeit</label> <a data-bs-toggle="tooltip" data-bs-html="true" title="Es werden Vorführungen angezeit, die am angegebenen Tag, ab der angegebenen Uhrzeit stattfinden."><i class="bi bi-question-circle smol-questionmark"></i></a>
+      <!-- <label for="timeinput">Datum/Uhrzeit</label> <a data-bs-toggle="tooltip" data-bs-html="true" title="Es werden Vorführungen angezeit, die am angegebenen Tag, ab der angegebenen Uhrzeit stattfinden."><i class="bi bi-question-circle smol-questionmark"></i></a> -->
       <input [(ngModel)]="searchData.dateTime" id="timeinput" name="time" class="form-control" type="datetime-local">
     </div>
-  </div>
-  <div class="col-auto" >
-  <button type="submit" class="btn btn-primary">Suchen</button>
   </div>
 </div>
 </form>

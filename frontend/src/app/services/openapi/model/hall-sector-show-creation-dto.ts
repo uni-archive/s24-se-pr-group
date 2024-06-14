@@ -9,16 +9,11 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { Artist } from './artist';
-import { EventDto } from './event-dto';
-import { LocationDto } from './location-dto';
+import { HallSectorDto } from './hall-sector-dto';
 
 
-export interface ShowDto { 
-    id?: number;
-    dateTime?: string;
-    artistList?: Array<Artist>;
-    event?: EventDto;
-    location?: LocationDto;
+export interface HallSectorShowCreationDto { 
+    sectorDto?: HallSectorDto;
+    price?: number;
 }
 
