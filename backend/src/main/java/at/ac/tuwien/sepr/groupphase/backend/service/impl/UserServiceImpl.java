@@ -9,7 +9,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDt
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.EmailChangeTokenDao;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.PasswordResetTokenDao;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.NewPasswordTokenDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.UserDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
     private static final int MAX_EXPIRATION_TIME = 5;
     private final UserDao userDao;
     private final EmailChangeTokenDao emailChangeTokenDao;
-    private final PasswordResetTokenDao passwordResetTokenDao;
+    private final NewPasswordTokenDao newPasswordTokenDao;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenizer jwtTokenizer;
     private final UserValidator userValidator;
@@ -72,8 +72,7 @@ public class UserServiceImpl implements UserService {
     public UserServiceImpl(UserDao userDao, EmailChangeTokenDao emailChangeTokenDao, PasswordEncoder passwordEncoder,
                            JwtTokenizer jwtTokenizer, UserValidator userValidator,
                            EmailSenderService emailSenderService, AddressService addressService, Cache<String,
-        Integer> loginAttemptCache, PasswordResetTokenDao passwordResetTokenDao,
-                           UserUnlockSchedulingService userUnlockSchedulingService) {
+        Integer> loginAttemptCache, NewPasswordTokenDao newPasswordTokenDao, UserUnlockSchedulingService userUnlockSchedulingService) {
         this.userDao = userDao;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
@@ -82,7 +81,7 @@ public class UserServiceImpl implements UserService {
         this.emailSenderService = emailSenderService;
         this.emailChangeTokenDao = emailChangeTokenDao;
         this.loginAttemptCache = loginAttemptCache;
-        this.passwordResetTokenDao = passwordResetTokenDao;
+        this.newPasswordTokenDao = newPasswordTokenDao;
         this.userUnlockSchedulingService = userUnlockSchedulingService;
     }
 
@@ -320,7 +319,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updatePassword(String token, String currentPassword, String newPassword) throws ValidationException,
         DtoNotFoundException {
-        NewPasswordTokenDto validToken = passwordResetTokenDao.findByToken(token);
+        NewPasswordTokenDto validToken = newPasswordTokenDao.findByToken(token);
         if (validToken == null) {
             throw new ValidationException("Der Link ist ungültig.");
         }
@@ -386,14 +385,14 @@ public class UserServiceImpl implements UserService {
         // Invalidate old tokens for the current email
         invalidateNewPasswordTokens(email);
 
-        return passwordResetTokenDao.create(newPasswordToken);
+        return newPasswordTokenDao.create(newPasswordToken);
     }
 
     private void invalidateNewPasswordTokens(String email) {
-        passwordResetTokenDao.findByEmail(email).forEach(token -> {
+        newPasswordTokenDao.findByEmail(email).forEach(token -> {
             token.setExpiryDate(LocalDateTime.now().minusMinutes(1));
             try {
-                passwordResetTokenDao.update(token);  // Save the updated token
+                newPasswordTokenDao.update(token);  // Save the updated token
             } catch (EntityNotFoundException e) {
                 LOGGER.warn("Could not update the password reset token because it does not exist.", e);
             }
