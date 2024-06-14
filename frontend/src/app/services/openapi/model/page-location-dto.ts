@@ -9,10 +9,9 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { PageableObject } from './pageable-object';
-import { SortObject } from './sort-object';
-import { LocationDto } from './location-dto';
-
+import { PageableObject } from "./pageable-object";
+import { SortObject } from "./sort-object";
+import { LocationDto } from "./location-dto";
 
 export interface PageLocationDto {
     totalElements?: number;
@@ -27,4 +26,3 @@ export interface PageLocationDto {
     pageable?: PageableObject;
     empty?: boolean;
 }
-
