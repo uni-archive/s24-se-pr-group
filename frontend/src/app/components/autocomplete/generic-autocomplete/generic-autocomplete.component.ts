@@ -2,6 +2,7 @@ import { Component, OnInit, Output, EventEmitter, Input, TemplateRef } from '@an
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
+import {EventDto} from "../../../services/openapi";
 
 @Component({
   selector: 'app-generic-autocomplete',
@@ -13,7 +14,7 @@ export class GenericAutocompleteComponent<T> implements OnInit {
   @Input() displayTemplate!: TemplateRef<any>;
   @Input() placeholder: string = 'Search and select an item';
   @Input() label: string = 'Search';
-
+  @Input() textExtraction : (item : T) => string = null;
 
   @Output() itemSelected = new EventEmitter<T>();
 
@@ -50,6 +51,10 @@ export class GenericAutocompleteComponent<T> implements OnInit {
   }
 
   getItemDisplayName(item: T): string {
+
+    if (this.textExtraction !== null) {
+      return this.textExtraction(item);
+    }
     // Customize this method to extract the display name from the item
     return (item as any).name;
   }

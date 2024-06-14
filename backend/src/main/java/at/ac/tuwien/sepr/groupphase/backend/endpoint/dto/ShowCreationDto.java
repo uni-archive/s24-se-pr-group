@@ -2,17 +2,22 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.ArtistDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.EventDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.LocationDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class ShowCreationDto {
     private LocalDateTime dateTime;
-    private long eventid;
+    private EventDto event;
 
-    private List<ArtistDto> artists;
+    private List<ArtistDto> artistList;
 
-    //TODO: Location
+    private LocationDto location;
+
+    private List<HallSectorShowCreationDto> sectorShowList;
+
+
 
 
     public LocalDateTime getDateTime() {
@@ -25,30 +30,61 @@ public class ShowCreationDto {
         return this;
     }
 
-    public ShowCreationDto setEventid(long eventid) {
-        this.eventid = eventid;
-        return this;
-    }
 
-    public ShowCreationDto(LocalDateTime dateTime, long eventid, List<ArtistDto> artists) {
+    public ShowCreationDto(LocalDateTime dateTime, EventDto eventDto, List<ArtistDto> artists, LocationDto locationDto, List<HallSectorShowCreationDto> sectorShowList) {
         this.dateTime = dateTime;
-        this.eventid = eventid;
-        this.artists = artists;
+        this.event = eventDto;
+        this.artistList = artists;
+        this.location = locationDto;
+        this.sectorShowList = sectorShowList;
     }
 
-    public ShowCreationDto setArtists(List<ArtistDto> artists) {
-        this.artists = artists;
+    public ShowCreationDto setSectorShowList(List<HallSectorShowCreationDto> sectorShowList) {
+        this.sectorShowList = sectorShowList;
         return this;
     }
 
-    public List<ArtistDto> getArtists() {
-        return artists;
+    public List<HallSectorShowCreationDto> getSectorShowList() {
+        return sectorShowList;
     }
 
-    public long getEventid() {
-        return eventid;
+    public ShowCreationDto setLocation(LocationDto location) {
+        this.location = location;
+        return this;
+    }
+
+    public LocationDto getLocation() {
+        return location;
+    }
+
+    public ShowCreationDto setArtistList(List<ArtistDto> artistList) {
+        this.artistList = artistList;
+        return this;
+    }
+
+    public List<ArtistDto> getArtistList() {
+        return artistList;
+    }
+
+    public EventDto getEvent() {
+        return event;
+    }
+
+    public ShowCreationDto setEvent(EventDto event) {
+        this.event = event;
+        return this;
     }
 
     public ShowCreationDto() {
+    }
+
+    @Override
+    public String toString() {
+        return "ShowCreationDto{" +
+            "dateTime=" + dateTime +
+            ", event=" + event.getId() +
+            ", artistList=" + artistList.size() +
+            ", sectorShowList=" + sectorShowList.size() +
+            '}';
     }
 }

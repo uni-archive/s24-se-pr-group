@@ -51,6 +51,7 @@ public class ShowDao extends AbstractDao<Show, ShowDto> {
         return list;
     }
 
+    @Transactional
     public Page<ShowDto> findByLocationId(Long locationId, Pageable pageable) {
         return ((ShowRepository) repository).findByLocationId(locationId, pageable).map(mapper::toDto);
     }

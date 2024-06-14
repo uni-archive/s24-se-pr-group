@@ -46,6 +46,7 @@ import {CreateShowComponent} from "./components/administrative-tasks/create-show
 import {
   AutocompleteTextfieldComponent
 } from "./components/administrative-tasks/autocomplete-textfield/autocomplete-textfield.component";
+import {TagSearchComponent} from "./components/administrative-tasks/tag-search/tag-search.component";
 
 @NgModule({
   declarations: [
@@ -89,7 +90,8 @@ import {
     NgxPaginationModule,
     EventSearchComponent,
     ShowSearchComponent,
-    ArtistSearchComponent
+    ArtistSearchComponent,
+    TagSearchComponent
   ],
   providers: [httpInterceptorProviders],
   exports: [HeaderComponent, FooterComponent,

@@ -39,8 +39,9 @@ public class ArchTests {
         .layer("Service").definedBy("at.ac.tuwien.sepr.groupphase.backend.service..")
         .layer("Persistence").definedBy("at.ac.tuwien.sepr.groupphase.backend.persistence..")
         .layer("dto").definedBy("at.ac.tuwien.sepr.groupphase.backend.dto..")
+        .layer("config").definedBy("at.ac.tuwien.sepr.groupphase.backend.config..")
         .whereLayer("Endpoint").mayNotBeAccessedByAnyLayer()
-        .whereLayer("Service").mayOnlyBeAccessedByLayers("Endpoint")
+        .whereLayer("Service").mayOnlyBeAccessedByLayers("Endpoint", "config")
         .whereLayer("Persistence").mayOnlyBeAccessedByLayers("Service", "dto"));
 
     @ArchTest

@@ -7,22 +7,36 @@ import java.util.List;
 
 public class ShowDto implements AbstractDto {
 
-    private long id;
+    private Long id;
     private LocalDateTime dateTime;
-    private List<Artist> artistList;
+    private List<ArtistDto> artistList;
 
     private EventDto event;
+
+    private LocationDto location;
+
+
 
     @Override
     public Long getId() {
         return id;
     }
 
-    public ShowDto(long id, LocalDateTime dateTime, List<Artist> artistList, EventDto event) {
+    public ShowDto(Long id, LocalDateTime dateTime, List<ArtistDto> artistList, EventDto event, LocationDto location) {
         this.id = id;
         this.dateTime = dateTime;
         this.artistList = artistList;
         this.event = event;
+        this.location = location;
+    }
+
+    public ShowDto setLocation(LocationDto location) {
+        this.location = location;
+        return this;
+    }
+
+    public LocationDto getLocation() {
+        return location;
     }
 
     public ShowDto() {
@@ -32,7 +46,7 @@ public class ShowDto implements AbstractDto {
         return dateTime;
     }
 
-    public List<Artist> getArtistList() {
+    public List<ArtistDto> getArtistList() {
         return artistList;
     }
 
@@ -47,7 +61,7 @@ public class ShowDto implements AbstractDto {
         return this;
     }
 
-    public ShowDto setArtistList(List<Artist> artistList) {
+    public ShowDto setArtistList(List<ArtistDto> artistList) {
         this.artistList = artistList;
         return this;
     }
@@ -59,5 +73,15 @@ public class ShowDto implements AbstractDto {
 
     public EventDto getEvent() {
         return event;
+    }
+
+    @Override
+    public String toString() {
+        return "ShowDto{" +
+            "id=" + id +
+            ", dateTime=" + dateTime +
+            ", artistList=" + artistList +
+            ", event=" + event.getTitle() +
+            '}';
     }
 }

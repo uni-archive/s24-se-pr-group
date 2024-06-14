@@ -3,6 +3,7 @@ package at.ac.tuwien.sepr.groupphase.backend.persistence.mapper;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderSummaryDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Order;
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -13,9 +14,9 @@ import java.util.List;
 public interface OrderMapper extends BaseEntityMapper<Order, OrderDetailsDto> {
 
     @Mapping(target = "tickets", ignore = true)
-    Order toEntityFromSummary(OrderSummaryDto dto);
+    Order toEntityFromSummary(OrderSummaryDto dto, @Context CycleAvoidingMappingContext cycleAvoidingMappingContext);
 
-    List<Order> toEntityFromSummary(List<OrderSummaryDto> dto);
+    List<Order> toEntityFromSummary(List<OrderSummaryDto> dto, @Context CycleAvoidingMappingContext cycleAvoidingMappingContext);
 
     @Mapping(target = "ticketCount", ignore = true)
     @Mapping(target = "totalPrice", ignore = true)

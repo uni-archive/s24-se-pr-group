@@ -1,11 +1,16 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+import at.ac.tuwien.sepr.groupphase.backend.dto.HallSectorShowDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowListDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.HallSectorShowCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowResponse;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.HallSectorShowResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ShowResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.HallSectorShowMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.ShowMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.ShowService;
@@ -35,17 +40,24 @@ public class ShowEndpoint {
 
     private ShowService service;
     private final ShowResponseMapper showMapper;
+    private final HallSectorShowResponseMapper hallSectorShowMapper;
 
-    public ShowEndpoint(ShowService showService, ShowResponseMapper showMapper) {
+    public ShowEndpoint(ShowService showService, ShowResponseMapper showMapper,
+        HallSectorShowResponseMapper hallSectorShowMapper) {
         this.service = showService;
         this.showMapper = showMapper;
+        this.hallSectorShowMapper = hallSectorShowMapper;
     }
 
     @Secured(Code.ADMIN)
     @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createShow(@RequestBody ShowCreationDto creationDto) {
         LOGGER.info("POST /create {}", creationDto);
-        return service.createShow(creationDto);
+        ShowDto dto = showMapper.toDto(creationDto);
+        LOGGER.info("CREATING DTO {}", dto);
+        List<HallSectorShowDto> sectorShowList = hallSectorShowMapper.toDtoListFromCreationDto(creationDto.getSectorShowList())
+            .stream().map(sector -> sector.setShow(dto)).toList();
+        return ResponseEntity.ok(service.createShow(dto, sectorShowList));
     }
 
     @PermitAll

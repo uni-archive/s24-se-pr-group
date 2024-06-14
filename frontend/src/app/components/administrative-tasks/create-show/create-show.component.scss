@@ -9,7 +9,7 @@
 }
 
 .container {
-  max-width: 800px; // Adjust the max width as necessary
+  max-width: 1200px; // Adjust the max width as necessary
   margin: auto;
   padding: 20px;
 }
@@ -69,4 +69,16 @@ h2 {
 
 .input-fields {
   margin-bottom: 2vh;
+}
+
+.sector-cards {
+  margin-top: 2vh;
+}
+
+.sector-siglecard {
+  margin: 1vh 1vh;
+}
+
+.inline-sektor-labels {
+  margin-right: 1vw;
 }
