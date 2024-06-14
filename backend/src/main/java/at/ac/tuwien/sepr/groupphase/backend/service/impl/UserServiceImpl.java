@@ -25,12 +25,6 @@ import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationExceptio
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.UserValidator;
 import com.google.common.cache.Cache;
 import jakarta.mail.MessagingException;
-import java.lang.invoke.MethodHandles;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -292,7 +286,7 @@ public class UserServiceImpl implements UserService {
         ApplicationUserDto userByEmail;
         try {
             userByEmail = findApplicationUserByEmail(email);
-        } catch (NotFoundException e) {
+        } catch (DtoNotFoundException e) {
             LOGGER.warn("Could not find the user with the email address {}", email);
             // Do nothing, attacker should not now if it worked
             return;
