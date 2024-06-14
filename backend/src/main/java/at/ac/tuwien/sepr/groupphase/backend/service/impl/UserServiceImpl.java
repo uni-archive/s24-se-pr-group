@@ -4,10 +4,12 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.AddressDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.EmailChangeTokenDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.MailBody;
+import at.ac.tuwien.sepr.groupphase.backend.dto.NewPasswordTokenDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.EmailChangeTokenDao;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.NewPasswordTokenDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.UserDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
@@ -23,12 +25,6 @@ import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationExceptio
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.UserValidator;
 import com.google.common.cache.Cache;
 import jakarta.mail.MessagingException;
-import java.lang.invoke.MethodHandles;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,8 +50,10 @@ import java.util.concurrent.ExecutionException;
 public class UserServiceImpl implements UserService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final int MAX_EXPIRATION_TIME = 5;
     private final UserDao userDao;
     private final EmailChangeTokenDao emailChangeTokenDao;
+    private final NewPasswordTokenDao newPasswordTokenDao;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenizer jwtTokenizer;
     private final UserValidator userValidator;
@@ -66,9 +64,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     public UserServiceImpl(UserDao userDao, EmailChangeTokenDao emailChangeTokenDao, PasswordEncoder passwordEncoder,
-        JwtTokenizer jwtTokenizer, UserValidator userValidator,
-        EmailSenderService emailSenderService, AddressService addressService,
-        Cache<String, Integer> loginAttemptCache, UserUnlockSchedulingService userUnlockSchedulingService) {
+                           JwtTokenizer jwtTokenizer, UserValidator userValidator,
+                           EmailSenderService emailSenderService, AddressService addressService, Cache<String,
+        Integer> loginAttemptCache, NewPasswordTokenDao newPasswordTokenDao, UserUnlockSchedulingService userUnlockSchedulingService) {
         this.userDao = userDao;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
@@ -77,6 +75,7 @@ public class UserServiceImpl implements UserService {
         this.emailSenderService = emailSenderService;
         this.emailChangeTokenDao = emailChangeTokenDao;
         this.loginAttemptCache = loginAttemptCache;
+        this.newPasswordTokenDao = newPasswordTokenDao;
         this.userUnlockSchedulingService = userUnlockSchedulingService;
     }
 
@@ -281,6 +280,77 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+    @Override
+    public void sendEmailForNewPassword(String email, boolean reset) throws MailNotSentException {
+        // Find the user by email
+        ApplicationUserDto userByEmail;
+        try {
+            userByEmail = findApplicationUserByEmail(email);
+        } catch (DtoNotFoundException e) {
+            LOGGER.warn("Could not find the user with the email address {}", email);
+            // Do nothing, attacker should not now if it worked
+            return;
+        }
+
+        // Create a token for password reset
+        NewPasswordTokenDto passwordResetToken = createAndSaveNewPasswordToken(email);
+
+        MailBody mailBody;
+        if (reset) {
+            // Send email to the user to reset the password
+            mailBody = generateMailBodyResetPassword(userByEmail, passwordResetToken.getToken());
+        } else {
+            // Send email to the user to change the password
+            mailBody = generateMailBodyChangePassword(userByEmail, passwordResetToken.getToken());
+        }
+        try {
+            emailSenderService.sendHtmlMail(mailBody);
+        } catch (MessagingException e) {
+            throw new MailNotSentException("Error sending mail.");
+        }
+    }
+
+    @Override
+    public void updatePassword(String token, String currentPassword, String newPassword) throws ValidationException,
+        DtoNotFoundException {
+        NewPasswordTokenDto validToken = newPasswordTokenDao.findByToken(token);
+        if (validToken == null) {
+            throw new ValidationException("Der Link ist ungültig.");
+        }
+
+        if (validToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new ValidationException("Dieser Link ist abgelaufen.");
+        }
+
+        if (currentPassword != null) {
+            ApplicationUserDto user = userDao.findByEmail(validToken.getEmail());
+            if (!passwordEncoder.matches(currentPassword + user.getSalt(), user.getPassword())) {
+                throw new ValidationException("Das alte Passwort ist falsch.");
+            }
+            if (currentPassword.equals(newPassword)) {
+                throw new ValidationException("Das neue Passwort muss sich vom alten Passwort unterscheiden.");
+            }
+        }
+
+        if (newPassword == null || newPassword.isEmpty()) {
+            throw new ValidationException("Das Passwort darf nicht leer sein.");
+        } else {
+            if (newPassword.length() < 8) {
+                throw new ValidationException("Das Passwort muss mindestens 8 Zeichen lang sein.");
+            }
+        }
+
+        ApplicationUserDto user = userDao.findByEmail(validToken.getEmail());
+        user.setPassword(passwordEncoder.encode(newPassword + user.getSalt()));
+        try {
+            userDao.update(user);
+            invalidateNewPasswordTokens(validToken.getEmail());
+        } catch (EntityNotFoundException e) {
+            LOGGER.warn(e.getMessage());
+            throw new DtoNotFoundException("Das Passwort konnte nicht aktualisiert werden, da der Benutzer nicht existiert.");
+        }
+    }
+
     private EmailChangeTokenDto createAndSaveEmailChangeToken(String newEmail, String currentEmail) {
         String token = UUID.randomUUID().toString();
         LocalDateTime expiryDate = LocalDateTime.now().plusMinutes(10);
@@ -295,6 +365,32 @@ public class UserServiceImpl implements UserService {
         invalidateOldTokens(currentEmail);
 
         return emailChangeTokenDao.create(emailChangeToken);
+    }
+
+    private NewPasswordTokenDto createAndSaveNewPasswordToken(String email) {
+        String token = UUID.randomUUID().toString();
+        LocalDateTime expiryDate = LocalDateTime.now().plusMinutes(MAX_EXPIRATION_TIME);
+
+        NewPasswordTokenDto newPasswordToken = new NewPasswordTokenDto();
+        newPasswordToken.setToken(token);
+        newPasswordToken.setEmail(email);
+        newPasswordToken.setExpiryDate(expiryDate);
+
+        // Invalidate old tokens for the current email
+        invalidateNewPasswordTokens(email);
+
+        return newPasswordTokenDao.create(newPasswordToken);
+    }
+
+    private void invalidateNewPasswordTokens(String email) {
+        newPasswordTokenDao.findByEmail(email).forEach(token -> {
+            token.setExpiryDate(LocalDateTime.now().minusMinutes(1));
+            try {
+                newPasswordTokenDao.update(token);  // Save the updated token
+            } catch (EntityNotFoundException e) {
+                LOGGER.warn("Could not update the password reset token because it does not exist.", e);
+            }
+        });
     }
 
     private void invalidateOldTokens(String currentEmail) {
@@ -364,4 +460,107 @@ public class UserServiceImpl implements UserService {
         return new MailBody(email, subject, emailTemplate.toString());
     }
 
+    private MailBody generateMailBodyResetPassword(ApplicationUserDto user, String token) {
+        String email = user.getEmail();
+        String subject = "Passwort zurücksetzen";
+        String url = "http://localhost:4200/#/user/password/reset?token=" + token;
+
+        String emailTemplate = """
+            <!DOCTYPE html>
+            <html lang="de">
+            <head>
+               <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+               <style>
+                  body { background-color: #f8f9fa; font-family: Arial, sans-serif; }
+                  .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; }
+                  .card { background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 0.25rem; padding: 20px; }
+                  .card-body { padding: 20px; }
+                  .h3 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+                  .h5 { font-size: 1.25rem; }
+                  .text-gray-700 { color: #6c757d; }
+                  .btn-primary { display: inline-block; font-weight: 400; color: #fff !important; text-align: center; vertical-align: middle; cursor: pointer; background-color: #007bff; border: 1px solid #007bff; padding: 0.375rem 0.75rem; font-size: 1rem; border-radius: 0.25rem; text-decoration: none; }
+               </style>
+            </head>
+            <body>
+                <div class="container">
+                  <div class="card my-10">
+                    <div class="card-body">
+                      <h1 class="h3">Passwort zurücksetzen</h1>
+                      <h5 class="h5">Hallo""" + " " + user.getFirstName() +
+            """
+                !</h5>
+                <hr>
+                <div>
+                  <p class="text-gray-700">Wir haben eine Anfrage erhalten, dass du dein Passwort für dein TicketLine-Konto zurücksetzen möchtest.</p>
+                  <p class="text-gray-700">Wenn du diese Anfrage nicht gestellt hast, kannst du diese E-Mail ignorieren.</p>
+                  <p class="text-gray-700">Um dein Passwort zurückzusetzen, klicke bitte auf den folgenden Button:</p>
+                <hr>
+                <a class="btn btn-primary" href=\"""" + url + "\"" +
+            """
+                target="_blank" style="color: #fff !important;">Passwort zurücksetzen</a>
+                <p class="text-gray-700">Dieser Link ist für die nächsten""" + " " + MAX_EXPIRATION_TIME +
+            """
+                            Minuten gültig.</p>
+                            <p class="text-gray-700">Dies ist eine automatisch generierte E-Mail – bitte antworte nicht auf diese E-Mail.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </body>
+                </html>
+                """;
+        return new MailBody(email, subject, emailTemplate);
+    }
+
+    private MailBody generateMailBodyChangePassword(ApplicationUserDto user, String token) {
+        String email = user.getEmail();
+        String subject = "Passwort ändern";
+        String url = "http://localhost:4200/#/user/password/change?token=" + token;
+
+        String emailTemplate = """
+            <!DOCTYPE html>
+            <html lang="de">
+            <head>
+               <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+               <style>
+                  body { background-color: #f8f9fa; font-family: Arial, sans-serif; }
+                  .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; }
+                  .card { background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 0.25rem; padding: 20px; }
+                  .card-body { padding: 20px; }
+                  .h3 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+                  .h5 { font-size: 1.25rem; }
+                  .text-gray-700 { color: #6c757d; }
+                  .btn-primary { display: inline-block; font-weight: 400; color: #fff !important; text-align: center; vertical-align: middle; cursor: pointer; background-color: #007bff; border: 1px solid #007bff; padding: 0.375rem 0.75rem; font-size: 1rem; border-radius: 0.25rem; text-decoration: none; }
+               </style>
+            </head>
+            <body>
+                <div class="container">
+                  <div class="card my-10">
+                    <div class="card-body">
+                      <h1 class="h3">Passwort ändern</h1>
+                      <h5 class="h5">Hallo""" + " " + user.getFirstName() +
+            """
+                !</h5>
+                <hr>
+                <div>
+                  <p class="text-gray-700">Wir haben eine Anfrage erhalten, dass du dein Passwort für dein TicketLine-Konto ändern möchtest.</p>
+                  <p class="text-gray-700">Falls diese Aktion nicht von dir gestartet wurde, kontaktiere uns. Falls schon, folge der weiteren Beschreibung um dein Passwort zu ändern.</p>
+                  <p class="text-gray-700">Um dein Passwort zu ändern, klicke bitte auf den folgenden Button:</p>
+                <hr>
+                <a class="btn btn-primary" href=\"""" + url + "\"" +
+            """
+                target="_blank" style="color: #fff !important;">Passwort ändern</a>
+                <p class="text-gray-700">Dieser Link ist für die nächsten""" + " " + MAX_EXPIRATION_TIME +
+            """
+                            Minuten gültig.</p>
+                            <p class="text-gray-700">Dies ist eine automatisch generierte E-Mail – bitte antworte nicht auf diese E-Mail.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </body>
+                </html>
+                """;
+        return new MailBody(email, subject, emailTemplate);
+    }
 }
