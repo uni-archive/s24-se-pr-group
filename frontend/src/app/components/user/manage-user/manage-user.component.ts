@@ -84,4 +84,13 @@ export class ManageUserComponent {
         console.error("Fehler beim Laden des Benutzers:", error),
     });
   }
+
+  resetPassword(user: ApplicationUserDto) {
+    this.userEndpointService.sendEmailForPasswordReset(user.email).subscribe({
+      next: (response) => {
+        this.messagingService.setMessage(response.message, "success");
+      },
+      error: (error) => console.error("Fehler beim Laden der Benutzer:", error),
+    });
+  }
 }
