@@ -35,6 +35,7 @@ export class AuthInterceptor implements HttpInterceptor {
       this.globals.backendUri + "/users/user/password/reset";
     const activateAccountUri =
       this.globals.backendUri + "/users/user/activate/account";
+
     let allowedUriStarts = [
       locationUri,
       showLocationUri,
@@ -47,6 +48,9 @@ export class AuthInterceptor implements HttpInterceptor {
       updatePassword,
       sendResetPasswordEmail,
       activateAccountUri,
+      newsUri,
+      newsDetailUri,
+      top10Uri
     ];
 
     console.log("Intercepted request: " + req.url);

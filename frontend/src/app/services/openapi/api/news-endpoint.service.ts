@@ -216,7 +216,7 @@ export class NewsEndpointService implements NewsEndpointServiceInterface {
             }
         }
 
-        let localVarPath = `/api/v1/news`;
+        let localVarPath = `/api/v1/news/create`;
         return this.httpClient.request<NewsResponseDto>('post', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
@@ -282,7 +282,7 @@ export class NewsEndpointService implements NewsEndpointServiceInterface {
             }
         }
 
-        let localVarPath = `/api/v1/news/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
+        let localVarPath = `/api/v1/news/detail/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
         return this.httpClient.request<NewsResponseDto>('get', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
@@ -354,7 +354,7 @@ export class NewsEndpointService implements NewsEndpointServiceInterface {
             }
         }
 
-        let localVarPath = `/api/v1/news`;
+        let localVarPath = `/api/v1/news/all`;
         return this.httpClient.request<PageSimpleNewsResponseDto>('get', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,

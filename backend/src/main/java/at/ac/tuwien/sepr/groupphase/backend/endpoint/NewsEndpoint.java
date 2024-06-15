@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 
+import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,8 +51,8 @@ public class NewsEndpoint {
         this.newsEndpointMapper = newsEndpointMapper;
     }
 
-    @Secured("ROLE_USER")
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PermitAll
+    @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get list of news without details")
     public ResponseEntity<Page<SimpleNewsResponseDto>> findAll(@RequestParam(name = "page", defaultValue = "0") Integer page, @RequestParam(name = "size", defaultValue = "9") Integer size) {
         LOGGER.info("GET /api/v1/news");
@@ -75,12 +76,11 @@ public class NewsEndpoint {
         return ResponseEntity.ok(unreadNewsList.map(newsEndpointMapper::toSimpleResponse));
     }
 
-
-    @Secured("ROLE_USER")
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PermitAll
+    @GetMapping(value = "/detail/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get detailed information about a specific news")
     public ResponseEntity<NewsResponseDto> find(@PathVariable(name = "id") Long id) {
-        LOGGER.info("GET /api/v1/news/{}", id);
+        LOGGER.info("GET /api/v1/news/detail/{}", id);
         try {
             NewsDto newsDto = newsService.getNewsById(id);
             return ResponseEntity.ok(newsEndpointMapper.toResponse(newsDto));
@@ -90,7 +90,7 @@ public class NewsEndpoint {
     }
 
     @Secured("ROLE_ADMIN")
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Publish a new news")
     public ResponseEntity<NewsResponseDto> create(@RequestParam("image") MultipartFile file,
                                                   @RequestParam("title") String title,

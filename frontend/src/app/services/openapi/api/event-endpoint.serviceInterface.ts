@@ -52,9 +52,8 @@ export interface EventEndpointServiceInterface {
     /**
      * 
      * 
-     * @param eventType 
      */
-    getTop10EventsWithMostTickets(eventType?: 'CONCERT' | 'THEATER' | 'PLAY', extraHttpRequestParams?: any): Observable<Array<EventWithTicketCountDto>>;
+    getTop10EventsWithMostTickets(extraHttpRequestParams?: any): Observable<Array<EventWithTicketCountDto>>;
 
     /**
      * 
