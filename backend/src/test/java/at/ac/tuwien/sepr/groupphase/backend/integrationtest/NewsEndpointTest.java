@@ -70,7 +70,7 @@ class NewsEndpointIntegrationTest {
         newsDto.setImage(createValidTestImage());
         newsService.createNews(newsDto);
 
-        mockMvc.perform(get("/api/v1/news")
+        mockMvc.perform(get("/api/v1/news/all")
                 .param("page", "0")
                 .param("size", "9")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -89,7 +89,7 @@ class NewsEndpointIntegrationTest {
         EventDto eventDto = new EventDto();
         eventDto.setTitle("Test Event");
 
-        mockMvc.perform(multipart("/api/v1/news")
+        mockMvc.perform(multipart("/api/v1/news/create")
                 .file(file)
                 .param("title", title)
                 .param("summary", summary)
