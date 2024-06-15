@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
-import { SimpleNewsResponseDto, NewsEndpointService, EventDto, EventEndpointService } from '../../services/openapi';
+import { SimpleNewsResponseDto, NewsEndpointService, EventWithTicketCountDto, EventEndpointService } from '../../services/openapi';
 
 @Component({
   selector: 'app-home',
@@ -9,7 +9,7 @@ import { SimpleNewsResponseDto, NewsEndpointService, EventDto, EventEndpointServ
 })
 export class HomeComponent implements OnInit {
   news: SimpleNewsResponseDto[] = [];
-  events: EventDto[] = [];
+  events: EventWithTicketCountDto[] = [];
   itemsPerPage: number = 3;
 
   @ViewChild('scrollContainer', { static: false }) scrollContainer: ElementRef;
@@ -37,7 +37,7 @@ export class HomeComponent implements OnInit {
   }
 
   loadEvents() {
-    this.eventService.getTop10Events().subscribe({
+    this.eventService.getTop10EventsWithMostTickets().subscribe({
       next: (response: any) => {
         this.events = response;
       },

@@ -1,8 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.persistence.dao;
 
-import at.ac.tuwien.sepr.groupphase.backend.dto.EventDto;
-import at.ac.tuwien.sepr.groupphase.backend.dto.EventSearchDto;
-import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.*;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.EventType;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.BaseEntityMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.EventMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.ShowMapper;
@@ -19,7 +18,9 @@ import org.springframework.stereotype.Component;
 
 import java.lang.invoke.MethodHandles;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class EventDao extends AbstractDao<Event, EventDto> {
@@ -56,8 +57,17 @@ public class EventDao extends AbstractDao<Event, EventDto> {
     }
 
     @Transactional
-    public List<EventDto> getTop10EventsWithMostTickets(Pageable topTen) {
-        List<Event> events = ((EventRepository) repository).findMaximumBoughtShows(topTen);
-        return mapper.toDto(events);
+    public List<EventWithTicketCountDto> getTop10EventsWithMostTickets(EventType eventType, PageRequest pageRequest) {
+        LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
+        EventRepository eventRepository = (EventRepository) repository; // Cast repository to EventRepository
+        List<EventWithTicketCountProjection> results = eventRepository.findTop10ByOrderByTicketCountDesc(eventType, thirtyDaysAgo, pageRequest);
+
+        return results.stream()
+            .map(projection -> {
+                Event event = projection.getEvent();
+                long ticketCount = projection.getTicketCount();
+                return new EventWithTicketCountDto(event.getId(), event.getTitle(), event.getDescription(), ticketCount);
+            })
+            .collect(Collectors.toList());
     }
 }

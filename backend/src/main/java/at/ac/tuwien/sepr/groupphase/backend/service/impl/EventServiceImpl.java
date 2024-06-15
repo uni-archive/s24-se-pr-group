@@ -2,9 +2,11 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.EventDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.EventSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.EventWithTicketCountDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.EventResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.EventDao;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.EventType;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.EventService;
 import jakarta.transaction.Transactional;
@@ -13,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
@@ -65,8 +66,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
-    public List<EventDto> getTop10EventsWithMostTickets() {
-        Pageable topTen = PageRequest.of(0, 10);
-        return dao.getTop10EventsWithMostTickets(topTen);
+    public List<EventWithTicketCountDto> getTop10EventsWithMostTickets(EventType eventType, PageRequest pageRequest) {
+        return dao.getTop10EventsWithMostTickets(eventType, pageRequest);
     }
 }

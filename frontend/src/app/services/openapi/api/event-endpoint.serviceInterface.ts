@@ -17,6 +17,7 @@ import { EventCreationDto } from '../model/models';
 import { EventDto } from '../model/models';
 import { EventResponse } from '../model/models';
 import { EventSearchDto } from '../model/models';
+import { EventWithTicketCountDto } from '../model/models';
 
 
 import { Configuration }                                     from '../configuration';
@@ -51,8 +52,9 @@ export interface EventEndpointServiceInterface {
     /**
      * 
      * 
+     * @param eventType 
      */
-    getTop10Events(extraHttpRequestParams?: any): Observable<Array<EventDto>>;
+    getTop10EventsWithMostTickets(eventType?: 'CONCERT' | 'THEATER' | 'PLAY', extraHttpRequestParams?: any): Observable<Array<EventWithTicketCountDto>>;
 
     /**
      * 

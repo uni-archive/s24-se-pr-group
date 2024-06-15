@@ -26,6 +26,8 @@ import { EventDto } from '../model/event-dto';
 import { EventResponse } from '../model/event-response';
 // @ts-ignore
 import { EventSearchDto } from '../model/event-search-dto';
+// @ts-ignore
+import { EventWithTicketCountDto } from '../model/event-with-ticket-count-dto';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -301,13 +303,20 @@ export class EventEndpointService implements EventEndpointServiceInterface {
     }
 
     /**
+     * @param eventType 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getTop10Events(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<Array<EventDto>>;
-    public getTop10Events(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<EventDto>>>;
-    public getTop10Events(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<EventDto>>>;
-    public getTop10Events(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public getTop10EventsWithMostTickets(eventType?: 'CONCERT' | 'THEATER' | 'PLAY', observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<Array<EventWithTicketCountDto>>;
+    public getTop10EventsWithMostTickets(eventType?: 'CONCERT' | 'THEATER' | 'PLAY', observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<EventWithTicketCountDto>>>;
+    public getTop10EventsWithMostTickets(eventType?: 'CONCERT' | 'THEATER' | 'PLAY', observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<EventWithTicketCountDto>>>;
+    public getTop10EventsWithMostTickets(eventType?: 'CONCERT' | 'THEATER' | 'PLAY', observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+
+        let localVarQueryParameters = new HttpParams({encoder: this.encoder});
+        if (eventType !== undefined && eventType !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>eventType, 'eventType');
+        }
 
         let localVarHeaders = this.defaultHeaders;
 
@@ -346,9 +355,10 @@ export class EventEndpointService implements EventEndpointServiceInterface {
         }
 
         let localVarPath = `/api/v1/events/top10`;
-        return this.httpClient.request<Array<EventDto>>('get', `${this.configuration.basePath}${localVarPath}`,
+        return this.httpClient.request<Array<EventWithTicketCountDto>>('get', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
+                params: localVarQueryParameters,
                 responseType: <any>responseType_,
                 withCredentials: this.configuration.withCredentials,
                 headers: localVarHeaders,
