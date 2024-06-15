@@ -13,6 +13,6 @@ public interface NewsRepository extends JpaRepository<News, Long> {
 
     Page<News> findAllByOrderByPublishedAtDesc(Pageable pageable);
 
-    @Query("SELECT n FROM News n " + "WHERE n.id NOT IN (SELECT nu.id FROM News nu JOIN nu.users u WHERE u.id = :userId) " + "ORDER BY n.publishedAt DESC")
+    @Query("SELECT n FROM News n LEFT JOIN n.users u ON u.id = :userId WHERE u.id IS NULL ORDER BY n.publishedAt DESC")
     Page<News> findUnseenNewsByUser(@Param("userId") Long userId, Pageable pageable);
 }

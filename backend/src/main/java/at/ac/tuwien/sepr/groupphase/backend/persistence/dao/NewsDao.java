@@ -42,12 +42,20 @@ public class NewsDao extends AbstractDao<News, NewsDto> {
         if (!repository.existsById(newsDto.getId())) {
             throw new EntityNotFoundException(newsDto.getId());
         }
-        News news = mapper.toEntityWithContext(newsDto, new CycleAvoidingMappingContext());
+
+        News news = repository.findById(newsDto.getId())
+            .orElseThrow(() -> new EntityNotFoundException(newsDto.getId()));
+
         for (ApplicationUserDto userDto : newsDto.getUsers()) {
             ApplicationUser user = userRepository.findByEmail(userDto.getEmail());
+
             if (!user.getNews().contains(news)) {
                 user.getNews().add(news);
                 userRepository.save(user);
+            }
+
+            if (!news.getUsers().contains(user)) {
+                news.getUsers().add(user);
             }
         }
         repository.save(news);
