@@ -65,8 +65,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    @Transactional
-    public List<EventWithTicketCountDto> getTop10EventsWithMostTickets(EventType eventType, PageRequest pageRequest) {
-        return dao.getTop10EventsWithMostTickets(eventType, pageRequest);
+    public List<EventWithTicketCountDto> getTop10EventsWithMostTickets(PageRequest pageRequest) {
+        return dao.getTop10EventsWithMostTickets(pageRequest);
     }
 }

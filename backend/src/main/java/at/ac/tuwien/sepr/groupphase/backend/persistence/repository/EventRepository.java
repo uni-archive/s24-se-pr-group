@@ -32,9 +32,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query("SELECT e as event, COUNT(t) as ticketCount "
         + "FROM Ticket t JOIN t.show s JOIN s.event e "
-        + "WHERE (:type IS NULL OR e.eventType = :type) "
-        + "AND s.dateTime >= :startDate "
-        + "GROUP BY e.id " + "ORDER BY COUNT(t) DESC")
-    List<EventWithTicketCountProjection> findTop10ByOrderByTicketCountDesc
-        (@Param("type") EventType type, @Param("startDate") LocalDateTime startDate, Pageable pageable);
+        + "WHERE s.dateTime >= :startDate "
+        + "GROUP BY e.id "
+        + "ORDER BY COUNT(t) DESC")
+    List<EventWithTicketCountProjection> findTop10ByOrderByTicketCountDesc(
+        @Param("startDate") LocalDateTime startDate,
+        Pageable pageable);
 }
