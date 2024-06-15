@@ -1,21 +1,9 @@
-<div class="jumbotron mt-5">
-    <h1 class="display-4">TicketLine Home</h1>
-</div>
+<h1>TicketLine</h1>
 
-<div class="mt-4 container">
-    <h2>Top 10 Events</h2>
-    <div class="row">
-        <div class="col-md-4" *ngFor="let event of events">
-            <div class="card h-100">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">{{ event.title }}</h5>
-                    <p class="card-text">{{ event.description }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <h2>News</h2>
+<div>
+    <h2 class="news-header">
+        <a routerLink="/news" class="news-link">News</a>
+    </h2>
     <div class="news-carousel">
         <button class="carousel-control-prev" (click)="prevNews()">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -24,11 +12,15 @@
             <div class="row flex-nowrap">
                 <div class="col-4 p-2" *ngFor="let newsItem of news">
                     <div class="card h-100">
-                        <img class="news-image-preview" [src]="'data:image/jpeg;base64,' + newsItem.image" alt="news">
+                        <a [routerLink]="['/news-detail', newsItem.id]">
+                            <img class="news-image-preview" [src]="'data:image/jpeg;base64,' + newsItem.image" alt="news">
+                        </a>
                         <div class="card-body d-flex flex-column">
-                            <h5 class="card-title">{{ newsItem.title }}</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">{{ newsItem.publishedAt | date: 'dd.MM.yyyy HH:mm' }}</h6>
-                            <p class="card-text flex-grow-1">{{ newsItem.summary }}</p>
+                            <a [routerLink]="['/news', newsItem.id]" class="text-decoration-none text-dark">
+                                <h5 class="card-title">{{ newsItem.title }}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">{{ newsItem.publishedAt | date: 'dd.MM.yyyy HH:mm' }}</h6>
+                                <p class="card-text flex-grow-1">{{ newsItem.summary }}</p>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -37,5 +29,9 @@
         <button class="carousel-control-next" (click)="nextNews()">
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
         </button>
+    </div>
+    <h2>Top 10 Veranstaltungen</h2>
+    <div>
+        <canvas id="eventChart"></canvas>
     </div>
 </div>

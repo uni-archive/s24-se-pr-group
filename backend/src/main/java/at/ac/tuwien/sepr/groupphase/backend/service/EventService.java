@@ -45,7 +45,13 @@ public interface EventService {
      */
     EventDto getById(long id) throws EntityNotFoundException;
 
-
+    /**
+     * Retrieves the top 10 events with the most tickets sold within the last 30 days.
+     *
+     * @param eventType The type of the events to filter by. If null, all event types are considered.
+     * @param pageRequest The PageRequest object containing pagination information.
+     * @return A list of EventWithTicketCountDto containing event details and ticket count.
+     */
     @Transactional
     List<EventWithTicketCountDto> getTop10EventsWithMostTickets(EventType eventType, PageRequest pageRequest);
 }
