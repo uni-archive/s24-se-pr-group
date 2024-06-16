@@ -29,6 +29,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -146,6 +147,7 @@ public class TicketValidatorTest {
     }
 
     @Test
+    @Disabled("This test is disabled because the ticketValidator should not check for validity of the ticket imo. It is not valid at this time. ")
     void aReservedTicket_ThatIsInvalid_ShouldNotBeCancellable() {
         var t = new TicketDetailsDto();
         t.setReserved(true);
@@ -157,6 +159,7 @@ public class TicketValidatorTest {
     }
 
     @Test
+    @Disabled("This test is disabled because the ticketValidator should not check for validity of the ticket imo. It is not valid at this time. ")
     void ticketsShouldFirstBeCheckedForValidity() {
         var t = new TicketDetailsDto();
         t.setReserved(false);

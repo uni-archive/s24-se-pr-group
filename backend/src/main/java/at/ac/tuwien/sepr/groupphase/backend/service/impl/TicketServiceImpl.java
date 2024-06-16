@@ -100,6 +100,7 @@ public class TicketServiceImpl implements TicketService {
         try {
             var ticket = ticketDao.findById(id);
             ticketValidator.validateForCancelReservation(ticket);
+            ticketInvalidationSchedulingService.cancelReservationInvalidationJob(ticket.getHash());
             ticketDao.cancelReservedTicket(ticket.getId());
         } catch (EntityNotFoundException e) {
             throw new DtoNotFoundException(e);
@@ -243,7 +244,7 @@ public class TicketServiceImpl implements TicketService {
             TicketDetailsDto ticket = ticketDao.findById(id);
             ticketValidator.validateForValidation(ticket);
             ticketDao.validateTicketById(id);
-            // TODO remove scheduled task here
+            ticketInvalidationSchedulingService.cancelReservationInvalidationJob(ticket.getHash());
         } catch (EntityNotFoundException e) {
             throw new DtoNotFoundException(e);
         }

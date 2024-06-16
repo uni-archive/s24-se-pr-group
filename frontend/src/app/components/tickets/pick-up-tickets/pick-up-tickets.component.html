@@ -1,9 +1,9 @@
-<!-- pick-up-tickets.component.html -->
 <app-paginated-list
   [filterTemplate]="filterTemplate"
   [resultTemplate]="resultTemplate"
   [searchFunction]="searchTickets"
   [filterConfig]="filterConfig"
+  [refresh]="refresh"
   [showPaginationButtons]="true"
   [createButtonEnabled]="false"
   [heading]="getHeading()"
@@ -29,6 +29,7 @@
       <tr>
         <th>Vorname</th>
         <th>Nachname</th>
+        <th>Aktionen</th>
       </tr>
       </thead>
       <tbody>
@@ -36,7 +37,10 @@
         <td>{{ ticket.order.customer.firstName }}</td>
         <td>{{ ticket.order.customer.familyName }}</td>
         <td class="d-flex justify-content-end">
-          <button class="btn btn-success btn-lg" (click)="markAsPickedUp(ticket)">
+          <button class="btn btn-danger btn-lg" (click)="confirmCancellation(ticket)">
+            <i class="bi bi-x"></i>
+          </button>
+          <button class="btn btn-success btn-lg mr-2" (click)="markAsPickedUp(ticket)">
             <i class="bi bi-check"></i>
           </button>
         </td>
@@ -46,4 +50,16 @@
   </div>
 </ng-template>
 
-<app-confirmation-dialog *ngIf="showConfirmationDialog" [customerName]="customerNameToDisplay" (confirm)="onConfirm($event)"></app-confirmation-dialog>
+<app-confirmation-dialog
+  *ngIf="showConfirmationDialog"
+  [customerName]="customerNameToDisplay"
+  (confirm)="onConfirm($event)"
+  [action]="'mark as picked up'">
+</app-confirmation-dialog>
+
+<app-confirmation-dialog
+  *ngIf="showCancelDialog"
+  [customerName]="customerNameToDisplay"
+  (confirm)="onCancel($event)"
+  [action]="'cancel the reservation for'">
+</app-confirmation-dialog>

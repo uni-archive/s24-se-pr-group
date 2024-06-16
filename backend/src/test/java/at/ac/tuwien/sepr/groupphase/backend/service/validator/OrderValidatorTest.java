@@ -135,11 +135,11 @@ public class OrderValidatorTest {
         var order = new OrderDetailsDto();
         var invoice = new InvoiceDto();
         invoice.setInvoiceType(InvoiceType.PURCHASE);
-        invoice.setDateTime(LocalDateTime.now().minusSeconds(1));
+        invoice.setDateTime(LocalDateTime.now());
         order.setInvoices(List.of(invoice));
         order.setCustomer(user);
         var startedShow = new ShowDto();
-        startedShow.setDateTime(LocalDateTime.now());
+        startedShow.setDateTime(LocalDateTime.now().minusSeconds(1));
         var ticket = new TicketDetailsDto();
         ticket.setShow(startedShow);
         order.setTickets(List.of(ticket));

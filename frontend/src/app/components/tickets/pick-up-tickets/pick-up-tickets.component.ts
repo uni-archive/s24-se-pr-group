@@ -1,9 +1,9 @@
-// pick-up-tickets.component.ts
-import {Component, OnInit} from '@angular/core';
-import {ShowEndpointService, TicketEndpointService} from "../../../services/openapi";
-import {ActivatedRoute, Router} from "@angular/router";
-import {MessagingService} from "../../../services/messaging.service";
+import { Component, OnInit } from '@angular/core';
+import { ShowEndpointService, TicketEndpointService } from "../../../services/openapi";
+import { ActivatedRoute, Router } from "@angular/router";
+import { MessagingService } from "../../../services/messaging.service";
 import { DatePipe } from '@angular/common';
+
 @Component({
   selector: 'app-pick-up-tickets',
   templateUrl: './pick-up-tickets.component.html',
@@ -11,23 +11,25 @@ import { DatePipe } from '@angular/common';
   providers: [DatePipe]
 })
 export class PickUpTicketsComponent implements OnInit {
-  filterConfig = {firstName: '', familyName: ''};
+  filterConfig = { firstName: '', familyName: '' };
   showId: number;
   heading: string;
   showConfirmationDialog: boolean = false;
+  showCancelDialog: boolean = false;
   ticketIdToValidate: number;
+  ticketIdToCancel: number;
   customerNameToDisplay: string;
   currentCriteria: any;
   currentPage: number;
   currentSize: number;
+  refresh: boolean = false;
 
   constructor(private ticketEndpointService: TicketEndpointService,
               private router: Router,
               private route: ActivatedRoute,
               private showEndpointService: ShowEndpointService,
               private messageService: MessagingService,
-              private datePipe: DatePipe) {
-  }
+              private datePipe: DatePipe) { }
 
   searchTickets = (criteria: any, page: number, size: number) => {
     this.currentCriteria = criteria;
@@ -51,8 +53,6 @@ export class PickUpTicketsComponent implements OnInit {
     });
   }
 
-
-
   getHeading() {
     return this.heading;
   }
@@ -63,16 +63,37 @@ export class PickUpTicketsComponent implements OnInit {
     this.showConfirmationDialog = true;
   }
 
+  confirmCancellation(ticket: any) {
+    this.ticketIdToCancel = ticket.id;
+    this.customerNameToDisplay = `${ticket.order.customer.firstName} ${ticket.order.customer.familyName}`;
+    this.showCancelDialog = true;
+  }
+
   onConfirm(result: boolean) {
     this.showConfirmationDialog = false;
     if (result) {
       this.ticketEndpointService.validateTicket(this.ticketIdToValidate).subscribe({
         next: () => {
-          // Reload the table with the current parameters
-          this.searchTickets(this.currentCriteria, this.currentPage, this.currentSize).subscribe();
+          this.refresh = !this.refresh;
+          this.messageService.setMessage('Ticket validated successfully', 'success');
         },
         error: (err) => {
-          this.messageService.setMessage('Could not validate ticket: '+err.error, 'danger');
+          this.messageService.setMessage('Could not validate ticket: ' + err.error, 'danger');
+        }
+      });
+    }
+  }
+
+  onCancel(result: boolean) {
+    this.showCancelDialog = false;
+    if (result) {
+      this.ticketEndpointService.cancelReservedTicket(this.ticketIdToCancel).subscribe({
+        next: () => {
+          this.refresh = !this.refresh;
+          this.messageService.setMessage('Reservation cancelled successfully', 'success');
+        },
+        error: (err) => {
+          this.messageService.setMessage('Could not cancel reservation: ' + err.error, 'danger');
         }
       });
     }

@@ -1,4 +1,3 @@
-<!-- confirmation-dialog.component.html -->
 <div class="modal-backdrop">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -6,7 +5,7 @@
         <h4 class="modal-title">Aktion bestätigen</h4>
       </div>
       <div class="modal-body">
-        <p>Sind Sie sicher, dass Sie dieses Ticket für {{ customerName }} als abgeholt markieren möchten?</p>
+        <p>Sind Sie sicher, dass Sie dieses Ticket für {{ customerName }} {{ action }} möchten?</p>
       </div>
       <div class="modal-footer d-flex justify-content-between">
         <button type="button" class="btn btn-secondary" (click)="onNoClick()">Nein</button>

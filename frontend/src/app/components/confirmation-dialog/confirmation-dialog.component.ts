@@ -1,5 +1,4 @@
-// confirmation-dialog.component.ts
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-confirmation-dialog',
@@ -9,6 +8,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 export class ConfirmationDialogComponent {
   @Output() confirm = new EventEmitter<boolean>();
   @Input() customerName: string;
+  @Input() action: string = 'mark as picked up'; // Default action text
 
   onNoClick(): void {
     this.confirm.emit(false);
