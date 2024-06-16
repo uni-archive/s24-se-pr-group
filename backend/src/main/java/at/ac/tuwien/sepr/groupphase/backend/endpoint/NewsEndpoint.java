@@ -79,7 +79,7 @@ public class NewsEndpoint {
     @PermitAll
     @GetMapping(value = "/detail/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get detailed information about a specific news")
-    public ResponseEntity<NewsResponseDto> find(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<NewsResponseDto> find(@PathVariable("id") Long id) {
         LOGGER.info("GET /api/v1/news/detail/{}", id);
         try {
             NewsDto newsDto = newsService.getNewsById(id);

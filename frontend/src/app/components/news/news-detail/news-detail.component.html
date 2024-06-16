@@ -22,7 +22,7 @@
             </div>
         </div>
         <div class="col-lg-11 mb-3">
-            <button (click)="goBack()" class="btn bg-dark text-light">Zurück</button>
+            <button (click)="goBack()" class="btn btn-primary">Zurück</button>
         </div>
         <div class="col-lg-11">
             <div *ngIf="news">
@@ -44,12 +44,13 @@
 
                 <div *ngIf="news.eventDto" class="card mb-3 event-card-color hover-card" (click)="navigateToEvent(news.eventDto.id)">
                     <div class="card-body">
-                        <h5 class="card-title">Suche Tickets für: {{ news.eventDto.title }}</h5>
-                        <p class="card-text"> {{ news.eventDto.eventType }}</p>
+                        <h4 class="card-title">Suche Tickets für: {{ news.eventDto.title }}</h4>
+                        <h5 class="card-text">
+                            {{ news.eventDto.eventType === 'THEATER' ? 'Theaterstück' : news.eventDto.eventType === 'CONCERT' ? 'Konzert' : 'Kinofilm' }}
+                        </h5>
                         <p class="card-text"> {{ news.eventDto.description }}</p>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>

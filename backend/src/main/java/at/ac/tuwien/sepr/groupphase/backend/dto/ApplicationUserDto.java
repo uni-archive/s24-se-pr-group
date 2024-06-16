@@ -157,3 +157,4 @@ public class ApplicationUserDto implements AbstractDto {
         return this;
     }
 }
+

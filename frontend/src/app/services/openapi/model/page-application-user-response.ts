@@ -15,16 +15,16 @@ import { ApplicationUserResponse } from './application-user-response';
 
 
 export interface PageApplicationUserResponse { 
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
+    pageable?: PageableObject;
+    first?: boolean;
+    last?: boolean;
+    numberOfElements?: number;
     size?: number;
     content?: Array<ApplicationUserResponse>;
     number?: number;
     sort?: Array<SortObject>;
-    numberOfElements?: number;
-    first?: boolean;
-    last?: boolean;
-    pageable?: PageableObject;
     empty?: boolean;
 }
 

@@ -14,7 +14,6 @@
 export interface EventWithTicketCountDto { 
     eventId?: number;
     title?: string;
-    description?: string;
     ticketCount?: number;
 }
 

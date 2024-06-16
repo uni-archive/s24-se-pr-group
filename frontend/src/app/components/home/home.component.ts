@@ -96,6 +96,16 @@ export class HomeComponent implements OnInit {
                 scales: {
                     x: {
                         beginAtZero: true
+                    },
+                    y: {
+                        ticks: {
+                            align: 'start',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            color: 'black'
+                        }
                     }
                 },
                 plugins: {
@@ -130,6 +140,7 @@ export class HomeComponent implements OnInit {
 
         chart.update();
     }
+
 
     nextNews() {
         this.scroll('next');

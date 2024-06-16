@@ -1,13 +1,11 @@
 <div class="mt-4 container">
     <div class="input-group justify-content-center mb-4" id="searchRadio">
         <button (click)="switchMode('UNREAD')"
-                class="btn"
-                [ngClass]="{'btn-dark': newsMode === 'UNREAD', 'btn-light text-dark': newsMode !== 'UNREAD'}"
+                class="btn btn-outline-primary {{(newsMode === 'UNREAD' ? 'active' : '')}}"
                 type="button">Ungelesene News
         </button>
         <button (click)="switchMode('ALL')"
-                class="btn"
-                [ngClass]="{'btn-dark': newsMode === 'ALL', 'btn-light text-dark': newsMode !== 'ALL'}"
+                class="btn btn-outline-primary {{(newsMode === 'ALL' ? 'active' : '')}}"
                 type="button">Alle News
         </button>
     </div>
@@ -19,7 +17,6 @@
             </button>
         </ngb-toast>
     </div>
-
 
     <div class="row">
         <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 p-2" *ngFor="let news of getNews()">
@@ -33,17 +30,17 @@
             </div>
         </div>
     </div>
-</div>
 
-<div class="row mt-4">
-    <div class="col-12 d-flex justify-content-center">
-        <ngb-pagination
-                [collectionSize]="totalElements"
-                [(page)]="currentPage"
-                [pageSize]="pageSize"
-                (pageChange)="onPageChange($event)"
-                [maxSize]="5"
-                [boundaryLinks]="true">
-        </ngb-pagination>
+    <div class="row mt-4">
+        <div class="col-12 d-flex justify-content-center">
+            <ngb-pagination
+                    [collectionSize]="totalElements"
+                    [(page)]="currentPage"
+                    [pageSize]="pageSize"
+                    (pageChange)="onPageChange($event)"
+                    [maxSize]="5"
+                    [boundaryLinks]="true">
+            </ngb-pagination>
+        </div>
     </div>
 </div>

@@ -1,10 +1,10 @@
 <div class="container mt-4 mb-4">
     <div class="text-left mb-4">
-        <img ngSrc="assets/Logo.png" alt="TicketLine Logo" class="logo" height="100" width="200">
+        <img ngSrc="assets/Logo.png" alt="TicketLine Logo" class="logo" height="130" width="260">
     </div>
 
     <div>
-        <h2 class="news-header text-center">
+        <h2 class="news-header">
             <a *ngIf="!authService.isLoggedIn(); else loggedInContent" routerLink="/news" class="news-link">News</a>
             <ng-template #loggedInContent>
                 <a routerLink="/news" class="news-link">Deine News</a>
@@ -36,7 +36,7 @@
                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
             </button>
         </div>
-        <h2 class="mt-5 text-center">Top 10 Veranstaltungen</h2>
+        <h2 class="mt-5">Top 10 Veranstaltungen</h2>
         <div>
             <canvas id="eventChart"></canvas>
         </div>
