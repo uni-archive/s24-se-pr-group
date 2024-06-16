@@ -159,16 +159,10 @@ export class TicketSelectComponent {
   findSectorById(sectorId: number): HallSection {
     return this.hallplan.sections.find(section => section.id === sectorId);
   }
-
-  /*
-
-    spotId?: number;
-    orderId?: number;
-    showId?: number;
-    reservationOnly?: boolean;
-   */
-
   addToCart(isReservation: boolean) {
+    if (this.selectedSectors.length !== 0) {
+      this.messagingService.setMessage("Kaufen von Stehplätzen ist noch nicht implementiert.", 'info');
+    }
     forkJoin(this.selectedSeats.map(seat => this.ticketService.addTicket({
       spotId: seat.id,
       orderId: this.orderId,

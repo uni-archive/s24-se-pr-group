@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {LocationDto, LocationEndpointService, ShowEndpointService} from "../../../services/openapi";
 
 
@@ -15,6 +15,7 @@ export class LocationDetailsComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private showService: ShowEndpointService,
+    protected router: Router,
     private locationService: LocationEndpointService
   ) {
   }
