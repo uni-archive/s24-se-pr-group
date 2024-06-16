@@ -18,6 +18,7 @@ export interface HallSectorDto {
     name?: string;
     frontendCoordinates?: string;
     seats?: Array<HallSpotDto>;
+    color?: string;
     hallSectorShow?: HallSectorShowDto;
 }
 

@@ -98,4 +98,11 @@ public interface TicketService {
      * @param ticketHash the hash of the ticket
      */
     TicketDetailsDto findByHash(String ticketHash) throws DtoNotFoundException;
+
+    /**
+     * Finds all tickets for a show.
+     *
+     * @param showId the id of the show
+     */
+    List<TicketDetailsDto> findForShowById(long showId);
 }

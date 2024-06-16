@@ -18,7 +18,7 @@ export interface ShowDto {
     id?: number;
     dateTime?: string;
     artistList?: Array<ArtistDto>;
-    event?: EventDto;
     location?: LocationDto;
+    event?: EventDto;
 }
 

@@ -37,4 +37,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     @Modifying
     @Query("UPDATE Ticket t SET t.reserved = :setReserved WHERE t.id = :ticketId")
     void changeTicketReserved(@Param("ticketId") long ticketId, @Param("setReserved") boolean setReserved);
+
+    @Query("SELECT t FROM Ticket t INNER JOIN t.show s WHERE s.id = :showId")
+    List<Ticket> findTicketsByShowId(@Param("showId") long showId);
 }

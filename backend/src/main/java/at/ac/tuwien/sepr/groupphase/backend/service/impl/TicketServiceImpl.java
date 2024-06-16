@@ -226,4 +226,11 @@ public class TicketServiceImpl implements TicketService {
             // ignored
         }
     }
+
+    @Override
+    public List<TicketDetailsDto> findForShowById(long showId) {
+        var tickets = ticketDao.findForShowById(showId);
+        tickets.forEach(this::loadSectorShowForTicket);
+        return tickets;
+    }
 }

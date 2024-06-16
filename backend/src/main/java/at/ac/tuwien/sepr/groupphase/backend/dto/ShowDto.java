@@ -15,8 +15,6 @@ public class ShowDto implements AbstractDto {
 
     private EventDto event;
 
-    private LocationDto location;
-
 
 
     @Override
@@ -30,15 +28,6 @@ public class ShowDto implements AbstractDto {
         this.artistList = artistList;
         this.event = event;
         this.location = location;
-    }
-
-    public ShowDto setLocation(LocationDto location) {
-        this.location = location;
-        return this;
-    }
-
-    public LocationDto getLocation() {
-        return location;
     }
 
     public ShowDto() {
