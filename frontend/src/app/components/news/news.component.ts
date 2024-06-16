@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {SimpleNewsResponseDto, NewsEndpointService} from "../../services/openapi";
+import {AuthService} from '../../services/auth.service';
 
 @Component({
     selector: 'app-news',
@@ -16,12 +17,18 @@ export class NewsComponent implements OnInit {
     currentPage: number = 1;
 
     constructor(
-        private newsService: NewsEndpointService
+        private newsService: NewsEndpointService,
+        public authService: AuthService
     ) {
     }
 
     ngOnInit() {
-        this.newsMode = 'UNREAD';
+        if (this.authService.isLoggedIn()) {
+            this.newsMode = 'UNREAD';
+
+        } else {
+            this.newsMode = 'ALL';
+        }
         this.loadNews();
     }
 

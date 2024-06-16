@@ -1,5 +1,5 @@
 <div class="mt-4 container">
-    <div class="input-group justify-content-center mb-4" id="searchRadio">
+    <div *ngIf="authService.isLoggedIn()" class="input-group justify-content-center mb-4" id="searchRadio">
         <button (click)="switchMode('UNREAD')"
                 class="btn btn-outline-primary {{(newsMode === 'UNREAD' ? 'active' : '')}}"
                 type="button">Ungelesene News
@@ -9,6 +9,7 @@
                 type="button">Alle News
         </button>
     </div>
+    <h1 *ngIf="!authService.isLoggedIn()">News</h1>
     <div class="toast-container">
         <ngb-toast *ngIf="error" header="Fehler!" [autohide]="false" class="error-toast">
             {{ errorMessage }}
