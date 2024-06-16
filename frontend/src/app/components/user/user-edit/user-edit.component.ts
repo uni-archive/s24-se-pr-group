@@ -1,13 +1,10 @@
-import { Component, Input, OnInit, SimpleChanges } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { Router } from "@angular/router";
-import { firstValueFrom } from "rxjs";
-import { AuthService } from "src/app/services/auth.service";
-import { MessagingService } from "src/app/services/messaging.service";
-import {
-  ApplicationUserResponse,
-  UserEndpointService,
-} from "src/app/services/openapi";
+import {Component, Input, OnInit, SimpleChanges} from "@angular/core";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {Router} from "@angular/router";
+import {firstValueFrom} from "rxjs";
+import {AuthService} from "src/app/services/auth.service";
+import {MessagingService} from "src/app/services/messaging.service";
+import {ApplicationUserResponse, UserEndpointService,} from "src/app/services/openapi";
 
 @Component({
   selector: "app-user-edit",
@@ -18,6 +15,7 @@ export class UserEditComponent implements OnInit {
   @Input() user: ApplicationUserResponse = {};
   userForm: FormGroup;
   editMode: boolean = false;
+  userForDelete: ApplicationUserResponse = {};
 
   constructor(
     private fb: FormBuilder,
@@ -43,19 +41,19 @@ export class UserEditComponent implements OnInit {
     this.userForm = this.fb.group({
       id: [this.user.id, Validators.required],
       email: [
-        { value: this.user.email, disabled: true },
+        {value: this.user.email, disabled: true},
         [Validators.required, Validators.email],
       ],
       firstName: [
-        { value: this.user.firstName, disabled: true },
+        {value: this.user.firstName, disabled: true},
         Validators.required,
       ],
       familyName: [
-        { value: this.user.familyName, disabled: true },
+        {value: this.user.familyName, disabled: true},
         Validators.required,
       ],
       phoneNumber: [
-        { value: this.user.phoneNumber, disabled: true },
+        {value: this.user.phoneNumber, disabled: true},
         Validators.required,
       ],
     });
@@ -113,11 +111,11 @@ export class UserEditComponent implements OnInit {
         this.userForm = this.fb.group({
           id: [this.user.id, Validators.required],
           email: [
-            { value: this.user.email, disabled: true },
+            {value: this.user.email, disabled: true},
             [Validators.required, Validators.email],
           ],
           phoneNumber: [
-            { value: this.user.phoneNumber, disabled: true },
+            {value: this.user.phoneNumber, disabled: true},
             Validators.required,
           ],
         });
@@ -133,11 +131,11 @@ export class UserEditComponent implements OnInit {
     this.userForm = this.fb.group({
       id: [this.user.id, Validators.required],
       email: [
-        { value: this.user.email, disabled: !this.editMode },
+        {value: this.user.email, disabled: !this.editMode},
         [Validators.required, Validators.email],
       ],
       phoneNumber: [
-        { value: this.user.phoneNumber, disabled: !this.editMode },
+        {value: this.user.phoneNumber, disabled: !this.editMode},
         Validators.required,
       ],
     });
@@ -154,5 +152,22 @@ export class UserEditComponent implements OnInit {
           this.messagingService.setMessage(error.error.message, "danger");
         },
       });
+  }
+
+  public requestDeleteUser(user: ApplicationUserResponse): void {
+    this.userForDelete = user;
+  }
+
+  deleteAccount() {
+    this.userEndpointService.deleteUser(this.user.id).subscribe({
+      next: (response) => {
+        this.messagingService.setMessage(response.message, "success");
+        this.authService.logoutUser();
+        this.router.navigate(["/login"]);
+      },
+      error: (error) => {
+        this.messagingService.setMessage(error.error.message, "danger");
+      },
+    });
   }
 }

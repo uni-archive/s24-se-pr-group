@@ -86,10 +86,20 @@
         <button
           *ngIf="editMode"
           type="button"
-          class="btn btn-danger mx-1"
+          class="btn btn-primary mx-1"
           (click)="toggleEditMode()"
         >
           Abbrechen
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger mx-1"
+          (click)="requestDeleteUser(user)"
+          data-bs-target="#delete-confirm"
+          data-bs-toggle="modal"
+        >
+          <i class="bi bi-trash"></i>
+          Konto löschen
         </button>
       </div>
       <div class="form-group col-12 text-right mt-1">
@@ -104,3 +114,10 @@
     </div>
   </form>
 </div>
+
+<app-user-confirm-delete-dialog
+  [deleteWhat]="userForDelete?.firstName ?? ''"
+  (confirm)="deleteAccount()"
+  id="delete-confirm"
+  tabindex="-1"
+></app-user-confirm-delete-dialog>
