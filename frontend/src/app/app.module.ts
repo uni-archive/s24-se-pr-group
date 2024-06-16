@@ -46,6 +46,7 @@ import { ActivateAccountComponent } from "./components/user/registration/activat
 import { PickUpTicketsComponent } from "./components/tickets/pick-up-tickets/pick-up-tickets.component";
 import { ConfirmationDialogComponent } from "./components/confirmation-dialog/confirmation-dialog.component";
 import { PickUpTicketShowSelectComponent } from "./components/tickets/pick-up-ticket-show-select/pick-up-ticket-show-select.component";
+import { UserConfirmDeleteDialogComponent } from "./components/user/user-edit/user-confirm-delete-dialog/user-confirm-delete-dialog.component";
 
 @NgModule({
   declarations: [
@@ -81,6 +82,7 @@ import { PickUpTicketShowSelectComponent } from "./components/tickets/pick-up-ti
     PickUpTicketsComponent,
     ConfirmationDialogComponent,
     PickUpTicketShowSelectComponent
+    UserConfirmDeleteDialogComponent,
   ],
   imports: [
     BrowserModule,
