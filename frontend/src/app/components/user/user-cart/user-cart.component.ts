@@ -32,7 +32,8 @@ export class UserCartComponent implements OnInit {
     private orderService: OrderEndpointService,
     private ticketService: TicketEndpointService,
     private messagingService: MessagingService,
-    private router: Router
+    private router: Router,
+    private cookieService: CookieService
   ) {
   }
 
@@ -93,16 +94,8 @@ export class UserCartComponent implements OnInit {
     return formatPrice(total);
   }
 
-  purchaseOrder(): void {
-    this.orderService.purchaseOrder(this.order.id).subscribe({
-      next: () => {
-        this.messagingService.setMessage("Die Bestellung war erfolgreich!");
-        this.router.navigate(["/"]);
-      },
-      error: err => {
-        console.log(err);
-      }
-    });
+  gotoCheckout(): void {
+    this.router.navigate(["/user/cart/checkout"]);
   }
 
   loadOrder(): void {
@@ -110,7 +103,7 @@ export class UserCartComponent implements OnInit {
     this.orderService.getCurrentOrder().subscribe({
       next: order => {
         this.order = order;
-        console.log("current", this.order);
+        console.log(this.order);
         this.ticketsBySectorsByEvent = this.createEventToTicketMap();
       },
       error: err => {
@@ -118,7 +111,6 @@ export class UserCartComponent implements OnInit {
           this.orderService.createOrder().subscribe({
             next: order => {
               this.order = order;
-              console.log("create", this.order);
               this.ticketsBySectorsByEvent = this.createEventToTicketMap();
             },
             error: err => {

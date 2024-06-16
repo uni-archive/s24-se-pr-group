@@ -11,61 +11,45 @@ public class HallSectorShowDto implements AbstractDto {
         return id;
     }
 
-    public void setId(Long id) {
+    public HallSectorShowDto setId(Long id) {
         this.id = id;
+        return this;
+    }
+
+    public HallSectorShowDto setShow(ShowDto show) {
+        this.show = show;
+        return this;
+    }
+
+    public HallSectorShowDto setSector(HallSectorDto sector) {
+        this.sector = sector;
+        return this;
+    }
+
+    public HallSectorShowDto setPrice(long price) {
+        this.price = price;
+        return this;
     }
 
     public ShowDto getShow() {
         return show;
     }
 
-    public void setShow(ShowDto show) {
-        this.show = show;
-    }
-
     public HallSectorDto getSector() {
         return sector;
-    }
-
-    public void setSector(HallSectorDto sector) {
-        this.sector = sector;
     }
 
     public long getPrice() {
         return price;
     }
 
-    public void setPrice(long price) {
-        this.price = price;
+    public HallSectorShowDto() {
     }
 
-    public class HallSectorShowDtoBuilder {
-        private ShowDto show;
-        private HallSectorDto sector;
-        private long price;
-
-        public HallSectorShowDtoBuilder withShow(ShowDto show) {
-            this.show = show;
-            return this;
-        }
-
-        public HallSectorShowDtoBuilder withSector(HallSectorDto sector) {
-            this.sector = sector;
-            return this;
-        }
-
-        public HallSectorShowDtoBuilder withPrice(long price) {
-            this.price = price;
-            return this;
-        }
-
-        public HallSectorShowDto createHallSectorShowDto() {
-            var hallSectorShowDto = new HallSectorShowDto();
-            hallSectorShowDto.setId(id);
-            hallSectorShowDto.setShow(show);
-            hallSectorShowDto.setSector(sector);
-            hallSectorShowDto.setPrice(price);
-            return hallSectorShowDto;
-        }
+    public HallSectorShowDto(Long id, ShowDto show, HallSectorDto sector, long price) {
+        this.id = id;
+        this.show = show;
+        this.sector = sector;
+        this.price = price;
     }
 }

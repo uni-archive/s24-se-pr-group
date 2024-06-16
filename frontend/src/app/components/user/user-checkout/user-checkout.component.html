@@ -1,0 +1,143 @@
+<div class="jumbotron mt-5" xmlns="http://www.w3.org/1999/html">
+  <h1 class="display-4">Checkout</h1>
+</div>
+
+<div class="row" *ngIf="user">
+  <div class="col-md-4 order-md-2 mb-4">
+    <h4 class="d-flex justify-content-between align-items-center mb-3">
+      <span class="text-muted">Einkaufs-Übersicht</span>
+      <span class="badge badge-secondary badge-pill">3</span>
+    </h4>
+    <ul class="list-group mb-3">
+      <li class="list-group-item d-flex justify-content-between lh-condensed" *ngFor="let entry of this.ticketsByEvent | keyvalue">
+        <div class="w-50">
+          <h6 class="my-0">{{eventById(entry.key).title}}</h6>
+          <small class="text-muted">Anzahl Tickets: {{entry.value.length}}</small>
+        </div>
+        <span class="text-muted">{{formatPrice(total(entry.value))}}</span>
+      </li>
+      <li class="list-group-item list-group-item-secondary lh-condensed d-flex justify-content-between align-items-center">
+        <h6 class="m-0 fw-bold">Gesamt:</h6>
+        <span class="fw-bold">{{formatPrice(total(order.tickets))}}</span>
+      </li>
+    </ul>
+  </div>
+  <div class="col-md-8 order-md-1">
+    <h4 class="mb-3">Kundendaten</h4>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="firstName">First name</label>
+        <input type="text" disabled class="form-control" id="firstName" placeholder="" [value]="user.firstName">
+      </div>
+      <div class="col-md-6 mb-3">
+        <label for="lastName">Last name</label>
+        <input type="text" disabled class="form-control" id="lastName" placeholder="" [value]="user.familyName">
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="email">Email</label>
+      <input type="email" class="form-control" id="email" disabled [value]="user.email">
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-6">
+        <label for="address">Addresse</label>
+        <input type="text" class="form-control" id="address" disabled [value]="user.address.street">
+      </div>
+      <div class="col-6">
+        <label for="address">PLZ</label>
+        <input type="text" class="form-control" id="zip" disabled [value]="user.address.zip">
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-6">
+        <label for="address">Land</label>
+        <input type="text" class="form-control" id="country" disabled [value]="user.address.country">
+      </div>
+      <div class="col-6">
+        <label for="address">Stadt</label>
+        <input type="text" class="form-control" id="city" disabled [value]="user.address.city">
+      </div>
+    </div>
+
+    <hr class="mb-4">
+
+
+    <h4 class="mb-3">Zahlungsinformationen</h4>
+    <form [formGroup]="creditCardForm" class="row">
+      <div class="form-group col-6 mb-3">
+        <label class="form-label" for="cc-name">Karteninhaber</label>
+        <input
+          type="text"
+          class="form-control {{ markInvalid('name') ? 'is-invalid' : '' }} {{ markValid('name') ? 'is-valid' : '' }}"
+          id="cc-name"
+          placeholder="Vorname Nachname"
+          formControlName="name"
+        >
+        <div
+          *ngIf="markInvalid('name')"
+          class="invalid-feedback d-block"
+        >
+          Name des Karteninhabers. So wie es auf der Kreditkarte steht.
+        </div>
+      </div>
+      <div class="form-group col-6 mb-3">
+        <label class="form-label" for="cc-number">Kreditkartennummer</label>
+        <input
+          type="text"
+          class="form-control {{ markInvalid('creditCardNumber') ? 'is-invalid' : '' }} {{ markValid('creditCardNumber') ? 'is-valid' : '' }}"
+          formControlName="creditCardNumber"
+          id="cc-number"
+          placeholder=""
+          required
+        >
+        <div
+          class="invalid-feedback">
+          Bitte gib eine gültige Kreditkartennummer an.
+        </div>
+      </div>
+
+
+      <div class="d-flex gap-4">
+        <div class="mb-3">
+          <label class="form-label m-0">Gültig bis</label>
+          <app-credit-card-expiry-input
+            formControlName="expiry"
+            class="{{ markInvalid('expiry') ? 'is-invalid' : '' }} {{ markValid('expiry') ? 'is-valid' : '' }}"
+            [markInvalid]="markInvalid('expiry')"
+            [markValid]="markValid('expiry')"
+          ></app-credit-card-expiry-input>
+
+          <div
+            *ngIf="markInvalid('expiry')"
+            class="invalid-feedback d-block"
+          >
+            Bitte gib eine valides Gültigkeits-Datum ein (mm / yy)
+          </div>
+        </div>
+
+        <div class="mb-3" style="width: 120px;">
+          <label for="cc-cvv">CVV</label>
+          <input type="text"
+                 class="form-control {{ markInvalid('cvv') ? 'is-invalid' : '' }} {{ markValid('cvv') ? 'is-valid' : '' }}"
+                 id="cc-cvv"
+                 maxlength="3"
+                 placeholder="123"
+                 formControlName="cvv"
+          >
+          <div class="invalid-feedback" style="width: 500px;">
+            Bitte gib eine gültige (3-stellige) CVV ein.
+          </div>
+        </div>
+
+      </div>
+      <hr class="mb-4">
+
+      <div class="d-flex justify-content-end mt-3">
+        <button [disabled]="!creditCardForm.valid" class="btn btn-primary btn w-25" type="submit" (click)="purchaseOrder()">Bestellen!</button>
+      </div>
+    </form>
+  </div>
+</div>

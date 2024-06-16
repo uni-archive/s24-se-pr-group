@@ -94,6 +94,6 @@ public class Order extends AbstractEntity {
 
     @Override
     public String toString() {
-        return "Order{" + "tickets=" + tickets + ", customer=" + customer + '}';
+        return "Order{customer=" + customer + '}';
     }
 }

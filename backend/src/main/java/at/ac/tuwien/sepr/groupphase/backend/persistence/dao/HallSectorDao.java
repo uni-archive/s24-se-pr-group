@@ -8,6 +8,9 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallSpotRepos
 import java.util.List;
 import org.springframework.stereotype.Component;
 
+import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Component;
+
 @Component
 public class HallSectorDao extends AbstractDao<HallSector, HallSectorDto> {
 
@@ -22,6 +25,7 @@ public class HallSectorDao extends AbstractDao<HallSector, HallSectorDto> {
         return super.create(createDto);
     }
 
+    @Transactional
     public List<HallSectorDto> findByHallPlanId(Long hallPlanId) {
         return mapper.toDto(((HallSectorRepository) repository).findByHallPlanId(hallPlanId));
     }

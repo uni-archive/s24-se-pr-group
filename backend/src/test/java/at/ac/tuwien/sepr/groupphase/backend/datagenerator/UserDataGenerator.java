@@ -29,7 +29,7 @@ public class UserDataGenerator {
     private AddressRepository addressRepository;
 
     @PostConstruct
-    private void generateData() {
+    public void generateData() {
         ADMIN_USER.setAddress(new Address("Admin Test street", "1234", "Test city", "Test country"));
         CUSTOMER_USER.setAddress(new Address("Test street", "1234", "Test city", "Test country"));
         SUPER_ADMIN_USER.setAddress(new Address("Test street", "1234", "Test city", "Test country"));

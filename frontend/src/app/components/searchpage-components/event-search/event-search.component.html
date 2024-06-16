@@ -1,30 +1,26 @@
-<form class="search-form" #SearchForm="ngForm" (ngSubmit)="onSubmit()">
+<h2>Veranstaltungen</h2>
+<form class="search-form" #SearchForm="ngForm" (change)="onSubmit()">
   <div class="row form-group align-items-end">
 
-    <div class="col-auto">
-      <label for="textSearch">Text basierte Suche (Titel und Beschreibung)</label>
+    <div class="col-12 col-xl-4 mb-2">
       <input id="textSearch" class="form-control" type="text" [(ngModel)]="searchData.textSearch" name="textSearch"
              placeholder="text search">
 
     </div>
-    <div class="col-auto">
-      <label for="duration">Dauer in min (+-30%)</label>
+    <div class="col-12 col-xl-4 mb-2">
       <input id="duration" class="form-control" [(ngModel)]="searchData.dauer" type="number" step="1" name="dauer"
-             placeholder="duration in min" min="0">
+             placeholder="dauer in min" min="0">
 
     </div>
 
-    <div class="col-auto">
+    <div class="col-12 col-xl-4 mb-2">
 
-      <label for="type">Eventyp</label>
-      <select id="type" class="form-select" aria-label="Default select example" [(ngModel)]="searchData.typ" name="typ"
+      <select id="type" class="form-select" [(ngModel)]="searchData.typ" name="typ"
               #typ=ngModel>
+        <option value="" disabled selected>Event Typ wählen</option>
         <option *ngFor="let type of eventTypes" [ngValue]="type">{{ type }}</option>
       </select>
 
-    </div>
-    <div class="col-auto">
-      <button type="submit" class="btn btn-primary">Suchen</button>
     </div>
   </div>
 

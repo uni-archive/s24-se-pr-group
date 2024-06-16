@@ -33,48 +33,60 @@ public class HallSectorDto implements AbstractDto {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+
 
     public HallSectorShowDto getHallSectorShow() {
         return hallSectorShow;
     }
 
-    public void setHallSectorShow(HallSectorShowDto hallSectorShow) {
-        this.hallSectorShow = hallSectorShow;
-    }
 
     public HallPlanDto getHallPlan() {
         return hallPlan;
     }
 
-    public void setHallPlan(HallPlanDto hallPlan) {
-        this.hallPlan = hallPlan;
-    }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public String getFrontendCoordinates() {
         return frontendCoordinates;
     }
 
-    public void setFrontendCoordinates(String frontendCoordinates) {
-        this.frontendCoordinates = frontendCoordinates;
-    }
 
     public List<HallSpotDto> getSeats() {
         return seats;
     }
 
-    public void setSeats(List<HallSpotDto> seats) {
+    public HallSectorDto setId(Long id) {
+        this.id = id;
+        return this;
+    }
+
+    public HallSectorDto setHallPlan(HallPlanDto hallPlan) {
+        this.hallPlan = hallPlan;
+        return this;
+    }
+
+    public HallSectorDto setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public HallSectorDto setFrontendCoordinates(String frontendCoordinates) {
+        this.frontendCoordinates = frontendCoordinates;
+        return this;
+    }
+
+    public HallSectorDto setSeats(List<HallSpotDto> seats) {
         this.seats = seats;
+        return this;
+    }
+
+    public HallSectorDto setHallSectorShow(HallSectorShowDto hallSectorShow) {
+        this.hallSectorShow = hallSectorShow;
+        return this;
     }
 
     public HallSectorDto(Long id, HallPlanDto hallPlan, String name, String frontendCoordinates, List<HallSpotDto> seats, HallSectorShowDto hallSectorShow) {
@@ -84,6 +96,9 @@ public class HallSectorDto implements AbstractDto {
         this.frontendCoordinates = frontendCoordinates;
         this.seats = seats;
         this.hallSectorShow = hallSectorShow;
+    }
+
+    public HallSectorDto() {
     }
 
     public HallSectorDto withoutSeats() {

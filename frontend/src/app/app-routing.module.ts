@@ -21,16 +21,22 @@ import {EventDatailpageComponent} from "./components/event-datailpage/event-data
 import {NewsComponent} from "./components/news/news.component";
 import {NewsDetailComponent} from './components/news/news-detail/news-detail.component';
 import {LocationDetailsComponent} from "./components/location/location-details/location-details.component";
+import { ResetPasswordComponent } from "./components/user/reset-password/reset-password.component";
+import { ChangePasswordComponent } from "./components/user/change-password/change-password.component";
+import { SendResetMailComponent } from "./components/user/reset-password/send-reset-mail/send-reset-mail.component";
 import {UserCartComponent} from "./components/user/user-cart/user-cart.component";
+import {UserCheckoutComponent} from "./components/user/user-checkout/user-checkout.component";
 import {TicketSelectComponent} from "./components/ticket-select/ticket-select.component";
 
 
 const routes: Routes = [
-  {path: "", component: HomeComponent},
-  {path: "register", component: RegistrationComponent},
-  {path: "login", component: LoginComponent},
+  { path: "", component: HomeComponent },
+  { path: "register", component: RegistrationComponent },
+  { path: "login", component: LoginComponent },
   {
-    path: 'news-detail/:id', canActivate: [AuthGuard], component: NewsDetailComponent
+    path: "news-detail/:id",
+    canActivate: [AuthGuard],
+    component: NewsDetailComponent,
   },
   {
     path: 'my', canActivate: mapToCanActivate([AuthGuard]), children:
@@ -40,8 +46,35 @@ const routes: Routes = [
         {path: 'orders/:id', component: OrdersDetailsViewComponent}
       ]
   },
-  {path: "user/home", component: UserHomeComponent},
-  {path: "user/cart", component: UserCartComponent},
+  {
+    path: "user",
+    children: [
+      {
+        path: "home",
+        component: UserHomeComponent,
+      },
+      {
+        path: "password/change",
+        component: ChangePasswordComponent,
+      },
+      {
+        path: "password/send/reset/mail",
+        component: SendResetMailComponent,
+      },
+      {
+        path: "password/reset",
+        component: ResetPasswordComponent,
+      },
+      {
+        path: "cart",
+        component: UserCartComponent
+      },
+      {
+        path: "cart/checkout",
+        component: UserCheckoutComponent
+      }
+    ],
+  },
   {
     path: "locations", canActivate: mapToCanActivate([AdminGuard]),
     children:
@@ -52,27 +85,34 @@ const routes: Routes = [
       ]
   },
   {
-    path: "search",
+    path: "locations",
+    canActivate: mapToCanActivate([AdminGuard]),
     children: [
-      {path: '', component: SearchPageComponent}
-    ]
+      { path: "", component: LocationOverviewComponent },
+      { path: "create", component: LocationCreateComponent },
+      { path: "edit/:id", component: LocationEditComponent },
+    ],
   },
-  {path: "event/:id", component: EventDatailpageComponent},
-  {path: "eventcreation", component: CreateEventComponent},
-  {path: "showcreation", component: CreateShowComponent},
-  {path: 'hallplan', component: HallplanComponent},
-  {path: 'hallplan/create', component: HallplanCreateComponent},
+  {
+    path: "search",
+    children: [{ path: "", component: SearchPageComponent }],
+  },
+  { path: "event/:id", component: EventDatailpageComponent },
+  { path: "eventcreation", component: CreateEventComponent },
+  { path: "showcreation", component: CreateShowComponent },
+  { path: "hallplan", component: HallplanComponent },
+  { path: "hallplan/create", component: HallplanCreateComponent },
   {
     path: "location/:id",
     component: LocationDetailsComponent,
   },
-  {path: 'news', canActivate: [AuthGuard], component: NewsComponent},
+  { path: "hallplan/create", component: HallplanCreateComponent },
+  { path: "news", canActivate: [AuthGuard], component: NewsComponent },
   {path: "show/:id/ticket-select", component: TicketSelectComponent},
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, {useHash: true})],
-  exports: [RouterModule]
+  imports: [RouterModule.forRoot(routes, { useHash: true })],
+  exports: [RouterModule],
 })
-export class AppRoutingModule {
-}
+export class AppRoutingModule {}

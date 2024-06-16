@@ -9,9 +9,15 @@ import java.util.List;
 
 public interface BaseEntityMapper<T extends AbstractEntity, D extends AbstractDto> {
 
-    T toEntity(D dto);
+    @Named("toEntityWithoutContext")
+    default T toEntity(D dto) {
+        return toEntity(dto, new CycleAvoidingMappingContext());
+    }
 
-    List<T> toEntity(List<D> dto);
+    @Named("toEntityWithoutContext")
+    default List<T> toEntity(List<D> dto) {
+        return toEntity(dto, new CycleAvoidingMappingContext());
+    }
 
     @Named("toDtoWithoutContext")
     default D toDto(T entity) {
@@ -26,4 +32,8 @@ public interface BaseEntityMapper<T extends AbstractEntity, D extends AbstractDt
     D toDto(T entity, @Context CycleAvoidingMappingContext cycleAvoidingMappingContext);
 
     List<D> toDto(List<T> entity, @Context CycleAvoidingMappingContext cycleAvoidingMappingContext);
+
+    T toEntity(D dto, @Context CycleAvoidingMappingContext cycleAvoidingMappingContext);
+
+    List<T> toEntity(List<D> dto, @Context CycleAvoidingMappingContext cycleAvoidingMappingContext);
 }

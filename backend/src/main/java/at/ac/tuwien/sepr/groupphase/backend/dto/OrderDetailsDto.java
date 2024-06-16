@@ -67,7 +67,7 @@ public class OrderDetailsDto implements AbstractDto {
         return this.invoices.stream().filter(i -> i.getInvoiceType().equals(InvoiceType.CANCELLATION)).findFirst();
     }
 
-    public class OrderDetailsDtoBuilder {
+    public static class OrderDetailsDtoBuilder {
         private List<TicketDetailsDto> tickets;
         private ApplicationUserDto customer;
         private List<InvoiceDto> invoices;

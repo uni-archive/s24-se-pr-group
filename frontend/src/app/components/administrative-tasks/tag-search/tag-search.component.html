@@ -1,14 +1,42 @@
+<form>
 <div class="form-group">
   <label for="input-datalist">{{Label}}</label>
-  <input type="text" class="form-control" (change)="onChange()" [(ngModel)]="text" [placeholder]="placeholder" id="input-datalist">
+
+<div class="input-group">
+  <input type="text"
+         class="form-control"
+         (change)="onChange()"
+         [(ngModel)]="text"
+         name="artistSearch"
+         [placeholder]="placeholder"
+         id="input-datalist">
+  <div class="input-group-prepend">
+        <span class="input-group-text">
+          <i class="bi bi-search"></i>
+        </span>
+  </div>
+</div>
   <span class="badge rounded-pill bg-primary custom-badge" *ngFor="let artist of chosenArtists" >
+
     <div class="row justify-content-center align-content-center align-items-center" style="padding: 0vw 1vh">
       {{artist?.artistName}}, {{artist.lastName+" "+artist.firstName}}
       <button type="button" class="btn-close btn-close-white" (click)="removeArtist(artist)" aria-label="Close"></button>
     </div>
   </span>
-  <div class="container-fluid event-buttons">
-    <button class="btn btn-light btn-outline-dark eventbtn-group" (click)="eventClicked(artist)" *ngFor="let artist of autoCompleteList" >{{artist?.artistName}}, {{artist.lastName+" "+artist.firstName}}</button>
-  </div>
+
+
 </div>
+<ul class="list-group position-absolute" style="z-index: 1000; max-height: 200px; overflow-y: auto;">
+  <ng-container >
+    <li *ngFor="let item of autoCompleteList"
+        class="list-group-item list-group-item-action"
+        (click)="eventClicked(item)">
+      <ng-template [ngTemplateOutlet]="artistTemplate" [ngTemplateOutletContext]="{ $implicit: item }"></ng-template>
+    </li>
+  </ng-container>
+</ul>
+</form>
+<ng-template #artistTemplate let-item>
+  {{item?.artistName}}, {{item.lastName+" "+item.firstName}}
+</ng-template>
 

@@ -6,6 +6,7 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.type.InvoiceType;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -72,7 +73,6 @@ public class OrderValidatorTest {
 
         orderValidator.validateForCancel(order, user);
     }
-
 
     @Test
     void validateForCancel_if_ProvidedUserAndFoundCustomerInOrderDoNotMatch_ThenThrowValidationException() {

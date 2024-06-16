@@ -1,18 +1,19 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.validator;
 
-import at.ac.tuwien.sepr.groupphase.backend.dto.HallSeatDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.TicketAddToOrderDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.HallSpotDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.OrderDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.ShowDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.TicketDao;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSeat;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import org.springframework.stereotype.Component;
 
 @Component
 public class TicketValidator extends AbstractValidator<TicketDetailsDto> {
@@ -47,35 +48,69 @@ public class TicketValidator extends AbstractValidator<TicketDetailsDto> {
         endValidation(errors);
     }
 
-    public void validateForCreate(Long showId, Long spotId, Long orderId) throws ValidationException {
+    public void validateForCreate(TicketAddToOrderDto ticket) throws ValidationException {
         List<String> errors = new ArrayList<>();
-        if (Objects.isNull(showId)) {
+        if (Objects.isNull(ticket.showId())) {
             errors.add("Show id is null");
         }
         try {
-            showDao.findById(showId);
+            showDao.findById(ticket.showId());
         } catch (EntityNotFoundException e) {
-            errors.add("Show with id " + showId + " does not exist.");
+            errors.add("Show with id " + ticket.showId() + " does not exist.");
         }
-        if (Objects.isNull(spotId)) {
+        if (Objects.isNull(ticket.spotId())) {
             errors.add("Spot id is null");
         }
-        if (!hallSpotDao.existsById(spotId)) {
-            errors.add("Spot with id " + spotId + " does not exist.");
+        if (!hallSpotDao.existsById(ticket.spotId())) {
+            errors.add("Spot with id " + ticket.spotId() + " does not exist.");
         }
-        if (Objects.isNull(orderId)) {
+        if (Objects.isNull(ticket.orderId())) {
             errors.add("Order id is null");
         }
         try {
-            orderDao.findById(orderId);
+            var order = orderDao.findById(ticket.orderId());
+
+            if (order.getPurchaseInvoice().isPresent()) {
+                errors.add("Order with id %d is already purchased.".formatted(order.getId()));
+            } else if (order.getCancellationInvoice().isPresent()) {
+                errors.add("Order with id %d is already cancelled.".formatted(order.getId()));
+            }
+
         } catch (EntityNotFoundException e) {
-            errors.add("Order with id " + orderId + " does not exist.");
+            errors.add("Order with id " + ticket.orderId() + " does not exist.");
         }
 
-        var hallSpot = hallSpotDao.findById(spotId);
-        if (ticketDao.existsValidOrReservedTicketForShowAndSeat(showId, spotId) && hallSpot instanceof HallSeatDto) {
-            errors.add("Ticket for show with id " + showId + " and spot with id " + spotId + " already exists.");
+        if (ticketDao.existsValidOrReservedTicketForShowAndSeat(ticket.showId(), ticket.spotId())) {
+            errors.add("Ticket for show with id " + ticket.showId() + " and spot with id " + ticket.spotId() + " already exists.");
         }
+        endValidation(errors);
+    }
+
+    public void validateForDelete(long ticketId, OrderDetailsDto orderOfTicket) throws ValidationException {
+        List<String> errors = new ArrayList<>();
+
+        if (orderOfTicket.getTickets().stream().noneMatch(t -> t.getId().equals(ticketId))) {
+            errors.add("Ticket to delete (id: %d) does not exist in the provided order (id: %d).".formatted(ticketId, orderOfTicket.getId()));
+        } else if (orderOfTicket.getPurchaseInvoice().isPresent()) {
+            errors.add("Cannot delete ticket from purchased order.");
+        } else if (orderOfTicket.getCancellationInvoice().isPresent()) {
+            errors.add("Cannot delete ticket from cancelled order.");
+        }
+
+        endValidation(errors);
+    }
+
+    public void validateForChangeTicketReserved(long ticketId, OrderDetailsDto orderOfTicket) throws ValidationException {
+        List<String> errors = new ArrayList<>();
+
+        if (orderOfTicket.getTickets().stream().noneMatch(t -> t.getId().equals(ticketId))) {
+            errors.add("Ticket to delete (id: %d) does not exist in the provided order (id: %d).".formatted(ticketId, orderOfTicket.getId()));
+        } else if (orderOfTicket.getPurchaseInvoice().isPresent()) {
+            errors.add("Cannot delete ticket from purchased order.");
+        } else if (orderOfTicket.getCancellationInvoice().isPresent()) {
+            errors.add("Cannot delete ticket from cancelled order.");
+        }
+
         endValidation(errors);
     }
 }

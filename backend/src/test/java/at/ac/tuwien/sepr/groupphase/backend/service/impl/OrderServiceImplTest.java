@@ -1,13 +1,9 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
-import static at.ac.tuwien.sepr.groupphase.backend.supplier.ApplicationUserSupplier.aCustomerUser;
-import static java.util.function.Predicate.not;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.InvoiceDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.TicketAddToOrderDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Event;
@@ -32,18 +28,10 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.ShowRepositor
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.TicketRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.OrderValidator;
 import com.github.javafaker.Faker;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,6 +48,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+
+import static at.ac.tuwien.sepr.groupphase.backend.supplier.ApplicationUserSupplier.aCustomerUser;
+import static java.util.function.Predicate.not;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith({MockitoExtension.class})
 @SpringBootTest
@@ -375,7 +375,7 @@ public class OrderServiceImplTest {
 
     @Test
     void finding_anOrder_ShouldCallValidator()
-        throws ValidationException, EntityNotFoundException, DtoNotFoundException {
+        throws ValidationException, DtoNotFoundException {
         orderService.findById(testCancelOrder.getId(), aCustomerUser());
         verify(orderValidator).validateForFindById(orderDto.capture(), applicationUserDto.capture());
     }
@@ -388,7 +388,7 @@ public class OrderServiceImplTest {
 
     @Test
     void purchasing_anOrder_ShouldCreate_aPurchaseInvoice_And_SetAllAssociatedTicketsAsValid()
-        throws ValidationException, EntityNotFoundException, DtoNotFoundException {
+        throws ValidationException, DtoNotFoundException {
         var c = aCustomerUser()
             .setId(testPurchaseOrder.getCustomer().getId());
 
@@ -414,21 +414,29 @@ public class OrderServiceImplTest {
             .allMatch(TicketDetailsDto::isValid);
     }
 
-
-
     @Test
     void confirmOrderShouldScheduleJobsTo30MinutesBeforeTheShow()
-        throws DtoNotFoundException, ValidationException, SchedulerException {
+        throws DtoNotFoundException, ValidationException, SchedulerException, ForbiddenException {
         // given
         ApplicationUserDto user = userService.findApplicationUserByEmail(testCustomer.getEmail());
         OrderDetailsDto orderDetailsDto = orderService.create(user);
 
-        TicketDetailsDto ticketDtoToBuy = ticketService.addTicketToOrder(ticketToBuy.getHallSpot().getId(),
+        var ticketToCreate = new TicketAddToOrderDto(
+            ticketToBuy.getHallSpot().getId(),
+            orderDetailsDto.getId(),
             ticketToBuy.getShow().getId(),
-            orderDetailsDto.getId(), false);
-        TicketDetailsDto reservedTicketDto = ticketService.addTicketToOrder(reservedTicket.getHallSpot().getId(),
+            false
+        );
+        TicketDetailsDto ticketDtoToBuy = ticketService.addTicketToOrder(ticketToCreate, user);
+
+
+        var ticketToCreate2 = new TicketAddToOrderDto(
+            reservedTicket.getHallSpot().getId(),
+            orderDetailsDto.getId(),
             reservedTicket.getShow().getId(),
-            orderDetailsDto.getId(), true);
+            true
+        );
+        TicketDetailsDto reservedTicketDto = ticketService.addTicketToOrder(ticketToCreate2, user);
 
         orderDetailsDto = orderService.findById(orderDetailsDto.getId(), user);
 
@@ -436,18 +444,20 @@ public class OrderServiceImplTest {
         orderService.confirmOrder(orderDetailsDto);
 
         // then
-        assertThat(schedulerFactoryBean.getScheduler().getJobKeys(GroupMatcher.anyJobGroup()).stream()
-            .filter(x -> Objects.equals(x.getName(), "reservationJob-" + ticketDtoToBuy.getId())).findFirst())
-            .isEmpty();
+        assertThat(schedulerFactoryBean.getScheduler().getJobKeys(GroupMatcher.jobGroupEquals("reservationJobs"))
+            .stream()
+            .filter(x -> Objects.equals(x.getName(), "reservationJob-" + ticketDtoToBuy.getHash())).findFirst()).isEmpty();
         JobKey jobKey = schedulerFactoryBean.getScheduler().getJobKeys(GroupMatcher.anyJobGroup()).stream()
-            .filter(x -> Objects.equals(x.getName(), "reservationJob-" + reservedTicketDto.getId())).findFirst().get();
+            .filter(x -> Objects.equals(x.getName(), "reservationJob-" + reservedTicketDto.getHash())).findFirst().get();
         List<Trigger> triggers = (List<Trigger>) schedulerFactoryBean.getScheduler().getTriggersOfJob(jobKey);
         assertThat(triggers.size()).isEqualTo(1);
         Trigger actual = triggers.get(0);
 
-        assertThat(actual.getNextFireTime().before(Date.from(reservedTicket.getShow().getDateTime().minus(30, ChronoUnit.MINUTES).plus(2, ChronoUnit.SECONDS).toInstant(
-            ZoneOffset.UTC)))).isTrue();
+        assertThat(actual.getNextFireTime()
+            .before(Date.from(reservedTicket.getShow().getDateTime().minus(30, ChronoUnit.MINUTES).plus(2, ChronoUnit.SECONDS).toInstant(
+                ZoneOffset.UTC)))).isTrue();
         assertThat(actual.getNextFireTime()
             .after(Date.from(reservedTicket.getShow().getDateTime().minusMinutes(30).minusSeconds(2).toInstant(ZoneOffset.UTC)))).isTrue();
     }
+
 }

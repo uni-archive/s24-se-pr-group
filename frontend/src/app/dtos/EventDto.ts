@@ -1,4 +1,5 @@
-import {Event, Show} from "../services/openapi";
+import {Event} from "../services/openapi/model/event";
+import {Show} from "../services/openapi/model/show";
 
 export class EventDto{
   id: number;

@@ -2,11 +2,11 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.EventDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.HallPlanDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.HallSectorShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowListDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowCreationDto;
-//import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ShowHallPlanResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ShowHallPlanResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.EventDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.HallPlanDao;
@@ -14,17 +14,17 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.ShowDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.TicketDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.HallSectorShowService;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.HallSectorShowMapper;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallSectorShowRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.ShowService;
 import jakarta.transaction.Transactional;
+import java.lang.invoke.MethodHandles;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.lang.invoke.MethodHandles;
-import java.util.List;
 
 @Service
 public class ShowServiceImpl implements ShowService {
@@ -35,28 +35,39 @@ public class ShowServiceImpl implements ShowService {
     private final EventDao eventDao;
     private HallSectorShowService hallSectorShowService;
     private final TicketDao ticketDao;
+    private final HallSectorShowRepository sectorShowRepository;
+    private final HallSectorShowMapper sectorShowMapper;
 
-//    private final ShowHallPlanResponseMapper showHallPlanMapper;
 
-    public ShowServiceImpl(ShowDao dao, EventDao eventDao, HallPlanDao hallPlanDao, TicketDao ticketDao,
+    public ShowServiceImpl(ShowDao dao, EventDao eventDao, HallSectorShowRepository sectorShowRepository,
+                           HallSectorShowMapper sectorShowMapper, TicketDao ticketDao,
                            HallSectorShowService hallSectorShowService) {
         this.eventDao = eventDao;
         this.dao = dao;
         this.ticketDao = ticketDao;
         this.hallSectorShowService = hallSectorShowService;
+        this.sectorShowRepository = sectorShowRepository;
+        this.sectorShowMapper = sectorShowMapper;
     }
 
     @Override
     @Transactional
-    public ResponseEntity<String> createShow(ShowCreationDto creationDto) {
+    public String createShow(ShowDto creationDto, List<HallSectorShowDto> sectorShowList) {
         try {
-            EventDto sh = eventDao.findById(creationDto.getEventid());
-            ShowDto dto = new ShowDto().setDateTime(creationDto.getDateTime()).setEvent(new EventDto());
-            dao.create(dto);
-            return ResponseEntity.ok("\"Vorführung erfolreich erstellt.\"");
+
+            var showDto = dao.create(creationDto);
+            sectorShowList.forEach(sector ->
+                sectorShowRepository.save(
+                    sectorShowMapper.toEntity(new HallSectorShowDto()
+                        .setSector(sector.getSector())
+                        .setShow(showDto)
+                        .setPrice(sector.getPrice() * 100))
+                )
+            );
+            return "\"Vorführung erfolreich erstellt.\"";
         } catch (Exception ex) {
             LOGGER.error("ERROR occurred: {}", ex.getMessage(), ex);
-            return ResponseEntity.internalServerError().body("\"Erstellung gescheitert.\"");
+            return "\"Erstellung gescheitert.\"";
         }
     }
 

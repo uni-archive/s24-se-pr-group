@@ -1,5 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
+import static at.ac.tuwien.sepr.groupphase.backend.service.job.InvalidateReservationJob.RESERVATION_JOB_HASH_VARIABLE;
+
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.OrderDao;
@@ -35,12 +37,12 @@ public class TicketInvalidationSchedulingService {
         this.orderDao = orderDao;
     }
 
-    private void scheduleReservationInvalidationJob(Long reservationId, Date executionTime) throws SchedulerException {
+    private void scheduleReservationInvalidationJob(String reservationId, Date executionTime) throws SchedulerException {
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
 
         JobDetail jobDetail = JobBuilder.newJob(InvalidateReservationJob.class)
             .withIdentity("reservationJob-" + reservationId, "reservationJobs")
-            .usingJobData("ticketId", reservationId)
+            .usingJobData(RESERVATION_JOB_HASH_VARIABLE, reservationId)
             .storeDurably()
             .build();
 
@@ -54,15 +56,15 @@ public class TicketInvalidationSchedulingService {
         scheduler.scheduleJob(jobDetail, trigger);
     }
 
-    public void rescheduleReservationInvalidationJob(Long ticketId, Date newExecutionTime) throws SchedulerException {
+    public void rescheduleReservationInvalidationJob(String ticketHash, Date newExecutionTime) throws SchedulerException {
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
 
-        TriggerKey triggerKey = new TriggerKey("trigger-" + ticketId, "reservationTriggers");
+        TriggerKey triggerKey = new TriggerKey("trigger-" + ticketHash, "reservationTriggers");
         Trigger newTrigger = TriggerBuilder.newTrigger()
             .withIdentity(triggerKey)
             .startAt(newExecutionTime)
             .withSchedule(SimpleScheduleBuilder.simpleSchedule().withMisfireHandlingInstructionFireNow())
-            .forJob("reservationJob-" + ticketId, "reservationJobs")
+            .forJob("reservationJob-" + ticketHash, "reservationJobs")
             .build();
 
         scheduler.rescheduleJob(triggerKey, newTrigger);
@@ -70,7 +72,7 @@ public class TicketInvalidationSchedulingService {
 
     public void scheduleReservationInvalidationsForNewlyAddedTicket(TicketDetailsDto ticketDetailsDto)
         throws SchedulerException {
-        scheduleReservationInvalidationJob(ticketDetailsDto.getId(),
+        scheduleReservationInvalidationJob(ticketDetailsDto.getHash(),
             Date.from(Instant.now().plus(DEFAULT_RESERVATION_PERIOD, ChronoUnit.MINUTES)));
         OrderDetailsDto byId = null;
         try {
@@ -80,7 +82,7 @@ public class TicketInvalidationSchedulingService {
         }
         for (TicketDetailsDto ticket : byId.getTickets()) {
             if (!ticket.getId().equals(ticketDetailsDto.getId())) {
-                rescheduleReservationInvalidationJob(ticket.getId(),
+                rescheduleReservationInvalidationJob(ticket.getHash(),
                     Date.from(Instant.now().plus(DEFAULT_RESERVATION_PERIOD, ChronoUnit.MINUTES)));
             }
         }
@@ -90,15 +92,16 @@ public class TicketInvalidationSchedulingService {
         throws SchedulerException {
         LocalDateTime rescheduleTime = ticketDetailsDto.getShow().getDateTime()
             .minus(DEFAULT_RESERVATION_PERIOD, ChronoUnit.MINUTES);
-        rescheduleReservationInvalidationJob(ticketDetailsDto.getId(),
+        rescheduleReservationInvalidationJob(ticketDetailsDto.getHash(),
             Date.from(rescheduleTime.toInstant(ZoneOffset.UTC)));
 
     }
 
-    public void cancelReservationInvalidationJob(Long id) {
+    public void cancelReservationInvalidationJob(String hash) {
         try {
             Scheduler scheduler = schedulerFactoryBean.getScheduler();
-            scheduler.deleteJob(new JobKey("reservationJob-" + id, "reservationJobs"));
+
+            scheduler.deleteJob(new JobKey("reservationJob-" + hash, "reservationJobs"));
         } catch (SchedulerException e) {
             throw new IllegalStateException("Could not cancel reservation invalidation job", e);
         }

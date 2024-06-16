@@ -12,6 +12,8 @@ api/event-endpoint.service.ts
 api/event-endpoint.serviceInterface.ts
 api/hall-plan-endpoint.service.ts
 api/hall-plan-endpoint.serviceInterface.ts
+api/hall-sector-endpoint.service.ts
+api/hall-sector-endpoint.serviceInterface.ts
 api/location-endpoint.service.ts
 api/location-endpoint.serviceInterface.ts
 api/login-endpoint.service.ts
@@ -44,8 +46,12 @@ model/event-dto.ts
 model/event-response.ts
 model/event-search-dto.ts
 model/hall-seat-response.ts
+model/hall-sector-dto.ts
 model/hall-sector-response.ts
+model/hall-sector-show-creation-dto.ts
+model/hall-sector-show-dto.ts
 model/hall-sector-show-response.ts
+model/hall-spot-dto.ts
 model/hall-spot-response.ts
 model/hallplan-create-request.ts
 model/hallplan-seat-create-request.ts
@@ -53,7 +59,6 @@ model/hallplan-section-create-request.ts
 model/invoice-response.ts
 model/location-create-request.ts
 model/location-dto.ts
-model/location-response.ts
 model/models.ts
 model/order-details-response.ts
 model/order-summary-response.ts
@@ -62,9 +67,7 @@ model/page-location-dto.ts
 model/page-show-response.ts
 model/pageable-object.ts
 model/show-creation-dto.ts
-model/show-hallplan-response.ts
-model/show-hallplan-section-response.ts
-model/show-hallplan-spot-response.ts
+model/show-dto.ts
 model/show-list-dto.ts
 model/show-response.ts
 model/show-search-dto.ts

@@ -56,6 +56,29 @@ export interface UserEndpointServiceInterface {
     /**
      * 
      * 
+     * @param email 
+     */
+    sendEmailForPasswordChange(email: string, extraHttpRequestParams?: any): Observable<{ [key: string]: string; }>;
+
+    /**
+     * 
+     * 
+     * @param email 
+     */
+    sendEmailForPasswordReset(email: string, extraHttpRequestParams?: any): Observable<{ [key: string]: string; }>;
+
+    /**
+     * 
+     * 
+     * @param token 
+     * @param newPassword 
+     * @param currentPassword 
+     */
+    setNewPasswordWithValidToken(token: string, newPassword: string, currentPassword?: string, extraHttpRequestParams?: any): Observable<{ [key: string]: string; }>;
+
+    /**
+     * 
+     * 
      * @param token 
      */
     updateUserEmailWithValidToken(token: string, extraHttpRequestParams?: any): Observable<object>;

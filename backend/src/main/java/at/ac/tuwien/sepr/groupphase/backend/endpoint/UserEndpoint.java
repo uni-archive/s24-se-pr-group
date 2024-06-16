@@ -14,7 +14,6 @@ import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.MailNotSentException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import jakarta.annotation.security.PermitAll;
-import java.lang.invoke.MethodHandles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -34,11 +33,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.lang.invoke.MethodHandles;
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping(value = "/api/v1/users")
 public class UserEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final String RESPONSE_KEY = "message";
     private final UserService userService;
     private final ApplicationUserMapper userMapper;
 
@@ -134,5 +138,34 @@ public class UserEndpoint {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Dieser Link ist nicht gültig.");
     }
 
+    @PermitAll
+    @GetMapping(path = "/user/password/reset", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, String>> sendEmailForPasswordReset(@RequestParam("email") String email) throws MailNotSentException {
+        Map<String, String> response = new HashMap<>();
+        userService.sendEmailForNewPassword(email, true);
+        response.put(RESPONSE_KEY, "E-Mail zum Zurücksetzen des Passworts wurde gesendet");
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PermitAll
+    @GetMapping(path = "/user/password/change", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, String>> sendEmailForPasswordChange(@RequestParam("email") String email) throws MailNotSentException {
+        Map<String, String> response = new HashMap<>();
+        userService.sendEmailForNewPassword(email, false);
+        response.put(RESPONSE_KEY, "E-Mail zum Ändern des Passworts wurde gesendet.");
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PermitAll
+    @PutMapping("/user/password/update")
+    public ResponseEntity<Map<String, String>> setNewPasswordWithValidToken(@RequestParam("token") String token,
+                                                                            @RequestParam(required = false, name =
+                                                                                "currentPassword") String currentPassword,
+                                                                            @RequestParam("newPassword") String newPassword) throws ValidationException, DtoNotFoundException {
+        Map<String, String> response = new HashMap<>();
+        userService.updatePassword(token, currentPassword, newPassword);
+        response.put(RESPONSE_KEY, "Dein Passwort wurde erfolgreich geändert.");
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 
 }

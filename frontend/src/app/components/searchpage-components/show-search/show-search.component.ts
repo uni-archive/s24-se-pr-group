@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit} from "@angular/core";
 import {FormsModule} from "@angular/forms";
 import {BrowserModule} from "@angular/platform-browser";
 import {ShowSearchDto} from "../../../dtos/ShowSearchDto";
@@ -7,21 +7,18 @@ import {ShowEndpointService, ShowListDto} from "../../../services/openapi";
 import {formatDuration} from "../../../../formatters/durationFormatter";
 
 @Component({
-  selector: 'app-show-search',
+  selector: "app-show-search",
   standalone: true,
-  imports: [
-    FormsModule,
-    BrowserModule,
-    DatepickerComponent
-  ],
-  templateUrl: './show-search.component.html',
-  styleUrl: './show-search.component.scss'
+  imports: [FormsModule, BrowserModule, DatepickerComponent],
+  templateUrl: "./show-search.component.html",
+  styleUrl: "./show-search.component.scss",
 })
 export class ShowSearchComponent implements OnInit {
-
-  searchData : ShowSearchDto = new ShowSearchDto();
-  time : Date = null;
-  shows : ShowListDto[] = [];
+  searchData: ShowSearchDto = new ShowSearchDto();
+  time: Date = null;
+  shows: ShowListDto[] = [];
+  protected readonly formatDuration = formatDuration;
+  protected readonly Date = Date;
 
   constructor(private service: ShowEndpointService) {
   }
@@ -33,15 +30,20 @@ export class ShowSearchComponent implements OnInit {
   }
 
   reloadShows() {
-    let dto : ShowSearchDto = {dateTime:this.searchData.dateTime, price:this.searchData.price*100,eventId:this.searchData.eventId,location:null};
+    let dto: ShowSearchDto = {
+      dateTime: this.searchData.dateTime,
+      price: this.searchData.price * 100,
+      eventId: this.searchData.eventId,
+      location: null,
+    };
     this.service.searchShows(dto).subscribe({
-      next:(data) => {
+      next: (data) => {
         this.shows = data;
       },
-      error:(err) => {
+      error: (err) => {
         //TODO: INFORM USER
         console.log(err);
-      }
+      },
     });
   }
 
@@ -52,18 +54,25 @@ export class ShowSearchComponent implements OnInit {
   artistMap(artist) {
     if (artist.artistName) {
       return artist.artistName + " ";
-    }else {
-      return artist.firstName + " " + artist.lastName+ " ";
+    } else {
+      return artist.firstName + " " + artist.lastName + " ";
     }
   }
 
-  formatDateStr(date : String): String {
+  formatDateStr(date: String): String {
     let splitDatetime = date.split("T");
     let splitDate = splitDatetime[0].split("-");
     let splitTime = splitDatetime[1].split(":");
-    return  splitDate[2]+"."+splitDate[1]+"."+ splitDate[0] + " " + splitTime[0] + ":" + splitTime[1];
+    return (
+      splitDate[2] +
+      "." +
+      splitDate[1] +
+      "." +
+      splitDate[0] +
+      " " +
+      splitTime[0] +
+      ":" +
+      splitTime[1]
+    );
   }
-
-  protected readonly formatDuration = formatDuration;
-  protected readonly Date = Date;
 }

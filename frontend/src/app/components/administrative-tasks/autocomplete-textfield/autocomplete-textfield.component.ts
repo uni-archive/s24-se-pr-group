@@ -1,28 +1,26 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {ArtistDto, EventDto} from "../../../services/openapi";
-
+import {EventDto, EventEndpointService} from "../../../services/openapi";
 @Component({
-  selector: 'app-autocomplete-textfield',
-  templateUrl: './autocomplete-textfield.component.html',
-  styleUrl: './autocomplete-textfield.component.scss'
+  selector: "app-autocomplete-textfield",
+  templateUrl: "./autocomplete-textfield.component.html",
+  styleUrl: "./autocomplete-textfield.component.scss",
 })
 export class AutocompleteTextfieldComponent {
 
-  @Input() autoCompleteList :Iterable<any>;
-  @Input() placeholder: string;
-  @Input() Label: string;
-  @Output() search: EventEmitter<string> = new EventEmitter<string>();
-  @Output() eventChosen : EventEmitter<EventDto|ArtistDto> = new EventEmitter<EventDto|ArtistDto>();
-  public text: string = "";
-  onChange() {
-    console.log(this.autoCompleteList);
-    this.search.emit(this.text);
+  @Output() selectedEvent = new EventEmitter<EventDto>();
+  event:EventDto | null = null;
+
+  constructor(private eventService: EventEndpointService) {}
+
+  searchEvents = (query: string) => this.eventService.searchEvents({textSearch:query, typ:null, dauer:0});
+
+
+  onEventSelected(event: EventDto): void {
+    this.event = event;
+    this.selectedEvent.emit(event);
   }
 
-  eventClicked(event : EventDto) {
-    this.eventChosen.emit(event);
-    this.text = event.title;
-    this.autoCompleteList = [];
+  textExtraction(item: EventDto) : string {
+    return item.title;
   }
-
 }

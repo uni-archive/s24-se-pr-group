@@ -44,12 +44,18 @@
   <br/>
 </div>
 
-<div class="d-flex justify-content-end">
-  <h4 class="fw-bold">
-    Gesamtpreis: {{getTotalPrice()}}
-  </h4>
+<div *ngIf="order && order.tickets.length > 0">
+  <div class="d-flex justify-content-end">
+    <h4 class="fw-bold">
+      Gesamtpreis: {{getTotalPrice()}}
+    </h4>
+  </div>
+
+  <div class="d-flex justify-content-end">
+    <button class="btn btn-primary" (click)="gotoCheckout()">Jetzt zahlen</button>
+  </div>
 </div>
 
-<div class="d-flex justify-content-end">
-  <button class="btn btn-primary" (click)="purchaseOrder()">Jetzt zahlen</button>
+<div *ngIf="!order || order.tickets.length === 0">
+  <p class="text-black-50">Du hast noch keine Tickets in deinem Warenkorb.</p>
 </div>

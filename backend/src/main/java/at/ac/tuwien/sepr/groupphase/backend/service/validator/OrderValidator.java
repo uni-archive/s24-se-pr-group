@@ -4,17 +4,30 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.type.InvoiceType;
+import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
-import java.time.LocalDateTime;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAmount;
+import java.time.temporal.TemporalUnit;
+import java.time.temporal.WeekFields;
+import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.stereotype.Component;
+import java.util.Objects;
 
 @Component
 public class OrderValidator extends AbstractValidator<OrderDetailsDto> {

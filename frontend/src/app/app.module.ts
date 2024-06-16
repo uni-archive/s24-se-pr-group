@@ -1,8 +1,8 @@
-import {BrowserModule} from "@angular/platform-browser";
-import {NgModule} from "@angular/core";
-import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {HttpClientModule} from "@angular/common/http";
-import {NgxPaginationModule} from "ngx-pagination";
+import { BrowserModule } from "@angular/platform-browser";
+import { NgModule } from "@angular/core";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { HttpClientModule } from "@angular/common/http";
+import { NgxPaginationModule } from "ngx-pagination";
 
 import {AppRoutingModule} from "./app-routing.module";
 import {AppComponent} from "./app.component";
@@ -15,9 +15,7 @@ import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {httpInterceptorProviders} from "./interceptors";
 import {GlobalMessageComponent} from "./global-message/global-message.component";
 import {AngularPhoneNumberInput} from "angular-phone-number-input";
-import {
-  PrintPurchaseInvoiceButtonComponent
-} from "./components/print-purchase-invoice-button/print-purchase-invoice-button.component";
+import {PrintPurchaseInvoiceButtonComponent} from "./components/print-purchase-invoice-button/print-purchase-invoice-button.component";
 import {PrintTicketButtonComponent} from "./components/print-ticket-button/print-ticket-button.component";
 import {UserHomeComponent} from "./components/user/user-home/user-home.component";
 import {ManageUserComponent} from "./components/user/manage-user/manage-user.component";
@@ -36,16 +34,14 @@ import {SearchPageComponent} from "./components/searchpage-components/searchpage
 import {ArtistSearchComponent} from "./components/searchpage-components/artist-search/artist-search.component";
 import {NewsDetailComponent} from "./components/news/news-detail/news-detail.component";
 import {LocationDetailsComponent} from "./components/location/location-details/location-details.component";
-import {
-  LocationAutocompleteComponent
-} from "./components/location/location-autocomplete/location-autocomplete.component";
-import {
-  GenericAutocompleteComponent
-} from "./components/autocomplete/generic-autocomplete/generic-autocomplete.component";
+import {LocationAutocompleteComponent} from "./components/location/location-autocomplete/location-autocomplete.component";
+import {GenericAutocompleteComponent} from "./components/autocomplete/generic-autocomplete/generic-autocomplete.component";
 import {CreateShowComponent} from "./components/administrative-tasks/create-show/create-show.component";
-import {
-  AutocompleteTextfieldComponent
-} from "./components/administrative-tasks/autocomplete-textfield/autocomplete-textfield.component";
+import {AutocompleteTextfieldComponent} from "./components/administrative-tasks/autocomplete-textfield/autocomplete-textfield.component";
+import {TagSearchComponent} from "./components/administrative-tasks/tag-search/tag-search.component";
+import { ResetPasswordComponent } from "./components/user/reset-password/reset-password.component";
+import { ChangePasswordComponent } from "./components/user/change-password/change-password.component";
+import { SendResetMailComponent } from "./components/user/reset-password/send-reset-mail/send-reset-mail.component";
 
 @NgModule({
   declarations: [
@@ -73,7 +69,10 @@ import {
     LocationAutocompleteComponent,
     GenericAutocompleteComponent,
     CreateShowComponent,
-    AutocompleteTextfieldComponent
+    AutocompleteTextfieldComponent,
+    ResetPasswordComponent,
+    ChangePasswordComponent,
+    SendResetMailComponent,
   ],
   imports: [
     BrowserModule,
@@ -89,12 +88,16 @@ import {
     NgxPaginationModule,
     EventSearchComponent,
     ShowSearchComponent,
-    ArtistSearchComponent
+    ArtistSearchComponent,
+    TagSearchComponent
   ],
   providers: [httpInterceptorProviders],
-  exports: [HeaderComponent, FooterComponent,
-    LocationSearchComponent, LocationAutocompleteComponent],
+  exports: [
+    HeaderComponent,
+    FooterComponent,
+    LocationSearchComponent,
+    LocationAutocompleteComponent,
+  ],
   bootstrap: [AppComponent],
 })
-export class AppModule {
-}
+export class AppModule {}

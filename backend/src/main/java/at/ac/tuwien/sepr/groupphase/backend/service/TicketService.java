@@ -1,10 +1,15 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
+import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.TicketAddToOrderDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
-import java.util.List;
 import org.quartz.SchedulerException;
+
+import java.util.List;
 
 public interface TicketService {
 
@@ -25,8 +30,6 @@ public interface TicketService {
      * does not exist.
      */
     List<TicketDetailsDto> findForUserById(long userId);
-
-    List<TicketDetailsDto> findForShowById(long showId);
 
     /**
      * A ticket is assigned for a seat which is in a (sector, show) tuple. Additional information specific to this tuple
@@ -56,17 +59,16 @@ public interface TicketService {
     void invalidateAllTicketsForOrder(long orderId);
 
     /**
-     * Adds a ticket to an order.
+     * Adds a ticket to an ongoing (non-purchased) order.
      *
-     * @param seatId
-     * @param showId
-     * @param orderId
-     * @param reservationOnly if the ticket should be reserved only
-     * @return the created ticket
-     * @throws ValidationException
+     * @param ticket             The info for that ticket.
+     * @param applicationUserDto The user who wants to add the ticket.
+     * @return The created ticket.
+     * @throws ValidationException if the request is invalid.
+     * @throws ForbiddenException  if the user isn't authorized to add the ticket to that order.
      */
-    TicketDetailsDto addTicketToOrder(Long seatId, Long showId, Long orderId,
-        boolean reservationOnly) throws ValidationException;
+    TicketDetailsDto addTicketToOrder(TicketAddToOrderDto ticket, ApplicationUserDto applicationUserDto)
+        throws ValidationException, ForbiddenException, DtoNotFoundException;
 
     /**
      * Confirms payment on an order. This will cancel all Invalidation Jobs, and mark the tickets as valid if they are
@@ -86,7 +88,14 @@ public interface TicketService {
      */
     void setValidAllTicketsForOrder(long orderId);
 
-    void changeTicketReserved(long ticketId, boolean setReserved) throws ValidationException;
+    void changeTicketReserved(long ticketId, boolean setReserved, ApplicationUserDto userDto) throws ValidationException, ForbiddenException,
+        DtoNotFoundException;
 
-    void deleteTicket(long ticketId) throws ValidationException;
+    void deleteTicket(long ticketId, ApplicationUserDto userDto) throws ValidationException, ForbiddenException;
+    /**
+     * Finds a ticket by its hash.
+     *
+     * @param ticketHash the hash of the ticket
+     */
+    TicketDetailsDto findByHash(String ticketHash) throws DtoNotFoundException;
 }

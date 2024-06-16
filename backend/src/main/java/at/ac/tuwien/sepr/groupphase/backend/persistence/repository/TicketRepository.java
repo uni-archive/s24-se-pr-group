@@ -1,5 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.persistence.repository;
 
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Event;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Show;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Ticket;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,9 +17,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     @Query("SELECT t FROM Ticket t INNER JOIN t.order o INNER JOIN o.customer c WHERE c.id = :userId")
     List<Ticket> findTicketsByUserId(@Param("userId") long userId);
 
-    @Query("SELECT t FROM Ticket t INNER JOIN t.show s WHERE s.id = :showId")
-    List<Ticket> findTicketsByShowId(@Param("showId") long showId);
-
     @Modifying
     @Query("DELETE Ticket t WHERE t.id = :id")
     void cancelReservedTicket(@Param("id") long id);
@@ -30,8 +29,10 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     @Query("UPDATE Ticket t SET t.valid = true WHERE t.order.id = :orderId")
     void setValidAllTicketsForOrder(@Param("orderId") long orderId);
 
-    @Query("SELECT COUNT(t) > 0 FROM Ticket t WHERE t.show.id = :showId AND t.hallSpot.id = :seatId AND (t.valid = true OR t.reserved = true)")
+    @Query("SELECT COUNT(t) > 0 FROM Ticket t WHERE t.show.id = :showId AND t.hallSpot.id = :seatId")
     boolean existsValidTicketForShowAndSeat(@Param("showId") long showId, @Param("seatId") long seatId);
+
+    Ticket findByHash(String hash);
 
     @Modifying
     @Query("UPDATE Ticket t SET t.reserved = :setReserved WHERE t.id = :ticketId")

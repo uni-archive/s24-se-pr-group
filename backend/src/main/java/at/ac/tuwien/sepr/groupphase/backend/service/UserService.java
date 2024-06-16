@@ -2,19 +2,18 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.service.exception.MailNotSentException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.UserLockedException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.MailNotSentException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
-import java.util.stream.Stream;
 
 public interface UserService extends UserDetailsService {
 
@@ -47,7 +46,7 @@ public interface UserService extends UserDetailsService {
      * @return the JWT, if successful
      * @throws org.springframework.security.authentication.BadCredentialsException if credentials are bad
      */
-    String login(String email, String password);
+    String login(String email, String password) throws UserLockedException;
 
     /**
      * Create a new user.
@@ -107,4 +106,25 @@ public interface UserService extends UserDetailsService {
      * @return the updated user
      */
     ApplicationUserDto updateUserEmailWithValidToken(String token);
+
+    /**
+     * Send an email to the user with a link to reset the password.
+     *
+     * @param email the email
+     * @param reset if the password should be reset, otherwise the password should be changed
+     * @throws MailNotSentException if the mail could not be sent
+     */
+    void sendEmailForNewPassword(String email, boolean reset) throws MailNotSentException;
+
+    /**
+     * Update the password of a user using a valid token.
+     *
+     * @param token           the token
+     * @param currentPassword the current password
+     * @param newPassword     the new password
+     * @throws ValidationException  if the new password is invalid
+     * @throws DtoNotFoundException if the user does not exist
+     */
+    void updatePassword(String token, String currentPassword, String newPassword) throws ValidationException,
+        DtoNotFoundException;
 }

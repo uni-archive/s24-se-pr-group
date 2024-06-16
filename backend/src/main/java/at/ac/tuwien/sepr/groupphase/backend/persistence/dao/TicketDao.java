@@ -60,4 +60,8 @@ public class TicketDao extends AbstractDao<Ticket, TicketDetailsDto> {
     public void changeTicketReserved(long ticketId, boolean setReserved) {
         ((TicketRepository) repository).changeTicketReserved(ticketId, setReserved);
     }
+
+    public TicketDetailsDto findByHash(String hash) throws EntityNotFoundException {
+        return mapper.toDto(((TicketRepository) repository).findByHash(hash));
+    }
 }

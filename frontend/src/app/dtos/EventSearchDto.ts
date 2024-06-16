@@ -8,7 +8,7 @@ export class EventSearch{
 
   constructor() {
     this.typ = null;
-    this.dauer = 0;
+    this.dauer = null;
     this.textSearch = "";
   }
 
