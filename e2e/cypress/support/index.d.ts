@@ -20,5 +20,11 @@ declare namespace Cypress{
          * @param msg the text of the created message
          */
         createMessage(msg: string);
+
+
+        gotoLogin();
+
+        fillLoginForm(username: string, password: string);
+        clearLoginForm();
     }
 }
