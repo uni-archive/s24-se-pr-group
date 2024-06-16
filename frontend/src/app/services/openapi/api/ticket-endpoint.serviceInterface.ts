@@ -13,6 +13,7 @@ import { HttpHeaders }                                       from '@angular/comm
 
 import { Observable }                                        from 'rxjs';
 
+import { PageTicketDetailsResponse } from '../model/models';
 import { TicketCreationRequest } from '../model/models';
 import { TicketDetailsResponse } from '../model/models';
 
@@ -66,5 +67,25 @@ export interface TicketEndpointServiceInterface {
      * @param id 
      */
     removeTicket(id: number, extraHttpRequestParams?: any): Observable<{}>;
+
+    /**
+     * 
+     * 
+     * @param id 
+     * @param firstName 
+     * @param familyName 
+     * @param reservedOnly 
+     * @param valid 
+     * @param page 
+     * @param size 
+     */
+    searchTicketsInShow(id: number, firstName?: string, familyName?: string, reservedOnly?: boolean, valid?: boolean, page?: number, size?: number, extraHttpRequestParams?: any): Observable<PageTicketDetailsResponse>;
+
+    /**
+     * 
+     * 
+     * @param id 
+     */
+    validateTicket(id: number, extraHttpRequestParams?: any): Observable<{}>;
 
 }

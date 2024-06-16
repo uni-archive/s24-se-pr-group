@@ -5,6 +5,7 @@ import {ShowSearchDto} from "../../../dtos/ShowSearchDto";
 import {DatepickerComponent} from "../datepicker/datepicker.component";
 import {ShowEndpointService, ShowListDto} from "../../../services/openapi";
 import {formatDuration} from "../../../../formatters/durationFormatter";
+import {Router} from "@angular/router";
 
 @Component({
   selector: "app-show-search",
@@ -20,7 +21,7 @@ export class ShowSearchComponent implements OnInit {
   protected readonly formatDuration = formatDuration;
   protected readonly Date = Date;
 
-  constructor(private service: ShowEndpointService) {
+  constructor(private service: ShowEndpointService, private router: Router) {
   }
 
   onSubmit() {
@@ -34,7 +35,8 @@ export class ShowSearchComponent implements OnInit {
       dateTime: this.searchData.dateTime,
       price: this.searchData.price * 100,
       eventId: this.searchData.eventId,
-      location: null,
+      location: null
+    ,
     };
     this.service.searchShows(dto).subscribe({
       next: (data) => {
@@ -63,16 +65,10 @@ export class ShowSearchComponent implements OnInit {
     let splitDatetime = date.split("T");
     let splitDate = splitDatetime[0].split("-");
     let splitTime = splitDatetime[1].split(":");
-    return (
-      splitDate[2] +
-      "." +
-      splitDate[1] +
-      "." +
-      splitDate[0] +
-      " " +
-      splitTime[0] +
-      ":" +
-      splitTime[1]
-    );
+    return (splitDate[2] + "." + splitDate[1] + "." + splitDate[0] + " " + splitTime[0] + ":" + splitTime[1]);
+  }
+
+  navigateToPickup(id: number) {
+    this.router.navigate(['tickets/pickup', id]);
   }
 }

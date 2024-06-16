@@ -1,10 +1,13 @@
 package at.ac.tuwien.sepr.groupphase.backend.persistence.dao;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.TicketSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.TicketMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Ticket;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.TicketRepository;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.specification.TicketSpecification;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,8 +16,11 @@ import java.util.List;
 @Component
 public class TicketDao extends AbstractDao<Ticket, TicketDetailsDto> {
 
-    public TicketDao(TicketRepository repository, TicketMapper mapper) {
+    private final TicketSpecification ticketSpecification;
+
+    public TicketDao(TicketRepository repository, TicketMapper mapper, TicketSpecification ticketSpecification) {
         super(repository, mapper);
+        this.ticketSpecification = ticketSpecification;
     }
 
     @Transactional
@@ -22,6 +28,11 @@ public class TicketDao extends AbstractDao<Ticket, TicketDetailsDto> {
         var opt = repository.findById(id);
         var found = opt.orElseThrow(() -> new EntityNotFoundException(id));
         return mapper.toDto(found);
+    }
+
+    @Transactional
+    public void validateTicketById(long id) {
+        ((TicketRepository) repository).validateTicketById(id);
     }
 
     @Transactional
@@ -57,5 +68,12 @@ public class TicketDao extends AbstractDao<Ticket, TicketDetailsDto> {
 
     public TicketDetailsDto findByHash(String hash) throws EntityNotFoundException {
         return mapper.toDto(((TicketRepository) repository).findByHash(hash));
+    }
+
+    @Transactional
+    public Page<TicketDetailsDto> search(TicketSearchDto ticketSearchDto) {
+        return ((TicketRepository) repository)
+            .findAll(ticketSpecification.getTickets(ticketSearchDto), ticketSearchDto.pageable())
+            .map(mapper::toDto);
     }
 }

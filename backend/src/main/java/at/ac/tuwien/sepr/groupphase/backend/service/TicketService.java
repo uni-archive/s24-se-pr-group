@@ -3,11 +3,12 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketAddToOrderDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.dto.TicketSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import org.quartz.SchedulerException;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -98,4 +99,19 @@ public interface TicketService {
      * @param ticketHash the hash of the ticket
      */
     TicketDetailsDto findByHash(String ticketHash) throws DtoNotFoundException;
+
+    /**
+     * Searches for tickets based on the given search criteria.
+     *
+     * @param ticketSearchDto The search criteria.
+     * @return A page of tickets matching the search criteria.
+     */
+    Page<TicketDetailsDto> search(TicketSearchDto ticketSearchDto);
+
+    /**
+     * Validates a ticket.
+     *
+     * @param id the id of the ticket to validate.
+     */
+    void validateTicket(long id) throws DtoNotFoundException, ValidationException;
 }

@@ -6,6 +6,7 @@ public record TicketDetailsResponse(
     boolean reserved,
     boolean valid,
     HallSpotResponse hallSpot,
-    ShowResponse show
+    ShowResponse show,
+    OrderDetailsResponse order
 ) {
 }

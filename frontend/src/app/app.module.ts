@@ -42,6 +42,11 @@ import {TagSearchComponent} from "./components/administrative-tasks/tag-search/t
 import { ResetPasswordComponent } from "./components/user/reset-password/reset-password.component";
 import { ChangePasswordComponent } from "./components/user/change-password/change-password.component";
 import { SendResetMailComponent } from "./components/user/reset-password/send-reset-mail/send-reset-mail.component";
+import {PickUpTicketsComponent} from "./components/tickets/pick-up-tickets/pick-up-tickets.component";
+import {ConfirmationDialogComponent} from "./components/confirmation-dialog/confirmation-dialog.component";
+import {
+  PickUpTicketShowSelectComponent
+} from "./components/tickets/pick-up-ticket-show-select/pick-up-ticket-show-select.component";
 
 @NgModule({
   declarations: [
@@ -73,6 +78,10 @@ import { SendResetMailComponent } from "./components/user/reset-password/send-re
     ResetPasswordComponent,
     ChangePasswordComponent,
     SendResetMailComponent,
+    AutocompleteTextfieldComponent,
+    PickUpTicketsComponent,
+    ConfirmationDialogComponent,
+    PickUpTicketShowSelectComponent
   ],
   imports: [
     BrowserModule,
@@ -88,7 +97,8 @@ import { SendResetMailComponent } from "./components/user/reset-password/send-re
     NgxPaginationModule,
     EventSearchComponent,
     ShowSearchComponent,
-    ArtistSearchComponent,
+    ArtistSearchComponent
+,
     TagSearchComponent
   ],
   providers: [httpInterceptorProviders],

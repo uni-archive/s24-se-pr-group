@@ -26,6 +26,10 @@ import { ChangePasswordComponent } from "./components/user/change-password/chang
 import { SendResetMailComponent } from "./components/user/reset-password/send-reset-mail/send-reset-mail.component";
 import {UserCartComponent} from "./components/user/user-cart/user-cart.component";
 import {UserCheckoutComponent} from "./components/user/user-checkout/user-checkout.component";
+import {PickUpTicketsComponent} from "./components/tickets/pick-up-tickets/pick-up-tickets.component";
+import {
+  PickUpTicketShowSelectComponent
+} from "./components/tickets/pick-up-ticket-show-select/pick-up-ticket-show-select.component";
 
 
 const routes: Routes = [
@@ -45,8 +49,8 @@ const routes: Routes = [
         {path: 'orders/:id', component: OrdersDetailsViewComponent}
       ]
   },
-  {
-    path: "user",
+  { path: "tickets/pickup/:id", component: PickUpTicketsComponent},
+  {path: "user",
     children: [
       {
         path: "home",
@@ -105,8 +109,9 @@ const routes: Routes = [
     path: "location/:id",
     component: LocationDetailsComponent,
   },
-  { path: "hallplan/create", component: HallplanCreateComponent },
-  { path: "news", canActivate: [AuthGuard], component: NewsComponent },
+  {path: 'hallplan/create', component: HallplanCreateComponent},
+  {path: 'news', canActivate: [AuthGuard], component: NewsComponent},
+  { path: 'pickup-ticket-show-select', component: PickUpTicketShowSelectComponent },
 ];
 
 @NgModule({
