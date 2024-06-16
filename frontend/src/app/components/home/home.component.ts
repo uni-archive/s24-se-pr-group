@@ -41,7 +41,7 @@ export class HomeComponent implements OnInit {
   }
 
     loadAllNews() {
-        this.newsService.findAll(0, 12).subscribe({
+        this.newsService.findAll(0, 15).subscribe({
             next: (response: any) => {
                 this.news = response.content;
             },
@@ -52,7 +52,7 @@ export class HomeComponent implements OnInit {
     }
 
     loadUnreadNews() {
-        this.newsService.findUnread(0, 12).subscribe({
+        this.newsService.findUnread(0, 15).subscribe({
             next: (response: any) => {
                 this.news = response.content;
             },

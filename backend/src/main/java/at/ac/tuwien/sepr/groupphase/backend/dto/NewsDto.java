@@ -12,11 +12,9 @@ public class NewsDto implements AbstractDto {
     private LocalDateTime publishedAt;
     private byte[] image;
     private EventDto eventDto;
-    private List<ApplicationUserDto> users;
+    private ApplicationUserDto user;
 
-    public NewsDto() {
-        this.users = new ArrayList<>();
-    }
+    public NewsDto() {}
 
     public Long getId() {
         return id;
@@ -74,12 +72,12 @@ public class NewsDto implements AbstractDto {
         this.eventDto = eventDto;
     }
 
-    public List<ApplicationUserDto> getUsers() {
-        return users;
+    public ApplicationUserDto getUser() {
+        return user;
     }
 
-    public void setUsers(List<ApplicationUserDto> users) {
-        this.users = users;
+    public void setUser(ApplicationUserDto user) {
+        this.user = user;
     }
 
     @Override
@@ -92,7 +90,7 @@ public class NewsDto implements AbstractDto {
             + ", publishedAt=" + publishedAt
             + ", image=" + (image != null ? "present" : "null")
             + ", eventDto=" + eventDto
-            + ", users=" + users
+            + ", users=" + user
             + '}';
     }
 }

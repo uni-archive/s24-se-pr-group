@@ -38,7 +38,7 @@ public class NewsDao extends AbstractDao<News, NewsDto> {
             .map(news -> mapper.toDtoWithContext(news, new CycleAvoidingMappingContext()));
     }
 
-    public void updateNewsWithUsers(NewsDto newsDto) throws EntityNotFoundException {
+    public void updateNewsWithUser(NewsDto newsDto) throws EntityNotFoundException {
         if (!repository.existsById(newsDto.getId())) {
             throw new EntityNotFoundException(newsDto.getId());
         }
@@ -46,20 +46,21 @@ public class NewsDao extends AbstractDao<News, NewsDto> {
         News news = repository.findById(newsDto.getId())
             .orElseThrow(() -> new EntityNotFoundException(newsDto.getId()));
 
-        for (ApplicationUserDto userDto : newsDto.getUsers()) {
-            ApplicationUser user = userRepository.findByEmail(userDto.getEmail());
+        ApplicationUserDto userDto = newsDto.getUser();
+        ApplicationUser user = userRepository.findByEmail(userDto.getEmail());
 
-            if (!user.getNews().contains(news)) {
-                user.getNews().add(news);
-                userRepository.save(user);
-            }
-
-            if (!news.getUsers().contains(user)) {
-                news.getUsers().add(user);
-            }
+        if (!user.getNews().contains(news)) {
+            user.getNews().add(news);
+            userRepository.save(user);
         }
+
+        if (!news.getUsers().contains(user)) {
+            news.getUsers().add(user);
+        }
+
         repository.save(news);
     }
+
 
     public Page<NewsDto> findUnseenNewsByUser(Long userId, Pageable pageable) throws EntityNotFoundException {
         if (!userRepository.existsById(userId)) {

@@ -45,8 +45,8 @@ public class NewsServiceImpl implements NewsService {
         LOGGER.debug("Find news with id {}", id);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        ApplicationUserDto userDto = userDao.findByEmail(username);
+        String username = authentication != null ? authentication.getName() : null;
+        ApplicationUserDto userDto = username != null ? userDao.findByEmail(username) : null;
 
         NewsDto newsDto;
         try {
@@ -54,14 +54,11 @@ public class NewsServiceImpl implements NewsService {
         } catch (EntityNotFoundException e) {
             throw new DtoNotFoundException(e);
         }
-        if (newsDto.getUsers() == null) {
-            newsDto.setUsers(new ArrayList<>());
-        }
 
-        if (!newsDto.getUsers().contains(userDto)) {
-            newsDto.getUsers().add(userDto);
+        if (userDto != null) {
+            newsDto.setUser(userDto);
             try {
-                newsDao.updateNewsWithUsers(newsDto);
+                newsDao.updateNewsWithUser(newsDto);
             } catch (EntityNotFoundException e) {
                 throw new DtoNotFoundException(e);
             }
@@ -69,6 +66,7 @@ public class NewsServiceImpl implements NewsService {
 
         return newsDto;
     }
+
 
     @Override
     public void createNews(NewsDto newsDto) throws ValidationException {
