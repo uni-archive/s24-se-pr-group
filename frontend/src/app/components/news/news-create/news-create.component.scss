@@ -1,0 +1,8 @@
+.disabled-blue {
+  background-color: #b0c4de !important;
+  border-color: #b0c4de !important;
+  color: white !important;
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: 0.65;
+}

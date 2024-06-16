@@ -100,8 +100,8 @@
                         <button
                                 type="submit"
                                 class="btn btn-block w-100"
-                                [ngClass]="{ 'btn-success': newsForm.valid && selectedFile && selectedEvent,
-                                'btn-danger': !newsForm.valid || !selectedFile || !selectedEvent }"
+                                [ngClass]="{ 'btn-primary': newsForm.valid && selectedFile && selectedEvent,
+                                'disabled-blue': !newsForm.valid || !selectedFile || !selectedEvent }"
                                 [disabled]="!newsForm.valid || !selectedFile || !selectedEvent"
                         >
                             Erstellen

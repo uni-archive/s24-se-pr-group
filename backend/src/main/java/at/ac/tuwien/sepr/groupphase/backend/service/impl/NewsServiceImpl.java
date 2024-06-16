@@ -7,7 +7,6 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.UserDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.NewsService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.NewsValidator;
 import jakarta.transaction.Transactional;
@@ -23,10 +22,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
 
 @Service
 public class NewsServiceImpl implements NewsService {
@@ -76,7 +71,7 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
-    public NewsDto createNews(NewsDto newsDto) throws ValidationException {
+    public void createNews(NewsDto newsDto) throws ValidationException {
         LOGGER.debug("Create news {}", newsDto);
         newsDto.setPublishedAt(LocalDateTime.now());
         if (newsDto.getTitle() != null) {
@@ -89,7 +84,7 @@ public class NewsServiceImpl implements NewsService {
             newsDto.setText(newsDto.getText().trim());
         }
         newsValidator.validateForPublish(newsDto);
-        return newsDao.create(newsDto);
+        newsDao.create(newsDto);
     }
 
     @Override
