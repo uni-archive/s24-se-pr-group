@@ -45,6 +45,5 @@ public interface EventService {
      */
     EventDto getById(long id) throws EntityNotFoundException;
 
-
-    List<EventWithTicketCountDto> getTop10EventsWithMostTickets(PageRequest pageRequest);
+    List<EventWithTicketCountDto> getTop10EventsWithMostTickets();
 }

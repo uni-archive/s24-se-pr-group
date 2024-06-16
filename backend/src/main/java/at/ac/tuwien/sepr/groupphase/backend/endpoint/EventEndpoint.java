@@ -67,8 +67,7 @@ public class EventEndpoint {
     @PermitAll
     @GetMapping("/top10")
     public ResponseEntity<List<EventWithTicketCountDto>> getTop10EventsWithMostTickets() {
-        PageRequest pageRequest = PageRequest.of(0, 10);
-        List<EventWithTicketCountDto> events = service.getTop10EventsWithMostTickets(pageRequest);
+        List<EventWithTicketCountDto> events = service.getTop10EventsWithMostTickets();
         return ResponseEntity.ok(events);
     }
 }

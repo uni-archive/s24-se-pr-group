@@ -65,7 +65,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventWithTicketCountDto> getTop10EventsWithMostTickets(PageRequest pageRequest) {
-        return dao.getTop10EventsWithMostTickets(pageRequest);
+    public List<EventWithTicketCountDto> getTop10EventsWithMostTickets() {
+        return dao.getTop10EventsWithMostTickets();
     }
 }

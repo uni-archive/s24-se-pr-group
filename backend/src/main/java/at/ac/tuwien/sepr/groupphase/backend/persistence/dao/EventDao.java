@@ -56,11 +56,11 @@ public class EventDao extends AbstractDao<Event, EventDto> {
         return mapper.toDto(((EventRepository) repository).findByArtist(artistId));
     }
 
-    @Transactional
-    public List<EventWithTicketCountDto> getTop10EventsWithMostTickets(PageRequest pageRequest) {
+
+    public List<EventWithTicketCountDto> getTop10EventsWithMostTickets() {
         LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
-        EventRepository eventRepository = (EventRepository) repository;
-        List<EventWithTicketCountProjection> results = eventRepository.findTop10ByOrderByTicketCountDesc(thirtyDaysAgo, pageRequest);
+        List<EventWithTicketCountProjection> results = ((EventRepository) repository)
+            .findTop10ByOrderByTicketCountDesc(thirtyDaysAgo, PageRequest.of(0, 10));
 
         return results.stream()
             .map(projection -> {
