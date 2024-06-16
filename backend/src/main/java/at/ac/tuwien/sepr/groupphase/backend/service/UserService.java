@@ -134,4 +134,6 @@ public interface UserService extends UserDetailsService {
      * @throws ValidationException if the token is invalid
      */
     void activateAccount(String token) throws ValidationException;
+
+    void deleteUser(long id) throws DtoNotFoundException, ValidationException, MailNotSentException;
 }

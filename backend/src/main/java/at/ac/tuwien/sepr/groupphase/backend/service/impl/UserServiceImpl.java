@@ -4,8 +4,10 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.AccountActivateTokenDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.AddressDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.EmailChangeTokenDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.InvoiceDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.MailBody;
 import at.ac.tuwien.sepr.groupphase.backend.dto.NewPasswordTokenDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.OrderSummaryDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
@@ -18,6 +20,7 @@ import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.security.SecurityUtil;
 import at.ac.tuwien.sepr.groupphase.backend.service.AddressService;
 import at.ac.tuwien.sepr.groupphase.backend.service.EmailSenderService;
+import at.ac.tuwien.sepr.groupphase.backend.service.OrderService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
@@ -64,12 +67,13 @@ public class UserServiceImpl implements UserService {
     private final AddressService addressService;
     private final Cache<String, Integer> loginAttemptCache;
     private final UserUnlockSchedulingService userUnlockSchedulingService;
+    private final OrderService orderService;
 
     @Autowired
     public UserServiceImpl(UserDao userDao, EmailChangeTokenDao emailChangeTokenDao, PasswordEncoder passwordEncoder,
-                           JwtTokenizer jwtTokenizer, UserValidator userValidator, AccountActivateTokenDao accountActivateTokenDao,
-                           EmailSenderService emailSenderService, AddressService addressService, Cache<String, Integer> loginAttemptCache,
-                           NewPasswordTokenDao newPasswordTokenDao, UserUnlockSchedulingService userUnlockSchedulingService) {
+                           JwtTokenizer jwtTokenizer, UserValidator userValidator,AccountActivateTokenDao accountActivateTokenDao, EmailSenderService emailSenderService,
+                           AddressService addressService, Cache<String, Integer> loginAttemptCache, NewPasswordTokenDao newPasswordTokenDao,
+                           UserUnlockSchedulingService userUnlockSchedulingService, OrderService orderService) {
         this.userDao = userDao;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
@@ -81,6 +85,7 @@ public class UserServiceImpl implements UserService {
         this.newPasswordTokenDao = newPasswordTokenDao;
         this.userUnlockSchedulingService = userUnlockSchedulingService;
         this.accountActivateTokenDao = accountActivateTokenDao;
+        this.orderService = orderService;
     }
 
     @Override
@@ -393,6 +398,41 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Override
+    public void deleteUser(long id) throws DtoNotFoundException, ValidationException, MailNotSentException {
+        //validate user
+        ApplicationUserDto user;
+        try {
+            user = userDao.findById(id);
+        } catch (EntityNotFoundException e) {
+            throw new DtoNotFoundException(e.getMessage());
+        }
+
+        List<OrderSummaryDto> orders = orderService.findForUser(id);
+        if (!orders.isEmpty()) {
+            for (OrderSummaryDto order : orders) {
+                List<InvoiceDto> invoices = order.getInvoices();
+                if (invoices.isEmpty()) {
+                    throw new ValidationException("Bitte storniere alle Bestellungen bevor du dein Konto löschst.");
+                }
+            }
+        }
+
+        try {
+            userDao.deleteById(id);
+        } catch (EntityNotFoundException e) {
+            throw new DtoNotFoundException(e.getMessage());
+        }
+
+        MailBody mailBody = generateMailBodyAccountDelete(user);
+
+        try {
+            emailSenderService.sendHtmlMail(mailBody);
+        } catch (MessagingException e) {
+            throw new MailNotSentException("Error sending mail.");
+        }
+    }
+
     private EmailChangeTokenDto createAndSaveEmailChangeToken(String newEmail, String currentEmail) {
         String token = UUID.randomUUID().toString();
         LocalDateTime expiryDate = LocalDateTime.now().plusMinutes(10);
@@ -669,6 +709,46 @@ public class UserServiceImpl implements UserService {
                     </div>
                   </body>
                 </html>
+                """;
+        return new MailBody(email, subject, emailTemplate);
+    }
+
+    private MailBody generateMailBodyAccountDelete(ApplicationUserDto user) {
+        String email = user.getEmail();
+        String subject = "Konto löschen";
+        String url = "http://localhost:4200/";
+        String emailTemplate = """
+            <!DOCTYPE html>
+            <html lang="de">
+            <head>
+               <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+               <style>
+                  body { background-color: #f8f9fa; font-family: Arial, sans-serif; }
+                  .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; }
+                  .card { background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 0.25rem; padding: 20px; }
+                  .card-body { padding: 20px; }
+                  .h3 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+                  .h5 { font-size: 1.25rem; }
+                  .text-gray-700 { color: #6c757d; }
+                  .btn-primary { display: inline-block; font-weight: 400; color: #fff !important; text-align: center; vertical-align: middle; cursor: pointer; background-color: #007bff; border: 1px solid #007bff; padding: 0.375rem 0.75rem; font-size: 1rem; border-radius: 0.25rem; text-decoration: none; }
+               </style>
+            </head>
+            <body>
+                <div class="container">
+                  <div class="card my-10">
+                    <div class="card-body">
+                      <h1 class="h3">Konto löschen</h1>
+                      <h5 class="h5">Hallo""" + " " + user.getFirstName() +
+            """
+                !</h5>
+                <p class="text-gray-700">Hiermit bestätigen wir, dass dein Konto gelöscht wurde.</p>
+                <p class="text-gray-700">Wir bedauern es sehr, dass du uns verlässt und hoffen, dass du uns in Zukunft wieder besuchst.</p>
+                <a class="btn btn-primary" href=\"""" + url + "\"" +
+            """
+                target="_blank" style="color: #fff !important;">TicketLine Homepage</a>
+                    </div>
+                  </div>
+                </body>
                 """;
         return new MailBody(email, subject, emailTemplate);
     }
