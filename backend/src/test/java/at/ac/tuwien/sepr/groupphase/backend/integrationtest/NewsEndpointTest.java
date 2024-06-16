@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.EventDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.NewsDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsRequestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.NewsEndpointMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.NewsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.UserRepository;
@@ -15,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.mock.web.MockPart;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,6 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import javax.imageio.ImageIO;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -89,12 +92,19 @@ class NewsEndpointIntegrationTest {
         EventDto eventDto = new EventDto();
         eventDto.setTitle("Test Event");
 
+        NewsRequestDto newsRequestDto = new NewsRequestDto();
+        newsRequestDto.setTitle(title);
+        newsRequestDto.setSummary(summary);
+        newsRequestDto.setText(text);
+        newsRequestDto.setEventDto(eventDto);
+
+        String newsRequestString = new ObjectMapper().writeValueAsString(newsRequestDto);
+        MockPart newsRequestPart = new MockPart("news", newsRequestString.getBytes(StandardCharsets.UTF_8));
+        newsRequestPart.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
         mockMvc.perform(multipart("/api/v1/news/create")
-                .file(file)
-                .param("title", title)
-                .param("summary", summary)
-                .param("text", text)
-                .param("event", new ObjectMapper().writeValueAsString(eventDto)))
+                .file("image", file.getBytes())
+                .part(newsRequestPart))
             .andExpect(status().isForbidden());
     }
 

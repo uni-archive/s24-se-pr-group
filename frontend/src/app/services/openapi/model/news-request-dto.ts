@@ -9,15 +9,16 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { SortObject } from './sort-object';
+import { EventDto } from './event-dto';
 
 
-export interface PageableObject { 
-    pageNumber?: number;
-    pageSize?: number;
-    offset?: number;
-    sort?: Array<SortObject>;
-    paged?: boolean;
-    unpaged?: boolean;
+export interface NewsRequestDto { 
+    id?: number;
+    title?: string;
+    summary?: string;
+    text?: string;
+    publishedAt?: string;
+    image?: Array<string>;
+    eventDto?: EventDto;
 }
 

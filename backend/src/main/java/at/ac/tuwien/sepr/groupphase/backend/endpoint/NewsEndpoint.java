@@ -1,6 +1,5 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
-import at.ac.tuwien.sepr.groupphase.backend.dto.EventDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.NewsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsRequestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsResponseDto;
@@ -10,20 +9,13 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.NewsEndpointMapper;
 import at.ac.tuwien.sepr.groupphase.backend.service.NewsService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
-
-import java.io.IOException;
-import java.lang.invoke.MethodHandles;
-import java.util.List;
-
 import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,9 +25,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 
 @RestController
 @RequestMapping(value = "/api/v1/news")
@@ -54,7 +50,8 @@ public class NewsEndpoint {
     @PermitAll
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get list of news without details")
-    public ResponseEntity<Page<SimpleNewsResponseDto>> findAll(@RequestParam(name = "page", defaultValue = "0") Integer page, @RequestParam(name = "size", defaultValue = "9") Integer size) {
+    public ResponseEntity<Page<SimpleNewsResponseDto>> findAll(@RequestParam(name = "page", defaultValue = "0") Integer page,
+                                                               @RequestParam(name = "size", defaultValue = "9") Integer size) {
         LOGGER.info("GET /api/v1/news");
         PageRequest pageable = PageRequest.of(page, size);
         Page<NewsDto> newsList = newsService.getAllNews(pageable);
@@ -64,7 +61,8 @@ public class NewsEndpoint {
     @Secured("ROLE_USER")
     @GetMapping(value = "/unread", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get list of unread news without details")
-    public ResponseEntity<Page<SimpleNewsResponseDto>> findUnread(@RequestParam(name = "page", defaultValue = "0") Integer page, @RequestParam(name = "size", defaultValue = "9") Integer size) {
+    public ResponseEntity<Page<SimpleNewsResponseDto>> findUnread(@RequestParam(name = "page", defaultValue = "0") Integer page,
+                                                                  @RequestParam(name = "size", defaultValue = "9") Integer size) {
         LOGGER.info("GET /api/v1/news/unread");
         PageRequest pageable = PageRequest.of(page, size);
         Page<NewsDto> unreadNewsList;
@@ -92,29 +90,14 @@ public class NewsEndpoint {
     @Secured("ROLE_ADMIN")
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Publish a new news")
-    public ResponseEntity<NewsResponseDto> create(@RequestParam("image") MultipartFile file,
-                                                  @RequestParam("title") String title,
-                                                  @RequestParam("summary") String summary,
-                                                  @RequestParam("text") String text,
-                                                  @RequestParam("event") String event) {
-
-        NewsRequestDto newsRequestDto = new NewsRequestDto();
-        newsRequestDto.setTitle(title);
-        newsRequestDto.setSummary(summary);
-        newsRequestDto.setText(text);
+    public ResponseEntity<NewsResponseDto> create(@RequestPart("image") MultipartFile file,
+                                                  @RequestPart("news") NewsRequestDto newsRequestDto) {
 
         try {
             newsRequestDto.setImage(file.getBytes());
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid image data", e);
         }
-        EventDto eventDto;
-        try {
-            eventDto = new ObjectMapper().readValue(event, EventDto.class);
-        } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid event data", e);
-        }
-        newsRequestDto.setEventDto(eventDto);
 
         LOGGER.info("POST /api/v1/news body: {}", newsRequestDto);
 

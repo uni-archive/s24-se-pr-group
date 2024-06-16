@@ -17,6 +17,7 @@ import { SimpleNewsResponseDto } from './simple-news-response-dto';
 export interface PageSimpleNewsResponseDto { 
     totalPages?: number;
     totalElements?: number;
+    pageable?: PageableObject;
     size?: number;
     content?: Array<SimpleNewsResponseDto>;
     number?: number;
@@ -24,7 +25,6 @@ export interface PageSimpleNewsResponseDto {
     numberOfElements?: number;
     first?: boolean;
     last?: boolean;
-    pageable?: PageableObject;
     empty?: boolean;
 }
 

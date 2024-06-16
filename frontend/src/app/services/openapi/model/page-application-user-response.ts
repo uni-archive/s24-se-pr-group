@@ -17,6 +17,7 @@ import { ApplicationUserResponse } from './application-user-response';
 export interface PageApplicationUserResponse { 
     totalPages?: number;
     totalElements?: number;
+    pageable?: PageableObject;
     size?: number;
     content?: Array<ApplicationUserResponse>;
     number?: number;
@@ -24,7 +25,6 @@ export interface PageApplicationUserResponse {
     numberOfElements?: number;
     first?: boolean;
     last?: boolean;
-    pageable?: PageableObject;
     empty?: boolean;
 }
 

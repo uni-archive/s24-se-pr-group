@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {EventDto, NewsEndpointService, NewsResponseDto} from '../../../services/openapi';
+import {EventDto, NewsEndpointService, NewsRequestDto, NewsResponseDto} from '../../../services/openapi';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
 @Component({
@@ -66,7 +66,13 @@ export class NewsCreateComponent implements OnInit {
     }
 
     private createNews(news: any): void {
-        this.newsService.create(news.title, news.summary, news.text, JSON.stringify(this.selectedEvent), this.selectedFile).subscribe({
+        const newsData: NewsRequestDto = {
+            title: news.title,
+            summary: news.summary,
+            text: news.text,
+            eventDto: this.selectedEvent
+        };
+        this.newsService.create(this.selectedFile, newsData).subscribe({
             next: () => {
                 this.successMessage = 'Die News wurde erfolgreich gespeichert.';
                 this.success = true;

@@ -13,6 +13,7 @@ import { HttpHeaders }                                       from '@angular/comm
 
 import { Observable }                                        from 'rxjs';
 
+import { NewsRequestDto } from '../model/models';
 import { NewsResponseDto } from '../model/models';
 import { PageSimpleNewsResponseDto } from '../model/models';
 
@@ -28,13 +29,10 @@ export interface NewsEndpointServiceInterface {
     /**
      * Publish a new news
      * 
-     * @param title 
-     * @param summary 
-     * @param text 
-     * @param event 
      * @param image 
+     * @param news 
      */
-    create(title: string, summary: string, text: string, event: string, image: Blob, extraHttpRequestParams?: any): Observable<NewsResponseDto>;
+    create(image: Blob, news: NewsRequestDto, extraHttpRequestParams?: any): Observable<NewsResponseDto>;
 
     /**
      * Get detailed information about a specific news
