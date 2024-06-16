@@ -11,7 +11,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper
-public interface ShowHallSpotResponseMapper extends BaseResponseMapper<HallSeatDto, ShowHallplanSpotResponse>, BaseEntityMapper<HallSeat, HallSeatDto> {
+public interface ShowHallSpotResponseMapper extends BaseResponseMapper<HallSeatDto, ShowHallplanSpotResponse> {
 
     @Mapping(target = "isReserved", expression = "java(ticketDetailsForSpot != null)")
     ShowHallplanSpotResponse toResponse(HallSeatDto dto, @Context TicketDetailsDto ticketDetailsForSpot);

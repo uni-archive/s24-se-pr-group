@@ -1,12 +1,12 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.EventDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.HallPlanDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowListDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowCreationDto;
 //import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ShowHallPlanResponseMapper;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.hallplan.ShowHallplanResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ShowHallPlanResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.EventDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.HallPlanDao;
@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class ShowServiceImpl implements ShowService {
@@ -34,20 +33,17 @@ public class ShowServiceImpl implements ShowService {
 
     private final ShowDao dao;
     private final EventDao eventDao;
-    private ShowHallPlanResponseMapper showHallPlanResponseMapper;
     private HallSectorShowService hallSectorShowService;
     private final TicketDao ticketDao;
 
 //    private final ShowHallPlanResponseMapper showHallPlanMapper;
 
     public ShowServiceImpl(ShowDao dao, EventDao eventDao, HallPlanDao hallPlanDao, TicketDao ticketDao,
-                           HallSectorShowService hallSectorShowService,
-                           ShowHallPlanResponseMapper showHallPlanResponseMapper) {
+                           HallSectorShowService hallSectorShowService) {
         this.eventDao = eventDao;
         this.dao = dao;
         this.ticketDao = ticketDao;
         this.hallSectorShowService = hallSectorShowService;
-        this.showHallPlanResponseMapper = showHallPlanResponseMapper;
     }
 
     @Override
@@ -75,11 +71,9 @@ public class ShowServiceImpl implements ShowService {
     }
 
     @Override
-    public ShowHallplanResponse getAvailableSeatsByShowId(Long showId) {
-        var tickets = ticketDao.findForShowById(showId);
+    public HallPlanDto getHallPlanByShowId(Long showId) {
         var hallPlan = dao.getHallPlanByShowId(showId);
-        var hallSectorShowList = hallSectorShowService.findByShowId(showId);
-        return showHallPlanResponseMapper.toResponse(hallPlan, hallSectorShowList, tickets);
+        return hallPlan;
     }
 
     @Override

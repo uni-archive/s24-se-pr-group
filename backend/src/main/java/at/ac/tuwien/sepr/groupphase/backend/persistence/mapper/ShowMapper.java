@@ -8,7 +8,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", uses = { EventMapper.class })
-public interface ShowMapper extends BaseEntityMapper<Show, ShowDto>, BaseResponseMapper<ShowDto, ShowResponse> {
+public interface ShowMapper extends BaseEntityMapper<Show, ShowDto> {
     @Mapping(source = "event.id", target = "event")
     ShowDto toDto(Show show,  @Context CycleAvoidingMappingContext cycleAvoidingMappingContext);
 

@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Mapper(uses = ShowHallSpotResponseMapper.class, componentModel = MappingConstants.ComponentModel.SPRING)
-public interface ShowHallSectorResponseMapper extends BaseResponseMapper<HallSectorDto, ShowHallplanSectionResponse>, BaseEntityMapper<HallSector, HallSectorDto> {
+public interface ShowHallSectorResponseMapper extends BaseResponseMapper<HallSectorDto, ShowHallplanSectionResponse> {
 
     @Mapping(target = "spots", expression = "java(mapSpots(hallSectorDto, ticketsForSector))")
     @Mapping(target = "spotCount", expression = "java(countSpots(hallSectorDto))")

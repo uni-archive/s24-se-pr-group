@@ -20,7 +20,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Mapper(uses = ShowHallSectorResponseMapper.class, componentModel = MappingConstants.ComponentModel.SPRING)
-public interface ShowHallPlanResponseMapper extends BaseResponseMapper<HallPlanDto, ShowHallplanResponse>, BaseEntityMapper<HallPlan, HallPlanDto> {
+public interface ShowHallPlanResponseMapper extends BaseResponseMapper<HallPlanDto, ShowHallplanResponse> {
 
     @Named("map with custom sectors")
     @Mapping(target = "sectors", expression = "java(mapSectors(dto, hallSectorShowList, ticketsForShow))")

@@ -1,11 +1,13 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowListDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.HallSectorShowResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.hallplan.ShowHallplanResponse;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.HallSectorShowResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ShowHallPlanResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ShowResponseMapper;
@@ -14,6 +16,7 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.ShowMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.HallSectorShowService;
 import at.ac.tuwien.sepr.groupphase.backend.service.ShowService;
+import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
 import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,14 +44,20 @@ public class ShowEndpoint {
     private ShowService service;
     private final HallSectorShowService hallSectorShowService;
     private final HallSectorShowResponseMapper hallSectorShowResponseMapper;
+    private final ShowHallPlanResponseMapper showHallPlanResponseMapper;
+    private final TicketService ticketService;
     private final ShowResponseMapper showMapper;
 
     public ShowEndpoint(ShowService showService, ShowResponseMapper showMapper, HallSectorShowResponseMapper hallSectorShowResponseMapper,
+                        ShowHallPlanResponseMapper showHallPlanResponseMapper,
+                        TicketService ticketService,
                         HallSectorShowService hallSectorShowService) {
         this.service = showService;
         this.showMapper = showMapper;
         this.hallSectorShowResponseMapper = hallSectorShowResponseMapper;
         this.hallSectorShowService = hallSectorShowService;
+        this.showHallPlanResponseMapper = showHallPlanResponseMapper;
+        this.ticketService = ticketService;
     }
 
     @Secured(Code.ADMIN)
@@ -90,15 +99,24 @@ public class ShowEndpoint {
     @GetMapping("/{id}/available-seats")
     public ResponseEntity<ShowHallplanResponse> getAvailableSeatsByShowId(@PathVariable("id") Long id) {
         LOGGER.info("Getting available hallplan for show with id {}", id);
-        LOGGER.info("{}", service.getAvailableSeatsByShowId(id));
-        return ResponseEntity.ok(service.getAvailableSeatsByShowId(id));
+
+        var tickets = ticketService.findForShowById(id);
+        var hallPlan = service.getHallPlanByShowId(id);
+        var hallSectorShowList = hallSectorShowService.findByShowId(id);
+        return ResponseEntity.ok(showHallPlanResponseMapper.toResponse(hallPlan, hallSectorShowList, tickets));
     }
 
     @PermitAll
     @GetMapping("/{id}")
-    public ResponseEntity<ShowResponse> getShowById(@PathVariable("id") Long id) throws EntityNotFoundException {
+    public ResponseEntity<ShowResponse> getShowById(@PathVariable("id") Long id) throws NotFoundException {
         LOGGER.trace("Getting show with id {}", id);
-        return ResponseEntity.ok(showMapper.toResponse(service.getById(id)));
+        ShowDto res;
+        try {
+            res = service.getById(id);
+        } catch (EntityNotFoundException e) {
+            throw new NotFoundException(e);
+        }
+        return ResponseEntity.ok(showMapper.toResponse(res));
     }
 
 }
