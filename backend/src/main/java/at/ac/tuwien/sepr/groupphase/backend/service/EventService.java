@@ -4,10 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.EventDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.EventSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.EventWithTicketCountDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreationDto;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.EventType;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
-import jakarta.transaction.Transactional;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -45,5 +42,10 @@ public interface EventService {
      */
     EventDto getById(long id) throws EntityNotFoundException;
 
+    /**
+     * Retrieves a list of the top 10 events with the most tickets sold.
+     *
+     * @return a list of the top 10 events with the most tickets sold as {@link EventWithTicketCountDto}
+     */
     List<EventWithTicketCountDto> getTop10EventsWithMostTickets();
 }

@@ -19,7 +19,6 @@ public class NewsDao extends AbstractDao<News, NewsDto> {
     private final UserRepository userRepository;
     private final NewsMapper mapper;
 
-
     @Override
     public NewsDto findById(Long id) throws EntityNotFoundException {
         return mapper.toDtoWithContext(newsRepository.findById(id).orElseThrow(()
@@ -60,7 +59,6 @@ public class NewsDao extends AbstractDao<News, NewsDto> {
 
         repository.save(news);
     }
-
 
     public Page<NewsDto> findUnseenNewsByUser(Long userId, Pageable pageable) throws EntityNotFoundException {
         if (!userRepository.existsById(userId)) {

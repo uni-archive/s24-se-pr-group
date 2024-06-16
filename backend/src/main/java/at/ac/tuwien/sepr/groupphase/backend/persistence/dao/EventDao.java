@@ -1,7 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.persistence.dao;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.*;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.EventType;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.BaseEntityMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.EventMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.ShowMapper;
@@ -13,7 +12,6 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.lang.invoke.MethodHandles;

@@ -1,8 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.dto;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 public class NewsDto implements AbstractDto {
     private Long id;

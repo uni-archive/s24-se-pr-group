@@ -5,7 +5,6 @@ public class EventWithTicketCountDto {
     private String title;
     private Long ticketCount;
 
-
     public EventWithTicketCountDto(Long eventId, String title, String description, long ticketCount) {
         this.eventId = eventId;
         this.title = title;
