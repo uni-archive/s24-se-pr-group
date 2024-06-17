@@ -27,13 +27,9 @@ import { SendResetMailComponent } from "./components/user/reset-password/send-re
 import { UserCartComponent } from "./components/user/user-cart/user-cart.component";
 import { UserCheckoutComponent } from "./components/user/user-checkout/user-checkout.component";
 import { ActivateAccountComponent } from "./components/user/registration/activate-account/activate-account.component";
-import {UserCartComponent} from "./components/user/user-cart/user-cart.component";
-import {UserCheckoutComponent} from "./components/user/user-checkout/user-checkout.component";
-import {TicketSelectComponent} from "./components/ticket-select/ticket-select.component";
-import {PickUpTicketsComponent} from "./components/tickets/pick-up-tickets/pick-up-tickets.component";
-import {PickUpTicketShowSelectComponent
-} from "./components/tickets/pick-up-ticket-show-select/pick-up-ticket-show-select.component";
-
+import { TicketSelectComponent } from "./components/ticket-select/ticket-select.component";
+import { PickUpTicketsComponent } from "./components/tickets/pick-up-tickets/pick-up-tickets.component";
+import { PickUpTicketShowSelectComponent } from "./components/tickets/pick-up-ticket-show-select/pick-up-ticket-show-select.component";
 
 const routes: Routes = [
   { path: "", component: HomeComponent },
@@ -53,7 +49,7 @@ const routes: Routes = [
       { path: "orders/:id", component: OrdersDetailsViewComponent },
     ],
   },
-  { path: "tickets/pickup/:id", component: PickUpTicketsComponent},
+  { path: "tickets/pickup/:id", component: PickUpTicketsComponent },
   {
     path: "user",
     children: [
@@ -118,11 +114,14 @@ const routes: Routes = [
     path: "location/:id",
     component: LocationDetailsComponent,
   },
-  { path: 'pickup-ticket-show-select', component: PickUpTicketShowSelectComponent },
+  {
+    path: "pickup-ticket-show-select",
+    component: PickUpTicketShowSelectComponent,
+  },
 
   { path: "hallplan/create", component: HallplanCreateComponent },
   { path: "news", canActivate: [AuthGuard], component: NewsComponent },
-  {path: "show/:id/ticket-select", component: TicketSelectComponent},
+  { path: "show/:id/ticket-select", component: TicketSelectComponent },
 ];
 
 @NgModule({
