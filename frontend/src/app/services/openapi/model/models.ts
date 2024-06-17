@@ -33,6 +33,7 @@ export * from './page-location-dto';
 export * from './page-show-response';
 export * from './page-ticket-details-response';
 export * from './pageable-object';
+export * from './sector-ticket-creation-request';
 export * from './show-creation-dto';
 export * from './show-dto';
 export * from './show-hallplan-response';
