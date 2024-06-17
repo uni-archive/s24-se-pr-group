@@ -52,6 +52,9 @@ public class ApplicationUser extends AbstractEntity {
     @Column(name = "SUPER_ADMIN", updatable = false)
     private boolean superAdmin;
 
+    @Column(name = "ACCOUNT_ACTIVATED")
+    private boolean accountActivated;
+
     @OneToMany(mappedBy = "customer")
     private List<Order> orders;
 
@@ -66,7 +69,9 @@ public class ApplicationUser extends AbstractEntity {
     public ApplicationUser() {
     }
 
-    public ApplicationUser(String email, String password, String firstName, String familyName, String phoneNumber, String salt, int loginCount, boolean accountLocked, UserType type, boolean superAdmin, Address address) {
+    public ApplicationUser(String email, String password, String firstName, String familyName, String phoneNumber,
+                           String salt, int loginCount, boolean accountLocked, UserType type, boolean superAdmin,
+                           boolean accountActivated, Address address) {
         this.email = email;
         this.password = password;
         this.firstName = firstName;
@@ -78,6 +83,7 @@ public class ApplicationUser extends AbstractEntity {
         this.type = type;
         this.superAdmin = superAdmin;
         this.address = address;
+        this.accountActivated = accountActivated;
     }
 
     @Override
@@ -219,6 +225,20 @@ public class ApplicationUser extends AbstractEntity {
 
     public boolean isSuperAdmin() {
         return superAdmin;
+    }
+
+    public ApplicationUser setSuperAdmin(boolean superAdmin) {
+        this.superAdmin = superAdmin;
+        return this;
+    }
+
+    public boolean isAccountActivated() {
+        return accountActivated;
+    }
+
+    public ApplicationUser setAccountActivated(boolean emailConfirmed) {
+        this.accountActivated = emailConfirmed;
+        return this;
     }
 
 }
