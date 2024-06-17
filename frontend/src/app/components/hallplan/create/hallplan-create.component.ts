@@ -126,7 +126,8 @@ export class HallplanCreateComponent {
     this.hallplan.refreshCanvas(true);
   }
 
-  updateSection() {
+  updateSection(e) {
+    e.preventDefault();
     if (!this.sectionForm.valid)
       return;
     const name = this.sectionForm.value.name;

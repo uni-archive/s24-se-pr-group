@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.SectorTicketCreationRequest;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.TicketCreationRequest;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.TicketDetailsResponse;
@@ -107,6 +108,26 @@ public class TicketEndpoint {
         }
         try {
             return ticketMapper.toResponse(ticketService.addTicketToOrder(ticketMapper.toDto(ticketCreationRequest), user));
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        }
+    }
+
+    @Secured(Code.USER)
+    @PostMapping("/for-section")
+    @ResponseStatus(HttpStatus.CREATED)
+    public TicketDetailsResponse addSectionTicket(@RequestBody SectorTicketCreationRequest ticketCreationRequest)
+        throws at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException, ForbiddenException {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var username = authentication.getPrincipal().toString();
+        ApplicationUserDto user = null;
+        try {
+            user = userService.findApplicationUserByEmail(username);
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        }
+        try {
+            return ticketMapper.toResponse(ticketService.addSectorTicketToOrder(ticketMapper.toSectorDto(ticketCreationRequest), user));
         } catch (DtoNotFoundException e) {
             throw new NotFoundException(e);
         }

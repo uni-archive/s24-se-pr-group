@@ -21,7 +21,7 @@ export class ShowSearchComponent implements OnInit {
   protected readonly formatDuration = formatDuration;
   protected readonly Date = Date;
 
-  constructor(private service: ShowEndpointService, private router: Router) {
+  constructor(private service: ShowEndpointService, protected router: Router) {
   }
 
   onSubmit() {

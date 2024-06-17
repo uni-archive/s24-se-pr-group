@@ -121,7 +121,11 @@ const routes: Routes = [
 
   { path: "hallplan/create", component: HallplanCreateComponent },
   { path: "news", canActivate: [AuthGuard], component: NewsComponent },
-  { path: "show/:id/ticket-select", component: TicketSelectComponent },
+  {
+    path: "show/:id/ticket-select",
+    canActivate: mapToCanActivate([AuthGuard]),
+    component: TicketSelectComponent
+  },
 ];
 
 @NgModule({

@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {EventDto, EventEndpointService, ShowEndpointService, ShowListDto} from "../../services/openapi";
-import { ActivatedRoute } from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {MessagingService} from "../../services/messaging.service";
 import {NgForOf, NgIf} from "@angular/common";
 @Component({
@@ -43,7 +43,11 @@ export class EventDatailpageComponent implements OnInit {
     }
   }
 
-  constructor(private eventService : EventEndpointService, private messagingService : MessagingService, private showService : ShowEndpointService, private route : ActivatedRoute) {
+  constructor(private eventService : EventEndpointService,
+              private messagingService : MessagingService,
+              protected router: Router,
+              private showService : ShowEndpointService,
+              private route : ActivatedRoute) {
   }
 
 }
