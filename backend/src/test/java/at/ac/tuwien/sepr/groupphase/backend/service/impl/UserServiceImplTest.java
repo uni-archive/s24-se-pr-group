@@ -1,11 +1,13 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
+import at.ac.tuwien.sepr.groupphase.backend.dto.AccountActivateTokenDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.EmailChangeTokenDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.MailBody;
 import at.ac.tuwien.sepr.groupphase.backend.dto.NewPasswordTokenDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.AccountActivateTokenDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.EmailChangeTokenDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.NewPasswordTokenDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.UserDao;
@@ -74,6 +76,9 @@ class UserServiceImplTest {
     @Mock
     private NewPasswordTokenDao newPasswordTokenDao;
 
+    @Mock
+    private AccountActivateTokenDao accountActivateTokenDao;
+
     @InjectMocks
     private UserServiceImpl userService;
 
@@ -81,11 +86,17 @@ class UserServiceImplTest {
     private ArgumentCaptor<ApplicationUserDto> userDto;
 
     @Test
-    void createUserShouldCallValidateAndSetSalt() throws ValidationException, ForbiddenException {
+    void createUserShouldCallValidateAndSetSalt() throws ValidationException, ForbiddenException, MailNotSentException {
         ApplicationUserDto user = ApplicationUserSupplier.anAdminUser();
         doNothing().when(userValidator).validateForCreate(user);
         when(passwordEncoder.encode(Mockito.anyString())).thenReturn("encodedPassword");
         when(addressService.create(user.getAddress())).thenReturn(user.getAddress());
+
+        AccountActivateTokenDto emailConfirmToken = new AccountActivateTokenDto();
+        emailConfirmToken.setToken(UUID.randomUUID().toString());
+        emailConfirmToken.setEmail(user.getEmail());
+        emailConfirmToken.setExpiryDate(LocalDateTime.now().plusMinutes(10));
+        when(accountActivateTokenDao.create(any(AccountActivateTokenDto.class))).thenReturn(emailConfirmToken);
 
         userService.createUser(user);
 
