@@ -48,6 +48,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     Page<Ticket> findAll(Specification<Ticket> specification, Pageable pageable);
 
     @Modifying
-    @Query("UPDATE Ticket t SET t.valid = true, t.reserved = false WHERE t.id = :id")
+    @Query("UPDATE Ticket t SET t.valid = true WHERE t.id = :id")
     void validateTicketById(@Param("id") long id);
 }

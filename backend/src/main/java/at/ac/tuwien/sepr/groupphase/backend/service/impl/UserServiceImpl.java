@@ -51,8 +51,10 @@ import java.util.concurrent.ExecutionException;
 @Service
 public class UserServiceImpl implements UserService {
 
+    public static final String ACCOUNT_LOCKED = "Ihr Account wurde wegen wiederholter falscher Anmeldeversuche gesperrt. Bitte versuchen Sie es später erneut oder kontaktieren Sie einen Administrator.";
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final int MAX_EXPIRATION_TIME = 5;
+    public static final String INCORRECT_USERNAME_OR_PASSWORD = "Nutzername oder Passwort sind falsch.";
     private final UserDao userDao;
     private final EmailChangeTokenDao emailChangeTokenDao;
     private final NewPasswordTokenDao newPasswordTokenDao;
@@ -124,7 +126,7 @@ public class UserServiceImpl implements UserService {
     public String
     login(String email, String password) throws UserLockedException {
         try {
-            Integer recentLoginAttempts = loginAttemptCache.get(email, () -> 0);
+            Integer recentLoginAttempts = loginAttemptCache.get(email, () -> 1);
             if (recentLoginAttempts > 5) {
                 ApplicationUserDto byEmail = userDao.findByEmail(email);
                 if (byEmail != null) {
@@ -133,14 +135,14 @@ public class UserServiceImpl implements UserService {
                     userUnlockSchedulingService.scheduleUnlockUser(byEmail.getEmail());
                 }
                 throw new UserLockedException(
-                    "Account is locked due to multiple failed login attempts. Please try again later.");
+                    ACCOUNT_LOCKED);
             }
             loginAttemptCache.put(email, recentLoginAttempts + 1);
         } catch (ExecutionException e) {
             throw new BadCredentialsException(
-                "Account is locked due to multiple failed login attempts. Please try again later.");
+                ACCOUNT_LOCKED);
         } catch (EntityNotFoundException | SchedulerException e) {
-            throw new BadCredentialsException("Username or password is incorrect or account is locked");
+            throw new BadCredentialsException(INCORRECT_USERNAME_OR_PASSWORD);
         }
         try {
             ApplicationUserDto applicationUserDto = findApplicationUserByEmail(email);
@@ -162,9 +164,9 @@ public class UserServiceImpl implements UserService {
                 return jwtTokenizer.getAuthToken(userDetails.getUsername(), roles);
             }
         } catch (DtoNotFoundException e) {
-            throw new BadCredentialsException("Username or password is incorrect or account is locked");
+            throw new BadCredentialsException(INCORRECT_USERNAME_OR_PASSWORD);
         }
-        throw new BadCredentialsException("Username or password is incorrect or account is locked");
+        throw new BadCredentialsException(INCORRECT_USERNAME_OR_PASSWORD);
     }
 
     public ApplicationUserDto createUser(ApplicationUserDto toCreate) throws ValidationException, ForbiddenException, MailNotSentException {
