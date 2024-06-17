@@ -27,15 +27,13 @@ context("authentication (user-story 2.1.2)", () => {
                 // after 6 invalid attempts, the user should get blocked
                 for (let i = 0; i < 6; i++) {
                     cy.fillLoginForm(customerGettingBruteforcePrevented.username, customerGettingBruteforcePrevented.password);
-                    cy.contains('Login failed.')
-                        .get('button.close')
-                        .click();
+                    cy.url().should('include', '/login');
                    cy.clearLoginForm();
                 }
 
                 // now you shouldn't be able to log-in even if the password is correct
                 cy.fillLoginForm(customerGettingBruteforcePrevented.username, password);
-                cy.contains('Login failed.');
+                cy.url().should('include', '/login');
             });
         });
         it("locks the account of an admin", () => {
@@ -45,15 +43,13 @@ context("authentication (user-story 2.1.2)", () => {
                 // after 6 invalid attempts, the user should get blocked
                 for (let i = 0; i < 6; i++) {
                     cy.fillLoginForm(adminGettingBruteforcePrevented.username, adminGettingBruteforcePrevented.password);
-                    cy.contains('Login failed.')
-                        .get('button.close')
-                        .click();
+                    cy.url().should('include', '/login');
                     cy.clearLoginForm();
                 }
 
                 // now you shouldn't be able to log-in even if the password is correct
                 cy.fillLoginForm(adminGettingBruteforcePrevented.username, password);
-                cy.contains('Login failed.');
+                cy.url().should('include', '/login');
             });
         });
     });

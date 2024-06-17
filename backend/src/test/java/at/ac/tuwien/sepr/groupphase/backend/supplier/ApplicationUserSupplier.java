@@ -18,6 +18,7 @@ public class ApplicationUserSupplier {
             .setAdmin(true)
             .setAccountLocked(false)
             .setLoginCount(0)
+            .setAccountActivated(true)
             .setAddress(AddressSupplier.anAddress());
         return applicationUserDto;
     }
@@ -30,6 +31,7 @@ public class ApplicationUserSupplier {
             .setPhoneNumber("+436642345678")
             .setPassword("password")
             .setAdmin(false)
+            .setAccountActivated(true)
             .setAccountLocked(false)
             .setLoginCount(0);
     }
@@ -43,6 +45,7 @@ public class ApplicationUserSupplier {
             .setPassword("password")
             .setType(UserType.ADMIN)
             .setAccountLocked(false)
+            .setAccountActivated(true)
             .setLoginCount(0);
     }
 
@@ -55,6 +58,7 @@ public class ApplicationUserSupplier {
             .setPassword("password")
             .setType(UserType.CUSTOMER)
             .setAccountLocked(false)
+            .setAccountActivated(true)
             .setLoginCount(0);
     }
 
@@ -69,6 +73,7 @@ public class ApplicationUserSupplier {
             .setPassword(passwordEncoder.encode("password" + "salt"))
             .setType(UserType.CUSTOMER)
             .setAccountLocked(false)
+            .setAccountActivated(true)
             .setLoginCount(0);
     }
 }

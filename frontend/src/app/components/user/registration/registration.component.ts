@@ -1,16 +1,19 @@
-import {AfterViewInit, Component, Input} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {UserCreateRequest, UserEndpointService} from '../../../services/openapi';
-import {AuthService} from '../../../services/auth.service';
-import {Router} from '@angular/router';
-import {matchPasswords} from '../../../../validators/passwordRepeatValidator';
-import {MessagingService} from '../../../services/messaging.service';
-import {EventService} from "../../../services/event.service";
+import { AfterViewInit, Component, Input } from "@angular/core";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import {
+  UserCreateRequest,
+  UserEndpointService,
+} from "../../../services/openapi";
+import { AuthService } from "../../../services/auth.service";
+import { Router } from "@angular/router";
+import { matchPasswords } from "../../../../validators/passwordRepeatValidator";
+import { MessagingService } from "../../../services/messaging.service";
+import { EventService } from "../../../services/event.service";
 
 @Component({
-  selector: 'app-registration',
-  templateUrl: './registration.component.html',
-  styleUrls: ['./registration.component.scss'],
+  selector: "app-registration",
+  templateUrl: "./registration.component.html",
+  styleUrls: ["./registration.component.scss"],
 })
 export class RegistrationComponent implements AfterViewInit {
   @Input() isAdminFlag: boolean = false;
@@ -26,25 +29,25 @@ export class RegistrationComponent implements AfterViewInit {
   ) {
     this.registrationForm = this.fb.group(
       {
-        email: ['', [Validators.required, Validators.email]],
-        password: ['', [Validators.required, Validators.minLength(8)]],
-        password_repeat: ['', [Validators.required, Validators.minLength(8)]],
-        firstName: ['', Validators.required],
-        familyName: ['', Validators.required],
-        phoneNumber: [''],
-        street: ['', Validators.required],
-        city: ['', Validators.required],
-        zip: ['', Validators.required],
-        country: ['Austria', Validators.required],
+        email: ["", [Validators.required, Validators.email]],
+        password: ["", [Validators.required, Validators.minLength(8)]],
+        password_repeat: ["", [Validators.required, Validators.minLength(8)]],
+        firstName: ["", Validators.required],
+        familyName: ["", Validators.required],
+        phoneNumber: [""],
+        street: ["", Validators.required],
+        city: ["", Validators.required],
+        zip: ["", Validators.required],
+        country: ["Austria", Validators.required],
         isAdmin: [false],
       },
-      {validators: matchPasswords}
+      { validators: matchPasswords }
     );
   }
 
   ngAfterViewInit(): void {
     if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/home']);
+      this.router.navigate(["/home"]);
     }
   }
 
@@ -66,19 +69,25 @@ export class RegistrationComponent implements AfterViewInit {
       };
       this.userEndpointService.register(newUser).subscribe({
         next: (response) => {
-          this.messagingService.setMessage('User registered successfully', 'success');
+          this.messagingService.setMessage(
+            "Registrierung erfolgt - bitte aktiviere dein Konto im E-Mail Postfach.",
+            "success"
+          );
           this.eventService.emitRegistrationSuccess(); // Emit event here
           if (!this.isAdminFlag) {
-            this.router.navigate(['/login'], {
-              queryParams: {username: newUser.email},
+            this.router.navigate(["/login"], {
+              queryParams: { username: newUser.email },
             });
           } else {
             this.registrationForm.reset();
           }
         },
         error: (error) => {
-          this.messagingService.setMessage('Error registering user: ' + error.error, 'danger');
-          console.error('Error registering user:', error);
+          this.messagingService.setMessage(
+            "Error registering user: " + error.error,
+            "danger"
+          );
+          console.error("Error registering user:", error);
         },
       });
     }

@@ -55,7 +55,7 @@ public class UserEndpoint {
     @PostMapping(path = "/registration", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> register(@RequestBody UserCreateRequest userCreateRequest)
-        throws ValidationException, ForbiddenException {
+        throws ValidationException, ForbiddenException, MailNotSentException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getAuthorities().stream()
             .anyMatch(r -> r.getAuthority().equals(Code.USER)) && !authentication.getAuthorities().stream()
@@ -165,6 +165,15 @@ public class UserEndpoint {
         Map<String, String> response = new HashMap<>();
         userService.updatePassword(token, currentPassword, newPassword);
         response.put(RESPONSE_KEY, "Dein Passwort wurde erfolgreich geändert.");
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PermitAll
+    @PostMapping("/user/activate/account")
+    public ResponseEntity<Map<String, String>> activateAccount(@RequestParam("token") String token) throws ValidationException {
+        Map<String, String> response = new HashMap<>();
+        userService.activateAccount(token);
+        response.put(RESPONSE_KEY, "Dein Konto wurde erfolgreich aktiviert. Du kannst dich nun anmelden.");
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

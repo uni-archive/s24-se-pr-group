@@ -24,6 +24,7 @@ export interface ApplicationUserDto {
     accountLocked?: boolean;
     admin?: boolean;
     superAdmin?: boolean;
+    accountActivated?: boolean;
     address?: AddressDto;
 }
 

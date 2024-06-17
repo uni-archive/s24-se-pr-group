@@ -3,12 +3,10 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
-import at.ac.tuwien.sepr.groupphase.backend.service.exception.UserLockedException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.MailNotSentException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.UserLockedException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -55,7 +53,8 @@ public interface UserService extends UserDetailsService {
      * @return the created user
      * @throws ValidationException if the user is invalid
      */
-    public ApplicationUserDto createUser(ApplicationUserDto toCreate) throws ValidationException, ForbiddenException;
+    public ApplicationUserDto createUser(ApplicationUserDto toCreate) throws ValidationException, ForbiddenException,
+        MailNotSentException;
 
     /**
      * Search for users in the persistent data store matching all provided fields.
@@ -127,4 +126,12 @@ public interface UserService extends UserDetailsService {
      */
     void updatePassword(String token, String currentPassword, String newPassword) throws ValidationException,
         DtoNotFoundException;
+
+    /**
+     * Activate the account of a user using a valid token.
+     *
+     * @param token the token
+     * @throws ValidationException if the token is invalid
+     */
+    void activateAccount(String token) throws ValidationException;
 }

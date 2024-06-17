@@ -80,7 +80,7 @@ public class PdfPrintOrderDataGenerator {
         // creating user for order
         Address address = new Address("Test street", "1234", "Test city", "Test country");
         addressRepository.save(address);
-        var customer = new ApplicationUser("pdf-user-51@email.com", "", "pdf", "pdf", "+431234567890", "zyxwvutsrqponmlkjihgfedcba", 0, false, UserType.CUSTOMER, false, address);
+        var customer = new ApplicationUser("pdf-user-51@email.com", "", "pdf", "pdf", "+431234567890", "zyxwvutsrqponmlkjihgfedcba", 0, false, UserType.CUSTOMER, false, true, address);
         customer.setPassword(passwordEncoder.encode("password" + customer.getSalt()));
 
         userRepository.save(customer);

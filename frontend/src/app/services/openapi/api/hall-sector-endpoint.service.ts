@@ -45,9 +45,8 @@ export class HallSectorEndpointService implements HallSectorEndpointServiceInter
             this.configuration = configuration;
         }
         if (typeof this.configuration.basePath !== 'string') {
-            const firstBasePath = Array.isArray(basePath) ? basePath[0] : undefined;
-            if (firstBasePath != undefined) {
-                basePath = firstBasePath;
+            if (Array.isArray(basePath) && basePath.length > 0) {
+                basePath = basePath[0];
             }
 
             if (typeof basePath !== 'string') {
