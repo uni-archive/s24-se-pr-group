@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
+import at.ac.tuwien.sepr.groupphase.backend.dto.AccountActivateTokenDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.AddressDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.EmailChangeTokenDto;
@@ -8,6 +9,7 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.NewPasswordTokenDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.AccountActivateTokenDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.EmailChangeTokenDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.NewPasswordTokenDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.UserDao;
@@ -54,6 +56,7 @@ public class UserServiceImpl implements UserService {
     private final UserDao userDao;
     private final EmailChangeTokenDao emailChangeTokenDao;
     private final NewPasswordTokenDao newPasswordTokenDao;
+    private final AccountActivateTokenDao accountActivateTokenDao;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenizer jwtTokenizer;
     private final UserValidator userValidator;
@@ -64,9 +67,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     public UserServiceImpl(UserDao userDao, EmailChangeTokenDao emailChangeTokenDao, PasswordEncoder passwordEncoder,
-                           JwtTokenizer jwtTokenizer, UserValidator userValidator,
-                           EmailSenderService emailSenderService, AddressService addressService, Cache<String,
-        Integer> loginAttemptCache, NewPasswordTokenDao newPasswordTokenDao, UserUnlockSchedulingService userUnlockSchedulingService) {
+                           JwtTokenizer jwtTokenizer, UserValidator userValidator, AccountActivateTokenDao accountActivateTokenDao,
+                           EmailSenderService emailSenderService, AddressService addressService, Cache<String, Integer> loginAttemptCache,
+                           NewPasswordTokenDao newPasswordTokenDao, UserUnlockSchedulingService userUnlockSchedulingService) {
         this.userDao = userDao;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
@@ -77,6 +80,7 @@ public class UserServiceImpl implements UserService {
         this.loginAttemptCache = loginAttemptCache;
         this.newPasswordTokenDao = newPasswordTokenDao;
         this.userUnlockSchedulingService = userUnlockSchedulingService;
+        this.accountActivateTokenDao = accountActivateTokenDao;
     }
 
     @Override
@@ -117,7 +121,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String login(String email, String password) throws UserLockedException {
+    public String
+    login(String email, String password) throws UserLockedException {
         try {
             Integer recentLoginAttempts = loginAttemptCache.get(email, () -> 0);
             if (recentLoginAttempts > 5) {
@@ -139,6 +144,9 @@ public class UserServiceImpl implements UserService {
         }
         try {
             ApplicationUserDto applicationUserDto = findApplicationUserByEmail(email);
+            if (!applicationUserDto.getAccountActivated()) {
+                throw new BadCredentialsException("Bitte aktiviere dein Konto zuvor.");
+            }
             UserDetails userDetails = getUserDetailsForUser(applicationUserDto);
             if (userDetails != null
                 && userDetails.isAccountNonExpired()
@@ -159,14 +167,26 @@ public class UserServiceImpl implements UserService {
         throw new BadCredentialsException("Username or password is incorrect or account is locked");
     }
 
-    public ApplicationUserDto createUser(ApplicationUserDto toCreate) throws ValidationException, ForbiddenException {
+    public ApplicationUserDto createUser(ApplicationUserDto toCreate) throws ValidationException, ForbiddenException, MailNotSentException {
         LOGGER.debug("Create user");
         userValidator.validateForCreate(toCreate);
+        // Create a token for email confirmation, throws ValidationException if a token already exists
+        AccountActivateTokenDto emailConfirmToken = createAndSaveEmailConfirmToken(toCreate.getEmail());
+
         AddressDto addressDto = addressService.create(toCreate.getAddress());
         toCreate.setAddress(addressDto);
         toCreate.setSalt(SecurityUtil.generateSalt(32));
         toCreate.setPassword(passwordEncoder.encode(toCreate.getPassword() + toCreate.getSalt()));
-        return userDao.create(toCreate);
+        ApplicationUserDto user = userDao.create(toCreate);
+
+        // Send email to the user to confirm the email address
+        MailBody mailBody = generateMailBodyConfirmEmail(toCreate, emailConfirmToken.getToken());
+        try {
+            emailSenderService.sendHtmlMail(mailBody);
+        } catch (MessagingException e) {
+            throw new MailNotSentException("Error sending mail.");
+        }
+        return user;
     }
 
     @Override
@@ -351,6 +371,28 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public void activateAccount(String token) throws ValidationException {
+        AccountActivateTokenDto emailConfirmToken = accountActivateTokenDao.findByToken(token);
+        if (emailConfirmToken == null) {
+            throw new ValidationException("Der Link ist ungültig.");
+        }
+
+        if (emailConfirmToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new ValidationException("Dieser Link ist abgelaufen.");
+        }
+
+        try {
+            ApplicationUserDto user = userDao.findByEmail(emailConfirmToken.getEmail());
+            user.setAccountActivated(true);
+            userDao.update(user);
+            accountActivateTokenDao.deleteById(emailConfirmToken.getId());
+        } catch (EntityNotFoundException e) {
+            LOGGER.error("Could not confirm the email because the user does not exist.", e);
+        }
+
+    }
+
     private EmailChangeTokenDto createAndSaveEmailChangeToken(String newEmail, String currentEmail) {
         String token = UUID.randomUUID().toString();
         LocalDateTime expiryDate = LocalDateTime.now().plusMinutes(10);
@@ -380,6 +422,22 @@ public class UserServiceImpl implements UserService {
         invalidateNewPasswordTokens(email);
 
         return newPasswordTokenDao.create(newPasswordToken);
+    }
+
+    private AccountActivateTokenDto createAndSaveEmailConfirmToken(String email) throws ValidationException {
+        String token = UUID.randomUUID().toString();
+        LocalDateTime expiryDate = LocalDateTime.now().plusMinutes(MAX_EXPIRATION_TIME);
+
+        AccountActivateTokenDto emailConfirmToken = new AccountActivateTokenDto();
+        emailConfirmToken.setToken(token);
+        emailConfirmToken.setEmail(email);
+        emailConfirmToken.setExpiryDate(expiryDate);
+
+        if (!accountActivateTokenDao.findByEmail(email).isEmpty()) {
+            throw new ValidationException("Es wurde bereits eine Bestätigungsmail an diese E-Mail-Adresse gesendet.");
+        }
+
+        return accountActivateTokenDao.create(emailConfirmToken);
     }
 
     private void invalidateNewPasswordTokens(String email) {
@@ -553,6 +611,57 @@ public class UserServiceImpl implements UserService {
                 <p class="text-gray-700">Dieser Link ist für die nächsten""" + " " + MAX_EXPIRATION_TIME +
             """
                             Minuten gültig.</p>
+                            <p class="text-gray-700">Dies ist eine automatisch generierte E-Mail – bitte antworte nicht auf diese E-Mail.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </body>
+                </html>
+                """;
+        return new MailBody(email, subject, emailTemplate);
+    }
+
+    private MailBody generateMailBodyConfirmEmail(ApplicationUserDto user, String token) {
+        String email = user.getEmail();
+        String subject = "Konto Aktivierung";
+        String url = "http://localhost:4200/#/user/activate/account?token=" + token;
+
+        String emailTemplate = """
+            <!DOCTYPE html>
+            <html lang="de">
+            <head>
+               <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+               <style>
+                  body { background-color: #f8f9fa; font-family: Arial, sans-serif; }
+                  .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; }
+                  .card { background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 0.25rem; padding: 20px; }
+                  .card-body { padding: 20px; }
+                  .h3 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+                  .h5 { font-size: 1.25rem; }
+                  .text-gray-700 { color: #6c757d; }
+                  .btn-primary { display: inline-block; font-weight: 400; color: #fff !important; text-align: center; vertical-align: middle; cursor: pointer; background-color: #007bff; border: 1px solid #007bff; padding: 0.375rem 0.75rem; font-size: 1rem; border-radius: 0.25rem; text-decoration: none; }
+               </style>
+            </head>
+            <body>
+                <div class="container">
+                  <div class="card my-10">
+                    <div class="card-body">
+                      <h1 class="h3">Konto Aktivierung</h1>
+                      <h5 class="h5">Hallo""" + " " + user.getFirstName() + "!</h5>" +
+            """
+                      <hr>
+                      <div>
+                      <p class="text-gray-700">Herzlich Willkommen bei TicketLine!
+                      Du bist nur noch einen Schritt davon entfernt, dein Konto zu aktivieren.</p>
+                      Bitte klicke auf den Link um dein TicketLine Konto zu aktivieren.</p>
+                <hr>
+                <a class="btn btn-primary" href=\"""" + url + "\"" +
+            """
+                target="_blank" style="color: #fff !important;">Konto aktivieren</a>
+                <p class="text-gray-700">Dieser Link ist für die nächsten""" + " " + MAX_EXPIRATION_TIME + " " +
+            """
+                Minuten gültig.</p>
                             <p class="text-gray-700">Dies ist eine automatisch generierte E-Mail – bitte antworte nicht auf diese E-Mail.</p>
                           </div>
                         </div>
