@@ -18,6 +18,9 @@ public class HallSector extends AbstractEntity {
     @Column(name = "NAME")
     private String name;
 
+    @Column(name = "COLOR")
+    private String color;
+
     @Column(name = "FRONTEND_COORDINATES")
     private String frontendCoordinates;
 
@@ -44,6 +47,14 @@ public class HallSector extends AbstractEntity {
     @Override
     public int hashCode() {
         return Objects.hash(getId(), hallPlan, name, frontendCoordinates);
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 
     public HallPlan getHallPlan() {
@@ -86,5 +97,6 @@ public class HallSector extends AbstractEntity {
         this.name = name;
         this.frontendCoordinates = frontendCoordinates;
         this.seats = seats;
+        this.color = "#ff0000";
     }
 }

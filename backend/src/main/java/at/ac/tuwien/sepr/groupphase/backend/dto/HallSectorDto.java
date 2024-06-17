@@ -16,7 +16,17 @@ public class HallSectorDto implements AbstractDto {
     private String frontendCoordinates;
     private List<HallSpotDto> seats;
 
+    private String color;
+
     private HallSectorShowDto hallSectorShow;
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
 
     @Override
     public Long getId() {

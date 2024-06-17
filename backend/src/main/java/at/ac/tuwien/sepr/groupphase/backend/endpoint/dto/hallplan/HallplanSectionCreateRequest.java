@@ -14,13 +14,10 @@ public class HallplanSectionCreateRequest {
     @NotNull(message = "Color must not be null")
     @Size(max = 10)
     private String color;
-
+    @NotNull(message = "spotCount must not be null")
+    private int spotCount;
     @NotNull(message = "standingOnly must not be null")
     private boolean standingOnly;
-
-    @NotNull(message = "Price must not be null")
-    private int price;
-
     @NotNull(message = "frontendCoordinates must not be null")
     private String frontendCoordinates;
 
@@ -43,7 +40,7 @@ public class HallplanSectionCreateRequest {
         this.color = color;
     }
 
-    public boolean isStandingOnly() {
+    public boolean getStandingOnly() {
         return standingOnly;
     }
 
@@ -51,13 +48,6 @@ public class HallplanSectionCreateRequest {
         this.standingOnly = standingOnly;
     }
 
-    public int getPrice() {
-        return price;
-    }
-
-    public void setPrice(int price) {
-        this.price = price;
-    }
 
     public String getFrontendCoordinates() {
         return frontendCoordinates;
@@ -73,5 +63,13 @@ public class HallplanSectionCreateRequest {
 
     public void setSpots(List<HallplanSeatCreateRequest> spots) {
         this.spots = spots;
+    }
+
+    public int getSpotCount() {
+        return spotCount;
+    }
+
+    public void setSpotCount(int spotCount) {
+        this.spotCount = spotCount;
     }
 }

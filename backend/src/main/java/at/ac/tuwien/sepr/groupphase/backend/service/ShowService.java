@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
+import at.ac.tuwien.sepr.groupphase.backend.dto.HallPlanDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.HallSectorShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowListDto;
@@ -38,6 +39,8 @@ public interface ShowService {
      */
     List<ShowListDto> getShowsByEventId(long eventid) throws EntityNotFoundException;
 
+    HallPlanDto getHallPlanByShowId(Long showId);
+
     /**
      * Get a list of ShowDtos matching the search criteria.
      *
@@ -53,6 +56,8 @@ public interface ShowService {
      * @return all shows that are at the
      */
     Page<ShowDto> findByLocation(Long locationId, boolean onlyFutureShows, Pageable pageable);
+
+    ShowDto getById(Long id) throws EntityNotFoundException;
 
     /**
      * Get a show by its id.

@@ -30,6 +30,17 @@ Cypress.Commands.add('clearLoginForm', () => {
     cy.get('input[id="password"]').clear();
 })
 
+Cypress.Commands.add('loginUser', (username, password) => {
+    cy.fixture('settings').then(settings => {
+        cy.visit(settings.baseUrl);
+        cy.contains('a', 'Login').click();
+        cy.get('input[id="inputUsername"]').type(username);
+        cy.get('input[id="password"]').type(password);
+        cy.contains('button', 'Login').click();
+        cy.contains('Logout');
+    })
+})
+
 Cypress.Commands.add('createMessage', (msg) => {
     cy.fixture('settings').then(settings => {
         cy.contains('a', 'Message');

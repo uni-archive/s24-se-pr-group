@@ -11,9 +11,9 @@ public class ShowDto implements AbstractDto {
     private LocalDateTime dateTime;
     private List<ArtistDto> artistList;
 
-    private EventDto event;
-
     private LocationDto location;
+
+    private EventDto event;
 
 
 
@@ -30,16 +30,15 @@ public class ShowDto implements AbstractDto {
         this.location = location;
     }
 
-    public ShowDto setLocation(LocationDto location) {
-        this.location = location;
-        return this;
+    public ShowDto() {
     }
 
     public LocationDto getLocation() {
         return location;
     }
 
-    public ShowDto() {
+    public void setLocation(LocationDto location) {
+        this.location = location;
     }
 
     public LocalDateTime getDateTime() {

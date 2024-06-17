@@ -1,0 +1,39 @@
+.w-60 {
+  width: 60%
+}
+
+.card-body {
+  padding: 0;
+}
+
+.section-group {
+  padding: var(--bs-card-spacer-y) var(--bs-card-spacer-x);
+  margin-bottom: 1rem;
+}
+
+.section-group:not(:last-child) {
+  border-bottom: 1px solid #e9ecef;
+}
+
+.sector-list {
+}
+
+.sector-list li {
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.sector-list .color-box {
+  display: inline-block;
+  height: 2.5rem;
+  background-color: var(--sector-color);
+  width: 2rem;
+}
+
+.sector-list .text {
+  flex-grow: 1;
+  margin: var(--bs-list-group-item-padding-y) var(--bs-list-group-item-padding-x);
+}

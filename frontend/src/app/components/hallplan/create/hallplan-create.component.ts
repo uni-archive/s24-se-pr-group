@@ -35,9 +35,9 @@ export class HallplanCreateComponent {
               private hallplanService: HallplanService) {
     this.sectionForm = this.fb.group({
       name: ['', Validators.required],
-      price: ['', Validators.required],
       color: ['', Validators.required],
-      standingOnly: [false]
+      standingOnly: [false],
+      spotCount: ['', Validators.required]
     });
     this.mainForm = this.fb.group({
       hallname: ['', Validators.required],
@@ -52,13 +52,23 @@ export class HallplanCreateComponent {
   onSelectedEntitiesChange(selectedEntities: InteractableEntity[]) {
     const selectedSections = this.hallplan.sections.filter(section => selectedEntities.map((entity: InteractableEntity & DrawableEntity) => entity.data).includes(section));
     this.selectedSection = selectedSections.length ? selectedSections[0] : null;
+    this.updateSectionForm();
+  }
+
+  updateSectionForm() {
     if (this.selectedSection) {
       this.sectionForm.patchValue({
         name: this.selectedSection.name,
-        price: this.selectedSection.price.toString(),
         color: this.selectedSection.color,
-        standingOnly: this.selectedSection.isStandingOnly
+        standingOnly: this.selectedSection.isStandingOnly,
+        spotCount: this.selectedSection.spotCount,
       });
+
+      if (this.selectedSection.isStandingOnly) {
+        this.sectionForm.get('spotCount').enable();
+      } else {
+        this.sectionForm.get('spotCount').disable();
+      }
     }
   }
 
@@ -86,11 +96,12 @@ export class HallplanCreateComponent {
       sectors: this.hallplan.sections.map(section => ({
         name: section.name,
         color: section.color,
-        frontendCoordinates: JSON.stringify(section.points),
+        frontendCoordinates: JSON.stringify(section.points.map(point => ({x: Math.floor(point.x * 100) / 100, y: Math.floor(point.y * 100) / 100}))),
         spots: section.seats.map(seat => ({
           frontendCoordinates: JSON.stringify(seat.pos),
         })),
-        isStandingOnly: section.isStandingOnly
+        spotCount: section.spotCount,
+        standingOnly: section.isStandingOnly
       }))
     };
   }
@@ -109,6 +120,7 @@ export class HallplanCreateComponent {
   regenerateSeats() {
     this.hallplan.sections.filter(section => !section.isStandingOnly).forEach(section => {
       section.seats = CreateHelper.generateSeats(section.points, this.hallplan.ctx).map(pos => ({pos}));
+      section.spotCount = section.seats.length;
     });
     this.hallplan.generateEntities();
     this.hallplan.refreshCanvas(true);
@@ -121,13 +133,18 @@ export class HallplanCreateComponent {
     const price = this.sectionForm.value.price;
     const color = this.sectionForm.value.color;
     const standingOnly = this.sectionForm.value.standingOnly;
+    const spotCount = this.sectionForm.value.spotCount;
     this.selectedSection.name = name;
     this.selectedSection.price = Number(price);
     this.selectedSection.color = color;
     this.selectedSection.isStandingOnly = standingOnly;
     if (standingOnly) {
       this.selectedSection.seats.splice(0, this.selectedSection.seats.length);
+      this.selectedSection.spotCount = Number(spotCount);
+    } else {
+      this.selectedSection.spotCount = this.selectedSection.seats.length;
     }
+    this.updateSectionForm();
     this.hallplan.generateEntities();
     this.hallplan.refreshCanvas(true);
   }

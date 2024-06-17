@@ -10,11 +10,13 @@
  * Do not edit the class manually.
  */
 import { EventResponse } from './event-response';
+import { LocationResponse } from './location-response';
 
 
 export interface ShowResponse { 
     id?: number;
     dateTime?: string;
     event?: EventResponse;
+    location?: LocationResponse;
 }
 

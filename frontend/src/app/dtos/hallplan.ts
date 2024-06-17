@@ -8,7 +8,7 @@ export class HallplanSectionCreateDto {
   name: string;
   color: string;
   spots: HallplanSpotCreateDto[];
-  isStandingOnly: boolean;
+  standingOnly: boolean;
   frontendCoordinates: string;
 }
 

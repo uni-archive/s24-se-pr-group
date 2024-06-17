@@ -6,14 +6,16 @@ export class SectionEntity extends DrawableEntity implements InteractableEntity 
   isHighlighted = false;
   isSelected = false;
   data: HallSection;
+  canEdit = true;
 
-  constructor(section: HallSection) {
+  constructor(section: HallSection, canEdit: boolean) {
     super();
     this.points = section.points;
+    this.canEdit = canEdit;
   }
 
   draw(ctx: CanvasRenderingContext2D, calculateScaledPoint: CalculateScaledPoint) {
-    ctx.fillStyle = this.data.color;
+    ctx.fillStyle = this.data.color + "66";
     ctx.beginPath();
     this.points.forEach((point, index) => {
       // move to points with respect to scale and pos
@@ -42,6 +44,9 @@ export class SectionEntity extends DrawableEntity implements InteractableEntity 
   }
 
   isInside(point: Point2D, ctx: CanvasRenderingContext2D): boolean {
+    if (! this.canEdit) {
+      return false;
+    }
     let isInside = false;
     const x = point.x;
     const y = point.y;
@@ -77,13 +82,20 @@ export class SeatEntity extends DrawableEntity implements InteractableEntity {
   isHighlighted = false;
   isSelected = false;
   data: HallSeat;
+  colorAvailable = 'blue';
+  colorNotAvailable = 'rgba(120, 120, 120, .8)';
+  fillColor: string;
 
   constructor(seat: HallSeat) {
     super();
     this.pos = seat.pos;
+    this.fillColor = seat.isAvailable !== false ? this.colorAvailable : this.colorNotAvailable;
   }
 
   isInside(point: Point2D, ctx: CanvasRenderingContext2D): boolean {
+    if (this.data.isAvailable === false) {
+      return false;
+    }
     const {x, y} = this.pos;
     const {x: pointX, y: pointY} = point;
     const distance = Math.sqrt(Math.pow(x - pointX, 2) + Math.pow(y - pointY, 2));
@@ -106,7 +118,7 @@ export class SeatEntity extends DrawableEntity implements InteractableEntity {
 
   draw(ctx: CanvasRenderingContext2D, calculateScaledPoint: CalculateScaledPoint, scale: number) {
     const {x, y} = calculateScaledPoint(this.pos);
-    ctx.fillStyle = 'blue';
+    ctx.fillStyle = this.fillColor;
     ctx.beginPath();
     ctx.arc(x, y, 5 * scale, 0, 2 * Math.PI);
     ctx.fill();

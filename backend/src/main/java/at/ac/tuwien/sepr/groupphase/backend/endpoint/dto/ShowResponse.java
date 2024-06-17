@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 public record ShowResponse(
     Long id,
     LocalDateTime dateTime,
-    EventResponse event
+    EventResponse event,
+    LocationResponse location
 ) {
 }

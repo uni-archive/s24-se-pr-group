@@ -1,6 +1,5 @@
 package at.ac.tuwien.sepr.groupphase.backend.persistence.repository;
 
-
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Ticket;
 import org.springframework.data.domain.Page;
 import java.util.List;
@@ -41,6 +40,9 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     @Modifying
     @Query("UPDATE Ticket t SET t.reserved = :setReserved WHERE t.id = :ticketId")
     void changeTicketReserved(@Param("ticketId") long ticketId, @Param("setReserved") boolean setReserved);
+
+    @Query("SELECT t FROM Ticket t INNER JOIN t.show s WHERE s.id = :showId")
+    List<Ticket> findTicketsByShowId(@Param("showId") long showId);
 
     @EntityGraph(attributePaths = {"order.customer"})
     Page<Ticket> findAll(Specification<Ticket> specification, Pageable pageable);

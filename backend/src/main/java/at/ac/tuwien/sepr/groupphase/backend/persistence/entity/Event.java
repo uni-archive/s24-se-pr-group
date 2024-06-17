@@ -83,5 +83,17 @@ public class Event extends AbstractEntity {
         return this;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Event event = (Event) o;
+        return title.equals(event.title) && description.equals(event.description) && eventType == event.eventType && duration.equals(event.duration);
+    }
+
 
 }

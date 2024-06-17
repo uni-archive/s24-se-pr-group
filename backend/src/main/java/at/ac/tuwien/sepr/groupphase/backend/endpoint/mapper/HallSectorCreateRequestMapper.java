@@ -20,10 +20,10 @@ public interface HallSectorCreateRequestMapper {
     HallSectorDto toDto(HallplanSectionCreateRequest hallplanCreateDto);
 
     default List<HallSpotDto> mapSpots(HallplanSectionCreateRequest hallSectorCreateRequest) {
-        if (hallSectorCreateRequest.isStandingOnly()) {
+        if (hallSectorCreateRequest.getStandingOnly()) {
             // map spots for standingOnly case
             return Stream.generate(HallSpotDto::new)
-                    .limit(hallSectorCreateRequest.getSpots().size())
+                    .limit(hallSectorCreateRequest.getSpotCount())
                     .toList();
         } else {
             // map spots for non-standingOnly case

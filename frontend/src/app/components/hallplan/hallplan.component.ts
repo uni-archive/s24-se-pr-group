@@ -1,4 +1,4 @@
-import {Component, ElementRef, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, ViewChild} from '@angular/core';
 import {
   CreateHelper,
   DrawableEntity,
@@ -21,6 +21,7 @@ import {BackgroundEntity, SeatEntity, SectionEntity} from "./entities";
   styleUrl: './hallplan.component.scss'
 })
 export class HallplanComponent {
+  @Input() editMode: boolean = false;
   @ViewChild('hallplanCanvas') myCanvas: ElementRef<HTMLCanvasElement>;
   ctx: CanvasRenderingContext2D;
   width = 1000;
@@ -65,6 +66,12 @@ export class HallplanComponent {
     });
   }
 
+  deselectSeat(seatId: number) {
+    this.interactionHelper.deselectEntity(
+      this.entities.find(entity => entity instanceof SeatEntity && entity.data.id === seatId) as
+        unknown as InteractableEntity);
+  }
+
   async ngAfterViewInit() {
     // After the view has been initialized, you can access the canvas element here
     this.backgroundImage = await this.loadImage(this.backgroundImageUrl);
@@ -79,7 +86,7 @@ export class HallplanComponent {
     this.additionalHelpers.push(this.moveHelper = new MoveHelper(this.drawHelper, canvas, this.width, this.height));
     this.additionalHelpers.push(this.createHelper = new CreateHelper(this.drawHelper, canvas, this.sections, this.seats, this.ctx));
     const interactableEntities = this.entities.filter(entity => 'getActions' in entity).map(entity => entity as unknown as InteractableEntity);
-    this.additionalHelpers.push(this.interactionHelper = new InteractionHelper(this.drawHelper, canvas, interactableEntities));
+    this.additionalHelpers.push(this.interactionHelper = new InteractionHelper(this.drawHelper, canvas, interactableEntities, this.editMode));
     this.interactionHelper.onSelectionChange = (selectedEntities) => {
       this.onSelectedEntitiesChange?.(selectedEntities);
       this.entitiesSelected = selectedEntities.length > 0;
@@ -105,7 +112,7 @@ export class HallplanComponent {
   generateEntities() {
     this.entities.splice(0, this.entities.length);
     this.entities.push(new BackgroundEntity(this.backgroundImage, this.width, this.height));
-    this.entities.push(...this.sections.map(section => new SectionEntity(section).setData(section)));
+    this.entities.push(...this.sections.map(section => new SectionEntity(section, this.editMode || section.isStandingOnly).setData(section)));
     this.entities.push(...this.sections.map(section => section.seats.map(seat => new SeatEntity(seat).setData(seat))).reduce((acc, val) => acc.concat(val), []));
     const interactableEntities = this.entities.filter(entity => 'getActions' in entity).map(entity => entity as unknown as InteractableEntity);
     this.interactionHelper?.setEntities(interactableEntities);
@@ -130,14 +137,16 @@ export class HallplanComponent {
   finishSection() {
     const sectionPolygon = this.createHelper.getSectionPolygon();
     if (sectionPolygon.length > 2) {
+      const seats = CreateHelper.generateSeats(this.createHelper.getSectionPolygon(), this.ctx).map(pos => ({ pos }));
       this.sections.push({
         points: sectionPolygon,
         name: 'Section ' + (this.sections.length + 1),
         color: '#ff0000',
         price: 100,
 
-        seats: CreateHelper.generateSeats(this.createHelper.getSectionPolygon(), this.ctx).map(pos => ({ pos })),
-        isStandingOnly: false
+        seats: seats,
+        isStandingOnly: false,
+        spotCount: seats.length,
       });
       this.createHelper.disable();
       this.generateEntities();
@@ -189,17 +198,23 @@ export class HallplanComponent {
 
 
 export type HallSection = {
+  id?: number;
   points: Point2D[];
   name: string;
   color: string;
   price: number;
+  spotCount?: number,
+  availableSpotCount?: number,
 
   seats: HallSeat[];
   isStandingOnly: boolean;
 }
 
 export type HallSeat = {
+  id?: number;
+  sectorId?: number;
   pos: Point2D;
+  isAvailable?: boolean;
 }
 
 export type Point2D = {

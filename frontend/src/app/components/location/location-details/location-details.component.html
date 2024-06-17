@@ -21,7 +21,7 @@
         <div class="card-right">
           <div>{{ show.event?.description }}</div>
           <div>
-            <button class="btn btn-secondary">
+            <button class="btn btn-secondary" (click)="router.navigate(['show', show.id, 'ticket-select'])">
               Buy Tickets
             </button>
           </div>

@@ -1,13 +1,19 @@
 package at.ac.tuwien.sepr.groupphase.backend.persistence.dao;
 
+import at.ac.tuwien.sepr.groupphase.backend.dto.HallPlanDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowListDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.ArtistMapper;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.EventMapper;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.HallPlanMapper;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.ShowMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Show;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.ArtistMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.ShowMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.ArtistRepository;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallPlanRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.ShowRepository;
 import jakarta.transaction.Transactional;
 import java.lang.invoke.MethodHandles;
@@ -26,13 +32,20 @@ public class ShowDao extends AbstractDao<Show, ShowDto> {
     private final ArtistRepository artrepo;
     private final EventDao eventDao;
     private final ArtistMapper artistMapper;
+    private final HallPlanMapper hallPlanMapper;
+
+    private final HallPlanRepository hallPlanRepository;
 
     protected ShowDao(ShowRepository repository, EventDao dao, ArtistRepository artrepo,
+        HallPlanMapper hallPlanMapper,
+        HallPlanRepository hallPlanRepository,
         ArtistMapper artmapper, ShowMapper mapper) {
         super(repository, mapper);
         this.artrepo = artrepo;
         this.artistMapper = artmapper;
         this.eventDao = dao;
+        this.hallPlanMapper = hallPlanMapper;
+        this.hallPlanRepository = hallPlanRepository;
     }
 
     @Transactional
@@ -84,5 +97,10 @@ public class ShowDao extends AbstractDao<Show, ShowDto> {
     public ShowDto findById(Long id) throws EntityNotFoundException {
         return mapper.toDto(((ShowRepository) repository).findById(id)
             .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException(id.toString())));
+    }
+
+    @Transactional
+    public HallPlanDto getHallPlanByShowId(long showId) {
+        return hallPlanMapper.toDto(((HallPlanRepository) hallPlanRepository).getHallPlanByShowId(showId));
     }
 }

@@ -50,8 +50,7 @@ public class TicketServiceImpl implements TicketService {
     private final HallSectorDao hallSectorDao;
 
     public TicketServiceImpl(TicketDao ticketDao, HallSpotDao hallSpotDao, ShowDao showDao,
-                             TicketValidator ticketValidator,
-        HallSectorShowService hallSectorShowService, OrderDao orderDao,
+                             TicketValidator ticketValidator, HallSectorShowService hallSectorShowService, OrderDao orderDao,
                              TicketInvalidationSchedulingService ticketInvalidationSchedulingService, HallSectorDao hallSectorDao) {
         this.ticketDao = ticketDao;
         this.hallSpotDao = hallSpotDao;
@@ -231,6 +230,13 @@ public class TicketServiceImpl implements TicketService {
         } catch (EntityNotFoundException ignored) {
             // ignored
         }
+    }
+
+    @Override
+    public List<TicketDetailsDto> findForShowById(long showId) {
+        var tickets = ticketDao.findForShowById(showId);
+        tickets.forEach(this::loadSectorShowForTicket);
+        return tickets;
     }
 
     @Override

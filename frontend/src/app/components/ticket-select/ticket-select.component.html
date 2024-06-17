@@ -1,0 +1,55 @@
+<div class="title d-flex align-items-baseline">
+  <h1>{{showResponse?.event.title}}</h1>
+  <p class="ms-3">am {{date}} um {{time}}</p>
+</div>
+<div class="subtitle d-flex flex-column">
+  <p class="my-2">in {{showResponse?.location.name}}, {{showResponse?.location.address.zip}} {{showResponse?.location.address.city}}</p>
+  <p>{{showResponse?.location.address.street}}</p>
+</div>
+
+<div class="side-by-side d-flex gap-3">
+  <div class="left w-60 d-flex align-items-center flex-column">
+    <app-hallplan #hallplan/>
+
+    <ul class="list-group sector-list w-25 mt-2 mb-4">
+      <li class="list-group-item" *ngFor="let sector of showHallplan?.sectors">
+        <span class="color-box" [style]="'--sector-color: ' + sector.color"></span>
+        <span class="text">{{sector.name}}</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="right">
+    <p>Folgende Plätze wurden ausgewählt:</p>
+
+    <div class="card">
+      <div class="card-body">
+        <div class="section-group" *ngFor="let sector of visibleSectors">
+          <h5 class="card-title">{{sector.name}}</h5>
+          <p class="card-text">{{sector.price}}€ pro Platz</p>
+          <div *ngIf="! sector.isStandingOnly">
+            <div class="w-100 input-group mt-1" *ngFor="let seat of sectorSeatMap[sector.id]">
+              <input class="form-control" readonly [value]="'Platz-Nr. ' + seat.id">
+              <button type="button" class="btn btn-danger" (click)="deselectSeat(seat)"><i class="bi bi-trash bg-danger" style="font-size: 20px;"></i></button>
+            </div>
+          </div>
+          <div class="form-group col-12" *ngIf="sector.isStandingOnly">
+            <label for="title">Anzahl gewählte Plätze:</label>
+            <input type="number" min="0" [max]="sector.availableSpotCount" id="title" value="1" class="form-control" placeholder="0" (change)="updateSectorSpotCount($event, sector.id)">
+          </div>
+        </div>
+        <div *ngIf="visibleSectors.length === 0">
+          <p class="text-muted m-2">Keine Plätze ausgewählt</p>
+        </div>
+      </div>
+      <div class="card-footer text-muted d-flex justify-content-between">
+        <span>Gesamtpreis:</span>
+        <span>{{calcPrice}}€</span>
+      </div>
+    </div>
+    <div class="buttons mt-4 d-flex justify-content-end">
+      <button type="button" class="btn btn-outline-primary mx-2" (click)="addToCart(true)">Reservieren</button>
+      <button type="button" class="btn btn-primary" (click)="addToCart(false)">Kaufen</button>
+    </div>
+  </div>
+</div>
