@@ -15,8 +15,8 @@ import { LocationDto } from './location-dto';
 
 
 export interface PageLocationDto { 
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
     size?: number;
     content?: Array<LocationDto>;
     number?: number;
