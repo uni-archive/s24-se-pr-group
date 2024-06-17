@@ -31,6 +31,13 @@ export interface UserEndpointServiceInterface {
     /**
      * 
      * 
+     * @param token 
+     */
+    activateAccount(token: string, extraHttpRequestParams?: any): Observable<{ [key: string]: string; }>;
+
+    /**
+     * 
+     * 
      */
     getUser(extraHttpRequestParams?: any): Observable<ApplicationUserResponse>;
 
