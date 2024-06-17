@@ -1,9 +1,12 @@
 package at.ac.tuwien.sepr.groupphase.backend.persistence.repository;
 
-import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Event;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Show;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Ticket;
+import org.springframework.data.domain.Page;
 import java.util.List;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -40,4 +43,11 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     @Query("SELECT t FROM Ticket t INNER JOIN t.show s WHERE s.id = :showId")
     List<Ticket> findTicketsByShowId(@Param("showId") long showId);
+
+    @EntityGraph(attributePaths = {"order.customer"})
+    Page<Ticket> findAll(Specification<Ticket> specification, Pageable pageable);
+
+    @Modifying
+    @Query("UPDATE Ticket t SET t.valid = true, t.reserved = false WHERE t.id = :id")
+    void validateTicketById(@Param("id") long id);
 }

@@ -17,6 +17,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.HallSectorShowService;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.HallSectorShowMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallSectorShowRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.ShowService;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import jakarta.transaction.Transactional;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
@@ -102,5 +103,15 @@ public class ShowServiceImpl implements ShowService {
     @Transactional
     public ShowDto getById(Long id) throws EntityNotFoundException {
         return dao.findById(id);
+    }
+
+    @Transactional
+    @Override
+    public ShowDto findById(Long showId) throws DtoNotFoundException {
+        try {
+            return dao.findById(showId);
+        } catch (EntityNotFoundException e) {
+            throw new DtoNotFoundException(e);
+        }
     }
 }

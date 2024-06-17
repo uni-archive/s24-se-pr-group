@@ -34,7 +34,9 @@ export class ManageUserComponent {
       size
     );
   };
+
   shouldRefresh: boolean;
+
   triggerRefresh(): void {
     this.shouldRefresh = !this.shouldRefresh;
   }

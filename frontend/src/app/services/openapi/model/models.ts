@@ -31,6 +31,7 @@ export * from './order-summary-response';
 export * from './page-application-user-response';
 export * from './page-location-dto';
 export * from './page-show-response';
+export * from './page-ticket-details-response';
 export * from './pageable-object';
 export * from './show-creation-dto';
 export * from './show-dto';

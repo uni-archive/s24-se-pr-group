@@ -5,6 +5,7 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderSummaryDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketAddToOrderDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.TicketSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.HallSectorDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.HallSpotDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.OrderDao;
@@ -19,8 +20,11 @@ import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.TicketValidator;
 import org.quartz.SchedulerException;
+import java.lang.invoke.MethodHandles;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -95,6 +99,7 @@ public class TicketServiceImpl implements TicketService {
         try {
             var ticket = ticketDao.findById(id);
             ticketValidator.validateForCancelReservation(ticket);
+            ticketInvalidationSchedulingService.cancelReservationInvalidationJob(ticket.getHash());
             ticketDao.cancelReservedTicket(ticket.getId());
         } catch (EntityNotFoundException e) {
             throw new DtoNotFoundException(e);
@@ -147,7 +152,7 @@ public class TicketServiceImpl implements TicketService {
             // Anundfürsich war die SummaryDto gedacht mit aggregtate Daten gefüllt zu sein, mein Request im Repository-Interface
             // hat hier dadurch an der Stelle null geliefert wenn noch kein Ticket drinnen war.
             // Das Replacement hier sollte aber prinzipiell gleichwertig sein für was du brauchst.
-            // ticket.setOrder(orderDao.findSummaryById(orderId));
+            // ticket.setOrder(orderDao.findById(orderId));
         } catch (EntityNotFoundException e) {
             throw new IllegalStateException("Entity could not be found after validation", e);
         } catch (Exception e) {
@@ -232,5 +237,22 @@ public class TicketServiceImpl implements TicketService {
         var tickets = ticketDao.findForShowById(showId);
         tickets.forEach(this::loadSectorShowForTicket);
         return tickets;
+    }
+
+    @Override
+    public Page<TicketDetailsDto> search(TicketSearchDto ticketSearchDto) {
+        return ticketDao.search(ticketSearchDto);
+    }
+
+    @Override
+    public void validateTicket(long id) throws DtoNotFoundException, ValidationException {
+        try {
+            TicketDetailsDto ticket = ticketDao.findById(id);
+            ticketValidator.validateForValidation(ticket);
+            ticketDao.validateTicketById(id);
+            ticketInvalidationSchedulingService.cancelReservationInvalidationJob(ticket.getHash());
+        } catch (EntityNotFoundException e) {
+            throw new DtoNotFoundException(e);
+        }
     }
 }

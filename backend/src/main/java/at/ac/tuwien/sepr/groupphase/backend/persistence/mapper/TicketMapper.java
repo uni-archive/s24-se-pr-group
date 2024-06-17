@@ -13,6 +13,7 @@ public interface TicketMapper extends BaseEntityMapper<Ticket, TicketDetailsDto>
     @Mapping(target = "hallSpot.sector.seats", ignore = true)
     @Mapping(target = "hallSpot.sector.hallPlan.sectors", ignore = true)
     @Mapping(target = "show.event.shows", ignore = true)
+    @Mapping(target = "order.tickets", ignore = true)
     Ticket toEntity(TicketDetailsDto dto, @Context CycleAvoidingMappingContext cycleAvoidingMappingContext);
 
     @Override

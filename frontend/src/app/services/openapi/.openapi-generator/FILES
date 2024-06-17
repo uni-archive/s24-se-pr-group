@@ -66,6 +66,7 @@ model/order-summary-response.ts
 model/page-application-user-response.ts
 model/page-location-dto.ts
 model/page-show-response.ts
+model/page-ticket-details-response.ts
 model/pageable-object.ts
 model/show-creation-dto.ts
 model/show-dto.ts

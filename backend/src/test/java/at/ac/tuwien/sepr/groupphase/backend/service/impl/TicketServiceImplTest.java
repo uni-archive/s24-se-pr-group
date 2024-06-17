@@ -12,6 +12,7 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketAddToOrderDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Event;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallPlan;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSector;
@@ -20,6 +21,7 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSpot;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Order;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Show;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Ticket;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.type.UserType;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.ArtistRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.EventRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallPlanRepository;
@@ -61,11 +63,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 @ExtendWith({MockitoExtension.class})
 @SpringBootTest
-@ActiveProfiles({"test", "generateData"})
+@ActiveProfiles({"test"})
 public class TicketServiceImplTest implements TestData {
 
     @MockBean
@@ -135,6 +138,8 @@ public class TicketServiceImplTest implements TestData {
     private static Ticket testTicketInvalidNonReserved;
     private static HallSpot hallSpot;
     private static Show show;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void setup() {
@@ -224,6 +229,23 @@ public class TicketServiceImplTest implements TestData {
         testTicketInvalidNonReserved.setShow(show);
         ticketRepository.save(testTicketInvalidNonReserved);
 
+        if (userRepository.findByEmail(ADMIN_USER) == null) {
+            createUser();
+        }
+    }
+
+    private void createUser() {
+        var user = new ApplicationUser();
+        user.setEmail(ADMIN_USER);
+        user.setPassword(passwordEncoder.encode("password"));
+        user.setType(UserType.ADMIN);
+        userRepository.save(user);
+
+        var user2 = new ApplicationUser();
+        user2.setEmail(DEFAULT_USER);
+        user2.setPassword(passwordEncoder.encode("password"));
+        user2.setType(UserType.CUSTOMER);
+        userRepository.save(user2);
     }
 
     @AfterEach

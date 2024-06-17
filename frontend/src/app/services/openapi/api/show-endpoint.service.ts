@@ -23,8 +23,6 @@ import { PageShowResponse } from '../model/page-show-response';
 // @ts-ignore
 import { ShowCreationDto } from '../model/show-creation-dto';
 // @ts-ignore
-import { ShowHallplanResponse } from '../model/show-hallplan-response';
-// @ts-ignore
 import { ShowListDto } from '../model/show-list-dto';
 // @ts-ignore
 import { ShowResponse } from '../model/show-response';
@@ -179,16 +177,16 @@ export class ShowEndpointService implements ShowEndpointServiceInterface {
     }
 
     /**
-     * @param id 
+     * @param showId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getAvailableSeatsByShowId(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<ShowHallplanResponse>;
-    public getAvailableSeatsByShowId(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<ShowHallplanResponse>>;
-    public getAvailableSeatsByShowId(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<ShowHallplanResponse>>;
-    public getAvailableSeatsByShowId(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling getAvailableSeatsByShowId.');
+    public getShowById(showId: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<ShowResponse>;
+    public getShowById(showId: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<ShowResponse>>;
+    public getShowById(showId: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<ShowResponse>>;
+    public getShowById(showId: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (showId === null || showId === undefined) {
+            throw new Error('Required parameter showId was null or undefined when calling getShowById.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -227,70 +225,7 @@ export class ShowEndpointService implements ShowEndpointServiceInterface {
             }
         }
 
-        let localVarPath = `/api/v1/show/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}/available-seats`;
-        return this.httpClient.request<ShowHallplanResponse>('get', `${this.configuration.basePath}${localVarPath}`,
-            {
-                context: localVarHttpContext,
-                responseType: <any>responseType_,
-                withCredentials: this.configuration.withCredentials,
-                headers: localVarHeaders,
-                observe: observe,
-                transferCache: localVarTransferCache,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * @param id 
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public getShowById(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<ShowResponse>;
-    public getShowById(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<ShowResponse>>;
-    public getShowById(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<ShowResponse>>;
-    public getShowById(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling getShowById.');
-        }
-
-        let localVarHeaders = this.defaultHeaders;
-
-        let localVarHttpHeaderAcceptSelected: string | undefined = options && options.httpHeaderAccept;
-        if (localVarHttpHeaderAcceptSelected === undefined) {
-            // to determine the Accept header
-            const httpHeaderAccepts: string[] = [
-                'application/json;charset=UTF-8'
-            ];
-            localVarHttpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        }
-        if (localVarHttpHeaderAcceptSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
-        }
-
-        let localVarHttpContext: HttpContext | undefined = options && options.context;
-        if (localVarHttpContext === undefined) {
-            localVarHttpContext = new HttpContext();
-        }
-
-        let localVarTransferCache: boolean | undefined = options && options.transferCache;
-        if (localVarTransferCache === undefined) {
-            localVarTransferCache = true;
-        }
-
-
-        let responseType_: 'text' | 'json' | 'blob' = 'json';
-        if (localVarHttpHeaderAcceptSelected) {
-            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
-                responseType_ = 'text';
-            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
-                responseType_ = 'json';
-            } else {
-                responseType_ = 'blob';
-            }
-        }
-
-        let localVarPath = `/api/v1/show/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
+        let localVarPath = `/api/v1/show/${this.configuration.encodeParam({name: "showId", value: showId, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
         return this.httpClient.request<ShowResponse>('get', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
