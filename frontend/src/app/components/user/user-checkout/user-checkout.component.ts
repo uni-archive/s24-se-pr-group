@@ -120,7 +120,7 @@ export class UserCheckoutComponent implements OnInit {
       }
     });
 
-    this.orderService.findById1(7).subscribe({
+    this.orderService.getCurrentOrder().subscribe({
       next: order => {
         this.order = order;
         this.order.tickets.forEach(ticket => {
