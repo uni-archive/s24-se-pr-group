@@ -92,16 +92,6 @@ public interface TicketService {
      */
     void confirmTicket(TicketDetailsDto ticketDetailsDto) throws SchedulerException, DtoNotFoundException;
 
-    /**
-     * Validates (as in: sets ticket as valid) all tickets of an order.
-     * Does nothing if the order does not exist.
-     * <br/><br/>
-     * This method is supposed to be used when an order-purchase is finalized.
-     *
-     * @param orderId The id of the order.
-     */
-    void setValidAllTicketsForOrder(long orderId);
-
     void changeTicketReserved(long ticketId, boolean setReserved, ApplicationUserDto userDto) throws ValidationException, ForbiddenException,
         DtoNotFoundException;
 

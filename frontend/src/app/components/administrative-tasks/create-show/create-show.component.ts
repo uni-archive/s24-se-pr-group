@@ -32,7 +32,6 @@ export class CreateShowComponent {
   constructor(
     private showService: ShowEndpointService,
     private hallSectorService: HallSectorEndpointService,
-    privatemessagingService: MessagingService,
     private eventService: EventEndpointService,
     private artistService: ArtistEndpointService,
     private messagingService: MessagingService

@@ -52,16 +52,6 @@ public interface OrderService {
      */
     OrderDetailsDto create(ApplicationUserDto user) throws ValidationException;
 
-
-    /**
-     * Confirms payment on an order. This will cancel all Invalidation Jobs, and mark the tickets as valid. Reserved
-     * Tickets will be invalidated 30 minutes before the show.
-     *
-     * @param orderDetailsDto the order to confirm
-     */
-    void confirmOrder(OrderDetailsDto orderDetailsDto) throws DtoNotFoundException;
-
-
     /**
      * Purchases an order. This creates a purchase-invoice and sets all tickets as valid that are associated with this order.
      *

@@ -15,8 +15,8 @@ import { ApplicationUserResponse } from './application-user-response';
 
 
 export interface PageApplicationUserResponse { 
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
     size?: number;
     content?: Array<ApplicationUserResponse>;
     number?: number;

@@ -2,6 +2,8 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.SectorTicketCreationRequest;
+import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.TicketCreationRequest;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.TicketDetailsResponse;
@@ -13,6 +15,8 @@ import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -96,7 +100,7 @@ public class TicketEndpoint {
     @Secured(Code.USER)
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public TicketDetailsResponse addTicket(@RequestBody TicketCreationRequest ticketCreationRequest)
+    public ResponseEntity<TicketDetailsResponse> addTicket(@RequestBody TicketCreationRequest ticketCreationRequest, HttpServletResponse response)
         throws at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException, ForbiddenException {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         var username = authentication.getPrincipal().toString();
@@ -107,7 +111,9 @@ public class TicketEndpoint {
             throw new NotFoundException(e);
         }
         try {
-            return ticketMapper.toResponse(ticketService.addTicketToOrder(ticketMapper.toDto(ticketCreationRequest), user));
+            TicketDetailsDto dto = ticketService.addTicketToOrder(ticketMapper.toDto(ticketCreationRequest), user);
+            addCookie(response, dto.getOrder().getId().toString());
+            return ResponseEntity.status(201).body(ticketMapper.toResponse(dto));
         } catch (DtoNotFoundException e) {
             throw new NotFoundException(e);
         }
@@ -131,6 +137,12 @@ public class TicketEndpoint {
         } catch (DtoNotFoundException e) {
             throw new NotFoundException(e);
         }
+    }
+
+    private static void addCookie(HttpServletResponse response, String orderId) {
+        Cookie order = new Cookie("order", orderId);
+        order.setMaxAge(60 * 30);
+        response.addCookie(order);
     }
 
     @Secured(Code.USER)
