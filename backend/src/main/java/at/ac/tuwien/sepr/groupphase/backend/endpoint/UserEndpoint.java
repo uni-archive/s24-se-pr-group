@@ -123,12 +123,11 @@ public class UserEndpoint {
 
     @Secured("ROLE_USER")
     @PutMapping(path = "/update/user", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ApplicationUserResponse updateUserInfo(@RequestBody UserUpdateInfoRequest userInfo)
-        throws ValidationException, MailNotSentException {
+    public ApplicationUserResponse updateUserInfo(@RequestBody UserUpdateInfoRequest userInfo) throws MailNotSentException {
         LOGGER.info("Update user info: {}", userInfo);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        ApplicationUserDto user = null;
+        ApplicationUserDto user;
         try {
             user = userService.findApplicationUserById(userInfo.id());
         } catch (DtoNotFoundException e) {
@@ -182,7 +181,7 @@ public class UserEndpoint {
     public ResponseEntity<Map<String, String>> setNewPasswordWithValidToken(@RequestParam("token") String token,
                                                                             @RequestParam(required = false, name =
                                                                                 "currentPassword") String currentPassword,
-                                                                            @RequestParam("newPassword") String newPassword) throws ValidationException {
+                                                                            @RequestParam("newPassword") String newPassword) {
         LOGGER.info("Set new password with token: {}", token);
         Map<String, String> response = new HashMap<>();
         try {
@@ -198,7 +197,7 @@ public class UserEndpoint {
 
     @PermitAll
     @PostMapping("/user/activate/account")
-    public ResponseEntity<Map<String, String>> activateAccount(@RequestParam("token") String token) throws ValidationException {
+    public ResponseEntity<Map<String, String>> activateAccount(@RequestParam("token") String token) {
         LOGGER.info("Activate account with token: {}", token);
         Map<String, String> response = new HashMap<>();
         try {
@@ -212,15 +211,13 @@ public class UserEndpoint {
 
     @PermitAll
     @DeleteMapping("/user/delete")
-    public ResponseEntity<Map<String, String>> deleteUser(@RequestParam("id") long id) throws ValidationException, MailNotSentException {
+    public ResponseEntity<Map<String, String>> deleteUser(@RequestParam("id") long id) throws MailNotSentException {
         LOGGER.info("Delete user with id: {}", id);
         Map<String, String> response = new HashMap<>();
         try {
             userService.deleteUser(id);
         } catch (DtoNotFoundException e) {
             throw new NotFoundException(e);
-        } catch (at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException e) {
-            throw new ValidationException(e.getMessage());
         }
         response.put(RESPONSE_KEY, "Dein Account wurde erfolgreich gelöscht.");
         return ResponseEntity.status(HttpStatus.OK).body(response);
