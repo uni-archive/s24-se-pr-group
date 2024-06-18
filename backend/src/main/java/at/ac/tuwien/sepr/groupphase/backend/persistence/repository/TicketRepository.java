@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.persistence.repository;
 
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSpot;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Ticket;
 import org.springframework.data.domain.Page;
 import java.util.List;
@@ -34,6 +35,9 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     @Query("SELECT COUNT(t) > 0 FROM Ticket t WHERE t.show.id = :showId AND t.hallSpot.id = :seatId")
     boolean existsValidTicketForShowAndSeat(@Param("showId") long showId, @Param("seatId") long seatId);
+
+    @Query("SELECT spot FROM HallSectorShow hss INNER JOIN hss.sector sec INNER JOIN sec.seats spot WHERE hss.show.id = :showId AND hss.sector.id = :sectorId AND spot NOT IN (SELECT t.hallSpot FROM Ticket t WHERE t.show.id = :showId)")
+    List<HallSpot> findFreeSpotForSector(@Param("showId") long showId, @Param("sectorId") long sectorId);
 
     Ticket findByHash(String hash);
 

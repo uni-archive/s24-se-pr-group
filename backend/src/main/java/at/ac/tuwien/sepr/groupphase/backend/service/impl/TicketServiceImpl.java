@@ -1,8 +1,10 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.HallSpotDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderSummaryDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.SectorTicketAddToOrderDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketAddToOrderDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketSearchDto;
@@ -32,6 +34,7 @@ import java.lang.invoke.MethodHandles;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 @Service
 public class TicketServiceImpl implements TicketService {
@@ -130,6 +133,39 @@ public class TicketServiceImpl implements TicketService {
             ticketInvalidationSchedulingService.scheduleReservationInvalidationsForNewlyAddedTicket(ticketDetailsDto);
         } catch (SchedulerException e) {
             throw new IllegalStateException("Could not schedule reservation invalidation job: " + e.getMessage(), e);
+        }
+        return ticketDetailsDto;
+    }
+
+    @Override
+    public TicketDetailsDto addSectorTicketToOrder(SectorTicketAddToOrderDto ticket, ApplicationUserDto user)
+        throws ValidationException, ForbiddenException {
+        try {
+            var order = orderDao.findById(ticket.orderId());
+            if (!Objects.equals(user.getId(), order.getCustomer().getId())) {
+                throw new ForbiddenException();
+            }
+        } catch (EntityNotFoundException e) {
+            throw new ForbiddenException();
+        }
+        List<HallSpotDto> availableSpots;
+        try {
+             availableSpots = ticketDao.findFreeSpotForSector(ticket.showId(), ticket.sectorId());
+             if (availableSpots.isEmpty()) {
+                 throw new ValidationException("No free spots available for sector");
+             }
+        } catch (EntityNotFoundException e) {
+            throw new ValidationException("No free spots available for sector");
+        }
+
+        var random = new Random();
+        TicketAddToOrderDto ticketAddToOrderDto = new TicketAddToOrderDto(availableSpots.get(random.nextInt(availableSpots.size())).getId(), ticket.orderId(), ticket.showId(), ticket.reservationOnly());
+
+        TicketDetailsDto ticketDetailsDto = createTicket(ticketAddToOrderDto);
+        try {
+            ticketInvalidationSchedulingService.scheduleReservationInvalidationsForNewlyAddedTicket(ticketDetailsDto);
+        } catch (SchedulerException e) {
+            throw new IllegalStateException("Could not schedule reservation invalidation job" + e.getMessage(), e);
         }
         return ticketDetailsDto;
     }

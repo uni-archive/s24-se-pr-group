@@ -1,7 +1,9 @@
 package at.ac.tuwien.sepr.groupphase.backend.persistence.dao;
 
+import at.ac.tuwien.sepr.groupphase.backend.dto.HallSpotDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.HallSpotMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.TicketMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Ticket;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
@@ -17,10 +19,12 @@ import java.util.List;
 public class TicketDao extends AbstractDao<Ticket, TicketDetailsDto> {
 
     private final TicketSpecification ticketSpecification;
+    private final HallSpotMapper hallSpotMapper;
 
-    public TicketDao(TicketRepository repository, TicketMapper mapper, TicketSpecification ticketSpecification) {
+    public TicketDao(TicketRepository repository, TicketMapper mapper, TicketSpecification ticketSpecification, HallSpotMapper hallSpotMapper) {
         super(repository, mapper);
         this.ticketSpecification = ticketSpecification;
+        this.hallSpotMapper = hallSpotMapper;
     }
 
     @Transactional
@@ -74,6 +78,10 @@ public class TicketDao extends AbstractDao<Ticket, TicketDetailsDto> {
 
     public TicketDetailsDto findByHash(String hash) throws EntityNotFoundException {
         return mapper.toDto(((TicketRepository) repository).findByHash(hash));
+    }
+
+    public List<HallSpotDto> findFreeSpotForSector(Long showId, Long sectorId) throws EntityNotFoundException {
+        return hallSpotMapper.toDto(((TicketRepository) repository).findFreeSpotForSector(showId, sectorId));
     }
 
     @Transactional

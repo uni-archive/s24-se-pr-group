@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.SectorTicketAddToOrderDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketAddToOrderDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketSearchDto;
@@ -69,6 +70,18 @@ public interface TicketService {
      * @throws ForbiddenException  if the user isn't authorized to add the ticket to that order.
      */
     TicketDetailsDto addTicketToOrder(TicketAddToOrderDto ticket, ApplicationUserDto applicationUserDto)
+        throws ValidationException, ForbiddenException, DtoNotFoundException;
+
+    /**
+     * Adds a ticket to an ongoing (non-purchased) order.
+     *
+     * @param ticket             The info for that ticket.
+     * @param applicationUserDto The user who wants to add the ticket.
+     * @return The created ticket.
+     * @throws ValidationException if the request is invalid.
+     * @throws ForbiddenException  if the user isn't authorized to add the ticket to that order.
+     */
+    TicketDetailsDto addSectorTicketToOrder(SectorTicketAddToOrderDto ticket, ApplicationUserDto applicationUserDto)
         throws ValidationException, ForbiddenException, DtoNotFoundException;
 
     /**

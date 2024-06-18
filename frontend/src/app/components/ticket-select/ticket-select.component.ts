@@ -1,7 +1,8 @@
 import {Component, ViewChild} from '@angular/core';
 import {HallplanComponent, HallSeat, HallSection} from "../hallplan/hallplan.component";
 import {
-  HallPlanEndpointService, OrderEndpointService,
+  HallPlanEndpointService,
+  OrderEndpointService,
   ShowEndpointService, ShowHallplanResponse,
   ShowResponse,
   TicketEndpointService
@@ -13,7 +14,7 @@ import {SeatEntity, SectionEntity} from "../hallplan/entities";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {HallSector} from "../../services/openapi/model/hall-sector";
 import {HttpStatusCode} from "@angular/common/http";
-import {forkJoin} from "rxjs";
+import {forkJoin, Observable} from "rxjs";
 
 @Component({
   selector: 'app-ticket-select',
@@ -160,15 +161,26 @@ export class TicketSelectComponent {
     return this.hallplan.sections.find(section => section.id === sectorId);
   }
   addToCart(isReservation: boolean) {
-    if (this.selectedSectors.length !== 0) {
-      this.messagingService.setMessage("Kaufen von Stehplätzen ist noch nicht implementiert.", 'info');
-    }
-    forkJoin(this.selectedSeats.map(seat => this.ticketService.addTicket({
-      spotId: seat.id,
-      orderId: this.orderId,
-      showId: this.showResponse.id,
-      reservationOnly: isReservation
-    }))).subscribe({
+    forkJoin([
+      ...this.selectedSectors.map(sectorId => {
+        const arrOut: Observable<any>[] = [];
+        for (let i = 0; i < this.selectedSectorSpots[String(sectorId)]; i++) {
+          arrOut.push(this.ticketService.addSectionTicket({
+            sectorId: sectorId,
+            orderId: this.orderId,
+            showId: this.showResponse.id,
+            reservationOnly: isReservation
+          }));
+        }
+        return arrOut;
+      }).reduce((acc, val) => acc.concat(val), []),
+      ...this.selectedSeats.map(seat => this.ticketService.addTicket({
+        spotId: seat.id,
+        orderId: this.orderId,
+        showId: this.showResponse.id,
+        reservationOnly: isReservation
+    }))
+    ]).subscribe({
       next: () => {
         this.messagingService.setMessage("Ihre Tickets wurden erfolgreich hinzugefügt.", 'success');
         this.router.navigate(['/user/cart']);

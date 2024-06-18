@@ -14,6 +14,7 @@ import { HttpHeaders }                                       from '@angular/comm
 import { Observable }                                        from 'rxjs';
 
 import { PageTicketDetailsResponse } from '../model/models';
+import { SectorTicketCreationRequest } from '../model/models';
 import { TicketCreationRequest } from '../model/models';
 import { TicketDetailsResponse } from '../model/models';
 
@@ -25,6 +26,13 @@ import { Configuration }                                     from '../configurat
 export interface TicketEndpointServiceInterface {
     defaultHeaders: HttpHeaders;
     configuration: Configuration;
+
+    /**
+     * 
+     * 
+     * @param sectorTicketCreationRequest 
+     */
+    addSectionTicket(sectorTicketCreationRequest: SectorTicketCreationRequest, extraHttpRequestParams?: any): Observable<TicketDetailsResponse>;
 
     /**
      * 
