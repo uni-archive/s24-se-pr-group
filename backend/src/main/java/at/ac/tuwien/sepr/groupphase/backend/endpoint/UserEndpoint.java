@@ -57,6 +57,7 @@ public class UserEndpoint {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> register(@RequestBody UserCreateRequest userCreateRequest)
         throws ValidationException, ForbiddenException, MailNotSentException {
+        LOGGER.info("Register user: {}", userCreateRequest);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getAuthorities().stream()
             .anyMatch(r -> r.getAuthority().equals(Code.USER)) && !authentication.getAuthorities().stream()
@@ -77,6 +78,7 @@ public class UserEndpoint {
     @Secured(Code.USER)
     @GetMapping(path = "/current", produces = MediaType.APPLICATION_JSON_VALUE)
     public ApplicationUserResponse getUser() {
+        LOGGER.info("Get current user");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         try {
             return userMapper.toResponse(userService.findApplicationUserByEmail(authentication.getName()));
@@ -132,6 +134,7 @@ public class UserEndpoint {
     @PermitAll
     @GetMapping("/update/user/email")
     public ResponseEntity<?> updateUserEmailWithValidToken(@RequestParam("token") String token) {
+        LOGGER.info("Update user email with token: {}", token);
         if (userService.updateUserEmailWithValidToken(token) != null) {
             return ResponseEntity.ok("Deine E-Mail-Adresse wurde erfolgreich geändert. Bitte melde dich mit deinen "
                 + "neuen Zugangsdaten an.");
@@ -142,6 +145,7 @@ public class UserEndpoint {
     @PermitAll
     @GetMapping(path = "/user/password/reset", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, String>> sendEmailForPasswordReset(@RequestParam("email") String email) throws MailNotSentException {
+        LOGGER.info("Send email for password reset to: {}", email);
         Map<String, String> response = new HashMap<>();
         userService.sendEmailForNewPassword(email, true);
         response.put(RESPONSE_KEY, "E-Mail zum Zurücksetzen des Passworts wurde gesendet");
@@ -151,6 +155,7 @@ public class UserEndpoint {
     @PermitAll
     @GetMapping(path = "/user/password/change", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, String>> sendEmailForPasswordChange(@RequestParam("email") String email) throws MailNotSentException {
+        LOGGER.info("Send email for password change to: {}", email);
         Map<String, String> response = new HashMap<>();
         userService.sendEmailForNewPassword(email, false);
         response.put(RESPONSE_KEY, "E-Mail zum Ändern des Passworts wurde gesendet.");
@@ -163,6 +168,7 @@ public class UserEndpoint {
                                                                             @RequestParam(required = false, name =
                                                                                 "currentPassword") String currentPassword,
                                                                             @RequestParam("newPassword") String newPassword) throws ValidationException, DtoNotFoundException {
+        LOGGER.info("Set new password with token: {}", token);
         Map<String, String> response = new HashMap<>();
         userService.updatePassword(token, currentPassword, newPassword);
         response.put(RESPONSE_KEY, "Dein Passwort wurde erfolgreich geändert.");
@@ -172,6 +178,7 @@ public class UserEndpoint {
     @PermitAll
     @PostMapping("/user/activate/account")
     public ResponseEntity<Map<String, String>> activateAccount(@RequestParam("token") String token) throws ValidationException {
+        LOGGER.info("Activate account with token: {}", token);
         Map<String, String> response = new HashMap<>();
         userService.activateAccount(token);
         response.put(RESPONSE_KEY, "Dein Konto wurde erfolgreich aktiviert. Du kannst dich nun anmelden.");
@@ -182,6 +189,7 @@ public class UserEndpoint {
     @DeleteMapping("/user/delete")
     public ResponseEntity<Map<String, String>> deleteUser(@RequestParam("id") long id) throws ValidationException,
         DtoNotFoundException, MailNotSentException {
+        LOGGER.info("Delete user with id: {}", id);
         Map<String, String> response = new HashMap<>();
         userService.deleteUser(id);
         response.put(RESPONSE_KEY, "Dein Account wurde erfolgreich gelöscht.");
