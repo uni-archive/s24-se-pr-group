@@ -139,8 +139,7 @@ public interface UserService extends UserDetailsService {
      *
      * @param id the id
      * @throws DtoNotFoundException if the user does not exist
-     * @throws ValidationException  if the user is invalid
      * @throws MailNotSentException if the mail could not be sent
      */
-    void deleteUser(long id) throws DtoNotFoundException, ValidationException, MailNotSentException;
+    void deleteUser(long id) throws DtoNotFoundException, MailNotSentException;
 }
