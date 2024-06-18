@@ -34,6 +34,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
@@ -123,12 +124,12 @@ class UserServiceImplTest {
     }
 
     @Test
-    void updateUserStatusByEmailShouldUpdateUser() throws NotFoundException, ValidationException, EntityNotFoundException {
+    void updateUserStatusByEmailShouldUpdateUser() throws ValidationException, EntityNotFoundException, DtoNotFoundException {
         ApplicationUserDto userToUpdate = ApplicationUserSupplier.anAdminUser();
         userToUpdate.setEmail("update@email.com");
         String adminEmail = "admin@email.com";
 
-        doNothing().when(userValidator).validateForUpdateStatus(userToUpdate, adminEmail);
+        doNothing().when(userValidator).validateForUpdateStatus(userToUpdate.getEmail(), adminEmail);
         when(userDao.findByEmail(userToUpdate.getEmail())).thenReturn(userToUpdate);
         when(userDao.update(userToUpdate)).thenReturn(userToUpdate);
 
@@ -141,33 +142,33 @@ class UserServiceImplTest {
         userToUpdate.setEmail("nonexistent@email.com");
         String adminEmail = "admin@email.com";
 
-        doNothing().when(userValidator).validateForUpdateStatus(userToUpdate, adminEmail);
+        doNothing().when(userValidator).validateForUpdateStatus(userToUpdate.getEmail(), adminEmail);
         when(userDao.findByEmail(userToUpdate.getEmail())).thenReturn(null);
 
-        NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> {
+        DtoNotFoundException exception = Assertions.assertThrows(DtoNotFoundException.class, () -> {
             userService.updateUserStatusByEmail(userToUpdate, adminEmail);
         });
 
-        verify(userValidator).validateForUpdateStatus(userToUpdate, adminEmail);
+        verify(userValidator).validateForUpdateStatus(userToUpdate.getEmail(), adminEmail);
         verify(userDao).findByEmail(userToUpdate.getEmail());
         Assertions.assertEquals("Could not update the user with the email address nonexistent@email.com because it does not exist", exception.getMessage());
     }
 
     @Test
-    void updateUserStatusByEmailShouldThrowNotFoundExceptionOnEntityNotFoundException() throws NotFoundException, ValidationException, EntityNotFoundException {
+    void updateUserStatusByEmailShouldThrowNotFoundExceptionOnEntityNotFoundException() throws ValidationException, EntityNotFoundException {
         ApplicationUserDto userToUpdate = ApplicationUserSupplier.anAdminUser();
         userToUpdate.setEmail("update@email.com");
         String adminEmail = "admin@email.com";
 
-        doNothing().when(userValidator).validateForUpdateStatus(userToUpdate, adminEmail);
+        doNothing().when(userValidator).validateForUpdateStatus(userToUpdate.getEmail(), adminEmail);
         when(userDao.findByEmail(userToUpdate.getEmail())).thenReturn(userToUpdate);
         when(userDao.update(userToUpdate)).thenThrow(new EntityNotFoundException(1L));
 
-        NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> {
+        DtoNotFoundException exception = Assertions.assertThrows(DtoNotFoundException.class, () -> {
             userService.updateUserStatusByEmail(userToUpdate, adminEmail);
         });
 
-        verify(userValidator).validateForUpdateStatus(userToUpdate, adminEmail);
+        verify(userValidator).validateForUpdateStatus(userToUpdate.getEmail(), adminEmail);
         verify(userDao).findByEmail(userToUpdate.getEmail());
         verify(userDao).update(userToUpdate);
         Assertions.assertTrue(exception.getCause() instanceof EntityNotFoundException);
@@ -443,5 +444,28 @@ class UserServiceImplTest {
         verify(newPasswordTokenDao).create(Mockito.any(NewPasswordTokenDto.class));
         verify(emailSenderService).sendHtmlMail(Mockito.any(MailBody.class));
     }
+
+    @Test
+    void loadUserByUsernameShouldReturnUserDetails() throws DtoNotFoundException {
+        // Arrange
+        String email = "test@example.com";
+        ApplicationUserDto user = new ApplicationUserDto();
+        user.setEmail(email);
+        user.setPassword("encodedPassword");
+        user.setAdmin(true);
+
+        when(userDao.findByEmail(email)).thenReturn(user);
+
+        // Act
+        UserDetails userDetails = userService.loadUserByUsername(email);
+
+        // Assert
+        Assertions.assertNotNull(userDetails);
+        Assertions.assertEquals(email, userDetails.getUsername());
+        Assertions.assertEquals("encodedPassword", userDetails.getPassword());
+        Assertions.assertTrue(userDetails.getAuthorities().stream()
+            .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN")));
+    }
+
 
 }
