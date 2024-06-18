@@ -7,7 +7,6 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.EmailChangeTokenDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.MailBody;
 import at.ac.tuwien.sepr.groupphase.backend.dto.NewPasswordTokenDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.AccountActivateTokenDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.EmailChangeTokenDao;
@@ -98,18 +97,14 @@ public class UserServiceImpl implements UserService {
     }
 
     private UserDetails getUserDetailsForUser(ApplicationUserDto applicationUser) {
-        try {
-            List<GrantedAuthority> grantedAuthorities;
-            if (applicationUser.getAdmin()) {
-                grantedAuthorities = AuthorityUtils.createAuthorityList(Code.ADMIN, Code.USER);
-            } else {
-                grantedAuthorities = AuthorityUtils.createAuthorityList(Code.USER);
-            }
-
-            return new User(applicationUser.getEmail(), applicationUser.getPassword(), grantedAuthorities);
-        } catch (NotFoundException e) {
-            throw new UsernameNotFoundException(e.getMessage(), e);
+        List<GrantedAuthority> grantedAuthorities;
+        if (applicationUser.getAdmin()) {
+            grantedAuthorities = AuthorityUtils.createAuthorityList(Code.ADMIN, Code.USER);
+        } else {
+            grantedAuthorities = AuthorityUtils.createAuthorityList(Code.USER);
         }
+
+        return new User(applicationUser.getEmail(), applicationUser.getPassword(), grantedAuthorities);
     }
 
     @Override
@@ -199,12 +194,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ApplicationUserDto updateUserStatusByEmail(ApplicationUserDto toUpdate, String adminEmail)
-        throws NotFoundException, ValidationException {
+        throws DtoNotFoundException, ValidationException {
         LOGGER.debug("Update user status: {}", toUpdate);
-        userValidator.validateForUpdateStatus(toUpdate, adminEmail);
+        userValidator.validateForUpdate(toUpdate);
+        userValidator.validateForUpdateStatus(toUpdate.getEmail(), adminEmail);
         ApplicationUserDto user = userDao.findByEmail(toUpdate.getEmail());
         if (user == null) {
-            throw new NotFoundException("Could not update the user with the email address " + toUpdate.getEmail()
+            throw new DtoNotFoundException("Could not update the user with the email address " + toUpdate.getEmail()
                 + " because it does not exist");
         }
         if (user.getSuperAdmin()) {
@@ -214,7 +210,7 @@ public class UserServiceImpl implements UserService {
             user.setAccountLocked(toUpdate.isAccountLocked());
             return userDao.update(user);
         } catch (EntityNotFoundException e) {
-            throw new NotFoundException(e);
+            throw new DtoNotFoundException(e);
         }
     }
 
@@ -223,7 +219,6 @@ public class UserServiceImpl implements UserService {
         MailNotSentException, DtoNotFoundException {
         LOGGER.debug("Update user info: {}", userInfo);
         ApplicationUserDto user;
-
         try {
             user = userDao.findById(userInfo.getId());
         } catch (EntityNotFoundException e) {
@@ -267,17 +262,17 @@ public class UserServiceImpl implements UserService {
         try {
             return userDao.update(user);
         } catch (EntityNotFoundException e) {
-            throw new NotFoundException("Could not update the user because it does not exist.");
+            throw new DtoNotFoundException("Could not update the user because it does not exist.");
         }
     }
 
     @Override
-    public ApplicationUserDto findApplicationUserById(Long id) throws NotFoundException {
+    public ApplicationUserDto findApplicationUserById(Long id) throws DtoNotFoundException {
         if (id != null) {
             try {
                 return userDao.findById(id);
             } catch (EntityNotFoundException e) {
-                throw new NotFoundException("Could not find the user with the id " + id);
+                throw new DtoNotFoundException("Could not find the user with the id " + id);
             }
         }
         return null;
@@ -396,7 +391,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(long id) throws DtoNotFoundException, ValidationException, MailNotSentException {
+    public void deleteUser(long id) throws DtoNotFoundException, MailNotSentException {
         //validate user
         ApplicationUserDto user;
         try {
@@ -420,7 +415,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private EmailChangeTokenDto createAndSaveEmailChangeToken(String newEmail, String currentEmail) {
+    private EmailChangeTokenDto createAndSaveEmailChangeToken(String newEmail, String currentEmail) throws DtoNotFoundException {
         String token = UUID.randomUUID().toString();
         LocalDateTime expiryDate = LocalDateTime.now().plusMinutes(10);
 
@@ -484,10 +479,11 @@ public class UserServiceImpl implements UserService {
             try {
                 emailChangeTokenDao.update(token);  // Save the updated token
             } catch (EntityNotFoundException e) {
-                throw new NotFoundException("Could not update the email change token because it does not exist.");
+                LOGGER.warn("Could not update the email change token because it does not exist.", e);
             }
         });
     }
+
 
     private MailBody generateMailBodyChangeEmail(ApplicationUserDto userInfo, ApplicationUserDto user, String token) {
         String email = userInfo.getEmail();

@@ -6,13 +6,13 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDt
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserCreateRequest;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateInfoRequest;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ApplicationUserMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.MailNotSentException;
-import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +56,7 @@ public class UserEndpoint {
     @PostMapping(path = "/registration", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> register(@RequestBody UserCreateRequest userCreateRequest)
-        throws ValidationException, ForbiddenException, MailNotSentException {
+        throws ForbiddenException, MailNotSentException {
         LOGGER.info("Register user: {}", userCreateRequest);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getAuthorities().stream()
@@ -71,8 +71,12 @@ public class UserEndpoint {
         }
         ApplicationUserDto dto = userMapper.toDto(userCreateRequest);
 
-        return ResponseEntity.status(201)
-            .body(userMapper.toResponse(userService.createUser(dto)));
+        try {
+            return ResponseEntity.status(201)
+                .body(userMapper.toResponse(userService.createUser(dto)));
+        } catch (at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException e) {
+            throw new ValidationException(e.getMessage());
+        }
     }
 
     @Secured(Code.USER)
@@ -105,12 +109,16 @@ public class UserEndpoint {
 
     @Secured(Code.ADMIN)
     @PutMapping(path = "/update/status", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ApplicationUserResponse updateUserStatusByEmail(@RequestBody ApplicationUserDto user)
-        throws ValidationException,
-        NotFoundException {
+    public ApplicationUserResponse updateUserStatusByEmail(@RequestBody ApplicationUserDto user) {
         LOGGER.info("Update user status by email: {}", user);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return userMapper.toResponse(userService.updateUserStatusByEmail(user, authentication.getName()));
+        try {
+            return userMapper.toResponse(userService.updateUserStatusByEmail(user, authentication.getName()));
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        } catch (at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException e) {
+            throw new ValidationException(e.getMessage());
+        }
     }
 
     @Secured("ROLE_USER")
@@ -120,7 +128,12 @@ public class UserEndpoint {
         LOGGER.info("Update user info: {}", userInfo);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        ApplicationUserDto user = userService.findApplicationUserById(userInfo.id());
+        ApplicationUserDto user = null;
+        try {
+            user = userService.findApplicationUserById(userInfo.id());
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        }
         if (!authentication.getName().equals(user.getEmail())) {
             throw new ValidationException("Du kannst nur deine eigenen Daten bearbeiten.");
         }
@@ -128,6 +141,8 @@ public class UserEndpoint {
             return userMapper.toResponse(userService.updateUserInfo(userMapper.toDto(userInfo)));
         } catch (DtoNotFoundException e) {
             throw new NotFoundException(e);
+        } catch (at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException e) {
+            throw new ValidationException(e.getMessage());
         }
     }
 
@@ -167,10 +182,16 @@ public class UserEndpoint {
     public ResponseEntity<Map<String, String>> setNewPasswordWithValidToken(@RequestParam("token") String token,
                                                                             @RequestParam(required = false, name =
                                                                                 "currentPassword") String currentPassword,
-                                                                            @RequestParam("newPassword") String newPassword) throws ValidationException, DtoNotFoundException {
+                                                                            @RequestParam("newPassword") String newPassword) throws ValidationException {
         LOGGER.info("Set new password with token: {}", token);
         Map<String, String> response = new HashMap<>();
-        userService.updatePassword(token, currentPassword, newPassword);
+        try {
+            userService.updatePassword(token, currentPassword, newPassword);
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        } catch (at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException e) {
+            throw new ValidationException(e.getMessage());
+        }
         response.put(RESPONSE_KEY, "Dein Passwort wurde erfolgreich geändert.");
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -180,18 +201,27 @@ public class UserEndpoint {
     public ResponseEntity<Map<String, String>> activateAccount(@RequestParam("token") String token) throws ValidationException {
         LOGGER.info("Activate account with token: {}", token);
         Map<String, String> response = new HashMap<>();
-        userService.activateAccount(token);
+        try {
+            userService.activateAccount(token);
+        } catch (at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException e) {
+            throw new ValidationException(e.getMessage());
+        }
         response.put(RESPONSE_KEY, "Dein Konto wurde erfolgreich aktiviert. Du kannst dich nun anmelden.");
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PermitAll
     @DeleteMapping("/user/delete")
-    public ResponseEntity<Map<String, String>> deleteUser(@RequestParam("id") long id) throws ValidationException,
-        DtoNotFoundException, MailNotSentException {
+    public ResponseEntity<Map<String, String>> deleteUser(@RequestParam("id") long id) throws ValidationException, MailNotSentException {
         LOGGER.info("Delete user with id: {}", id);
         Map<String, String> response = new HashMap<>();
-        userService.deleteUser(id);
+        try {
+            userService.deleteUser(id);
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        } catch (at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException e) {
+            throw new ValidationException(e.getMessage());
+        }
         response.put(RESPONSE_KEY, "Dein Account wurde erfolgreich gelöscht.");
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
