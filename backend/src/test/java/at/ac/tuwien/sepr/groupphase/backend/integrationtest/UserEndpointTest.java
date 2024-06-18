@@ -1,24 +1,23 @@
 package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 
-import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_ROLES;
-import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_USER;
-import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.DEFAULT_USER;
-import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.USER_ROLES;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import at.ac.tuwien.sepr.groupphase.backend.basetest.TestData;
 import at.ac.tuwien.sepr.groupphase.backend.config.properties.SecurityProperties;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserCreateRequest;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateInfoRequest;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.AccountActivateToken;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Address;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.EmailChangeToken;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.NewPasswordToken;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.AccountActivateTokenRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.AddressRepository;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.EmailChangeTokenRepository;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.NewPasswordTokenRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.supplier.AddressSupplier;
 import at.ac.tuwien.sepr.groupphase.backend.supplier.ApplicationUserSupplier;
 import at.ac.tuwien.sepr.groupphase.backend.util.PageModule;
@@ -43,7 +42,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_ROLES;
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_ROLES_2;
@@ -51,6 +53,7 @@ import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_USER;
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_USER_2;
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.DEFAULT_USER;
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.USER_ROLES;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -60,7 +63,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-public class UserEndpointTest {
+class UserEndpointTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -75,11 +78,19 @@ public class UserEndpointTest {
     private AddressRepository addressRepository;
 
     @Autowired
+    private EmailChangeTokenRepository emailChangeTokenRepository;
+
+    @Autowired
+    private NewPasswordTokenRepository newPasswordTokenRepository;
+
+    @Autowired
+    private AccountActivateTokenRepository accountActivateTokenRepository;
+
+    @Autowired
     private JwtTokenizer jwtTokenizer;
 
     @Autowired
     private SecurityProperties securityProperties;
-
 
     @BeforeEach
     void setUp() {
@@ -190,7 +201,6 @@ public class UserEndpointTest {
         );
     }
 
-
     @Test
     @DirtiesContext(methodMode = MethodMode.BEFORE_METHOD)
     void searchUsersShouldReturnResultsForAdmin() throws Exception {
@@ -210,7 +220,7 @@ public class UserEndpointTest {
 
         MockHttpServletResponse response = mvcResult.getResponse();
         Page<ApplicationUserResponse> users = objectMapper.readValue(response.getContentAsString(),
-            new TypeReference<Page<ApplicationUserResponse>>() {
+            new TypeReference<>() {
             });
         Assertions.assertAll(
             () -> Assertions.assertNotNull(users),
@@ -246,7 +256,7 @@ public class UserEndpointTest {
 
         userToUpdate.setAccountLocked(false);  // Set the new account locked status (false)
 
-        // Perform the PUT request with a admin token
+        // Perform the PUT request with an admin token
         mockMvc.perform(put(TestData.USER_BASE_URI + "/update/status")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES))
@@ -324,5 +334,344 @@ public class UserEndpointTest {
         // Assert
         MockHttpServletResponse response = mvcResult.getResponse();
         Assertions.assertEquals("Dieser Link ist nicht gültig.", response.getContentAsString());
+    }
+
+    @Test
+    @WithMockUser(roles = "USER", username = "user2@email.com")
+    void getUserShouldReturnCurrentUserDetails() throws Exception {
+        // Arrange
+        ApplicationUser user = new ApplicationUser();
+        user.setEmail("user2@email.com");
+        user.setFirstName("John");
+        user.setFamilyName("Doe");
+        userRepository.save(user);
+
+        // Act
+        MvcResult mvcResult = mockMvc.perform(get(TestData.USER_BASE_URI + "/current")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        // Assert
+        MockHttpServletResponse response = mvcResult.getResponse();
+        ApplicationUserResponse applicationUserResponse = objectMapper.readValue(response.getContentAsString(), ApplicationUserResponse.class);
+
+        Assertions.assertAll(
+            () -> Assertions.assertEquals("user2@email.com", applicationUserResponse.email()),
+            () -> Assertions.assertEquals("John", applicationUserResponse.firstName()),
+            () -> Assertions.assertEquals("Doe", applicationUserResponse.familyName())
+        );
+
+        userRepository.delete(user);
+    }
+
+    @Test
+    @WithMockUser(roles = "USER", username = "user2@email.com")
+    void getUserShouldThrowDtoNotFoundException() throws Exception {
+        // Act
+        MvcResult mvcResult = mockMvc.perform(get(TestData.USER_BASE_URI + "/current")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound())  // Expecting a 404 Not Found status
+            .andReturn();
+
+        // Assert
+        MockHttpServletResponse response = mvcResult.getResponse();
+        String responseBody = response.getContentAsString();
+
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(404, response.getStatus()),
+            () -> Assertions.assertThrows(DtoNotFoundException.class, () -> {
+                throw new DtoNotFoundException(responseBody);
+            })
+        );
+    }
+
+    @Test
+    @WithMockUser(roles = "USER", username = "user1@example.com")
+    void updateUserInfoShouldThrowValidationExceptionForAnotherUser() throws Exception {
+        // Arrange
+        ApplicationUser user = new ApplicationUser();
+        user.setId(1L);
+        user.setEmail("user2@example.com"); // Different email to trigger the validation exception
+        userRepository.save(user);
+
+        UserUpdateInfoRequest updateRequest = new UserUpdateInfoRequest(
+            user.getId(), null, "+431234567890"
+        );
+
+        // Act
+        MvcResult mvcResult = mockMvc.perform(put(TestData.USER_BASE_URI + "/update/user")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateRequest)))
+            .andExpect(status().isUnprocessableEntity()) // Expecting a 400 Bad Request status
+            .andReturn();
+
+        // Assert
+        MockHttpServletResponse response = mvcResult.getResponse();
+        String responseBody = response.getContentAsString();
+
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(422, response.getStatus()),
+            () -> Assertions.assertTrue(responseBody.contains("Du kannst nur deine eigenen Daten bearbeiten."))
+        );
+
+        userRepository.delete(user);
+    }
+
+    @Test
+    @WithMockUser(roles = "USER", username = "user1@example.com")
+    void updateUserInfoShouldUpdateUser() throws Exception {
+        // Arrange
+        Address address = AddressSupplier.anAddressEntity();
+        Address savedAddress = addressRepository.save(address);
+
+        ApplicationUser user = ApplicationUserSupplier.aUserEntity();
+        user.setId(-456L);
+        user.setEmail("user1@example.com");
+        user.setAddress(savedAddress); // Set the saved address to the user
+        ApplicationUser savedUser = userRepository.save(user);
+
+        // Verify the user is saved
+        Assertions.assertNotNull(userRepository.findById(savedUser.getId()).orElse(null));
+
+        UserUpdateInfoRequest updateRequest = new UserUpdateInfoRequest(
+            savedUser.getId(), null, "+431234567890"
+        );
+
+        // Act
+        MvcResult mvcResult = mockMvc.perform(put(TestData.USER_BASE_URI + "/update/user")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateRequest)))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        // Assert
+        MockHttpServletResponse response = mvcResult.getResponse();
+        ApplicationUserResponse applicationUserResponse = objectMapper.readValue(response.getContentAsString(), ApplicationUserResponse.class);
+
+        Assertions.assertAll(
+            () -> Assertions.assertEquals("+431234567890", applicationUserResponse.phoneNumber())
+        );
+
+        // Cleanup
+        userRepository.delete(savedUser);
+        addressRepository.delete(savedAddress);
+    }
+
+    @Test
+    void updateUserEmailWithValidTokenShouldReturnSuccessMessage() throws Exception {
+        // Arrange
+        ApplicationUser user = new ApplicationUser();
+        user.setEmail("old@email.com");
+        user.setFirstName("John");
+        user.setFamilyName("Doe");
+        userRepository.save(user);
+
+        EmailChangeToken token = new EmailChangeToken();
+        token.setToken("validToken");
+        token.setCurrentEmail("old@email.com");
+        token.setNewEmail("new@email.com");
+        token.setExpiryDate(LocalDateTime.now().plusDays(1));
+        emailChangeTokenRepository.save(token);
+
+        // Act
+        MvcResult mvcResult = mockMvc.perform(get("/api/v1/users/update/user/email")
+                .param("token", "validToken"))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        // Assert
+        MockHttpServletResponse response = mvcResult.getResponse();
+        String responseBody = response.getContentAsString();
+
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(200, response.getStatus()),
+            () -> Assertions.assertTrue(responseBody.contains("Deine E-Mail-Adresse wurde erfolgreich geändert. Bitte melde dich mit deinen neuen Zugangsdaten an."))
+        );
+
+        ApplicationUser updatedUser = userRepository.findByEmail("new@email.com");
+        Assertions.assertNotNull(updatedUser);
+        Assertions.assertEquals("John", updatedUser.getFirstName());
+        Assertions.assertEquals("Doe", updatedUser.getFamilyName());
+    }
+
+    @Test
+    void sendEmailForPasswordResetShouldReturnSuccessMessage() throws Exception {
+        // Arrange
+        ApplicationUser user = new ApplicationUser();
+        user.setEmail("test@email.com");
+        user.setFirstName("John");
+        user.setFamilyName("Doe");
+        userRepository.save(user);
+
+        // Act
+        MvcResult mvcResult = mockMvc.perform(get("/api/v1/users/user/password/reset")
+                .param("email", "test@email.com")
+                .characterEncoding(StandardCharsets.UTF_8.name())) // Ensure UTF-8 encoding
+            .andExpect(status().isOk())
+            .andReturn();
+
+        // Assert
+        MockHttpServletResponse response = mvcResult.getResponse();
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name()); // Ensure UTF-8 encoding
+        String responseBody = response.getContentAsString();
+        Map<String, String> expectedResponse = new HashMap<>();
+        expectedResponse.put("message", "E-Mail zum Zurücksetzen des Passworts wurde gesendet");
+
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(200, response.getStatus()),
+            () -> Assertions.assertEquals(objectMapper.writeValueAsString(expectedResponse), responseBody)
+        );
+
+        ApplicationUser updatedUser = userRepository.findByEmail("test@email.com");
+        Assertions.assertNotNull(updatedUser);
+
+        userRepository.delete(updatedUser);
+    }
+
+    @Test
+    void sendEmailForPasswordChangeShouldReturnSuccessMessage() throws Exception {
+        // Arrange
+        ApplicationUser user = new ApplicationUser();
+        user.setEmail("test123@email.com");
+        user.setFirstName("John");
+        user.setFamilyName("Doe");
+        userRepository.save(user);
+
+        // Act
+        MvcResult mvcResult = mockMvc.perform(get("/api/v1/users/user/password/change")
+                .param("email", "test123@email.com")
+                .characterEncoding(StandardCharsets.UTF_8.name())) // Ensure UTF-8 encoding
+            .andExpect(status().isOk())
+            .andReturn();
+
+        // Assert
+        MockHttpServletResponse response = mvcResult.getResponse();
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name()); // Ensure UTF-8 encoding
+        String responseBody = response.getContentAsString();
+        Map<String, String> expectedResponse = new HashMap<>();
+        expectedResponse.put("message", "E-Mail zum Ändern des Passworts wurde gesendet.");
+
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(200, response.getStatus()),
+            () -> Assertions.assertEquals(objectMapper.writeValueAsString(expectedResponse), responseBody)
+        );
+
+        userRepository.delete(user);
+    }
+
+    @Test
+    void setNewPasswordWithValidTokenShouldUpdatePassword() throws Exception {
+        // Arrange
+        ApplicationUser user = new ApplicationUser();
+        user.setEmail("test@email.com");
+        user.setFirstName("John");
+        user.setFamilyName("Doe");
+        user.setPassword("oldPassword");
+        userRepository.save(user);
+
+        NewPasswordToken token = new NewPasswordToken();
+        token.setToken("validToken");
+        token.setEmail("test@email.com");
+        token.setExpiryDate(LocalDateTime.now().plusDays(1));
+        newPasswordTokenRepository.save(token);
+
+        // Act
+        MvcResult mvcResult = mockMvc.perform(put("/api/v1/users/user/password/update")
+                .param("token", "validToken")
+                .param("newPassword", "newPassword")
+                .characterEncoding(StandardCharsets.UTF_8.name())) // Ensure UTF-8 encoding
+            .andExpect(status().isOk())
+            .andReturn();
+
+        // Assert
+        MockHttpServletResponse response = mvcResult.getResponse();
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name()); // Ensure UTF-8 encoding
+        String responseBody = response.getContentAsString();
+        Map<String, String> expectedResponse = new HashMap<>();
+        expectedResponse.put("message", "Dein Passwort wurde erfolgreich geändert.");
+
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(200, response.getStatus()),
+            () -> Assertions.assertEquals(objectMapper.writeValueAsString(expectedResponse), responseBody)
+        );
+
+        ApplicationUser updatedUser = userRepository.findByEmail("test@email.com");
+        Assertions.assertNotEquals("oldPassword", updatedUser.getPassword());
+
+        userRepository.delete(updatedUser);
+    }
+
+    @Test
+    void activateAccountShouldSucceed() throws Exception {
+        // Arrange
+        ApplicationUser user = new ApplicationUser();
+        user.setEmail("test@email.com");
+        user.setFirstName("John");
+        user.setFamilyName("Doe");
+        user.setAccountActivated(false);
+        userRepository.save(user);
+
+        AccountActivateToken token = new AccountActivateToken();
+        token.setToken("validToken");
+        token.setEmail("test@email.com");
+        token.setExpiryDate(LocalDateTime.now().plusDays(1));
+        accountActivateTokenRepository.save(token);
+
+        // Act
+        MvcResult mvcResult = mockMvc.perform(post("/api/v1/users/user/activate/account")
+                .param("token", "validToken")
+                .characterEncoding(StandardCharsets.UTF_8.name())) // Ensure UTF-8 encoding
+            .andExpect(status().isOk())
+            .andReturn();
+
+        // Assert
+        MockHttpServletResponse response = mvcResult.getResponse();
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name()); // Ensure UTF-8 encoding
+        String responseBody = response.getContentAsString();
+        Map<String, String> expectedResponse = new HashMap<>();
+        expectedResponse.put("message", "Dein Konto wurde erfolgreich aktiviert. Du kannst dich nun anmelden.");
+
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(200, response.getStatus()),
+            () -> Assertions.assertEquals(objectMapper.writeValueAsString(expectedResponse), responseBody)
+        );
+
+        ApplicationUser updatedUser = userRepository.findByEmail("test@email.com");
+        Assertions.assertTrue(updatedUser.isAccountActivated());
+
+        userRepository.delete(updatedUser);
+    }
+
+    @Test
+    void deleteUserShouldSucceed() throws Exception {
+        // Arrange
+        ApplicationUser user = new ApplicationUser();
+        user.setEmail("test@email.com");
+        user.setFirstName("John");
+        user.setFamilyName("Doe");
+        userRepository.save(user);
+
+        // Act
+        MvcResult mvcResult = mockMvc.perform(delete("/api/v1/users/user/delete")
+                .param("id", String.valueOf(user.getId()))
+                .characterEncoding(StandardCharsets.UTF_8.name())) // Ensure UTF-8 encoding
+            .andExpect(status().isOk())
+            .andReturn();
+
+        // Assert
+        MockHttpServletResponse response = mvcResult.getResponse();
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name()); // Ensure UTF-8 encoding
+        String responseBody = response.getContentAsString();
+        Map<String, String> expectedResponse = new HashMap<>();
+        expectedResponse.put("message", "Dein Account wurde erfolgreich gelöscht.");
+
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(200, response.getStatus()),
+            () -> Assertions.assertEquals(objectMapper.writeValueAsString(expectedResponse), responseBody)
+        );
+
+        ApplicationUser deletedUser = userRepository.findById(user.getId()).orElse(null);
+        Assertions.assertNull(deletedUser);
     }
 }
