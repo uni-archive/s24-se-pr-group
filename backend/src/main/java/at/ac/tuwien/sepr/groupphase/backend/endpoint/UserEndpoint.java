@@ -24,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -174,6 +175,16 @@ public class UserEndpoint {
         Map<String, String> response = new HashMap<>();
         userService.activateAccount(token);
         response.put(RESPONSE_KEY, "Dein Konto wurde erfolgreich aktiviert. Du kannst dich nun anmelden.");
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PermitAll
+    @DeleteMapping("/user/delete")
+    public ResponseEntity<Map<String, String>> deleteUser(@RequestParam("id") long id) throws ValidationException,
+        DtoNotFoundException, MailNotSentException {
+        Map<String, String> response = new HashMap<>();
+        userService.deleteUser(id);
+        response.put(RESPONSE_KEY, "Dein Account wurde erfolgreich gelöscht.");
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
