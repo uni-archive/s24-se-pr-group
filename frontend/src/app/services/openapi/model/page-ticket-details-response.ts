@@ -21,9 +21,9 @@ export interface PageTicketDetailsResponse {
     content?: Array<TicketDetailsResponse>;
     number?: number;
     sort?: Array<SortObject>;
-    numberOfElements?: number;
     first?: boolean;
     last?: boolean;
+    numberOfElements?: number;
     pageable?: PageableObject;
     empty?: boolean;
 }
