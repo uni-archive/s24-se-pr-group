@@ -6,6 +6,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserResponse
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserCreateRequest;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateInfoRequest;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.AccountActivateToken;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Address;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.ApplicationUser;
@@ -46,6 +47,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_ROLES;
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_ROLES_2;
@@ -53,6 +55,9 @@ import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_USER;
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_USER_2;
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.DEFAULT_USER;
 import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.USER_ROLES;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -136,8 +141,8 @@ class UserEndpointTest {
         ApplicationUser user = userRepository.findByEmail("cdef@ge.ck");
         Assertions.assertAll(
             () -> Assertions.assertNull(user),
-            () -> Assertions.assertEquals(403, response.getStatus()),
-            () -> Assertions.assertEquals("User is already logged in", response.getContentAsString())
+            () -> assertEquals(403, response.getStatus()),
+            () -> assertEquals("User is already logged in", response.getContentAsString())
         );
     }
 
@@ -156,8 +161,8 @@ class UserEndpointTest {
         ApplicationUser user = userRepository.findByEmail("cdef@ge.ck");
         Assertions.assertAll(
             () -> Assertions.assertNull(user),
-            () -> Assertions.assertEquals(403, response.getStatus()),
-            () -> Assertions.assertEquals("User is not an admin", response.getContentAsString())
+            () -> assertEquals(403, response.getStatus()),
+            () -> assertEquals("User is not an admin", response.getContentAsString())
         );
     }
 
@@ -177,7 +182,7 @@ class UserEndpointTest {
         ApplicationUser user = userRepository.findByEmail("cdefij@ge.ck");
         Assertions.assertAll(
             () -> Assertions.assertNotNull(user),
-            () -> Assertions.assertEquals(201, response.getStatus())
+            () -> assertEquals(201, response.getStatus())
         );
     }
 
@@ -197,7 +202,26 @@ class UserEndpointTest {
         ApplicationUser user = userRepository.findByEmail("cdefgh@ge.ck");
         Assertions.assertAll(
             () -> Assertions.assertNotNull(user),
-            () -> Assertions.assertEquals(201, response.getStatus())
+            () -> assertEquals(201, response.getStatus())
+        );
+    }
+
+    @Test
+    void registerUserShouldThrowValidationException() throws Exception {
+        UserCreateRequest userCreateRequest = new UserCreateRequest("test", "password", "Peter", "Test",
+            "+43 6776182783", false, AddressSupplier.addressCreateRequest());
+
+        MvcResult mvcResult = mockMvc.perform(post(TestData.USER_BASE_URI + "/registration")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userCreateRequest)))
+            .andExpect(status().isUnprocessableEntity())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        ApplicationUser user = userRepository.findByEmail("test");
+        Assertions.assertAll(
+            () -> Assertions.assertNull(user),
+            () -> assertEquals(422, response.getStatus())
         );
     }
 
@@ -224,8 +248,8 @@ class UserEndpointTest {
             });
         Assertions.assertAll(
             () -> Assertions.assertNotNull(users),
-            () -> Assertions.assertEquals(1, users.getTotalElements()),
-            () -> Assertions.assertEquals(1, users.getTotalPages())
+            () -> assertEquals(1, users.getTotalElements()),
+            () -> assertEquals(1, users.getTotalPages())
         );
     }
 
@@ -291,6 +315,29 @@ class UserEndpointTest {
     }
 
     @Test
+    void updateUserStatusByEmailShouldThrowValidationException() throws Exception {
+        ApplicationUser userToUpdate = ApplicationUserSupplier.anAdminUserEntity();
+        userToUpdate.setSuperAdmin(true);
+        userToUpdate.setAccountLocked(true);
+
+        // Save the entity and retrieve it to get the generated ID
+        ApplicationUser savedUser = userRepository.save(objectMapper.convertValue(userToUpdate, ApplicationUser.class));
+        userToUpdate.setId(savedUser.getId());  // Set the ID back to the DTO
+
+        userToUpdate.setAccountLocked(false);  // Set the new account locked status (false)
+
+        // Perform the PUT request with an admin token
+        mockMvc.perform(put(TestData.USER_BASE_URI + "/update/status")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES))
+                .content(objectMapper.writeValueAsString(userToUpdate)))
+            .andExpect(status().isUnprocessableEntity());
+
+        // Delete the entity
+        userRepository.delete(objectMapper.convertValue(userToUpdate, ApplicationUser.class));
+    }
+
+    @Test
     @WithMockUser(roles = "USER", username = "admin2@email.com")
     void updateUserInfoShouldUpdatePhoneNummer() throws Exception {
         // Arrange
@@ -315,7 +362,7 @@ class UserEndpointTest {
         // Assert
         MockHttpServletResponse response = mvcResult.getResponse();
         ApplicationUserResponse applicationUserResponse = objectMapper.readValue(response.getContentAsString(), ApplicationUserResponse.class);
-        Assertions.assertEquals("+431234567890", applicationUserResponse.phoneNumber());
+        assertEquals("+431234567890", applicationUserResponse.phoneNumber());
 
         userRepository.delete(user);
     }
@@ -333,7 +380,7 @@ class UserEndpointTest {
 
         // Assert
         MockHttpServletResponse response = mvcResult.getResponse();
-        Assertions.assertEquals("Dieser Link ist nicht gültig.", response.getContentAsString());
+        assertEquals("Dieser Link ist nicht gültig.", response.getContentAsString());
     }
 
     @Test
@@ -357,9 +404,9 @@ class UserEndpointTest {
         ApplicationUserResponse applicationUserResponse = objectMapper.readValue(response.getContentAsString(), ApplicationUserResponse.class);
 
         Assertions.assertAll(
-            () -> Assertions.assertEquals("user2@email.com", applicationUserResponse.email()),
-            () -> Assertions.assertEquals("John", applicationUserResponse.firstName()),
-            () -> Assertions.assertEquals("Doe", applicationUserResponse.familyName())
+            () -> assertEquals("user2@email.com", applicationUserResponse.email()),
+            () -> assertEquals("John", applicationUserResponse.firstName()),
+            () -> assertEquals("Doe", applicationUserResponse.familyName())
         );
 
         userRepository.delete(user);
@@ -379,7 +426,7 @@ class UserEndpointTest {
         String responseBody = response.getContentAsString();
 
         Assertions.assertAll(
-            () -> Assertions.assertEquals(404, response.getStatus()),
+            () -> assertEquals(404, response.getStatus()),
             () -> Assertions.assertThrows(DtoNotFoundException.class, () -> {
                 throw new DtoNotFoundException(responseBody);
             })
@@ -391,12 +438,11 @@ class UserEndpointTest {
     void updateUserInfoShouldThrowValidationExceptionForAnotherUser() throws Exception {
         // Arrange
         ApplicationUser user = new ApplicationUser();
-        user.setId(1L);
         user.setEmail("user2@example.com"); // Different email to trigger the validation exception
-        userRepository.save(user);
+        ApplicationUser savedUser = userRepository.save(user);
 
         UserUpdateInfoRequest updateRequest = new UserUpdateInfoRequest(
-            user.getId(), null, "+431234567890"
+            savedUser.getId(), null, "+431234567890"
         );
 
         // Act
@@ -411,8 +457,8 @@ class UserEndpointTest {
         String responseBody = response.getContentAsString();
 
         Assertions.assertAll(
-            () -> Assertions.assertEquals(422, response.getStatus()),
-            () -> Assertions.assertTrue(responseBody.contains("Du kannst nur deine eigenen Daten bearbeiten."))
+            () -> assertEquals(422, response.getStatus()),
+            () -> assertTrue(responseBody.contains("Du kannst nur deine eigenen Daten bearbeiten."))
         );
 
         userRepository.delete(user);
@@ -426,7 +472,6 @@ class UserEndpointTest {
         Address savedAddress = addressRepository.save(address);
 
         ApplicationUser user = ApplicationUserSupplier.aUserEntity();
-        user.setId(-456L);
         user.setEmail("user1@example.com");
         user.setAddress(savedAddress); // Set the saved address to the user
         ApplicationUser savedUser = userRepository.save(user);
@@ -450,12 +495,90 @@ class UserEndpointTest {
         ApplicationUserResponse applicationUserResponse = objectMapper.readValue(response.getContentAsString(), ApplicationUserResponse.class);
 
         Assertions.assertAll(
-            () -> Assertions.assertEquals("+431234567890", applicationUserResponse.phoneNumber())
+            () -> assertEquals("+431234567890", applicationUserResponse.phoneNumber())
         );
 
         // Cleanup
         userRepository.delete(savedUser);
         addressRepository.delete(savedAddress);
+    }
+
+    @Test
+    @WithMockUser(roles = "USER", username = "user@email.com")
+    void updateUserInfoShouldThrowNotFoundException() throws Exception {
+        UserUpdateInfoRequest updateRequest = new UserUpdateInfoRequest(
+            -123L, null, "+431234567890"
+        );
+
+        MvcResult mvcResult = mockMvc.perform(put(TestData.USER_BASE_URI + "/update/user")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateRequest)))
+            .andExpect(status().isNotFound())
+            .andReturn();
+
+        // Assert
+        MockHttpServletResponse response = mvcResult.getResponse();
+        String responseBody = response.getContentAsString();
+
+        Assertions.assertAll(
+            () -> assertEquals(404, response.getStatus()),
+            () -> assertTrue(responseBody.contains("Could not find the user with the id -123"))
+        );
+    }
+
+    @Test
+    @WithMockUser(roles = "USER", username = "user23@email.com")
+    void updateUserInfoShouldThrowValidationException() throws Exception {
+        // Arrange
+        ApplicationUser user = ApplicationUserSupplier.aUserEntity();
+        user.setEmail("user21@email.com"); // Match the mock user email
+        ApplicationUser savedUser = userRepository.save(user);
+
+        UserUpdateInfoRequest updateRequest = new UserUpdateInfoRequest(
+            savedUser.getId(), "user24@email.com", "+431234567890"
+        );
+
+        // Act & Assert
+        mockMvc.perform(put(TestData.USER_BASE_URI + "/update/user")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateRequest)))
+            .andExpect(status().isUnprocessableEntity())
+            .andExpect(result -> assertInstanceOf(ValidationException.class, result.getResolvedException()))
+            .andExpect(result -> assertEquals("Du kannst nur deine eigenen Daten bearbeiten.", Objects.requireNonNull(result.getResolvedException()).getMessage()));
+
+        // Clean up
+        userRepository.delete(user);
+    }
+
+    @Test
+    @WithMockUser(roles = "USER", username = "user1@email.com")
+    void updateUserInfoShouldThrowValidationExceptionForInvalidPhoneNumber() throws Exception {
+        // Arrange
+        ApplicationUser user = ApplicationUserSupplier.aUserEntity();
+        user.setEmail("user1@email.com");
+        ApplicationUser savedUser = userRepository.save(user);
+
+        UserUpdateInfoRequest updateRequest = new UserUpdateInfoRequest(
+            savedUser.getId(), null, "1234567890"
+        );
+
+        // Act
+        MvcResult mvcResult = mockMvc.perform(put(TestData.USER_BASE_URI + "/update/user")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateRequest)))
+            .andExpect(status().isUnprocessableEntity())
+            .andReturn();
+
+        // Assert
+        MockHttpServletResponse response = mvcResult.getResponse();
+        String responseBody = response.getContentAsString();
+
+        Assertions.assertAll(
+            () -> assertEquals(422, response.getStatus()),
+            () -> assertTrue(responseBody.contains("Validation Error: Telefonnummer ist ungültig"))
+        );
+
+        userRepository.delete(user);
     }
 
     @Test
@@ -485,14 +608,17 @@ class UserEndpointTest {
         String responseBody = response.getContentAsString();
 
         Assertions.assertAll(
-            () -> Assertions.assertEquals(200, response.getStatus()),
-            () -> Assertions.assertTrue(responseBody.contains("Deine E-Mail-Adresse wurde erfolgreich geändert. Bitte melde dich mit deinen neuen Zugangsdaten an."))
+            () -> assertEquals(200, response.getStatus()),
+            () -> assertTrue(responseBody.contains("Deine E-Mail-Adresse wurde erfolgreich geändert. Bitte melde dich mit deinen neuen Zugangsdaten an."))
         );
 
         ApplicationUser updatedUser = userRepository.findByEmail("new@email.com");
         Assertions.assertNotNull(updatedUser);
-        Assertions.assertEquals("John", updatedUser.getFirstName());
-        Assertions.assertEquals("Doe", updatedUser.getFamilyName());
+        assertEquals("John", updatedUser.getFirstName());
+        assertEquals("Doe", updatedUser.getFamilyName());
+
+        userRepository.delete(updatedUser);
+        emailChangeTokenRepository.delete(token);
     }
 
     @Test
@@ -519,8 +645,8 @@ class UserEndpointTest {
         expectedResponse.put("message", "E-Mail zum Zurücksetzen des Passworts wurde gesendet");
 
         Assertions.assertAll(
-            () -> Assertions.assertEquals(200, response.getStatus()),
-            () -> Assertions.assertEquals(objectMapper.writeValueAsString(expectedResponse), responseBody)
+            () -> assertEquals(200, response.getStatus()),
+            () -> assertEquals(objectMapper.writeValueAsString(expectedResponse), responseBody)
         );
 
         ApplicationUser updatedUser = userRepository.findByEmail("test@email.com");
@@ -553,8 +679,8 @@ class UserEndpointTest {
         expectedResponse.put("message", "E-Mail zum Ändern des Passworts wurde gesendet.");
 
         Assertions.assertAll(
-            () -> Assertions.assertEquals(200, response.getStatus()),
-            () -> Assertions.assertEquals(objectMapper.writeValueAsString(expectedResponse), responseBody)
+            () -> assertEquals(200, response.getStatus()),
+            () -> assertEquals(objectMapper.writeValueAsString(expectedResponse), responseBody)
         );
 
         userRepository.delete(user);
@@ -592,14 +718,43 @@ class UserEndpointTest {
         expectedResponse.put("message", "Dein Passwort wurde erfolgreich geändert.");
 
         Assertions.assertAll(
-            () -> Assertions.assertEquals(200, response.getStatus()),
-            () -> Assertions.assertEquals(objectMapper.writeValueAsString(expectedResponse), responseBody)
+            () -> assertEquals(200, response.getStatus()),
+            () -> assertEquals(objectMapper.writeValueAsString(expectedResponse), responseBody)
         );
 
         ApplicationUser updatedUser = userRepository.findByEmail("test@email.com");
         Assertions.assertNotEquals("oldPassword", updatedUser.getPassword());
 
         userRepository.delete(updatedUser);
+        newPasswordTokenRepository.delete(token);
+    }
+
+    @Test
+    void setPasswordWithValidTokenShouldThrowValidationException() throws Exception {
+        ApplicationUser user = ApplicationUserSupplier.aUserEntity();
+        user.setEmail("test1@email.com");
+        user.setFirstName("John");
+        user.setFamilyName("Doe");
+        user.setPassword("oldPassword");
+        userRepository.save(user);
+
+        NewPasswordToken token = new NewPasswordToken();
+        token.setToken("validToken");
+        token.setEmail("test1@email.com");
+        token.setExpiryDate(LocalDateTime.now().plusDays(1));
+        newPasswordTokenRepository.save(token);
+
+        // Act
+        MvcResult mvcResult = mockMvc.perform(put("/api/v1/users/user/password/update")
+                .param("token", "validToken")
+                .param("newPassword", "oldPassword")
+                .param("currentPassword", "oldPassword")
+                .characterEncoding(StandardCharsets.UTF_8.name())) // Ensure UTF-8 encoding
+            .andExpect(status().isUnprocessableEntity())
+            .andReturn();
+
+        userRepository.delete(user);
+        newPasswordTokenRepository.delete(token);
     }
 
     @Test
@@ -633,14 +788,25 @@ class UserEndpointTest {
         expectedResponse.put("message", "Dein Konto wurde erfolgreich aktiviert. Du kannst dich nun anmelden.");
 
         Assertions.assertAll(
-            () -> Assertions.assertEquals(200, response.getStatus()),
-            () -> Assertions.assertEquals(objectMapper.writeValueAsString(expectedResponse), responseBody)
+            () -> assertEquals(200, response.getStatus()),
+            () -> assertEquals(objectMapper.writeValueAsString(expectedResponse), responseBody)
         );
 
         ApplicationUser updatedUser = userRepository.findByEmail("test@email.com");
-        Assertions.assertTrue(updatedUser.isAccountActivated());
+        assertTrue(updatedUser.isAccountActivated());
 
         userRepository.delete(updatedUser);
+        accountActivateTokenRepository.delete(token);
+    }
+
+    @Test
+    void activateAccountShouldThrowValidationException() throws Exception {
+        // Act
+        MvcResult mvcResult = mockMvc.perform(post("/api/v1/users/user/activate/account")
+                .param("token", "validToken")
+                .characterEncoding(StandardCharsets.UTF_8.name())) // Ensure UTF-8 encoding
+            .andExpect(status().isUnprocessableEntity())
+            .andReturn();
     }
 
     @Test
@@ -667,11 +833,29 @@ class UserEndpointTest {
         expectedResponse.put("message", "Dein Account wurde erfolgreich gelöscht.");
 
         Assertions.assertAll(
-            () -> Assertions.assertEquals(200, response.getStatus()),
-            () -> Assertions.assertEquals(objectMapper.writeValueAsString(expectedResponse), responseBody)
+            () -> assertEquals(200, response.getStatus()),
+            () -> assertEquals(objectMapper.writeValueAsString(expectedResponse), responseBody)
         );
 
         ApplicationUser deletedUser = userRepository.findById(user.getId()).orElse(null);
         Assertions.assertNull(deletedUser);
+    }
+
+    @Test
+    void deleteUserShouldThrowNotFoundException() throws Exception {
+        // Act
+        MvcResult mvcResult = mockMvc.perform(delete("/api/v1/users/user/delete")
+                .param("id", String.valueOf(-123345L))
+                .characterEncoding(StandardCharsets.UTF_8.name())) // Ensure UTF-8 encoding
+            .andExpect(status().isNotFound())
+            .andReturn();
+
+        // Assert
+        MockHttpServletResponse response = mvcResult.getResponse();
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+
+        Assertions.assertAll(
+            () -> assertEquals(404, response.getStatus())
+        );
     }
 }
