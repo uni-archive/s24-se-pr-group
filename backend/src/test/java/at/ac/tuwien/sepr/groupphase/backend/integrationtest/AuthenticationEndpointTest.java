@@ -114,7 +114,7 @@ public class AuthenticationEndpointTest {
 
         MockHttpServletResponse response = mvcResult.getResponse();
         String contentAsString = response.getContentAsString();
-        Assertions.assertEquals("Account is locked due to multiple failed login attempts. Please try again later.",
+        Assertions.assertEquals("Ihr Account wurde wegen wiederholter falscher Anmeldeversuche gesperrt. Bitte versuchen Sie es später erneut oder kontaktieren Sie einen Administrator.",
             contentAsString);
     }
 

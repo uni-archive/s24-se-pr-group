@@ -37,8 +37,6 @@ public class TicketValidator extends AbstractValidator<TicketDetailsDto> {
             errors.add("Ticket is null");
         }
 
-        // TODO I (Peter R) am stupido again, and do not understand why this is needed. if the ticket has been picked up while being reserved, it gets set to valid.
-        // This should not be reversible i believe, as the ticket is picked up at the counter - how can it be given back?
         if (Objects.nonNull(ticket) && ticket.isValid()) {
             errors.add("Cannot cancel already validated ticket.");
         }

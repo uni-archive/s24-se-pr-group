@@ -15,15 +15,15 @@ import { LocationDto } from './location-dto';
 
 
 export interface PageLocationDto { 
-    totalElements?: number;
     totalPages?: number;
-    first?: boolean;
-    last?: boolean;
+    totalElements?: number;
     size?: number;
     content?: Array<LocationDto>;
     number?: number;
     sort?: Array<SortObject>;
     numberOfElements?: number;
+    first?: boolean;
+    last?: boolean;
     pageable?: PageableObject;
     empty?: boolean;
 }
