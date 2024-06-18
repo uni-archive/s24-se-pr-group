@@ -120,7 +120,7 @@ public class UserEndpoint {
 
         ApplicationUserDto user = userService.findApplicationUserById(userInfo.id());
         if (!authentication.getName().equals(user.getEmail())) {
-            throw new ValidationException("User can only update their own information.");
+            throw new ValidationException("Du kannst nur deine eigenen Daten bearbeiten.");
         }
         try {
             return userMapper.toResponse(userService.updateUserInfo(userMapper.toDto(userInfo)));
