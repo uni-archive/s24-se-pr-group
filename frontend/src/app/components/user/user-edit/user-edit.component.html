@@ -93,6 +93,7 @@
             Abbrechen
           </button>
           <button
+            *ngIf="!editMode"
             type="button"
             class="btn btn-primary mx-1"
             (click)="changePassword()"
@@ -101,6 +102,7 @@
           </button>
         </div>
         <button
+          *ngIf="!editMode"
           type="button"
           class="btn btn-danger mx-1"
           (click)="requestDeleteUser(user)"
