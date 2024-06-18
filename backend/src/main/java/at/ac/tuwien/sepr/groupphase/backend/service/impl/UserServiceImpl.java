@@ -4,10 +4,8 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.AccountActivateTokenDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.AddressDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.EmailChangeTokenDto;
-import at.ac.tuwien.sepr.groupphase.backend.dto.InvoiceDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.MailBody;
 import at.ac.tuwien.sepr.groupphase.backend.dto.NewPasswordTokenDto;
-import at.ac.tuwien.sepr.groupphase.backend.dto.OrderSummaryDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
@@ -20,7 +18,6 @@ import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.security.SecurityUtil;
 import at.ac.tuwien.sepr.groupphase.backend.service.AddressService;
 import at.ac.tuwien.sepr.groupphase.backend.service.EmailSenderService;
-import at.ac.tuwien.sepr.groupphase.backend.service.OrderService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
@@ -67,13 +64,12 @@ public class UserServiceImpl implements UserService {
     private final AddressService addressService;
     private final Cache<String, Integer> loginAttemptCache;
     private final UserUnlockSchedulingService userUnlockSchedulingService;
-    private final OrderService orderService;
 
     @Autowired
     public UserServiceImpl(UserDao userDao, EmailChangeTokenDao emailChangeTokenDao, PasswordEncoder passwordEncoder,
-                           JwtTokenizer jwtTokenizer, UserValidator userValidator,AccountActivateTokenDao accountActivateTokenDao, EmailSenderService emailSenderService,
+                           JwtTokenizer jwtTokenizer, UserValidator userValidator, AccountActivateTokenDao accountActivateTokenDao, EmailSenderService emailSenderService,
                            AddressService addressService, Cache<String, Integer> loginAttemptCache, NewPasswordTokenDao newPasswordTokenDao,
-                           UserUnlockSchedulingService userUnlockSchedulingService, OrderService orderService) {
+                           UserUnlockSchedulingService userUnlockSchedulingService) {
         this.userDao = userDao;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
@@ -85,7 +81,6 @@ public class UserServiceImpl implements UserService {
         this.newPasswordTokenDao = newPasswordTokenDao;
         this.userUnlockSchedulingService = userUnlockSchedulingService;
         this.accountActivateTokenDao = accountActivateTokenDao;
-        this.orderService = orderService;
     }
 
     @Override
@@ -406,16 +401,6 @@ public class UserServiceImpl implements UserService {
             user = userDao.findById(id);
         } catch (EntityNotFoundException e) {
             throw new DtoNotFoundException(e.getMessage());
-        }
-
-        List<OrderSummaryDto> orders = orderService.findForUser(id);
-        if (!orders.isEmpty()) {
-            for (OrderSummaryDto order : orders) {
-                List<InvoiceDto> invoices = order.getInvoices();
-                if (invoices.isEmpty()) {
-                    throw new ValidationException("Bitte storniere alle Bestellungen bevor du dein Konto löschst.");
-                }
-            }
         }
 
         try {
