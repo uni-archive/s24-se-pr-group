@@ -81,7 +81,7 @@ import { UserConfirmDeleteDialogComponent } from "./components/user/user-edit/us
     ActivateAccountComponent,
     PickUpTicketsComponent,
     ConfirmationDialogComponent,
-    PickUpTicketShowSelectComponent
+    PickUpTicketShowSelectComponent,
     UserConfirmDeleteDialogComponent,
   ],
   imports: [
@@ -98,8 +98,7 @@ import { UserConfirmDeleteDialogComponent } from "./components/user/user-edit/us
     NgxPaginationModule,
     EventSearchComponent,
     ShowSearchComponent,
-    ArtistSearchComponent
-,
+    ArtistSearchComponent,
     TagSearchComponent,
   ],
   providers: [httpInterceptorProviders],
