@@ -18,11 +18,8 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import java.lang.invoke.MethodHandles;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +36,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.lang.invoke.MethodHandles;
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/orders")
 public class OrderEndpoint {
@@ -51,7 +51,7 @@ public class OrderEndpoint {
     private final Auth auth;
 
     public OrderEndpoint(OrderService orderService, OrderResponseMapper orderMapper, UserService userService,
-        Auth auth) {
+                         Auth auth) {
         this.orderService = orderService;
         this.orderMapper = orderMapper;
         this.userService = userService;
@@ -126,8 +126,14 @@ public class OrderEndpoint {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         OrderDetailsDto orderDetailsDto = orderService.create(user);
-        response.addCookie(new Cookie("order", orderDetailsDto.getId().toString()));
+        addCookie(response, orderDetailsDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(orderMapper.toResponse(orderDetailsDto));
+    }
+
+    private static void addCookie(HttpServletResponse response, OrderDetailsDto orderDetailsDto) {
+        Cookie order = new Cookie("order", orderDetailsDto.getId().toString());
+        order.setMaxAge(60 * 30);
+        response.addCookie(order);
     }
 
     @Secured(Code.USER)

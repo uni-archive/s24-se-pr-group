@@ -22,8 +22,6 @@ import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.TicketValidator;
 import org.quartz.SchedulerException;
-import java.lang.invoke.MethodHandles;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -201,18 +199,13 @@ public class TicketServiceImpl implements TicketService {
             ticketInvalidationSchedulingService.rescheduleReservationInvalidationJobForConfirmedOrder(ticketDetailsDto);
         } else {
             ticketInvalidationSchedulingService.cancelReservationInvalidationJob(ticketDetailsDto.getHash());
+            ticketDetailsDto.setValid(true);
+            try {
+                ticketDao.update(ticketDetailsDto);
+            } catch (EntityNotFoundException e) {
+                throw new DtoNotFoundException(e);
+            }
         }
-        ticketDetailsDto.setValid(true);
-        try {
-            ticketDao.update(ticketDetailsDto);
-        } catch (EntityNotFoundException e) {
-            throw new DtoNotFoundException(e);
-        }
-    }
-
-    @Override
-    public void setValidAllTicketsForOrder(long orderId) {
-        ticketDao.setValidAllTicketsForOrder(orderId);
     }
 
     @Override

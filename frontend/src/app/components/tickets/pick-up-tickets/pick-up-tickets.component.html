@@ -29,13 +29,15 @@
       <tr>
         <th>Vorname</th>
         <th>Nachname</th>
-        <th>Aktionen</th>
+        <th>Platz</th>
+        <th></th>
       </tr>
       </thead>
       <tbody>
       <tr *ngFor="let ticket of items" class="align-middle">
         <td>{{ ticket.order.customer.firstName }}</td>
         <td>{{ ticket.order.customer.familyName }}</td>
+        <td>{{ ticket.hallSpot.id }}</td>
         <td class="d-flex justify-content-end">
           <button class="btn btn-danger btn-lg" (click)="confirmCancellation(ticket)">
             <i class="bi bi-x"></i>

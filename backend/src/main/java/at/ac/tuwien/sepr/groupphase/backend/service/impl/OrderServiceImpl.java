@@ -91,17 +91,6 @@ public class OrderServiceImpl implements OrderService {
         return orderDao.create(orderDetailsDto);
     }
 
-    @Override
-    public void confirmOrder(OrderDetailsDto orderDetailsDto) throws DtoNotFoundException {
-        try {
-            for (var ticket : orderDetailsDto.getTickets()) {
-                ticketService.confirmTicket(ticket);
-            }
-        } catch (SchedulerException exception) {
-            throw new IllegalStateException("Could not confirm order", exception);
-        }
-    }
-
 
     @Override
     public void purchaseOrder(long orderId, ApplicationUserDto user) throws DtoNotFoundException, ValidationException {
@@ -114,7 +103,13 @@ public class OrderServiceImpl implements OrderService {
         }
         orderValidator.validateForPurchase(order, user);
         invoiceService.createPurchaseInvoiceForOrder(orderId);
-        ticketService.setValidAllTicketsForOrder(order.getId());
+        for (var ticket : order.getTickets()) {
+            try {
+                ticketService.confirmTicket(ticket);
+            } catch (SchedulerException e) {
+                throw new IllegalStateException(e);
+            }
+        }
     }
 
     private void addInvoicesToOrder(OrderDetailsDto order) {

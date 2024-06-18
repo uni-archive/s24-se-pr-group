@@ -63,7 +63,7 @@
           >
             <i class="bi bi-printer"></i>
           </a>
-          <a *ngIf="ticket.reserved && ticket.valid" class="btn btn-sm responsive-danger-button"
+          <a *ngIf="ticket.reserved && !ticket.valid" class="btn btn-sm responsive-danger-button"
              data-bs-toggle="modal"
              [attr.data-bs-target]="'#cancelTicketReservationModal' + ticket.id"
           >

@@ -147,6 +147,7 @@ export class UserCheckoutComponent implements OnInit {
       this.orderService.purchaseOrder(this.order.id).subscribe({
         next: () => {
           this.messagingService.setMessage("Die Bestellung war erfolgreich!");
+          document.cookie = 'order=; Path=/api/v1; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
           this.router.navigate(["/"]);
         },
         error: err => {
