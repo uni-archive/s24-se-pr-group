@@ -4,9 +4,10 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.AddressDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.AddressDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.stereotype.Component;
 
 @Component
 public class AddressValidator extends AbstractValidator<AddressDto> {
@@ -17,7 +18,7 @@ public class AddressValidator extends AbstractValidator<AddressDto> {
         this.addressDao = addressDao;
     }
 
-    private List<String> validateAddress(AddressDto addressDto) {
+    public List<String> validateAddress(AddressDto addressDto) {
         List<String> errors = new ArrayList<>();
 
         if (addressDto.getStreet() == null || addressDto.getStreet().isEmpty()) {
