@@ -51,8 +51,10 @@ import java.util.concurrent.ExecutionException;
 @Service
 public class UserServiceImpl implements UserService {
 
+    public static final String ACCOUNT_LOCKED = "Ihr Account wurde wegen wiederholter falscher Anmeldeversuche gesperrt. Bitte versuchen Sie es später erneut oder kontaktieren Sie einen Administrator.";
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final int MAX_EXPIRATION_TIME = 5;
+    public static final String INCORRECT_USERNAME_OR_PASSWORD = "Nutzername oder Passwort sind falsch.";
     private final UserDao userDao;
     private final EmailChangeTokenDao emailChangeTokenDao;
     private final NewPasswordTokenDao newPasswordTokenDao;
@@ -67,9 +69,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     public UserServiceImpl(UserDao userDao, EmailChangeTokenDao emailChangeTokenDao, PasswordEncoder passwordEncoder,
-                           JwtTokenizer jwtTokenizer, UserValidator userValidator, AccountActivateTokenDao accountActivateTokenDao,
-                           EmailSenderService emailSenderService, AddressService addressService, Cache<String, Integer> loginAttemptCache,
-                           NewPasswordTokenDao newPasswordTokenDao, UserUnlockSchedulingService userUnlockSchedulingService) {
+                           JwtTokenizer jwtTokenizer, UserValidator userValidator, AccountActivateTokenDao accountActivateTokenDao, EmailSenderService emailSenderService,
+                           AddressService addressService, Cache<String, Integer> loginAttemptCache, NewPasswordTokenDao newPasswordTokenDao,
+                           UserUnlockSchedulingService userUnlockSchedulingService) {
         this.userDao = userDao;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
@@ -124,7 +126,7 @@ public class UserServiceImpl implements UserService {
     public String
     login(String email, String password) throws UserLockedException {
         try {
-            Integer recentLoginAttempts = loginAttemptCache.get(email, () -> 0);
+            Integer recentLoginAttempts = loginAttemptCache.get(email, () -> 1);
             if (recentLoginAttempts > 5) {
                 ApplicationUserDto byEmail = userDao.findByEmail(email);
                 if (byEmail != null) {
@@ -133,14 +135,14 @@ public class UserServiceImpl implements UserService {
                     userUnlockSchedulingService.scheduleUnlockUser(byEmail.getEmail());
                 }
                 throw new UserLockedException(
-                    "Account is locked due to multiple failed login attempts. Please try again later.");
+                    ACCOUNT_LOCKED);
             }
             loginAttemptCache.put(email, recentLoginAttempts + 1);
         } catch (ExecutionException e) {
             throw new BadCredentialsException(
-                "Account is locked due to multiple failed login attempts. Please try again later.");
+                ACCOUNT_LOCKED);
         } catch (EntityNotFoundException | SchedulerException e) {
-            throw new BadCredentialsException("Username or password is incorrect or account is locked");
+            throw new BadCredentialsException(INCORRECT_USERNAME_OR_PASSWORD);
         }
         try {
             ApplicationUserDto applicationUserDto = findApplicationUserByEmail(email);
@@ -162,9 +164,9 @@ public class UserServiceImpl implements UserService {
                 return jwtTokenizer.getAuthToken(userDetails.getUsername(), roles);
             }
         } catch (DtoNotFoundException e) {
-            throw new BadCredentialsException("Username or password is incorrect or account is locked");
+            throw new BadCredentialsException(INCORRECT_USERNAME_OR_PASSWORD);
         }
-        throw new BadCredentialsException("Username or password is incorrect or account is locked");
+        throw new BadCredentialsException(INCORRECT_USERNAME_OR_PASSWORD);
     }
 
     public ApplicationUserDto createUser(ApplicationUserDto toCreate) throws ValidationException, ForbiddenException, MailNotSentException {
@@ -391,6 +393,31 @@ public class UserServiceImpl implements UserService {
             LOGGER.error("Could not confirm the email because the user does not exist.", e);
         }
 
+    }
+
+    @Override
+    public void deleteUser(long id) throws DtoNotFoundException, ValidationException, MailNotSentException {
+        //validate user
+        ApplicationUserDto user;
+        try {
+            user = userDao.findById(id);
+        } catch (EntityNotFoundException e) {
+            throw new DtoNotFoundException(e.getMessage());
+        }
+
+        try {
+            userDao.deleteById(id);
+        } catch (EntityNotFoundException e) {
+            throw new DtoNotFoundException(e.getMessage());
+        }
+
+        MailBody mailBody = generateMailBodyAccountDelete(user);
+
+        try {
+            emailSenderService.sendHtmlMail(mailBody);
+        } catch (MessagingException e) {
+            throw new MailNotSentException("Error sending mail.");
+        }
     }
 
     private EmailChangeTokenDto createAndSaveEmailChangeToken(String newEmail, String currentEmail) {
@@ -669,6 +696,46 @@ public class UserServiceImpl implements UserService {
                     </div>
                   </body>
                 </html>
+                """;
+        return new MailBody(email, subject, emailTemplate);
+    }
+
+    private MailBody generateMailBodyAccountDelete(ApplicationUserDto user) {
+        String email = user.getEmail();
+        String subject = "Konto löschen";
+        String url = "http://localhost:4200/";
+        String emailTemplate = """
+            <!DOCTYPE html>
+            <html lang="de">
+            <head>
+               <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+               <style>
+                  body { background-color: #f8f9fa; font-family: Arial, sans-serif; }
+                  .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; }
+                  .card { background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 0.25rem; padding: 20px; }
+                  .card-body { padding: 20px; }
+                  .h3 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+                  .h5 { font-size: 1.25rem; }
+                  .text-gray-700 { color: #6c757d; }
+                  .btn-primary { display: inline-block; font-weight: 400; color: #fff !important; text-align: center; vertical-align: middle; cursor: pointer; background-color: #007bff; border: 1px solid #007bff; padding: 0.375rem 0.75rem; font-size: 1rem; border-radius: 0.25rem; text-decoration: none; }
+               </style>
+            </head>
+            <body>
+                <div class="container">
+                  <div class="card my-10">
+                    <div class="card-body">
+                      <h1 class="h3">Konto löschen</h1>
+                      <h5 class="h5">Hallo""" + " " + user.getFirstName() +
+            """
+                !</h5>
+                <p class="text-gray-700">Hiermit bestätigen wir, dass dein Konto gelöscht wurde.</p>
+                <p class="text-gray-700">Wir bedauern es sehr, dass du uns verlässt und hoffen, dass du uns in Zukunft wieder besuchst.</p>
+                <a class="btn btn-primary" href=\"""" + url + "\"" +
+            """
+                target="_blank" style="color: #fff !important;">TicketLine Homepage</a>
+                    </div>
+                  </div>
+                </body>
                 """;
         return new MailBody(email, subject, emailTemplate);
     }

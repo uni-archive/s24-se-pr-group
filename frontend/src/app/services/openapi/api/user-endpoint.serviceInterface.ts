@@ -38,6 +38,13 @@ export interface UserEndpointServiceInterface {
     /**
      * 
      * 
+     * @param id 
+     */
+    deleteUser(id: number, extraHttpRequestParams?: any): Observable<{ [key: string]: string; }>;
+
+    /**
+     * 
+     * 
      */
     getUser(extraHttpRequestParams?: any): Observable<ApplicationUserResponse>;
 

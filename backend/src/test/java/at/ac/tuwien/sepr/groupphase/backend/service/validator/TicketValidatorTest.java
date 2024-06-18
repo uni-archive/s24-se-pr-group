@@ -147,26 +147,24 @@ public class TicketValidatorTest {
     }
 
     @Test
-    @Disabled("This test is disabled because the ticketValidator should not check for validity of the ticket imo. It is not valid at this time. ")
     void aReservedTicket_ThatIsInvalid_ShouldNotBeCancellable() {
         var t = new TicketDetailsDto();
         t.setReserved(true);
-        t.setValid(false);
+        t.setValid(true);
 
         assertThatThrownBy(() -> ticketValidator.validateForCancelReservation(t))
-            .hasMessageContaining("Cannot cancel invalid ticket.")
+            .hasMessageContaining("Cannot cancel already validated ticket.")
             .isInstanceOf(ValidationException.class);
     }
 
     @Test
-    @Disabled("This test is disabled because the ticketValidator should not check for validity of the ticket imo. It is not valid at this time. ")
     void ticketsShouldFirstBeCheckedForValidity() {
         var t = new TicketDetailsDto();
         t.setReserved(false);
-        t.setValid(false);
+        t.setValid(true);
 
         assertThatThrownBy(() -> ticketValidator.validateForCancelReservation(t))
-            .hasMessageContaining("Cannot cancel invalid ticket.")
+            .hasMessageContaining("Cannot cancel already validated ticket.")
             .isInstanceOf(ValidationException.class);
     }
 

@@ -65,38 +65,61 @@
     </div>
 
     <div class="row">
-      <div class="form-group col-12 text-right d-flex">
+      <div class="form-group col-12 text-right d-flex justify-content-between">
+        <div class="d-flex">
+          <button
+            type="button"
+            class="btn btn-primary mx-1"
+            [disabled]="!userForm.valid"
+            (click)="saveUserDetails()"
+            *ngIf="editMode"
+          >
+            Speichern
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary mx-1"
+            (click)="toggleEditMode()"
+            *ngIf="!editMode"
+          >
+            Bearbeiten
+          </button>
+          <button
+            *ngIf="editMode"
+            type="button"
+            class="btn btn-primary mx-1"
+            (click)="toggleEditMode()"
+          >
+            Abbrechen
+          </button>
+          <button
+            *ngIf="!editMode"
+            type="button"
+            class="btn btn-primary mx-1"
+            (click)="changePassword()"
+          >
+            Passwort ändern
+          </button>
+        </div>
         <button
-          type="button"
-          class="btn btn-primary mx-1"
-          [disabled]="!userForm.valid"
-          (click)="saveUserDetails()"
-          *ngIf="editMode"
-        >
-          Speichern
-        </button>
-        <button
-          type="button"
-          class="btn btn-primary mx-1"
-          (click)="toggleEditMode()"
           *ngIf="!editMode"
-        >
-          Bearbeiten
-        </button>
-        <button
-          *ngIf="editMode"
           type="button"
           class="btn btn-danger mx-1"
-          (click)="toggleEditMode()"
+          (click)="requestDeleteUser(user)"
+          data-bs-target="#delete-confirm"
+          data-bs-toggle="modal"
         >
-          Abbrechen
-        </button>
-      </div>
-      <div class="form-group col-12 text-right mt-1">
-        <button type="button" class="btn btn-primary mx-1">
-          Passwort ändern
+          <i class="bi bi-trash"></i>
+          Konto löschen
         </button>
       </div>
     </div>
   </form>
 </div>
+
+<app-user-confirm-delete-dialog
+  [deleteWhat]="userForDelete?.firstName ?? ''"
+  (confirm)="deleteAccount()"
+  id="delete-confirm"
+  tabindex="-1"
+></app-user-confirm-delete-dialog>

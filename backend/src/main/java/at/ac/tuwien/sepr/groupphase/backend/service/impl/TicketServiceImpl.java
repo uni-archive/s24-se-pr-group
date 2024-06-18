@@ -115,11 +115,13 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
+    @Transactional
     public TicketDetailsDto addTicketToOrder(TicketAddToOrderDto ticket, ApplicationUserDto user)
         throws ValidationException, ForbiddenException {
         try {
             var order = orderDao.findById(ticket.orderId());
             if (!Objects.equals(user.getId(), order.getCustomer().getId())) {
+                // Create custom exception to delete the cookie if the order does not exist
                 throw new ForbiddenException();
             }
         } catch (EntityNotFoundException e) {
@@ -130,7 +132,7 @@ public class TicketServiceImpl implements TicketService {
         try {
             ticketInvalidationSchedulingService.scheduleReservationInvalidationsForNewlyAddedTicket(ticketDetailsDto);
         } catch (SchedulerException e) {
-            throw new IllegalStateException("Could not schedule reservation invalidation job" + e.getMessage(), e);
+            throw new IllegalStateException("Could not schedule reservation invalidation job: " + e.getMessage(), e);
         }
         return ticketDetailsDto;
     }
@@ -184,11 +186,6 @@ public class TicketServiceImpl implements TicketService {
             var refOrder = new OrderDetailsDto();
             refOrder.setId(createTicket.orderId());
             ticket.setOrder(refOrder);
-            // Note: @Peter R. ich habe das bissl geändert weil ich auch ein findSummaryById hatte.
-            // Anundfürsich war die SummaryDto gedacht mit aggregtate Daten gefüllt zu sein, mein Request im Repository-Interface
-            // hat hier dadurch an der Stelle null geliefert wenn noch kein Ticket drinnen war.
-            // Das Replacement hier sollte aber prinzipiell gleichwertig sein für was du brauchst.
-            // ticket.setOrder(orderDao.findById(orderId));
         } catch (EntityNotFoundException e) {
             throw new IllegalStateException("Entity could not be found after validation", e);
         } catch (Exception e) {
