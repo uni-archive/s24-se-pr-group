@@ -24,8 +24,8 @@ export class ResetPasswordComponent {
   ngOnInit() {
     this.changePasswordForm = this.formBuilder.group(
       {
-        newPassword: ["", [Validators.required, Validators.minLength(6)]],
-        confirmPassword: ["", Validators.required],
+        newPassword: ["", [Validators.required, Validators.minLength(8)]],
+        confirmPassword: ["", Validators.required, Validators.minLength(8)],
       },
       {
         validator: this.mustMatch("newPassword", "confirmPassword"),
