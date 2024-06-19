@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.datagenerator;
 
+import at.ac.tuwien.sepr.groupphase.backend.datagenerator.config.DataGenerationConfig;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Artist;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Event;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSector;
@@ -20,6 +21,8 @@ import java.util.List;
 import java.util.Random;
 
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -28,6 +31,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ShowDataGenerator {
 
+    private static final Logger log = LoggerFactory.getLogger(ShowDataGenerator.class);
     @Autowired
     private ShowRepository showRepository;
 
@@ -52,6 +56,10 @@ public class ShowDataGenerator {
     @Autowired
     private EventDataGenerator eventDataGenerator;
 
+    @Autowired
+    private DataGenerationConfig dataGenerationConfig;
+
+
     @Transactional
     @PostConstruct
     protected void generateData() throws ForbiddenException, ValidationException {
@@ -60,7 +68,8 @@ public class ShowDataGenerator {
         List<Event> allEvents = eventRepository.findAll(); // Assuming you have a method to fetch all events
         List<Location> allLocations = locationRepository.findAllWithHallplan(); // Assuming you have a method to fetch all locations
 
-        for (int i = 1; i <= 40; i++) {
+        for (int i = 1; i <= dataGenerationConfig.showAmount; i++) {
+            log.info("Generating show " + i + " of " + dataGenerationConfig.showAmount);
             LocalDateTime dateTime = LocalDateTime.now().plusDays(random.nextInt(365));
 
             // Randomly assign artists to the show
@@ -78,11 +87,10 @@ public class ShowDataGenerator {
             show.setEvent(event);
             show.setLocation(location);
 
-            showRepository.saveAndFlush(show);
+            show = showRepository.saveAndFlush(show);
 
-            for (HallSector sector : location.getHallPlan().getSectors()) {
-                if (hallSectorShowRepository.findByShowIdAndSectorId(show.getId(), sector.getId()).isPresent())
-                    continue;
+            List<HallSector> sectors = location.getHallPlan().getSectors().stream().distinct().toList();
+            for (HallSector sector : sectors) {
                 var hss = new HallSectorShow(show, sector, random.nextInt(50, 1000));
                 hallSectorShowRepository.save(hss);
             }

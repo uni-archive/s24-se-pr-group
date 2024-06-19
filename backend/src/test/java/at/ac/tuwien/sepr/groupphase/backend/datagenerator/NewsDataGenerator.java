@@ -1,11 +1,13 @@
 package at.ac.tuwien.sepr.groupphase.backend.datagenerator;
 
+import at.ac.tuwien.sepr.groupphase.backend.datagenerator.config.DataGenerationConfig;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.News;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.NewsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.NewsRepository;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +21,6 @@ import java.time.LocalDateTime;
 public class NewsDataGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final int NUMBER_OF_NEWS_TO_GENERATE = 10;
     private static final String TEST_NEWS_TITLE = "Lorem Ipsum";
     private static final String TEST_NEWS_SUMMARY = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur " +
         "consectetur egestas arcu viverra facilisis.";
@@ -43,6 +44,9 @@ public class NewsDataGenerator {
 
     private final NewsRepository newsRepository;
 
+    @Autowired
+    private DataGenerationConfig dataGenerationConfig;
+
     public NewsDataGenerator(NewsRepository newsRepository) {
         this.newsRepository = newsRepository;
     }
@@ -52,8 +56,9 @@ public class NewsDataGenerator {
         if (newsRepository.findAll().size() > 0) {
             LOGGER.debug("news already generated");
         } else {
-            LOGGER.debug("generating {} news entries", NUMBER_OF_NEWS_TO_GENERATE);
-            for (int i = 0; i < NUMBER_OF_NEWS_TO_GENERATE; i++) {
+            LOGGER.debug("generating {} news entries", dataGenerationConfig.newsAmount);
+            for (int i = 0; i < dataGenerationConfig.newsAmount; i++) {
+                LOGGER.info("generating news entry {} of {}", i, dataGenerationConfig.newsAmount);
                 byte[] dummyImage = DummyImageGenerator.createDummyImage();
                 News news = News.NewsBuilder.aNews()
                     .withTitle(TEST_NEWS_TITLE + " " + i)
