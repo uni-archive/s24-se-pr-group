@@ -2,7 +2,6 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ApplicationUserSearchDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.MailNotSentException;
@@ -71,18 +70,18 @@ public interface UserService extends UserDetailsService {
      * @param toUpdate   the user to update
      * @param adminEmail the email of the admin
      * @return the updated user
-     * @throws ValidationException if the email is invalid
-     * @throws NotFoundException   if the email does not exist
+     * @throws ValidationException  if the email is invalid
+     * @throws DtoNotFoundException if the email does not exist
      */
     ApplicationUserDto updateUserStatusByEmail(ApplicationUserDto toUpdate, String adminEmail) throws ValidationException,
-        NotFoundException;
+        DtoNotFoundException;
 
     /**
      * Update the user information.
      *
      * @param userInfo the user information to update
      * @return the updated user information
-     * @throws NotFoundException    if the user does not exist
+     * @throws DtoNotFoundException if the user does not exist
      * @throws ValidationException  if the user information is invalid
      * @throws MailNotSentException if the mail could not be sent
      */
@@ -94,9 +93,9 @@ public interface UserService extends UserDetailsService {
      *
      * @param id the id
      * @return the application user
-     * @throws NotFoundException if the user does not exist
+     * @throws DtoNotFoundException if the user does not exist
      */
-    ApplicationUserDto findApplicationUserById(Long id) throws NotFoundException;
+    ApplicationUserDto findApplicationUserById(Long id) throws DtoNotFoundException;
 
     /**
      * Update the email address of a user using a valid token.
@@ -135,5 +134,12 @@ public interface UserService extends UserDetailsService {
      */
     void activateAccount(String token) throws ValidationException;
 
-    void deleteUser(long id) throws DtoNotFoundException, ValidationException, MailNotSentException;
+    /**
+     * Delete a user based on the id.
+     *
+     * @param id the id
+     * @throws DtoNotFoundException if the user does not exist
+     * @throws MailNotSentException if the mail could not be sent
+     */
+    void deleteUser(long id) throws DtoNotFoundException, MailNotSentException;
 }

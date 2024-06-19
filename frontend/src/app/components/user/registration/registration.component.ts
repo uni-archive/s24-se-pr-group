@@ -47,7 +47,9 @@ export class RegistrationComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     if (this.authService.isLoggedIn()) {
-      this.router.navigate(["/home"]);
+      if (!this.isAdminFlag) {
+        this.router.navigate([""]);
+      }
     }
   }
 
