@@ -2,6 +2,8 @@ package at.ac.tuwien.sepr.groupphase.backend.persistence.repository;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallPlan;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSector;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSpot;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Show;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,4 +43,8 @@ public interface ShowRepository extends JpaRepository<Show, Long> {
 
     @EntityGraph(attributePaths = {"artists", "event", "location"})
     Show findById(long id);
+
+    @Query("SELECT s FROM Show s WHERE s.location IS NOT NULL")
+    @EntityGraph(attributePaths = {"event", "location", "location.hallPlan"})
+    List<Show> findAllWithHallPlans();
 }

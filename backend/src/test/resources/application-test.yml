@@ -1,5 +1,8 @@
 logging:
   file.name: ./log/backend-test.log
+  level:
+    root: INFO
+    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: TRACE
 
 spring:
   datasource:
@@ -7,3 +10,15 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
+    show-sql: false
+
+data:
+  artist: 100
+  news: 100
+  event: 100
+  location: 100
+  show: 100
+  user: 100
+  ticket: 100
+  order: 100
+  hallPlan: 3

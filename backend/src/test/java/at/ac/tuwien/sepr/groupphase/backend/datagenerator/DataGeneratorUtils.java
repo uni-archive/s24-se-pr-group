@@ -172,6 +172,7 @@ public class DataGeneratorUtils {
             sector.setName(faker.name().firstName());
             sector.setHallPlan(hallPlan);
             sector.setFrontendCoordinates("");
+            sector.setSeats(List.of());
             return sector;
         }, count);
     }

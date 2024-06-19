@@ -16,4 +16,7 @@ public interface HallSectorRepository extends JpaRepository<HallSector, Long> {
 
     @Query("SELECT hs FROM HallSector hs JOIN hs.seats s WHERE s.id = :spotId")
     HallSector findBySeatId(@Param("spotId") Long spotId);
+
+    @Query("SELECT hs FROM HallSector hs WHERE hs.hallPlan.id IN :hallPlanIds")
+    List<HallSector> findSectorsByHallPlanIds(@Param("hallPlanIds") List<Long> hallPlanIds);
 }

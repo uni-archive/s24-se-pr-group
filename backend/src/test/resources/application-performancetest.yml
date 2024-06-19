@@ -1,0 +1,10 @@
+data:
+  artist: 2000
+  news: 2000
+  event: 2000
+  location: 2000
+  show: 2000
+  user: 2000
+  ticket: 2000
+  order: 500
+  hallPlan: 120

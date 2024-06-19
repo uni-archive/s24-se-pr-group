@@ -32,7 +32,7 @@ public interface ShowHallPlanResponseMapper extends BaseResponseMapper<HallPlanD
                 var hss = hallSectorShowList.stream().filter(hs -> Objects.equals(hs.getSector().getId(), sector.getId())).findFirst().get();
                 var mapper = Mappers.getMapper(ShowHallSectorResponseMapper.class);
                 var ticketMapForSector = ticketsForShow.stream()
-                    .filter(t -> t.getHallSpot().getSector().getId() == sector.getId())
+                    .filter(t -> Objects.equals(t.getHallSpot().getSector().getId(), sector.getId()))
                     .collect(Collectors.toMap(t -> t.getHallSpot().getId(), t -> t));
                 return mapper.toResponse(sector, hss, ticketMapForSector);
             })
