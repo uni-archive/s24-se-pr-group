@@ -30,16 +30,12 @@ import { ActivateAccountComponent } from "./components/user/registration/activat
 import { TicketSelectComponent } from "./components/ticket-select/ticket-select.component";
 import { PickUpTicketsComponent } from "./components/tickets/pick-up-tickets/pick-up-tickets.component";
 import { PickUpTicketShowSelectComponent } from "./components/tickets/pick-up-ticket-show-select/pick-up-ticket-show-select.component";
+import {NewsCreateComponent} from "./components/news/news-create/news-create.component";
 
 const routes: Routes = [
   { path: "", component: HomeComponent },
   { path: "register", component: RegistrationComponent },
   { path: "login", component: LoginComponent },
-  {
-    path: "news-detail/:id",
-    canActivate: [AuthGuard],
-    component: NewsDetailComponent,
-  },
   {path: 'news', component: NewsComponent},
   {path: 'news-detail/:id', component: NewsDetailComponent},
   {path: 'news-create', canActivate: [AuthGuard], component: NewsCreateComponent},

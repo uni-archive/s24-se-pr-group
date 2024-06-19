@@ -15,8 +15,8 @@ import { TicketDetailsResponse } from './ticket-details-response';
 
 
 export interface PageTicketDetailsResponse { 
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
     size?: number;
     content?: Array<TicketDetailsResponse>;
     number?: number;

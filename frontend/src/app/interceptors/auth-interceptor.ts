@@ -35,7 +35,9 @@ export class AuthInterceptor implements HttpInterceptor {
       this.globals.backendUri + "/users/user/password/reset";
     const activateAccountUri =
       this.globals.backendUri + "/users/user/activate/account";
-
+    const newsUri = this.globals.backendUri + '/news/all';
+    const newsDetailUri = this.globals.backendUri + '/news/detail/';
+    const top10Uri = this.globals.backendUri + '/events/top10';
     let allowedUriStarts = [
       locationUri,
       showLocationUri,

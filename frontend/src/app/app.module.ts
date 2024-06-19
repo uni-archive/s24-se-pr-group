@@ -50,6 +50,7 @@ import { PickUpTicketsComponent } from "./components/tickets/pick-up-tickets/pic
 import { ConfirmationDialogComponent } from "./components/confirmation-dialog/confirmation-dialog.component";
 import { PickUpTicketShowSelectComponent } from "./components/tickets/pick-up-ticket-show-select/pick-up-ticket-show-select.component";
 import { UserConfirmDeleteDialogComponent } from "./components/user/user-edit/user-confirm-delete-dialog/user-confirm-delete-dialog.component";
+import {NgOptimizedImage} from "@angular/common";
 
 @NgModule({
   declarations: [

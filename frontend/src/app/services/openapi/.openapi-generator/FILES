@@ -1,5 +1,4 @@
 .gitignore
-.openapi-generator-ignore
 README.md
 api.module.ts
 api/address-endpoint.service.ts
@@ -41,11 +40,11 @@ model/application-user-response.ts
 model/artist-dto.ts
 model/artist-search-dto.ts
 model/artist-search-response.ts
-model/detailed-news-dto.ts
 model/event-creation-dto.ts
 model/event-dto.ts
 model/event-response.ts
 model/event-search-dto.ts
+model/event-with-ticket-count-dto.ts
 model/hall-seat-response.ts
 model/hall-sector-dto.ts
 model/hall-sector-response.ts
@@ -62,12 +61,14 @@ model/location-create-request.ts
 model/location-dto.ts
 model/location-response.ts
 model/models.ts
+model/news-request-dto.ts
+model/news-response-dto.ts
 model/order-details-response.ts
 model/order-summary-response.ts
 model/page-application-user-response.ts
 model/page-location-dto.ts
-model/page-news-response-dto.ts
 model/page-show-response.ts
+model/page-simple-news-response-dto.ts
 model/page-ticket-details-response.ts
 model/pageable-object.ts
 model/sector-ticket-creation-request.ts
@@ -79,7 +80,7 @@ model/show-hallplan-spot-response.ts
 model/show-list-dto.ts
 model/show-response.ts
 model/show-search-dto.ts
-model/simple-news-dto.ts
+model/simple-news-response-dto.ts
 model/sort-object.ts
 model/ticket-creation-request.ts
 model/ticket-details-response-hall-spot.ts

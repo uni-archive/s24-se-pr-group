@@ -17,13 +17,6 @@ public class ShowCreationDto {
 
     private List<HallSectorShowCreationDto> sectorShowList;
 
-
-
-    private List<HallSectorShowCreationDto> sectorShowList;
-
-
-
-
     public LocalDateTime getDateTime() {
         return dateTime;
     }
@@ -42,15 +35,6 @@ public class ShowCreationDto {
         this.location = locationDto;
         this.sectorShowList = sectorShowList;
         this.sectorShowList = sectorShowList;
-    }
-
-    public ShowCreationDto setSectorShowList(List<HallSectorShowCreationDto> sectorShowList) {
-        this.sectorShowList = sectorShowList;
-        return this;
-    }
-
-    public List<HallSectorShowCreationDto> getSectorShowList() {
-        return sectorShowList;
     }
 
     public ShowCreationDto setSectorShowList(List<HallSectorShowCreationDto> sectorShowList) {

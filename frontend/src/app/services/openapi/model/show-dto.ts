@@ -20,6 +20,5 @@ export interface ShowDto {
     artistList?: Array<ArtistDto>;
     location?: LocationDto;
     event?: EventDto;
-    location?: LocationDto;
 }
 

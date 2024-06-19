@@ -1,12 +1,15 @@
 package at.ac.tuwien.sepr.groupphase.backend.datagenerator;
 
+import at.ac.tuwien.sepr.groupphase.backend.datagenerator.config.DataGenerationConfig;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Event;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.News;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.EventRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.NewsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.NewsRepository;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +17,7 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Random;
 
 @Profile("generateData")
@@ -43,17 +47,20 @@ public class NewsDataGenerator {
         "pulvinar vel. Nam ut arcu enim.";
 
     private final NewsRepository newsRepository;
+    private final EventRepository eventRepository;
 
     @Autowired
     private DataGenerationConfig dataGenerationConfig;
 
-    public NewsDataGenerator(NewsRepository newsRepository) {
+    public NewsDataGenerator(NewsRepository newsRepository, EventRepository eventRepository) {
         this.newsRepository = newsRepository;
+        this.eventRepository = eventRepository;
     }
 
     @PostConstruct
     private void generateNews() throws IOException {
         Random random = new Random();
+        List<Event> all = eventRepository.findAll();
         if (!newsRepository.findAll().isEmpty()) {
             LOGGER.debug("news already generated");
         } else {
@@ -67,7 +74,7 @@ public class NewsDataGenerator {
                     .withText(TEST_NEWS_TEXT)
                     .withImage(dummyImage)
                     .withPublishedAt(LocalDateTime.now().minusMonths(i))
-                    .withEvent(event)
+                    .withEvent(all.get(random.nextInt(all.size())))
                     .build();
                 LOGGER.debug("saving news {}", news);
                 newsRepository.save(news);
