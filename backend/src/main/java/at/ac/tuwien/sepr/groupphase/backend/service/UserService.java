@@ -130,7 +130,7 @@ public interface UserService extends UserDetailsService {
      * Activate the account of a user using a valid token.
      *
      * @param token the token
-     * @throws ValidationException if the token is invalid
+     * @throws ValidationException if the token is invalid, or the token is expired
      */
     void activateAccount(String token) throws ValidationException;
 
