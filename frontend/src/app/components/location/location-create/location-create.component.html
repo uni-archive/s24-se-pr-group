@@ -23,6 +23,9 @@
         class="form-control"
         placeholder="Straße"
       />
+      <div *ngIf="createForm.get('street').invalid && createForm.get('street').touched" class="invalid-feedback">
+        Bitte geben Sie eine Straße ein.
+      </div>
     </div>
     <div class="form-group col-12 col-xl-6">
       <label for="zip">PLZ:</label>
@@ -33,6 +36,9 @@
         class="form-control"
         placeholder="PLZ"
       />
+      <div *ngIf="createForm.get('zip').invalid && createForm.get('zip').touched" class="invalid-feedback">
+        Bitte geben Sie eine PLZ ein.
+      </div>
     </div>
     <div class="form-group col-12 col-xl-6">
       <label for="city">Stadt:</label>
@@ -43,14 +49,28 @@
         class="form-control"
         placeholder="Stadt"
       />
+      <div *ngIf="createForm.get('city').invalid && createForm.get('city').touched" class="invalid-feedback">
+        Bitte geben Sie eine Stadt ein.
+      </div>
     </div>
     <div class="form-group col-12">
       <country-dropdown formControlName="country"></country-dropdown>
+      <div *ngIf="createForm.get('country').invalid && createForm.get('country').touched" class="invalid-feedback">
+        Bitte wählen Sie ein Land aus.
+      </div>
     </div>
+  </div>
+  <app-hallplan-autocomplete class="form-group col-12" formControlName="hallPlan" (selectedHallPlan)="onHallPlanSelected($event)" (resetHallPlan)="onHallPlanSelected(null)"></app-hallplan-autocomplete>
+  <div *ngIf="createForm.get('hallPlan').invalid && createForm.get('hallPlan').touched" class="invalid-feedback">
+    Bitte wählen Sie einen Hallenplan aus.
   </div>
   <div class="row">
     <div class="form-group">
       <button type="submit" class="btn btn-primary" [disabled]="!createForm.valid">Erstellen</button>
     </div>
+  </div>
+
+  <div class="form-group col-12" *ngIf="selectedHallPlan">
+    <app-hallplan-viewer [hallPlan]="selectedHallPlan"></app-hallplan-viewer>
   </div>
 </form>

@@ -4,16 +4,18 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallPlan;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSeat;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.util.List;
 
 public class HallSectorDto implements AbstractDto {
     private Long id;
 
-    @JsonIgnore
+    @JsonBackReference
     private HallPlanDto hallPlan;
     private String name;
     private String frontendCoordinates;
+    @JsonManagedReference
     private List<HallSpotDto> seats;
 
     private String color;

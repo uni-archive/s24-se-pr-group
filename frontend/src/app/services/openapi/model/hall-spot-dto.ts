@@ -9,9 +9,11 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { HallSectorDto } from './hall-sector-dto';
 
 
 export interface HallSpotDto { 
     id?: number;
+    sector?: HallSectorDto;
 }
 

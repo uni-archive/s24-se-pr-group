@@ -7,6 +7,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.AddressResponseMappe
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.AddressService;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import java.util.List;
@@ -47,7 +48,12 @@ public class AddressEndpoint {
     public ResponseEntity<AddressDto> update(@PathVariable(name = "id") Long id, @RequestBody AddressDto addressDto)
         throws ValidationException, EntityNotFoundException, ForbiddenException {
         addressDto.setId(id);
-        AddressDto updatedAddress = addressService.update(addressDto);
+        AddressDto updatedAddress = null;
+        try {
+            updatedAddress = addressService.update(addressDto);
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        }
         return new ResponseEntity<>(updatedAddress, HttpStatus.OK);
     }
 
@@ -55,14 +61,23 @@ public class AddressEndpoint {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable(name = "id") Long id)
         throws EntityNotFoundException, ForbiddenException {
-        addressService.delete(id);
+        try {
+            addressService.delete(id);
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Secured(Code.USER)
     @GetMapping("/{id}")
     public ResponseEntity<AddressDto> findById(@PathVariable(name = "id") Long id) throws EntityNotFoundException {
-        AddressDto address = addressService.findById(id);
+        AddressDto address = null;
+        try {
+            address = addressService.findById(id);
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        }
         return new ResponseEntity<>(address, HttpStatus.OK);
     }
 

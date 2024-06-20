@@ -7,7 +7,7 @@ import java.util.List;
 
 public class EventDto implements AbstractDto {
 
-    private long id;
+    private Long id;
     private String description;
     private long duration;
     private String title;
@@ -70,7 +70,7 @@ public class EventDto implements AbstractDto {
         return this;
     }
 
-    public EventDto(long id, String description, long duration, String title, EventType type, List<ShowDto> shows) {
+    public EventDto(Long id, String description, long duration, String title, EventType type, List<ShowDto> shows) {
         this.id = id;
         this.description = description;
         this.duration = duration;

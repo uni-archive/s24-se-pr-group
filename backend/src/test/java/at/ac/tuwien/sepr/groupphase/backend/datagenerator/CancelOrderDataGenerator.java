@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.datagenerator;
 
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallPlan;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSector;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSectorShow;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Invoice;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Order;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Show;
@@ -19,6 +20,8 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.ShowRepositor
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.TicketRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,7 +40,6 @@ import static at.ac.tuwien.sepr.groupphase.backend.datagenerator.DataGeneratorUt
 import static at.ac.tuwien.sepr.groupphase.backend.datagenerator.DataGeneratorUtils.fakeManyShows;
 import static at.ac.tuwien.sepr.groupphase.backend.datagenerator.DataGeneratorUtils.fakeManyTickets;
 import static at.ac.tuwien.sepr.groupphase.backend.datagenerator.DataGeneratorUtils.fakeUser;
-import static at.ac.tuwien.sepr.groupphase.backend.datagenerator.DataGeneratorUtils.randomChoices;
 
 
 /**
@@ -48,6 +50,7 @@ import static at.ac.tuwien.sepr.groupphase.backend.datagenerator.DataGeneratorUt
 @Component
 public class CancelOrderDataGenerator {
 
+    private static final Logger log = LoggerFactory.getLogger(CancelOrderDataGenerator.class);
     @Autowired
     private OrderRepository orderRepository;
     @Autowired
@@ -91,8 +94,8 @@ public class CancelOrderDataGenerator {
         );
         cancellableOrderWithNoTickets.setInvoices(List.of(inv1));
 
-        var artists = fakeManyArtists(5);
-        var events = fakeManyEvents(5);
+        var artists = fakeManyArtists(20);
+        var events = fakeManyEvents(20);
         var shows = fakeManyShows(events, artists, 10);
         shows.forEach(s -> s.setDateTime(LocalDateTime.now().plusDays(1)));
         var hallplan = new HallPlan();
@@ -100,6 +103,7 @@ public class CancelOrderDataGenerator {
         var hallSpots = fakeManyHallSpots(sectors, 5);
         var sectorShowsChosenMap = new ConcurrentHashMap<HallSector, List<Show>>();
         var sectorShows = fakeManyHallSectorShows(shows, sectors, sectorShowsChosenMap, 10);
+
         var tickets = fakeManyTickets(hallSpots, sectorShowsChosenMap, 5);
 
         var cancellableOrderWithTickets = new Order();

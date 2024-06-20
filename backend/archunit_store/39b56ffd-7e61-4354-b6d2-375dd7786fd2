@@ -1,2 +1,1 @@
 Method <at.ac.tuwien.sepr.groupphase.backend.config.LogFilter.doFilterInternal(jakarta.servlet.http.HttpServletRequest, jakarta.servlet.http.HttpServletResponse, jakarta.servlet.FilterChain)> calls constructor <java.lang.RuntimeException.<init>(java.lang.Throwable)> in (LogFilter.java:48)
-Method <at.ac.tuwien.sepr.groupphase.backend.service.impl.HallPlanServiceImpl.create(at.ac.tuwien.sepr.groupphase.backend.dto.HallPlanDto)> calls constructor <java.lang.RuntimeException.<init>(java.lang.Throwable)> in (HallPlanServiceImpl.java:50)

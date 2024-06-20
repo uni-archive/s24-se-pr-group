@@ -15,5 +15,6 @@ import { AddressCreateRequest } from './address-create-request';
 export interface LocationCreateRequest { 
     name?: string;
     addressCreateRequest?: AddressCreateRequest;
+    hallPlanId?: number;
 }
 

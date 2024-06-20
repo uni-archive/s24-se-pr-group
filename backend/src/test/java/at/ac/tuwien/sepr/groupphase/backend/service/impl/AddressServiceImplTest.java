@@ -6,6 +6,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.AddressDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.UserDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.AddressValidator;
@@ -61,7 +62,7 @@ class AddressServiceImplTest {
     }
 
     @Test
-    void updateShouldCallValidatorAndDao() throws ValidationException, EntityNotFoundException, ForbiddenException {
+    void updateShouldCallValidatorAndDao() throws ValidationException, EntityNotFoundException, ForbiddenException, DtoNotFoundException {
         AddressDto addressDto = new AddressDto();
         addressDto.setId(1L);
         ApplicationUserDto userDto = new ApplicationUserDto();

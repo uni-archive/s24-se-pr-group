@@ -9,6 +9,7 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.AbstractDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.impl.AbstractDtoImpl;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.impl.AbstractEntityImpl;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.AbstractServiceImpl;
@@ -64,7 +65,7 @@ class AbstractServiceTest {
 
     @Test
     void updateShouldValidateBeforeReturningDaoResult()
-        throws ValidationException, ForbiddenException, EntityNotFoundException {
+        throws ValidationException, ForbiddenException, DtoNotFoundException, EntityNotFoundException {
         AbstractDtoImpl dto = new AbstractDtoImpl();
         when(dao.update(dto)).thenReturn(dto);
 
@@ -88,7 +89,7 @@ class AbstractServiceTest {
     }
 
     @Test
-    void findByIdShouldReturnDaoResult() throws EntityNotFoundException {
+    void findByIdShouldReturnDaoResult() throws EntityNotFoundException, DtoNotFoundException {
         AbstractDtoImpl dto = new AbstractDtoImpl();
         when(dao.findById(1L)).thenReturn(dto);
 
@@ -99,7 +100,7 @@ class AbstractServiceTest {
     }
 
     @Test
-    void deleteShouldCallDao() throws ForbiddenException, EntityNotFoundException {
+    void deleteShouldCallDao() throws ForbiddenException, EntityNotFoundException, DtoNotFoundException {
         service.delete(1L);
 
         verify(dao).deleteById(1L);

@@ -51,6 +51,11 @@ import { ConfirmationDialogComponent } from "./components/confirmation-dialog/co
 import { PickUpTicketShowSelectComponent } from "./components/tickets/pick-up-ticket-show-select/pick-up-ticket-show-select.component";
 import { UserConfirmDeleteDialogComponent } from "./components/user/user-edit/user-confirm-delete-dialog/user-confirm-delete-dialog.component";
 import {NgOptimizedImage} from "@angular/common";
+import {
+  HallPlanAutocompleteComponent
+} from "./components/hallplan/hallplan-autocomplete/hall-plan-autocomplete.component";
+import {HallplanComponent} from "./components/hallplan/hallplan.component";
+import {HallPlanViewerComponent} from "./components/hallplan/hallplan-viewer/hallplan-viewer.component";
 
 @NgModule({
   declarations: [
@@ -88,25 +93,28 @@ import {NgOptimizedImage} from "@angular/common";
     ConfirmationDialogComponent,
     PickUpTicketShowSelectComponent,
     UserConfirmDeleteDialogComponent,
+    HallPlanAutocompleteComponent,
+    HallPlanViewerComponent
   ],
-    imports: [
-        BrowserModule,
-        AppRoutingModule,
-        ReactiveFormsModule,
-        HttpClientModule,
-        NgbModule,
-        FormsModule,
-        AngularPhoneNumberInput,
-        PrintPurchaseInvoiceButtonComponent,
-        PrintTicketButtonComponent,
-        TicketsTableComponent,
-        NgxPaginationModule,
-        EventSearchComponent,
-        ShowSearchComponent,
-        ArtistSearchComponent,
-        TagSearchComponent,
-        NgOptimizedImage,
-    ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+    NgbModule,
+    FormsModule,
+    AngularPhoneNumberInput,
+    PrintPurchaseInvoiceButtonComponent,
+    PrintTicketButtonComponent,
+    TicketsTableComponent,
+    NgxPaginationModule,
+    EventSearchComponent,
+    ShowSearchComponent,
+    ArtistSearchComponent,
+    TagSearchComponent,
+    NgOptimizedImage,
+    HallplanComponent,
+  ],
   providers: [httpInterceptorProviders],
   exports: [
     HeaderComponent,

@@ -15,15 +15,15 @@ import { TicketDetailsResponse } from './ticket-details-response';
 
 
 export interface PageTicketDetailsResponse { 
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
     size?: number;
     content?: Array<TicketDetailsResponse>;
     number?: number;
     sort?: Array<SortObject>;
+    numberOfElements?: number;
     first?: boolean;
     last?: boolean;
-    numberOfElements?: number;
     pageable?: PageableObject;
     empty?: boolean;
 }

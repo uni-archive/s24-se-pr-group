@@ -48,9 +48,21 @@
       <country-dropdown formControlName="country"></country-dropdown>
     </div>
   </div>
+  <app-hallplan-autocomplete class="form-group col-12"
+                             formControlName="hallPlan"
+                             (selectedHallPlan)="onHallPlanSelected($event)"
+                             (resetHallPlan)="onHallPlanReset()"
+                             [initialHallPlan]="selectedHallPlan">
+  </app-hallplan-autocomplete>
+  <div *ngIf="editForm.get('hallPlan').invalid" class="invalid-feedback">
+    Bitte wählen Sie einen Hallenplan aus.
+  </div>
   <div class="row">
     <div class="form-group">
       <button type="submit" class="btn btn-primary" [disabled]="!editForm.valid">Aktualisieren</button>
     </div>
+  </div>
+  <div class="form-group col-12" *ngIf="selectedHallPlan">
+    <app-hallplan-viewer [hallPlan]="selectedHallPlan"></app-hallplan-viewer>
   </div>
 </form>

@@ -9,12 +9,14 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { HallPlanDto } from './hall-plan-dto';
 import { HallSectorShowDto } from './hall-sector-show-dto';
 import { HallSpotDto } from './hall-spot-dto';
 
 
 export interface HallSectorDto { 
     id?: number;
+    hallPlan?: HallPlanDto;
     name?: string;
     frontendCoordinates?: string;
     seats?: Array<HallSpotDto>;

@@ -26,6 +26,7 @@ public abstract class AbstractDao<T extends AbstractEntity, D extends AbstractDt
         return mapper.toDto(repository.save(mapper.toEntity(createDto)));
     }
 
+    @Transactional
     public D findById(Long id) throws EntityNotFoundException {
         return mapper.toDto(repository.findById(id).orElseThrow(() -> new EntityNotFoundException(id)));
     }
@@ -46,6 +47,7 @@ public abstract class AbstractDao<T extends AbstractEntity, D extends AbstractDt
         return mapper.toDto(repository.save(mapper.toEntity(entity)));
     }
 
+    @Transactional
     public List<D> findAll() {
         return repository.findAll().stream().map(mapper::toDto).collect(Collectors.toList());
     }

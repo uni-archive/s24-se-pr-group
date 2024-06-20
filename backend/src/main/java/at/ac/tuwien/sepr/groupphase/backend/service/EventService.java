@@ -5,6 +5,7 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.EventSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.EventWithTicketCountDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public interface EventService {
      *
      * @param eventDto creation dto
      */
-    ResponseEntity<EventDto> createEvent(EventCreationDto eventDto);
+    EventDto createEvent(EventDto eventDto);
 
     /**
      * Returns a list of EventDTOs that fit the given search criteria.
@@ -40,7 +41,7 @@ public interface EventService {
      * @param id event id
      * @return ResponseEntity with EventDto
      */
-    EventDto getById(long id) throws EntityNotFoundException;
+    EventDto getById(long id) throws DtoNotFoundException;
 
     /**
      * Retrieves a list of the top 10 events with the most tickets sold.

@@ -4,7 +4,6 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.HallSectorShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowListDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowSearchDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.HallSectorShowCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.hallplan.ShowHallplanResponse;
@@ -13,10 +12,10 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.HallSectorShowRespon
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ShowHallPlanResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ShowResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.HallSectorShowService;
 import at.ac.tuwien.sepr.groupphase.backend.service.ShowService;
 import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,8 +75,7 @@ public class ShowEndpoint {
 
     @PermitAll
     @GetMapping(value = "/event/{eventid}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ShowListDto>> getShowsByEventId(@PathVariable("eventid") long eventid)
-        throws EntityNotFoundException {
+    public ResponseEntity<List<ShowListDto>> getShowsByEventId(@PathVariable("eventid") long eventid) throws DtoNotFoundException {
         var result = service.getShowsByEventId(eventid);
         LOGGER.info("POST: events/{} ({})", eventid, result);
         return ResponseEntity.ok(result);
@@ -85,8 +83,7 @@ public class ShowEndpoint {
 
     @PermitAll
     @PostMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ShowListDto>> searchShows(@RequestBody ShowSearchDto searchDto)
-        throws EntityNotFoundException {
+    public ResponseEntity<List<ShowListDto>> searchShows(@RequestBody ShowSearchDto searchDto) throws DtoNotFoundException {
         var result = service.searchShows(searchDto);
         LOGGER.info("POST: /search ({})", result);
         return ResponseEntity.ok(result);
@@ -120,7 +117,7 @@ public class ShowEndpoint {
         ShowDto res;
         try {
             res = service.getById(id);
-        } catch (EntityNotFoundException e) {
+        } catch (DtoNotFoundException e) {
             throw new NotFoundException(e);
         }
         return ResponseEntity.ok(showMapper.toResponse(res));

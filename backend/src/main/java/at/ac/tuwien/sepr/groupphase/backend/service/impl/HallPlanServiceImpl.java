@@ -6,12 +6,14 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.HallSectorDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.HallSpotDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.AbstractService;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 @Service
 public class HallPlanServiceImpl extends AbstractService<HallPlanDto> {
@@ -28,8 +30,7 @@ public class HallPlanServiceImpl extends AbstractService<HallPlanDto> {
     }
 
     @Transactional
-    @Override
-    public HallPlanDto create(HallPlanDto dto) {
+    public HallPlanDto createHallPlan(HallPlanDto dto) throws DtoNotFoundException {
         var plan = dao.create(dto.withoutSectors());
         dto.getSectors().forEach(section -> {
             section.setHallPlan(plan);
@@ -47,10 +48,13 @@ public class HallPlanServiceImpl extends AbstractService<HallPlanDto> {
                 sector.setSeats(hallSpotDao.findByHallSectorId(sector.getId()));
             });
         } catch (EntityNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new DtoNotFoundException(e);
         }
         return retVal;
     }
 
 
+    public List<HallPlanDto> findByName(String name) {
+        return dao.findByName(name);
+    }
 }

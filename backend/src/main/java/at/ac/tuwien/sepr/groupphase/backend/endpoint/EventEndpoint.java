@@ -5,16 +5,13 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.EventSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.EventWithTicketCountDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventResponse;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.EventResponseMapper;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.EventType;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.EventService;
-import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
-import at.ac.tuwien.sepr.groupphase.backend.service.validator.EventValidator;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -41,7 +38,7 @@ public class EventEndpoint {
     @Secured("ROLE_ADMIN")
     @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EventDto> createEvent(@RequestBody EventCreationDto createDto) {
-        return service.createEvent(createDto);
+        return ResponseEntity.ok(service.createEvent(mapper.toDto(createDto)));
     }
 
     @PermitAll
@@ -52,8 +49,12 @@ public class EventEndpoint {
 
     @PermitAll
     @GetMapping(value = "/{eventid}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EventDto> findById(@PathVariable("eventid") long eventid) throws EntityNotFoundException {
-        return ResponseEntity.ok(service.getById(eventid));
+    public ResponseEntity<EventDto> findById(@PathVariable("eventid") long eventid)  {
+        try {
+            return ResponseEntity.ok(service.getById(eventid));
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        }
     }
 
     @PermitAll

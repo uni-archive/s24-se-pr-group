@@ -1,20 +1,11 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-  TemplateRef,
-  SimpleChanges,
-  OnChanges,
-} from "@angular/core";
-import { FormBuilder, FormGroup, FormControl } from "@angular/forms";
-import { debounceTime } from "rxjs/operators";
+import { Component, EventEmitter, Input, OnInit, Output, TemplateRef, SimpleChanges, OnChanges } from '@angular/core';
+import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
+import { debounceTime } from 'rxjs/operators';
 
 @Component({
-  selector: "app-paginated-list",
-  templateUrl: "./paginated-list.component.html",
-  styleUrls: ["./paginated-list.component.scss"],
+  selector: 'app-paginated-list',
+  templateUrl: './paginated-list.component.html',
+  styleUrls: ['./paginated-list.component.scss']
 })
 export class PaginatedListComponent implements OnInit, OnChanges {
   @Input() filterTemplate!: TemplateRef<any>;
@@ -23,7 +14,7 @@ export class PaginatedListComponent implements OnInit, OnChanges {
   @Input() showPaginationButtons: boolean = true;
   @Input() filterConfig: { [key: string]: any } = {}; // Accept filter configuration with default values
   @Input() createButtonEnabled: boolean = false;
-  @Input() heading: string = "";
+  @Input() heading: string = '';
   @Input() refresh: boolean = false; // Input to trigger refresh
 
   @Output() createNew = new EventEmitter<void>();
@@ -34,6 +25,7 @@ export class PaginatedListComponent implements OnInit, OnChanges {
   currentPage = 1;
   totalPages = 1;
   pageSize = 10;
+  totalItems = 0;
 
   constructor(private fb: FormBuilder) {}
 
@@ -48,10 +40,10 @@ export class PaginatedListComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes["refresh"] && !changes["refresh"].firstChange) {
+    if (changes['refresh'] && !changes['refresh'].firstChange) {
       this.searchItems();
     }
-    if (changes["filterConfig"]) {
+    if (changes['filterConfig']) {
       this.initializeFormControls();
     }
   }
@@ -66,7 +58,7 @@ export class PaginatedListComponent implements OnInit, OnChanges {
     Object.keys(this.filterConfig).forEach((controlName: string) => {
       this.searchForm.addControl(
         controlName,
-        new FormControl(this.filterConfig[controlName] ?? "")
+        new FormControl(this.filterConfig[controlName] ?? '')
       );
     });
   }
@@ -82,25 +74,17 @@ export class PaginatedListComponent implements OnInit, OnChanges {
       next: (data: any) => {
         this.items = data.content;
         this.totalPages = data.totalPages;
+        this.totalItems = data.totalElements;
+        console.log(data)
       },
       error: (err: any) => {
         this.error = err.message;
-      },
+      }
     });
   }
 
   changePage(page: number): void {
-    if (page > 0 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.searchItems();
-    }
-  }
-
-  getPages(): number[] {
-    const pages = [];
-    for (let i = 1; i <= this.totalPages; i++) {
-      pages.push(i);
-    }
-    return pages;
+    this.currentPage = page;
+    this.searchItems();
   }
 }

@@ -15,7 +15,7 @@ import { Observable }                                        from 'rxjs';
 
 import { LocationCreateRequest } from '../model/models';
 import { LocationDto } from '../model/models';
-import { PageLocationDto } from '../model/models';
+import { PageLocationSummaryResponse } from '../model/models';
 
 
 import { Configuration }                                     from '../configuration';
@@ -58,13 +58,13 @@ export interface LocationEndpointServiceInterface {
      * 
      * @param name 
      */
-    findByName(name: string, extraHttpRequestParams?: any): Observable<Array<LocationDto>>;
+    findByName1(name: string, extraHttpRequestParams?: any): Observable<Array<LocationDto>>;
 
     /**
      * 
      * 
      */
-    findByName1(extraHttpRequestParams?: any): Observable<Array<LocationDto>>;
+    findByName2(extraHttpRequestParams?: any): Observable<Array<LocationDto>>;
 
     /**
      * 
@@ -79,7 +79,7 @@ export interface LocationEndpointServiceInterface {
      * @param sort 
      * @param withUpComingShows 
      */
-    search1(name?: string, city?: string, street?: string, postalCode?: string, country?: string, page?: number, size?: number, sort?: string, withUpComingShows?: boolean, extraHttpRequestParams?: any): Observable<PageLocationDto>;
+    search1(name?: string, city?: string, street?: string, postalCode?: string, country?: string, page?: number, size?: number, sort?: string, withUpComingShows?: boolean, extraHttpRequestParams?: any): Observable<PageLocationSummaryResponse>;
 
     /**
      * 
