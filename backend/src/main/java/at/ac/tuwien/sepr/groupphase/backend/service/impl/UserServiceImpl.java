@@ -51,9 +51,9 @@ import java.util.concurrent.ExecutionException;
 public class UserServiceImpl implements UserService {
 
     public static final String ACCOUNT_LOCKED = "Ihr Account wurde wegen wiederholter falscher Anmeldeversuche gesperrt. Bitte versuchen Sie es später erneut oder kontaktieren Sie einen Administrator.";
+    public static final String INCORRECT_USERNAME_OR_PASSWORD = "Nutzername oder Passwort sind falsch.";
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final int MAX_EXPIRATION_TIME = 5;
-    public static final String INCORRECT_USERNAME_OR_PASSWORD = "Nutzername oder Passwort sind falsch.";
     private final UserDao userDao;
     private final EmailChangeTokenDao emailChangeTokenDao;
     private final NewPasswordTokenDao newPasswordTokenDao;
@@ -370,13 +370,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void activateAccount(String token) throws ValidationException {
+        LOGGER.debug("Activate account with token: {}", token);
         AccountActivateTokenDto emailConfirmToken = accountActivateTokenDao.findByToken(token);
         if (emailConfirmToken == null) {
-            throw new ValidationException("Der Link ist ungültig.");
+            throw new ValidationException("Dieser Link ist ungültig.");
         }
 
         if (emailConfirmToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new ValidationException("Dieser Link ist abgelaufen.");
+            throw new ValidationException("Dieser Link ist abgelaufen. Bitte neu registrieren.");
         }
 
         try {
@@ -387,7 +388,6 @@ public class UserServiceImpl implements UserService {
         } catch (EntityNotFoundException e) {
             LOGGER.error("Could not confirm the email because the user does not exist.", e);
         }
-
     }
 
     @Override
