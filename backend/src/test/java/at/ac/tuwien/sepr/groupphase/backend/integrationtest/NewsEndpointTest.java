@@ -6,13 +6,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import at.ac.tuwien.sepr.groupphase.backend.dto.EventDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsRequestDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.SimpleNewsResponseDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Event;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.News;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.EventRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.NewsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.UserRepository;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.EventMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -64,10 +68,16 @@ public class NewsEndpointTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private EventRepository eventRepository;
+
+    @Autowired
+    private EventMapper eventMapper;
 
     @BeforeEach
     void setUp() {
         newsRepository.deleteAll();
+        eventRepository.deleteAll();
     }
 
     private byte[] createValidTestImage() throws IOException {
@@ -78,6 +88,10 @@ public class NewsEndpointTest {
     }
 
     void setUpWith9News() throws IOException {
+        Event event = new Event();
+        event.setTitle("Titel");
+        eventRepository.save(event);
+
         for (int i = 1; i <= 9; i++) {
             News news = new News();
             news.setId((long) -i);
@@ -86,6 +100,7 @@ public class NewsEndpointTest {
             news.setText("Text");
             news.setPublishedAt(LocalDateTime.now());
             news.setImage(createValidTestImage());
+            news.setEvent(event);
             newsRepository.save(news);
         }
     }
@@ -94,13 +109,15 @@ public class NewsEndpointTest {
     void findAllShouldReturn9NewsWithData() throws Exception {
         setUpWith9News();
 
-        MvcResult mvcResult = mockMvc.perform(get("/api/v1/news/all").contentType(MediaType.APPLICATION_JSON)
-            .param("page", "0").param("size", "9")).andExpect(status().isOk()).andReturn();
+        MvcResult mvcResult = mockMvc.perform(get("/api/v1/news/all").contentType(MediaType
+            .APPLICATION_JSON).param("page", "0").param("size", "9"))
+            .andExpect(status().isOk()).andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
         ObjectNode node = objectMapper.readValue(content, ObjectNode.class);
 
-        List<SimpleNewsResponseDto> newsList = objectMapper.convertValue(node.get("content"), new TypeReference<>() {
+        List<SimpleNewsResponseDto> newsList = objectMapper.convertValue(node.get("content")
+            , new TypeReference<>() {
         });
 
         Assertions.assertEquals(9, newsList.size());
@@ -125,8 +142,8 @@ public class NewsEndpointTest {
 
         Authentication authentication = mock(Authentication.class);
         when(authentication.getName()).thenReturn("test@email.com");
-        when(authentication.getAuthorities()).thenAnswer(invocation -> Collections.singletonList
-            (new SimpleGrantedAuthority("ROLE_USER")));
+        when(authentication.getAuthorities()).thenAnswer(invocation
+            -> Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
         when(authentication.isAuthenticated()).thenReturn(true);
 
         SecurityContext securityContext = mock(SecurityContext.class);
@@ -139,19 +156,19 @@ public class NewsEndpointTest {
         userRepository.save(user);
 
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/news/unread")
-            .contentType(MediaType.APPLICATION_JSON).param("page", "0").param("size", "9"))
-            .andExpect(status().isOk()).andReturn();
+            .contentType(MediaType.APPLICATION_JSON).param("page", "0")
+            .param("size", "9")).andExpect(status().isOk()).andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
         ObjectNode node = objectMapper.readValue(content, ObjectNode.class);
 
-        List<SimpleNewsResponseDto> newsList = objectMapper.convertValue(node.get("content"), new TypeReference<>() {
+        List<SimpleNewsResponseDto> newsList = objectMapper.convertValue(node.get("content")
+            , new TypeReference<>() {
         });
 
         Assertions.assertFalse(newsList.isEmpty(), "There should be unread news");
         for (SimpleNewsResponseDto news : newsList) {
-            Assertions.assertFalse(readNews.stream().anyMatch(rn -> rn.getId()
-                .equals(news.getId())), "Read news should not be in the unread list");
+            Assertions.assertFalse(readNews.stream().anyMatch(rn -> rn.getId().equals(news.getId())), "Read news should not be in the unread list");
         }
     }
 
@@ -172,6 +189,9 @@ public class NewsEndpointTest {
         Assertions.assertEquals(news.getTitle(), newsResponse.getTitle());
         Assertions.assertEquals(news.getSummary(), newsResponse.getSummary());
         Assertions.assertEquals(news.getText(), newsResponse.getText());
+        Assertions.assertNotNull(newsResponse.getEventDto(), "Event should not be null");
+        Assertions.assertEquals(news.getEvent().getTitle(), newsResponse.getEventDto().getTitle()
+            , "Event titles should match");
     }
 
     @Test
@@ -190,18 +210,24 @@ public class NewsEndpointTest {
         byte[] imageBytes = createValidTestImage();
         MockMultipartFile imageFile = new MockMultipartFile("image", "test.jpg"
             , MediaType.IMAGE_JPEG_VALUE, imageBytes);
+
+        Event event = new Event();
+        event.setTitle("Test Event");
+        eventRepository.save(event);
+
+        EventDto eventDto = eventMapper.toDto(event);
+
         NewsRequestDto newsRequestDto = new NewsRequestDto();
         newsRequestDto.setTitle("Test Title");
         newsRequestDto.setSummary("Test Summary");
         newsRequestDto.setText("Test Text");
+        newsRequestDto.setEventDto(eventDto);
+
         MockMultipartFile newsPart = new MockMultipartFile("news", ""
             , MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(newsRequestDto));
 
-        mockMvc.perform(multipart("/api/v1/news/create")
-                .file(imageFile)
-                .file(newsPart)
-                .contentType(MediaType.MULTIPART_FORM_DATA))
-            .andExpect(status().isCreated());
+        mockMvc.perform(multipart("/api/v1/news/create").file(imageFile).file(newsPart)
+            .contentType(MediaType.MULTIPART_FORM_DATA)).andExpect(status().isCreated());
 
         Assertions.assertEquals(1, newsRepository.count());
         News savedNews = newsRepository.findAll().getFirst();
@@ -209,5 +235,7 @@ public class NewsEndpointTest {
         Assertions.assertEquals("Test Summary", savedNews.getSummary());
         Assertions.assertEquals("Test Text", savedNews.getText());
         Assertions.assertArrayEquals(imageBytes, savedNews.getImage(), "The image should be identical");
+        Assertions.assertNotNull(savedNews.getEvent(), "Event should not be null");
+        Assertions.assertEquals("Test Event", savedNews.getEvent().getTitle(), "Event titles should match");
     }
 }
