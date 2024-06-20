@@ -13,8 +13,9 @@ import { HttpHeaders }                                       from '@angular/comm
 
 import { Observable }                                        from 'rxjs';
 
-import { DetailedNewsDto } from '../model/models';
-import { SimpleNewsDto } from '../model/models';
+import { NewsRequestDto } from '../model/models';
+import { NewsResponseDto } from '../model/models';
+import { PageSimpleNewsResponseDto } from '../model/models';
 
 
 import { Configuration }                                     from '../configuration';
@@ -28,24 +29,32 @@ export interface NewsEndpointServiceInterface {
     /**
      * Publish a new news
      * 
-     * @param title 
-     * @param summary 
-     * @param text 
      * @param image 
+     * @param news 
      */
-    create(title: string, summary: string, text: string, image: Blob, extraHttpRequestParams?: any): Observable<DetailedNewsDto>;
+    create(image: Blob, news: NewsRequestDto, extraHttpRequestParams?: any): Observable<NewsResponseDto>;
 
     /**
      * Get detailed information about a specific news
      * 
      * @param id 
      */
-    find(id: number, extraHttpRequestParams?: any): Observable<DetailedNewsDto>;
+    find(id: number, extraHttpRequestParams?: any): Observable<NewsResponseDto>;
 
     /**
      * Get list of news without details
      * 
+     * @param page 
+     * @param size 
      */
-    findAll(extraHttpRequestParams?: any): Observable<Array<SimpleNewsDto>>;
+    findAll(page?: number, size?: number, extraHttpRequestParams?: any): Observable<PageSimpleNewsResponseDto>;
+
+    /**
+     * Get list of unread news without details
+     * 
+     * @param page 
+     * @param size 
+     */
+    findUnread(page?: number, size?: number, extraHttpRequestParams?: any): Observable<PageSimpleNewsResponseDto>;
 
 }

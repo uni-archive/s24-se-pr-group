@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.EventDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.EventSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.EventWithTicketCountDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
@@ -40,4 +41,11 @@ public interface EventService {
      * @return ResponseEntity with EventDto
      */
     EventDto getById(long id) throws EntityNotFoundException;
+
+    /**
+     * Retrieves a list of the top 10 events with the most tickets sold.
+     *
+     * @return a list of the top 10 events with the most tickets sold as {@link EventWithTicketCountDto}
+     */
+    List<EventWithTicketCountDto> getTop10EventsWithMostTickets();
 }

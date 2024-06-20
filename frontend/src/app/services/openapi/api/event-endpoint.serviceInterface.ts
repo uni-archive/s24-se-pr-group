@@ -17,6 +17,7 @@ import { EventCreationDto } from '../model/models';
 import { EventDto } from '../model/models';
 import { EventResponse } from '../model/models';
 import { EventSearchDto } from '../model/models';
+import { EventWithTicketCountDto } from '../model/models';
 
 
 import { Configuration }                                     from '../configuration';
@@ -47,6 +48,12 @@ export interface EventEndpointServiceInterface {
      * @param eventid 
      */
     findById3(eventid: number, extraHttpRequestParams?: any): Observable<EventDto>;
+
+    /**
+     * 
+     * 
+     */
+    getTop10EventsWithMostTickets(extraHttpRequestParams?: any): Observable<Array<EventWithTicketCountDto>>;
 
     /**
      * 

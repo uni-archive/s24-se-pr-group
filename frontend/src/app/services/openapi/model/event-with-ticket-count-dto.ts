@@ -11,12 +11,9 @@
  */
 
 
-export interface DetailedNewsDto { 
-    id?: number;
-    publishedAt?: string;
+export interface EventWithTicketCountDto { 
+    eventId?: number;
     title?: string;
-    summary?: string;
-    image?: Array<string>;
-    text?: string;
+    ticketCount?: number;
 }
 

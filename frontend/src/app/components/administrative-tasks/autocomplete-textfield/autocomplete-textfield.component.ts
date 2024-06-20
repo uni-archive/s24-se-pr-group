@@ -8,12 +8,11 @@ import {EventDto, EventEndpointService} from "../../../services/openapi";
 export class AutocompleteTextfieldComponent {
 
   @Output() selectedEvent = new EventEmitter<EventDto>();
-  event:EventDto | null = null;
+  event: EventDto | null = null;
 
   constructor(private eventService: EventEndpointService) {}
 
   searchEvents = (query: string) => this.eventService.searchEvents({textSearch:query, typ:null, dauer:0});
-
 
   onEventSelected(event: EventDto): void {
     this.event = event;

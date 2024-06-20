@@ -40,6 +40,7 @@ export class AuthService {
     console.log('Logout');
     localStorage.removeItem('authToken');
     document.cookie = 'order=; Path=/api/v1; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    window.location.href = '/';
   }
 
   getToken() {

@@ -17,9 +17,6 @@ public class ShowCreationDto {
 
     private List<HallSectorShowCreationDto> sectorShowList;
 
-
-
-
     public LocalDateTime getDateTime() {
         return dateTime;
     }
@@ -36,6 +33,7 @@ public class ShowCreationDto {
         this.event = eventDto;
         this.artistList = artists;
         this.location = locationDto;
+        this.sectorShowList = sectorShowList;
         this.sectorShowList = sectorShowList;
     }
 

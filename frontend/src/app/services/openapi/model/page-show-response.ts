@@ -15,8 +15,8 @@ import { SortObject } from './sort-object';
 
 
 export interface PageShowResponse { 
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
     size?: number;
     content?: Array<ShowResponse>;
     number?: number;

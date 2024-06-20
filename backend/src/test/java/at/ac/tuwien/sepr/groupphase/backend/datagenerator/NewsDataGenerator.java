@@ -1,7 +1,9 @@
 package at.ac.tuwien.sepr.groupphase.backend.datagenerator;
 
 import at.ac.tuwien.sepr.groupphase.backend.datagenerator.config.DataGenerationConfig;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Event;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.News;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.EventRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.NewsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.NewsRepository;
 import jakarta.annotation.PostConstruct;
@@ -15,6 +17,8 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Random;
 
 @Profile("generateData")
 @Component
@@ -43,17 +47,21 @@ public class NewsDataGenerator {
         "pulvinar vel. Nam ut arcu enim.";
 
     private final NewsRepository newsRepository;
+    private final EventRepository eventRepository;
 
     @Autowired
     private DataGenerationConfig dataGenerationConfig;
 
-    public NewsDataGenerator(NewsRepository newsRepository) {
+    public NewsDataGenerator(NewsRepository newsRepository, EventRepository eventRepository) {
         this.newsRepository = newsRepository;
+        this.eventRepository = eventRepository;
     }
 
     @PostConstruct
     private void generateNews() throws IOException {
-        if (newsRepository.findAll().size() > 0) {
+        Random random = new Random();
+        List<Event> all = eventRepository.findAll();
+        if (!newsRepository.findAll().isEmpty()) {
             LOGGER.debug("news already generated");
         } else {
             LOGGER.debug("generating {} news entries", dataGenerationConfig.newsAmount);
@@ -61,11 +69,12 @@ public class NewsDataGenerator {
                 LOGGER.info("generating news entry {} of {}", i, dataGenerationConfig.newsAmount);
                 byte[] dummyImage = DummyImageGenerator.createDummyImage();
                 News news = News.NewsBuilder.aNews()
-                    .withTitle(TEST_NEWS_TITLE + " " + i)
+                    .withTitle(TEST_NEWS_TITLE + " " + i )
                     .withSummary(TEST_NEWS_SUMMARY)
                     .withText(TEST_NEWS_TEXT)
                     .withImage(dummyImage)
                     .withPublishedAt(LocalDateTime.now().minusMonths(i))
+                    .withEvent(all.get(random.nextInt(all.size())))
                     .build();
                 LOGGER.debug("saving news {}", news);
                 newsRepository.save(news);

@@ -22,7 +22,6 @@ export class TagSearchComponent {
   @Output() artistRemoved: EventEmitter<ArtistDto> = new EventEmitter<ArtistDto>();
   public text: string = "";
   onChange() {
-    console.log(this.autoCompleteList);
     this.search.emit(this.text);
   }
 

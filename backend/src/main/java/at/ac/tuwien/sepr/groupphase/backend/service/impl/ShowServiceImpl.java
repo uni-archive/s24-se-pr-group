@@ -39,9 +39,8 @@ public class ShowServiceImpl implements ShowService {
     private final HallSectorShowRepository sectorShowRepository;
     private final HallSectorShowMapper sectorShowMapper;
 
-
     public ShowServiceImpl(ShowDao dao, EventDao eventDao, HallSectorShowRepository sectorShowRepository,
-                           HallSectorShowMapper sectorShowMapper, TicketDao ticketDao,
+        HallSectorShowMapper sectorShowMapper, TicketDao ticketDao,
                            HallSectorShowService hallSectorShowService) {
         this.eventDao = eventDao;
         this.dao = dao;

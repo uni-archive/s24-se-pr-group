@@ -1,40 +1,37 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DetailedNewsDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsInquiryDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.SimpleNewsDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.NewsMapper;
+import at.ac.tuwien.sepr.groupphase.backend.dto.NewsDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsRequestDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.SimpleNewsResponseDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.NewsEndpointMapper;
 import at.ac.tuwien.sepr.groupphase.backend.service.NewsService;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-
-import jakarta.validation.Valid;
-
-import java.io.IOException;
-import java.lang.invoke.MethodHandles;
-import java.sql.Blob;
-import java.sql.SQLException;
-import java.util.List;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.sql.rowset.serial.SerialBlob;
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 
 @RestController
 @RequestMapping(value = "/api/v1/news")
@@ -42,64 +39,73 @@ public class NewsEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final NewsService newsService;
-    private final NewsMapper newsMapper;
+    private final NewsEndpointMapper newsEndpointMapper;
 
     @Autowired
-    public NewsEndpoint(NewsService newsService, NewsMapper newsMapper) {
+    public NewsEndpoint(NewsService newsService, NewsEndpointMapper newsEndpointMapper) {
         this.newsService = newsService;
-        this.newsMapper = newsMapper;
+        this.newsEndpointMapper = newsEndpointMapper;
     }
 
-    @Secured("ROLE_USER")
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get list of news without details", security = @SecurityRequirement(name = "apiKey"))
-    public List<SimpleNewsDto> findAll() {
+    @PermitAll
+    @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get list of news without details")
+    public ResponseEntity<Page<SimpleNewsResponseDto>> findAll(@RequestParam(name = "page", defaultValue = "0") Integer page,
+                                                               @RequestParam(name = "size", defaultValue = "9") Integer size) {
         LOGGER.info("GET /api/v1/news");
-        return newsMapper.newsToSimpleNewsDto(newsService.findAll());
+        PageRequest pageable = PageRequest.of(page, size);
+        Page<NewsDto> newsList = newsService.getAllNews(pageable);
+        return ResponseEntity.ok(newsList.map(newsEndpointMapper::toSimpleResponse));
     }
 
     @Secured("ROLE_USER")
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get detailed information about a specific news", security = @SecurityRequirement(name = "apiKey"))
-    public DetailedNewsDto find(@PathVariable(name = "id") Long id) {
-        LOGGER.info("GET /api/v1/news/{}", id);
-        return newsMapper.newsToDetailedNewsDto(newsService.findOne(id));
+    @GetMapping(value = "/unread", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get list of unread news without details")
+    public ResponseEntity<Page<SimpleNewsResponseDto>> findUnread(@RequestParam(name = "page", defaultValue = "0") Integer page,
+                                                                  @RequestParam(name = "size", defaultValue = "9") Integer size) {
+        LOGGER.info("GET /api/v1/news/unread");
+        PageRequest pageable = PageRequest.of(page, size);
+        Page<NewsDto> unreadNewsList;
+        try {
+            unreadNewsList = newsService.getUnseenNews(pageable);
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        }
+        return ResponseEntity.ok(unreadNewsList.map(newsEndpointMapper::toSimpleResponse));
+    }
+
+    @PermitAll
+    @GetMapping(value = "/detail/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get detailed information about a specific news")
+    public ResponseEntity<NewsResponseDto> find(@PathVariable("id") Long id) {
+        LOGGER.info("GET /api/v1/news/detail/{}", id);
+        try {
+            NewsDto newsDto = newsService.getNewsById(id);
+            return ResponseEntity.ok(newsEndpointMapper.toResponse(newsDto));
+        } catch (DtoNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        }
     }
 
     @Secured("ROLE_ADMIN")
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Publish a new news", security = @SecurityRequirement(name = "apiKey"))
-    public DetailedNewsDto create(@Valid @RequestParam("image") MultipartFile file, @Valid @RequestParam("title") String title, @Valid @RequestParam("summary") String summary, @Valid @RequestParam("text") String text) {
+    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Publish a new news")
+    public ResponseEntity<NewsResponseDto> create(@RequestPart("image") MultipartFile file,
+                                                  @RequestPart("news") NewsRequestDto newsRequestDto) {
 
-        NewsInquiryDto newsInquiryDto = new NewsInquiryDto();
-        newsInquiryDto.setTitle(title);
-        newsInquiryDto.setSummary(summary);
-        newsInquiryDto.setText(text);
-
-        Blob imageBlob;
         try {
-            imageBlob = new SerialBlob(file.getBytes());
-        } catch (SQLException | IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+            newsRequestDto.setImage(file.getBytes());
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid image data", e);
         }
 
-        newsInquiryDto.setImage(imageBlob);
-
-
-        LOGGER.info("POST /api/v1/news body: {}", newsInquiryDto);
+        LOGGER.info("POST /api/v1/news body: {}", newsRequestDto);
 
         try {
-            return newsMapper.newsToDetailedNewsDto(newsService.publishNews(newsMapper.newsInquiryDtoToNews(newsInquiryDto)));
-        } catch (ValidationException e) {
-
+            newsService.createNews(newsEndpointMapper.toDto(newsRequestDto));
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        } catch (IOException | ValidationException e) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, e.getMessage(), e);
-
-
         }
     }
 }
-
-
-
-

@@ -1,5 +1,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <a class="navbar-brand ml-lg-5" href="">TicketLine</a>
+  <div class="initial-div">
+    <img src="assets/Logo-sm.png" href="">
+  </div>
   <button
     class="navbar-toggler"
     type="button"
@@ -15,7 +17,7 @@
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav me-auto">
       <li class="nav-item">
-        <a class="nav-link" *ngIf="authService.isLoggedIn()" routerLink="/news" routerLinkActive="active">News</a>
+        <a class="nav-link" routerLink="/news" routerLinkActive="active">News</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" routerLink="/search" routerLinkActive="active">Suche</a>
@@ -37,7 +39,10 @@
            routerLink="/showcreation" routerLinkActive="active">Erstelle Vorführung</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" *ngIf="authService.isLoggedIn() && authService.getUserRole()==='ADMIN'"
+        <a class="nav-link" *ngIf="authService.isLoggedIn() && authService.getUserRole()==='ADMIN'" routerLink="/news-create" routerLinkActive="active">Erstelle News</a>
+      </li>
+      <li class="nav-item">
+      <a class="nav-link" *ngIf="authService.isLoggedIn() && authService.getUserRole()==='ADMIN'"
            routerLink="/locations" routerLinkActive="active">Aufführungsorte</a>
       </li>
       <li>
