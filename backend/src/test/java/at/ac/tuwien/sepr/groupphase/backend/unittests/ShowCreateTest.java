@@ -39,7 +39,7 @@ public class ShowCreateTest {
 
     // @Test
     public void testShowCreate() {
-        EventCreationDto eventdto = new EventCreationDto("EventTest", 60, "Cool event WOW!", EventType.CONCERT);
+        EventDto eventdto = new EventDto(null, "EventTest", 60, "Cool event WOW!", EventType.CONCERT, List.of());
         eventService.createEvent(eventdto);
 
         service.createShow(new ShowDto(null, LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay(), null,null,null),

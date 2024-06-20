@@ -9,6 +9,7 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { HallPlanDto } from './hall-plan-dto';
 import { AddressDto } from './address-dto';
 
 
@@ -16,5 +17,6 @@ export interface LocationDto {
     id?: number;
     name?: string;
     address?: AddressDto;
+    hallPlan?: HallPlanDto;
 }
 

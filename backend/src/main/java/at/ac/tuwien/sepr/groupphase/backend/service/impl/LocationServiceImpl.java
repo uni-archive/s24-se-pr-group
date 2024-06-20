@@ -8,6 +8,7 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFound
 import at.ac.tuwien.sepr.groupphase.backend.service.AbstractService;
 import at.ac.tuwien.sepr.groupphase.backend.service.AddressService;
 import at.ac.tuwien.sepr.groupphase.backend.service.LocationService;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.LocationValidator;
@@ -25,20 +26,23 @@ public class LocationServiceImpl extends AbstractService<LocationDto> implements
     private final AddressService addressService;
     private final LocationValidator locationValidator;
     private final LocationDao locationDao;
+    private final HallPlanServiceImpl hallPlanServiceImpl;
 
     public LocationServiceImpl(
-        LocationValidator locationValidator, LocationDao locationDao, AddressService addressService) {
+        LocationValidator locationValidator, LocationDao locationDao, AddressService addressService, HallPlanServiceImpl hallPlanServiceImpl) {
         super(locationValidator, locationDao);
         this.addressService = addressService;
         this.locationValidator = locationValidator;
         this.locationDao = locationDao;
+        this.hallPlanServiceImpl = hallPlanServiceImpl;
     }
 
     @Override
-    public LocationDto create(LocationDto dto) throws ValidationException, ForbiddenException {
+    public LocationDto createLocation(LocationDto dto) throws ValidationException, ForbiddenException, DtoNotFoundException {
         locationValidator.validateForCreate(dto);
         AddressDto addressDto = addressService.create(dto.getAddress());
         dto.setAddress(addressDto);
+        dto.setHallPlan(hallPlanServiceImpl.findById(dto.getHallPlan().getId()));
         return locationDao.create(dto);
     }
 
@@ -52,10 +56,15 @@ public class LocationServiceImpl extends AbstractService<LocationDto> implements
     }
 
     @Override
-    public LocationDto update(LocationDto dto) throws ValidationException, EntityNotFoundException, ForbiddenException {
+    public LocationDto update(LocationDto dto) throws ValidationException, DtoNotFoundException, ForbiddenException {
         locationValidator.validateForUpdate(dto);
-        AddressDto addressDto = addressService.update(dto.getAddress());
-        dto.setAddress(addressDto);
-        return locationDao.update(dto);
+        try {
+            AddressDto addressDto = addressService.update(dto.getAddress());
+            dto.setAddress(addressDto);
+            return locationDao.update(dto);
+        }
+        catch (EntityNotFoundException e) {
+            throw new DtoNotFoundException(e);
+        }
     }
 }

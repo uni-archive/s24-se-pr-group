@@ -33,19 +33,12 @@ public class ShowServiceImpl implements ShowService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final ShowDao dao;
-    private final EventDao eventDao;
-    private HallSectorShowService hallSectorShowService;
-    private final TicketDao ticketDao;
     private final HallSectorShowRepository sectorShowRepository;
     private final HallSectorShowMapper sectorShowMapper;
 
-    public ShowServiceImpl(ShowDao dao, EventDao eventDao, HallSectorShowRepository sectorShowRepository,
-        HallSectorShowMapper sectorShowMapper, TicketDao ticketDao,
-                           HallSectorShowService hallSectorShowService) {
-        this.eventDao = eventDao;
+    public ShowServiceImpl(ShowDao dao, HallSectorShowRepository sectorShowRepository,
+        HallSectorShowMapper sectorShowMapper) {
         this.dao = dao;
-        this.ticketDao = ticketDao;
-        this.hallSectorShowService = hallSectorShowService;
         this.sectorShowRepository = sectorShowRepository;
         this.sectorShowMapper = sectorShowMapper;
     }
@@ -72,8 +65,12 @@ public class ShowServiceImpl implements ShowService {
     }
 
     @Override
-    public List<ShowListDto> getShowsByEventId(long eventid) throws EntityNotFoundException {
-        return dao.getShowsByEventId(eventid);
+    public List<ShowListDto> getShowsByEventId(long eventid) throws DtoNotFoundException {
+        try {
+            return dao.getShowsByEventId(eventid);
+        } catch (EntityNotFoundException e) {
+            throw new DtoNotFoundException(e);
+        }
     }
 
     @Override
@@ -88,8 +85,12 @@ public class ShowServiceImpl implements ShowService {
     }
 
     @Override
-    public List<ShowListDto> searchShows(ShowSearchDto searchDto) throws EntityNotFoundException {
-        return dao.searchShows(searchDto);
+    public List<ShowListDto> searchShows(ShowSearchDto searchDto) throws DtoNotFoundException {
+        try {
+            return dao.searchShows(searchDto);
+        } catch (EntityNotFoundException e) {
+            throw new DtoNotFoundException(e);
+        }
     }
 
     @Override
@@ -100,8 +101,12 @@ public class ShowServiceImpl implements ShowService {
 
     @Override
     @Transactional
-    public ShowDto getById(Long id) throws EntityNotFoundException {
-        return dao.findById(id);
+    public ShowDto getById(Long id) throws DtoNotFoundException {
+        try {
+            return dao.findById(id);
+        } catch (EntityNotFoundException e) {
+            throw new DtoNotFoundException(e);
+        }
     }
 
     @Transactional

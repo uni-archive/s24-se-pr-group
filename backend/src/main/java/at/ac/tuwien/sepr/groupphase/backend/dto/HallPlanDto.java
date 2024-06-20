@@ -20,6 +20,9 @@ public class HallPlanDto implements AbstractDto {
     @NotNull(message = "Sectors must not be null")
     private List<HallSectorDto> sectors;
 
+    public HallPlanDto() {
+    }
+
     public HallPlanDto withoutSectors() {
         return new HallPlanDto(id, name, backgroundImage, null);
     }

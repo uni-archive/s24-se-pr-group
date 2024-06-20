@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 
 import at.ac.tuwien.sepr.groupphase.backend.config.properties.SecurityProperties;
+import at.ac.tuwien.sepr.groupphase.backend.datagenerator.HallPlanGeneratorUtil;
 import at.ac.tuwien.sepr.groupphase.backend.dto.AddressDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.LocationDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AddressCreateRequest;
@@ -10,6 +11,7 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Address;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Location;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Show;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.AddressRepository;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallPlanRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.LocationRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.ShowRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
@@ -17,8 +19,6 @@ import at.ac.tuwien.sepr.groupphase.backend.supplier.AddressSupplier;
 import at.ac.tuwien.sepr.groupphase.backend.util.PageModule;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
@@ -36,6 +36,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 
@@ -75,6 +77,11 @@ public class LocationEndpointTest {
 
     @Autowired
     private ShowRepository showRepository;
+    @Autowired
+    private HallPlanRepository hallPlanRepository;
+
+    @Autowired
+    private HallPlanGeneratorUtil hallPlanGenerator;
 
     @BeforeEach
     void setUp() {
@@ -84,9 +91,10 @@ public class LocationEndpointTest {
     @Test
     @Order(1)
     void createShouldCreateLocationAsAdmin() throws Exception {
+        hallPlanGenerator.generateRandomHallPlans(1L);
         AddressCreateRequest addressCreateRequest = new AddressCreateRequest("123 Main St", "Vienna", "1010",
             "Austria");
-        LocationCreateRequest createRequest = new LocationCreateRequest("Test Location", addressCreateRequest);
+        LocationCreateRequest createRequest = new LocationCreateRequest("Test Location", addressCreateRequest, 1L);
 
         MvcResult mvcResult = mockMvc.perform(post("/api/v1/location")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -96,16 +104,17 @@ public class LocationEndpointTest {
             .andReturn();
 
         MockHttpServletResponse response = mvcResult.getResponse();
-        LocationDto createdLocation = objectMapper.readValue(response.getContentAsString(), LocationDto.class);
+        LocationResponse createdLocation = objectMapper.readValue(response.getContentAsString(), LocationResponse.class);
 
         Assertions.assertAll(
             () -> Assertions.assertNotNull(createdLocation),
-            () -> Assertions.assertEquals("Test Location", createdLocation.getName()),
-            () -> Assertions.assertEquals("123 Main St", createdLocation.getAddress().getStreet()),
-            () -> Assertions.assertEquals("Vienna", createdLocation.getAddress().getCity()),
-            () -> Assertions.assertEquals("1010", createdLocation.getAddress().getZip()),
-            () -> Assertions.assertEquals("Austria", createdLocation.getAddress().getCountry())
-        );
+            () -> Assertions.assertEquals("Test Location", createdLocation.name()),
+            () -> Assertions.assertEquals("123 Main St", createdLocation.address().street()),
+            () -> Assertions.assertEquals("Vienna", createdLocation.address().city()),
+            () -> Assertions.assertEquals("1010", createdLocation.address().zip()),
+            () -> Assertions.assertEquals("Austria", createdLocation.address().country()),
+            () -> Assertions.assertNotNull(createdLocation.hallPlan())
+            );
     }
 
     @Test
@@ -205,7 +214,7 @@ public class LocationEndpointTest {
     @Test
     @Order(6)
     void createInvalidLocationShouldReturnValidationErrors() throws Exception {
-        LocationCreateRequest invalidCreateRequest = new LocationCreateRequest("", null);
+        LocationCreateRequest invalidCreateRequest = new LocationCreateRequest("", null, 1L);
 
         MvcResult mvcResult = mockMvc.perform(post("/api/v1/location")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -226,9 +235,10 @@ public class LocationEndpointTest {
     @Test
     @Order(7)
     void createInvalidAddressShouldReturnValidationErrors() throws Exception {
+        hallPlanGenerator.generateRandomHallPlans(1L);
         AddressCreateRequest invalidAddressCreateRequest = new AddressCreateRequest("", "", "not-a-number", "");
         LocationCreateRequest invalidCreateRequest = new LocationCreateRequest("locationname",
-            invalidAddressCreateRequest);
+            invalidAddressCreateRequest, 1L);
 
         MvcResult mvcResult = mockMvc.perform(post("/api/v1/location")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -470,8 +480,8 @@ public class LocationEndpointTest {
         });
 
         Assertions.assertAll(
-            ()-> Assertions.assertEquals(2, locations.getNumberOfElements()),
-            ()-> Assertions.assertTrue(locations.stream().allMatch(location -> location.name().equals("Location 1") || location.name().equals("Location 2")))
+            () -> Assertions.assertEquals(2, locations.getNumberOfElements()),
+            () -> Assertions.assertTrue(locations.stream().allMatch(location -> location.name().equals("Location 1") || location.name().equals("Location 2")))
         );
     }
 
@@ -502,8 +512,8 @@ public class LocationEndpointTest {
         });
 
         Assertions.assertAll(
-            ()-> Assertions.assertEquals(2, locations.size()),
-            ()-> Assertions.assertTrue(locations.stream().allMatch(location -> location.name().equals("abcdefg") || location.name().equals("mmmmdefghijkmm")))
+            () -> Assertions.assertEquals(2, locations.size()),
+            () -> Assertions.assertTrue(locations.stream().allMatch(location -> location.name().equals("abcdefg") || location.name().equals("mmmmdefghijkmm")))
         );
     }
 }

@@ -1,5 +1,5 @@
-import {Component, EventEmitter, Output} from '@angular/core';
-import { LocationDto, LocationEndpointService } from '../../../services/openapi';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {HallPlanDto, LocationDto, LocationEndpointService} from '../../../services/openapi';
 
 @Component({
   selector: 'app-location-autocomplete',
@@ -8,11 +8,12 @@ import { LocationDto, LocationEndpointService } from '../../../services/openapi'
 })
 export class LocationAutocompleteComponent {
   @Output() selectedLocation = new EventEmitter<LocationDto>();
+  @Input()  initialHallPlan: HallPlanDto | null;
   location: LocationDto | null = null;
 
   constructor(private locationService: LocationEndpointService) {}
 
-  searchLocations = (query: string) => this.locationService.findByName(query);
+  searchLocations = (query: string) => this.locationService.findByName1(query);
 
   onLocationSelected(location: LocationDto): void {
     this.location = location;

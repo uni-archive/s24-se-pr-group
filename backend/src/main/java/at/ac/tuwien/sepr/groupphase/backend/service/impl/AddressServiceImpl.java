@@ -9,6 +9,7 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.UserDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.AbstractService;
 import at.ac.tuwien.sepr.groupphase.backend.service.AddressService;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.AddressValidator;
@@ -34,7 +35,7 @@ public class AddressServiceImpl extends AbstractService<AddressDto> implements A
 
     @Override
     public AddressDto update(AddressDto addressDto)
-        throws ValidationException, EntityNotFoundException, ForbiddenException {
+        throws ValidationException, DtoNotFoundException, ForbiddenException {
         addressValidator.validateForUpdate(addressDto);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String loggedInUserEmail = authentication.getName();
@@ -42,7 +43,11 @@ public class AddressServiceImpl extends AbstractService<AddressDto> implements A
         if (!isAdminOrUpdatingOwnAddress(addressDto.getId(), authentication, byEmail)) {
             throw new ForbiddenException();
         }
-        return addressDao.update(addressDto);
+        try {
+            return addressDao.update(addressDto);
+        } catch (EntityNotFoundException e) {
+            throw new DtoNotFoundException(e);
+        }
     }
 
 

@@ -37,7 +37,7 @@ public interface ShowService {
      * @param eventid the id of the event
      * @return list of the shows
      */
-    List<ShowListDto> getShowsByEventId(long eventid) throws EntityNotFoundException;
+    List<ShowListDto> getShowsByEventId(long eventid) throws DtoNotFoundException;
 
     HallPlanDto getHallPlanByShowId(Long showId);
 
@@ -47,7 +47,7 @@ public interface ShowService {
      * @param searchDto contains search chriteria
      * @return list of ShowDtos
      */
-    List<ShowListDto> searchShows(ShowSearchDto searchDto) throws EntityNotFoundException;
+    List<ShowListDto> searchShows(ShowSearchDto searchDto) throws DtoNotFoundException;
 
 
     /**
@@ -57,7 +57,7 @@ public interface ShowService {
      */
     Page<ShowDto> findByLocation(Long locationId, boolean onlyFutureShows, Pageable pageable);
 
-    ShowDto getById(Long id) throws EntityNotFoundException;
+    ShowDto getById(Long id) throws DtoNotFoundException;
 
     /**
      * Get a show by its id.

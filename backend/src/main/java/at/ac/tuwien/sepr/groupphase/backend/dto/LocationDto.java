@@ -7,6 +7,7 @@ public class LocationDto implements AbstractDto {
     private Long id;
     private String name;
     private AddressDto address;
+    private HallPlanDto hallPlan;
 
 
     public LocationDto() {
@@ -43,6 +44,14 @@ public class LocationDto implements AbstractDto {
     public LocationDto setAddress(AddressDto address) {
         this.address = address;
         return this;
+    }
+
+    public HallPlanDto getHallPlan() {
+        return hallPlan;
+    }
+
+    public void setHallPlan(HallPlanDto hallPlan) {
+        this.hallPlan = hallPlan;
     }
 
     @Override

@@ -3,6 +3,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 import at.ac.tuwien.sepr.groupphase.backend.dto.LocationDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.LocationSearch;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import java.util.List;
@@ -12,10 +13,10 @@ public interface LocationService {
     /**
      * Creates a new location.
      *
-     * @param locationDto the data transfer object containing the location information
+     * @param dto the data transfer object containing the location information
      * @return the created {@link LocationDto}
      */
-    LocationDto create(LocationDto locationDto) throws ValidationException, ForbiddenException;
+    public LocationDto createLocation(LocationDto dto) throws ValidationException, ForbiddenException, DtoNotFoundException;
 
     /**
      * Updates an existing location.
@@ -23,14 +24,14 @@ public interface LocationService {
      * @param locationDto the data transfer object containing the updated location information
      * @return the updated {@link LocationDto}
      */
-    LocationDto update(LocationDto locationDto) throws ValidationException, EntityNotFoundException, ForbiddenException;
+    LocationDto update(LocationDto locationDto) throws ValidationException, DtoNotFoundException, ForbiddenException;
 
     /**
      * Deletes an location by its ID.
      *
      * @param id the ID of the location to delete
      */
-    void delete(Long id) throws EntityNotFoundException, ForbiddenException;
+    void delete(Long id) throws DtoNotFoundException, ForbiddenException;
 
     /**
      * Finds an location by its ID.
@@ -38,7 +39,7 @@ public interface LocationService {
      * @param id the ID of the location to find
      * @return the found {@link LocationDto}, or {@code null} if no location is found with the given ID
      */
-    LocationDto findById(Long id) throws EntityNotFoundException;
+    LocationDto findById(Long id) throws DtoNotFoundException;
 
     /**
      * Retrieves all locationes.

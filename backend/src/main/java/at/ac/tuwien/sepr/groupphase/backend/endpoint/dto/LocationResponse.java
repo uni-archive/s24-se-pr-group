@@ -1,5 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
-public record LocationResponse(Long id, String name, AddressResponse address) {
+import at.ac.tuwien.sepr.groupphase.backend.dto.HallPlanDto;
+
+public record LocationResponse(Long id, String name, AddressResponse address, HallPlanDto hallPlan) {
 
 }

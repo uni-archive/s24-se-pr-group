@@ -1,8 +1,8 @@
-import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {ActivatedRoute, Router} from '@angular/router';
-import {LocationDto, LocationEndpointService} from "../../../services/openapi";
-import {MessagingService} from "../../../services/messaging.service";
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { HallPlanDto, LocationDto, LocationEndpointService } from '../../../services/openapi';
+import { MessagingService } from '../../../services/messaging.service';
 
 @Component({
   selector: 'app-location-edit',
@@ -13,6 +13,7 @@ export class LocationEditComponent implements OnInit {
   editForm: FormGroup;
   locationId: number;
   addressId: number;
+  selectedHallPlan: HallPlanDto | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -27,6 +28,7 @@ export class LocationEditComponent implements OnInit {
       city: ['', Validators.required],
       zip: ['', Validators.required],
       country: ['', Validators.required],
+      hallPlan: [null, Validators.required]
     });
   }
 
@@ -43,13 +45,15 @@ export class LocationEditComponent implements OnInit {
           street: data.address?.street,
           city: data.address?.city,
           zip: data.address?.zip,
-          country: data.address?.country
+          country: data.address?.country,
+          hallPlan: data.hallPlan
         });
         this.addressId = data.address?.id;
+        this.selectedHallPlan = data.hallPlan;
       },
       error: (error) => {
         this.messagingService.setMessage('Error loading location data', 'error');
-        console.error('Error loading location data:', error)
+        console.error('Error loading location data:', error);
       }
     });
   }
@@ -64,22 +68,28 @@ export class LocationEditComponent implements OnInit {
           street: this.editForm.value.street,
           city: this.editForm.value.city,
           zip: this.editForm.value.zip,
-          country: this.editForm.value.country,
+          country: this.editForm.value.country
         },
+        hallPlan: this.editForm.value.hallPlan
       };
 
       this.locationService.update(this.locationId, updatedLocation).subscribe({
         next: () => this.router.navigate(['/locations']),
         error: (error) => {
-          this.messagingService.setMessage('Error updating location:' + error.error, 'error');
-          console.error('Error updating location:', error)
+          this.messagingService.setMessage('Error updating location: ' + error.error, 'error');
+          console.error('Error updating location:', error);
         }
       });
     }
   }
 
+  onHallPlanSelected(hallPlan: HallPlanDto): void {
+    this.selectedHallPlan = hallPlan;
+    this.editForm.patchValue({ hallPlan });
+  }
 
-  onLocationSelected(location: LocationDto): void {
-    this.editForm.get('location')!.setValue(location);
+  onHallPlanReset(): void {
+    this.selectedHallPlan = null;
+    this.editForm.patchValue({ hallPlan: null });
   }
 }

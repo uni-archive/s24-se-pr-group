@@ -1,9 +1,8 @@
-import {Component} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {Router} from '@angular/router';
-import {LocationCreateRequest, LocationEndpointService} from "../../../services/openapi";
-import {MessagingService} from "../../../services/messaging.service";
-
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { HallPlanDto, LocationCreateRequest, LocationEndpointService } from "../../../services/openapi";
+import { MessagingService } from "../../../services/messaging.service";
 
 @Component({
   selector: 'app-location-create',
@@ -12,6 +11,7 @@ import {MessagingService} from "../../../services/messaging.service";
 })
 export class LocationCreateComponent {
   createForm: FormGroup;
+  selectedHallPlan: HallPlanDto | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -25,6 +25,7 @@ export class LocationCreateComponent {
       city: ['', Validators.required],
       zip: ['', Validators.required],
       country: ['Austria', Validators.required],
+      hallPlan: [null, Validators.required]
     });
   }
 
@@ -38,18 +39,24 @@ export class LocationCreateComponent {
           zip: this.createForm.value.zip,
           country: this.createForm.value.country,
         },
+        hallPlanId: this.createForm.value.hallPlan.id
       };
 
       this.locationService.create1(newLocation).subscribe({
         next: () => {
-          this.router.navigate(['/locations'])
+          this.router.navigate(['/locations']);
           this.messagingService.setMessage('Location created successfully', 'success');
         },
         error: (error) => {
           this.messagingService.setMessage('Error creating location: ' + error.error, 'error');
-          console.error('Error creating location:', error)
+          console.error('Error creating location:', error);
         },
       });
     }
+  }
+
+  onHallPlanSelected(hallPlan: HallPlanDto): void {
+    this.selectedHallPlan = hallPlan;
+    this.createForm.patchValue({ hallPlan });
   }
 }

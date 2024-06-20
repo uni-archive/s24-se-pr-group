@@ -6,15 +6,12 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.EventWithTicketCountDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.EventResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.EventDao;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.EventType;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.EventService;
-import jakarta.transaction.Transactional;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.data.domain.PageRequest;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
@@ -24,23 +21,15 @@ public class EventServiceImpl implements EventService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private EventDao dao;
-    private EventResponseMapper mapper;
 
-    public EventServiceImpl(EventDao eventDao, EventResponseMapper mapper) {
+    public EventServiceImpl(EventDao eventDao) {
         this.dao = eventDao;
-        this.mapper = mapper;
     }
 
     @Override
-    public ResponseEntity<EventDto> createEvent(EventCreationDto eventDto) {
-        try {
-            LOGGER.info("CREATING: {}", mapper.toDto(eventDto));
-            return ResponseEntity.ok(dao.create(mapper.toDto(eventDto)));
-        } catch (Exception ex) {
-            LOGGER.info("ERROR occurred: {}", ex);
-            return ResponseEntity.internalServerError().build();
-        }
-
+    public EventDto createEvent(EventDto eventDto) {
+        LOGGER.info("CREATING: {}", eventDto);
+        return dao.create(eventDto);
     }
 
 
@@ -55,8 +44,12 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventDto getById(long id) throws EntityNotFoundException {
-        return dao.findById(id);
+    public EventDto getById(long id) throws DtoNotFoundException {
+        try {
+            return dao.findById(id);
+        } catch (EntityNotFoundException e) {
+            throw new DtoNotFoundException(e);
+        }
     }
 
     @Override

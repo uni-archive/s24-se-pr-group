@@ -1,6 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import at.ac.tuwien.sepr.groupphase.backend.dto.EventDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.EventType;
 import at.ac.tuwien.sepr.groupphase.backend.service.EventService;
@@ -14,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -28,7 +31,7 @@ public class EventCreateTest {
     @Test
     public void testEventCreate(){
         int currentAmount = service.getAllEvents().size();
-        EventCreationDto eventdto = new EventCreationDto("EventTest", 60, "Cool event WOW!", EventType.CONCERT);
+        EventDto eventdto = new EventDto(null, "EventTest", 60, "Cool event WOW!", EventType.CONCERT, List.of());
         service.createEvent(eventdto);
         assertEquals(currentAmount+1, service.getAllEvents().size());
     }

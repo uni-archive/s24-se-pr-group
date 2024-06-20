@@ -1,11 +1,13 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.AddressDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.HallPlanDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.LocationDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.AddressDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.LocationDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.AddressService;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.LocationValidator;
@@ -33,19 +35,26 @@ class LocationServiceImplTest {
     @Mock
     private LocationValidator locationValidator;
 
+    @Mock
+    private HallPlanServiceImpl hallPlanServiceImpl;
+
     @InjectMocks
     private LocationServiceImpl locationService;
 
     @Test
-    void createShouldValidateLocationAndCreateAddress() throws ForbiddenException, ValidationException {
+    void createShouldValidateLocationAndCreateAddress() throws ForbiddenException, ValidationException, DtoNotFoundException {
         // given
         LocationDto locationDto = new LocationDto();
         AddressDto addressDto = new AddressDto();
         locationDto.setAddress(addressDto);
+        HallPlanDto hallPlan = new HallPlanDto();
+        hallPlan.setId(1L);
+        locationDto.setHallPlan(hallPlan);
         when(addressService.create(addressDto)).thenReturn(addressDto);
         when(locationDao.create(locationDto)).thenReturn(locationDto);
+        when(hallPlanServiceImpl.findById(locationDto.getHallPlan().getId())).thenReturn(new HallPlanDto());
         // when
-        LocationDto locationDto1 = locationService.create(locationDto);
+        LocationDto locationDto1 = locationService.createLocation(locationDto);
         // then
         assertEquals(locationDto, locationDto1);
         verify(locationValidator).validateForCreate(locationDto);
@@ -54,7 +63,7 @@ class LocationServiceImplTest {
     }
 
     @Test
-    void updateShouldValidateLocationAndAddress() throws ValidationException, ForbiddenException, EntityNotFoundException {
+    void updateShouldValidateLocationAndAddress() throws ValidationException, ForbiddenException, EntityNotFoundException, DtoNotFoundException {
         // given
         LocationDto locationDto = new LocationDto();
         AddressDto addressDto = new AddressDto();

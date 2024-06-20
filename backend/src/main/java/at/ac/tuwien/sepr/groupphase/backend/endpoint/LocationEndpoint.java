@@ -4,14 +4,16 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.AddressSearch;
 import at.ac.tuwien.sepr.groupphase.backend.dto.LocationDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.LocationSearch;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LocationCreateRequest;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LocationSummaryResponse;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.LocationResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.LocationService;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
+import at.ac.tuwien.sepr.groupphase.backend.service.impl.HallPlanServiceImpl;
 import jakarta.annotation.security.PermitAll;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -29,47 +31,70 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "/api/v1/location")
 public class LocationEndpoint {
 
     private final LocationService locationService;
     private final LocationResponseMapper locationMapper;
+    private final HallPlanServiceImpl hallPlanServiceImpl;
 
-    public LocationEndpoint(LocationService locationService, LocationResponseMapper locationMapper) {
+    public LocationEndpoint(LocationService locationService, LocationResponseMapper locationMapper, HallPlanServiceImpl hallPlanServiceImpl) {
         this.locationService = locationService;
         this.locationMapper = locationMapper;
+        this.hallPlanServiceImpl = hallPlanServiceImpl;
     }
 
     @Secured(Code.ADMIN)
     @PostMapping
     public ResponseEntity<LocationDto> create(@RequestBody LocationCreateRequest createRequest)
         throws ValidationException, ForbiddenException {
-        LocationDto createdLocation = locationService.create(locationMapper.createRequestToDto(createRequest));
+        LocationDto createdLocation = null;
+        try {
+            createdLocation = locationService.createLocation(locationMapper.createRequestToDto(createRequest));
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        }
         return new ResponseEntity<>(createdLocation, HttpStatus.CREATED);
     }
 
     @Secured(Code.USER)
     @PutMapping("/{id}")
     public ResponseEntity<LocationDto> update(@PathVariable(name = "id") Long id, @RequestBody LocationDto locationDto)
-        throws ValidationException, EntityNotFoundException, ForbiddenException {
+        throws ValidationException, ForbiddenException {
         locationDto.setId(id);
-        LocationDto updatedLocation = locationService.update(locationDto);
+        LocationDto updatedLocation = null;
+        try {
+            updatedLocation = locationService.update(locationDto);
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        }
         return new ResponseEntity<>(updatedLocation, HttpStatus.OK);
     }
 
     @Secured(Code.ADMIN)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable(name = "id") Long id)
-        throws EntityNotFoundException, ForbiddenException {
-        locationService.delete(id);
+        throws ForbiddenException {
+        try {
+            locationService.delete(id);
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PermitAll
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<LocationDto> findById(@PathVariable(name = "id") Long id) throws EntityNotFoundException {
-        LocationDto location = locationService.findById(id);
+    public ResponseEntity<LocationDto> findById(@PathVariable(name = "id") Long id) {
+        LocationDto location = null;
+        try {
+            location = locationService.findById(id);
+        } catch (DtoNotFoundException e) {
+            throw new NotFoundException(e);
+        }
         return new ResponseEntity<>(location, HttpStatus.OK);
     }
 
@@ -82,7 +107,8 @@ public class LocationEndpoint {
 
     @PermitAll
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Page<LocationDto>> search(@RequestParam(name = "name", required = false) String name,
+    public ResponseEntity<Page<LocationSummaryResponse>> search(
+        @RequestParam(name = "name", required = false) String name,
         @RequestParam(name = "city", required = false) String city,
         @RequestParam(name = "street", required = false) String street,
         @RequestParam(name = "postalCode", required = false) String postalCode,
@@ -103,7 +129,8 @@ public class LocationEndpoint {
         }
         PageRequest pageable = PageRequest.of(page, size, sortBy);
         LocationSearch locationSearchRequest = new LocationSearch(name, addressSearch, withUpComingShows, pageable);
-        return new ResponseEntity<>(locationService.search(locationSearchRequest), HttpStatus.OK);
+        Page<LocationSummaryResponse> search = locationService.search(locationSearchRequest).map(locationMapper::toSummaryResponse);
+        return new ResponseEntity<>(search, HttpStatus.OK);
     }
 
     @Secured(Code.USER)

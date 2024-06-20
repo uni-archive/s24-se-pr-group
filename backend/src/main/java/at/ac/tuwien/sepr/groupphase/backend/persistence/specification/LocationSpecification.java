@@ -22,6 +22,7 @@ public class LocationSpecification {
 
     public Specification<Location> getLocations(LocationSearch locationSearch) {
         return (root, query, criteriaBuilder) -> {
+            query.distinct(true);
             List<Predicate> predicates = new ArrayList<>();
             addNameToPredicates(locationSearch, root, criteriaBuilder, predicates);
             addAddressToPredicates(locationSearch, root, criteriaBuilder, predicates);

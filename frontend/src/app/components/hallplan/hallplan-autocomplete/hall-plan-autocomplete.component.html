@@ -1,0 +1,13 @@
+<app-generic-autocomplete [searchFunction]="searchHallPlans"
+                          [displayTemplate]="hallPlanTemplate"
+                          label="Hallenplan"
+                          placeholder="Wählen Sie einen Hallenplan aus..."
+                          (itemSelected)="onHallPlanSelected($event)"
+                          (itemReset)="onHallPlanReset()"
+                          [selectedItem]="initialHallPlan"
+>
+</app-generic-autocomplete>
+
+<ng-template #hallPlanTemplate let-hallPlan>
+  {{ hallPlan.name }}
+</ng-template>

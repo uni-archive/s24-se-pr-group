@@ -13,6 +13,7 @@ import { HttpHeaders }                                       from '@angular/comm
 
 import { Observable }                                        from 'rxjs';
 
+import { HallPlanDto } from '../model/models';
 import { HallplanCreateRequest } from '../model/models';
 
 
@@ -23,6 +24,20 @@ import { Configuration }                                     from '../configurat
 export interface HallPlanEndpointServiceInterface {
     defaultHeaders: HttpHeaders;
     configuration: Configuration;
+
+    /**
+     * 
+     * 
+     * @param name 
+     */
+    findByName(name: string, extraHttpRequestParams?: any): Observable<object>;
+
+    /**
+     * 
+     * 
+     * @param body 
+     */
+    getById(body: number, extraHttpRequestParams?: any): Observable<HallPlanDto>;
 
     /**
      * 

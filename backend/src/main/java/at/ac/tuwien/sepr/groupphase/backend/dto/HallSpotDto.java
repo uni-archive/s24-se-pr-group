@@ -1,11 +1,12 @@
 package at.ac.tuwien.sepr.groupphase.backend.dto;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class HallSpotDto implements AbstractDto {
     private Long id;
 
-    @JsonIgnore
+    @JsonBackReference
     private HallSectorDto sector;
 
     @Override
