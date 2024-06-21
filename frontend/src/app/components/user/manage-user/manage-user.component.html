@@ -81,23 +81,25 @@
           <td>{{ user.familyName }}</td>
           <td>{{ user.email }}</td>
           <td>{{ user.accountLocked ? "Gesperrt" : "Aktiv" }}</td>
-          <td class="d-flex">
-            <button
-              class="btn btn-primary btn-sm mx-1"
-              (click)="
-                user.accountLocked
-                  ? updateLockStatus(user, false)
-                  : updateLockStatus(user, true)
-              "
-            >
-              {{ user.accountLocked ? "Entsperren" : "Sperren" }}
-            </button>
-            <button
-              class="btn btn-primary btn-sm mx-1"
-              (click)="resetPassword(user)"
-            >
-              Passwort zurücksetzen
-            </button>
+          <td>
+            <div class="d-flex">
+              <button
+                class="btn btn-primary btn-sm mx-1"
+                (click)="
+                  user.accountLocked
+                    ? updateLockStatus(user, false)
+                    : updateLockStatus(user, true)
+                "
+              >
+                {{ user.accountLocked ? "Entsperren" : "Sperren" }}
+              </button>
+              <button
+                class="btn btn-primary btn-sm mx-1"
+                (click)="resetPassword(user)"
+              >
+                Passwort zurücksetzen
+              </button>
+            </div>
           </td>
         </tr>
       </tbody>

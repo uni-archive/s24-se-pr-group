@@ -65,6 +65,6 @@ export class UserHomeComponent {
   }
 
   public get heading(): string {
-    return this.isAdmin ? "Admin Home Page" : "User Home Page";
+    return this.isAdmin ? "Admin Homepage" : "User Homepage";
   }
 }

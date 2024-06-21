@@ -16,6 +16,7 @@ import { EventService } from "../../../services/event.service";
   styleUrls: ["./registration.component.scss"],
 })
 export class RegistrationComponent implements AfterViewInit {
+  @Input() noTopMargin: boolean = false;
   @Input() isAdminFlag: boolean = false;
   registrationForm: FormGroup;
 
@@ -34,7 +35,7 @@ export class RegistrationComponent implements AfterViewInit {
         password_repeat: ["", [Validators.required, Validators.minLength(8)]],
         firstName: ["", Validators.required],
         familyName: ["", Validators.required],
-        phoneNumber: [""],
+        phoneNumber: ["", Validators.required],
         street: ["", Validators.required],
         city: ["", Validators.required],
         zip: ["", Validators.required],
@@ -93,5 +94,11 @@ export class RegistrationComponent implements AfterViewInit {
         },
       });
     }
+  }
+
+  checkPasswordsMatch(): boolean {
+    const password = this.registrationForm.get("password")?.value;
+    const passwordRepeat = this.registrationForm.get("password_repeat")?.value;
+    return password === passwordRepeat;
   }
 }
