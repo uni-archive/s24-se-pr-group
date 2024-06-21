@@ -1,10 +1,13 @@
-import {Component, Input, OnInit, SimpleChanges} from "@angular/core";
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {Router} from "@angular/router";
-import {firstValueFrom} from "rxjs";
-import {AuthService} from "src/app/services/auth.service";
-import {MessagingService} from "src/app/services/messaging.service";
-import {ApplicationUserResponse, UserEndpointService,} from "src/app/services/openapi";
+import { Component, Input, OnInit, SimpleChanges } from "@angular/core";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { Router } from "@angular/router";
+import { firstValueFrom } from "rxjs";
+import { AuthService } from "src/app/services/auth.service";
+import { MessagingService } from "src/app/services/messaging.service";
+import {
+  ApplicationUserResponse,
+  UserEndpointService,
+} from "src/app/services/openapi";
 
 @Component({
   selector: "app-user-edit",
@@ -24,7 +27,25 @@ export class UserEditComponent implements OnInit {
     private authService: AuthService,
     private router: Router
   ) {
-    this.createForm();
+    this.userForm = this.fb.group({
+      id: [this.user.id, Validators.required],
+      email: [
+        { value: this.user.email, disabled: true },
+        [Validators.required, Validators.email],
+      ],
+      firstName: [
+        { value: this.user.firstName, disabled: true },
+        Validators.required,
+      ],
+      familyName: [
+        { value: this.user.familyName, disabled: true },
+        Validators.required,
+      ],
+      phoneNumber: [
+        { value: this.user.phoneNumber, disabled: true },
+        Validators.required,
+      ],
+    });
   }
 
   ngOnInit() {
@@ -35,28 +56,6 @@ export class UserEditComponent implements OnInit {
     if (changes.user) {
       this.updateFormValues();
     }
-  }
-
-  createForm() {
-    this.userForm = this.fb.group({
-      id: [this.user.id, Validators.required],
-      email: [
-        {value: this.user.email, disabled: true},
-        [Validators.required, Validators.email],
-      ],
-      firstName: [
-        {value: this.user.firstName, disabled: true},
-        Validators.required,
-      ],
-      familyName: [
-        {value: this.user.familyName, disabled: true},
-        Validators.required,
-      ],
-      phoneNumber: [
-        {value: this.user.phoneNumber, disabled: true},
-        Validators.required,
-      ],
-    });
   }
 
   async loadUserData() {
@@ -111,11 +110,11 @@ export class UserEditComponent implements OnInit {
         this.userForm = this.fb.group({
           id: [this.user.id, Validators.required],
           email: [
-            {value: this.user.email, disabled: true},
+            { value: this.user.email, disabled: true },
             [Validators.required, Validators.email],
           ],
           phoneNumber: [
-            {value: this.user.phoneNumber, disabled: true},
+            { value: this.user.phoneNumber, disabled: true },
             Validators.required,
           ],
         });
@@ -131,11 +130,11 @@ export class UserEditComponent implements OnInit {
     this.userForm = this.fb.group({
       id: [this.user.id, Validators.required],
       email: [
-        {value: this.user.email, disabled: !this.editMode},
+        { value: this.user.email, disabled: !this.editMode },
         [Validators.required, Validators.email],
       ],
       phoneNumber: [
-        {value: this.user.phoneNumber, disabled: !this.editMode},
+        { value: this.user.phoneNumber, disabled: !this.editMode },
         Validators.required,
       ],
     });

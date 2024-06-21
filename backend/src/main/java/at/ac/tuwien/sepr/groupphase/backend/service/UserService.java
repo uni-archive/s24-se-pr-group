@@ -74,7 +74,7 @@ public interface UserService extends UserDetailsService {
      * @throws DtoNotFoundException if the email does not exist
      */
     ApplicationUserDto updateUserStatusByEmail(ApplicationUserDto toUpdate, String adminEmail) throws ValidationException,
-        DtoNotFoundException;
+        DtoNotFoundException, MailNotSentException;
 
     /**
      * Update the user information.
@@ -130,7 +130,7 @@ public interface UserService extends UserDetailsService {
      * Activate the account of a user using a valid token.
      *
      * @param token the token
-     * @throws ValidationException if the token is invalid
+     * @throws ValidationException if the token is invalid, or the token is expired
      */
     void activateAccount(String token) throws ValidationException;
 

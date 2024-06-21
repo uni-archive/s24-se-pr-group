@@ -19,13 +19,20 @@ export class ActivateAccountComponent {
 
   activateAccount() {
     this.token = this.route.snapshot.queryParamMap.get("token");
+    if (this.token == null || this.token == "") {
+      this.messagingService.setMessage(
+        "Keinen gültigen Token gefunden.",
+        "danger"
+      );
+      return;
+    }
     this.userEndpointService.activateAccount(this.token).subscribe({
       next: (response) => {
         this.messagingService.setMessage(response.message, "success");
         this.router.navigate(["/login"]);
       },
       error: (error) => {
-        console.error("Failed to activate account", error);
+        this.messagingService.setMessage(error.error, "danger");
       },
     });
   }

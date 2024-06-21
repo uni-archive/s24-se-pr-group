@@ -92,6 +92,9 @@ public class UserValidator extends AbstractValidator<ApplicationUserDto> {
             if (!email.matches(EMAIL_REGEX)) {
                 errors.add("Email ist ungültig");
             }
+            if (email.length() > 255) {
+                errors.add("Email ist zu lang");
+            }
         }
     }
 
@@ -102,18 +105,35 @@ public class UserValidator extends AbstractValidator<ApplicationUserDto> {
             if (password.length() < MIN_PASSWORD_LENGTH) {
                 errors.add("Passwort muss mindestens " + MIN_PASSWORD_LENGTH + " Zeichen lang sein");
             }
+            if (password.length() > 255) {
+                errors.add("Passwort ist zu lang");
+            }
         }
     }
 
     private void validateFirstName(String firstName, List<String> errors) {
         if (firstName == null || firstName.isEmpty()) {
             errors.add("Vorname ist leer");
+        } else {
+            if (containsNumbers(firstName)) {
+                errors.add("Vorname darf keine Zahlen enthalten");
+            }
+            if (firstName.length() > 255) {
+                errors.add("Vorname ist zu lang");
+            }
         }
     }
 
     private void validateFamilyName(String familyName, List<String> errors) {
         if (familyName == null || familyName.isEmpty()) {
             errors.add("Familienname ist leer");
+        } else {
+            if (containsNumbers(familyName)) {
+                errors.add("Familienname darf keine Zahlen enthalten");
+            }
+            if (familyName.length() > 255) {
+                errors.add("Familienname ist zu lang");
+            }
         }
     }
 
@@ -130,7 +150,14 @@ public class UserValidator extends AbstractValidator<ApplicationUserDto> {
             } catch (NumberParseException e) {
                 errors.add("Telefonnummer ist ungültig");
             }
+            if (phoneNumber.length() > 255) {
+                errors.add("Telefonnummer ist zu lang");
+            }
         }
+    }
+
+    private boolean containsNumbers(String name) {
+        return name.matches(".*\\d.*");
     }
 
 }

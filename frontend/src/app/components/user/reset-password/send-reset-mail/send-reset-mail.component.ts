@@ -27,7 +27,6 @@ export class SendResetMailComponent {
       console.log(email);
       this.userEndpointService.sendEmailForPasswordReset(email).subscribe({
         next: (response) => {
-          console.log("Passwort-Reset-E-Mail gesendet", response);
           this.messagingService.setMessage(response.message, "success");
         },
         error: (error) => {

@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Output } from "@angular/core";
 import { AuthService } from "src/app/services/auth.service";
 import {
-  ApplicationUserDto,
   ApplicationUserResponse,
   UserEndpointService,
 } from "src/app/services/openapi";
@@ -30,7 +29,7 @@ export class UserHomeComponent {
     private userEndpointService: UserEndpointService
   ) {}
 
-  toggleRegistration(id: string) {
+  toggleView(id: string) {
     this.selectedLinkId = id;
     this.showEditUserForm = false;
     this.showManageUserForm = false;
@@ -65,6 +64,6 @@ export class UserHomeComponent {
   }
 
   public get heading(): string {
-    return this.isAdmin ? "Admin Home Page" : "User Home Page";
+    return this.isAdmin ? "Admin Homepage" : "User Homepage";
   }
 }

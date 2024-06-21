@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<div class="container p-0">
-  <h1 class="h1 mb-3">{{ heading }}</h1>
-  <div class="row">
-    <div class="col-md-5 col-xl-4">
-      <div class="list-group list-group-flush">
+<div class="container container-custom mt-5 shadow-lg p-3 rounded">
+  <h1 class="h1 mb-3 text-center">{{ heading }}</h1>
+  <div class="row position-relative">
+    <div class="col-md-4 col-xl-3 border-right-custom">
+      <div class="list-group list-group-flush hover-pointer">
         <a
           id="editUser"
           class="list-group-item list-group-item-action"
           [ngClass]="{ active: selectedLinkId === 'editUser' }"
-          (click)="toggleRegistration('editUser')"
+          (click)="toggleView('editUser')"
         >
           Meine Daten
         </a>
@@ -16,7 +16,7 @@
           id="createUser"
           class="list-group-item list-group-item-action"
           [ngClass]="{ active: selectedLinkId === 'createUser' }"
-          (click)="toggleRegistration('createUser')"
+          (click)="toggleView('createUser')"
           *ngIf="isAdmin"
         >
           Nutzer erstellen
@@ -25,24 +25,25 @@
           id="manageUser"
           class="list-group-item list-group-item-action"
           [ngClass]="{ active: selectedLinkId === 'manageUser' }"
-          (click)="toggleRegistration('manageUser')"
+          (click)="toggleView('manageUser')"
           *ngIf="isAdmin"
         >
           Nutzer verwalten
         </a>
         <a
           class="list-group-item list-group-item-action"
-          routerLink="/hallplan/create" routerLinkActive="active"
+          routerLink="/hallplan/create"
+          routerLinkActive="active"
           *ngIf="isAdmin"
         >
           Saalplan erstellen
         </a>
       </div>
     </div>
-    <div class="col-md-7 col-xl-8">
+    <div class="col-md-8 col-xl-9">
       <div class="tab-content">
         <div
-          class="collapse show active"
+          class="tab-pane fade show active"
           id="account"
           role="tabpanel"
           aria-labelledby="account-tab"
@@ -53,6 +54,7 @@
           <app-registration
             *ngIf="showCreateUserForm && isAdmin"
             [isAdminFlag]="isAdmin"
+            [noTopMargin]="true"
           ></app-registration>
           <app-user-edit *ngIf="showEditUserForm" [user]="user"></app-user-edit>
         </div>

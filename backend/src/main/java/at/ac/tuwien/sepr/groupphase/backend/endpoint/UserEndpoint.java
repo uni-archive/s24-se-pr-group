@@ -109,7 +109,7 @@ public class UserEndpoint {
 
     @Secured(Code.ADMIN)
     @PutMapping(path = "/update/status", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ApplicationUserResponse updateUserStatusByEmail(@RequestBody ApplicationUserDto user) {
+    public ApplicationUserResponse updateUserStatusByEmail(@RequestBody ApplicationUserDto user) throws MailNotSentException {
         LOGGER.info("Update user status by email: {}", user);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         try {

@@ -17,13 +17,13 @@ import { TicketDetailsResponse } from './ticket-details-response';
 export interface PageTicketDetailsResponse { 
     totalElements?: number;
     totalPages?: number;
+    first?: boolean;
+    last?: boolean;
     size?: number;
     content?: Array<TicketDetailsResponse>;
     number?: number;
     sort?: Array<SortObject>;
     numberOfElements?: number;
-    first?: boolean;
-    last?: boolean;
     pageable?: PageableObject;
     empty?: boolean;
 }

@@ -51,9 +51,9 @@ import java.util.concurrent.ExecutionException;
 public class UserServiceImpl implements UserService {
 
     public static final String ACCOUNT_LOCKED = "Ihr Account wurde wegen wiederholter falscher Anmeldeversuche gesperrt. Bitte versuchen Sie es später erneut oder kontaktieren Sie einen Administrator.";
+    public static final String INCORRECT_USERNAME_OR_PASSWORD = "Nutzername oder Passwort sind falsch.";
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final int MAX_EXPIRATION_TIME = 5;
-    public static final String INCORRECT_USERNAME_OR_PASSWORD = "Nutzername oder Passwort sind falsch.";
     private final UserDao userDao;
     private final EmailChangeTokenDao emailChangeTokenDao;
     private final NewPasswordTokenDao newPasswordTokenDao;
@@ -177,7 +177,7 @@ public class UserServiceImpl implements UserService {
         ApplicationUserDto user = userDao.create(toCreate);
 
         // Send email to the user to confirm the email address
-        MailBody mailBody = generateMailBodyConfirmEmail(toCreate, emailConfirmToken.getToken());
+        MailBody mailBody = generateMailBodyActivateAccount(toCreate, emailConfirmToken.getToken());
         try {
             emailSenderService.sendHtmlMail(mailBody);
         } catch (MessagingException e) {
@@ -194,9 +194,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ApplicationUserDto updateUserStatusByEmail(ApplicationUserDto toUpdate, String adminEmail)
-        throws DtoNotFoundException, ValidationException {
+        throws DtoNotFoundException, ValidationException, MailNotSentException {
         LOGGER.debug("Update user status: {}", toUpdate);
-        userValidator.validateForUpdate(toUpdate);
         userValidator.validateForUpdateStatus(toUpdate.getEmail(), adminEmail);
         ApplicationUserDto user = userDao.findByEmail(toUpdate.getEmail());
         if (user == null) {
@@ -208,9 +207,17 @@ public class UserServiceImpl implements UserService {
         }
         try {
             user.setAccountLocked(toUpdate.isAccountLocked());
-            return userDao.update(user);
+            ApplicationUserDto updatedUser = userDao.update(user);
+            if (!updatedUser.isAccountLocked()) {
+                // Send email to the user to inform about the account unlock
+                MailBody mailBody = generateMailBodyUnlockUser(updatedUser);
+                emailSenderService.sendHtmlMail(mailBody);
+            }
+            return user;
         } catch (EntityNotFoundException e) {
             throw new DtoNotFoundException(e);
+        } catch (MessagingException e) {
+            throw new MailNotSentException("Error sending mail.", e);
         }
     }
 
@@ -370,13 +377,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void activateAccount(String token) throws ValidationException {
+        LOGGER.debug("Activate account with token: {}", token);
         AccountActivateTokenDto emailConfirmToken = accountActivateTokenDao.findByToken(token);
         if (emailConfirmToken == null) {
-            throw new ValidationException("Der Link ist ungültig.");
+            throw new ValidationException("Dieser Link ist ungültig.");
         }
 
         if (emailConfirmToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new ValidationException("Dieser Link ist abgelaufen.");
+            throw new ValidationException("Dieser Link ist abgelaufen. Bitte neu registrieren.");
         }
 
         try {
@@ -387,7 +395,6 @@ public class UserServiceImpl implements UserService {
         } catch (EntityNotFoundException e) {
             LOGGER.error("Could not confirm the email because the user does not exist.", e);
         }
-
     }
 
     @Override
@@ -645,7 +652,7 @@ public class UserServiceImpl implements UserService {
         return new MailBody(email, subject, emailTemplate);
     }
 
-    private MailBody generateMailBodyConfirmEmail(ApplicationUserDto user, String token) {
+    private MailBody generateMailBodyActivateAccount(ApplicationUserDto user, String token) {
         String email = user.getEmail();
         String subject = "Konto Aktivierung";
         String url = "http://localhost:4200/#/user/activate/account?token=" + token;
@@ -735,4 +742,54 @@ public class UserServiceImpl implements UserService {
                 """;
         return new MailBody(email, subject, emailTemplate);
     }
+
+    private MailBody generateMailBodyUnlockUser(ApplicationUserDto user) {
+        String email = user.getEmail();
+        String subject = "Benutzerkonto entsperrt";
+        String url = "http://localhost:4200/#/login";
+
+        String emailTemplate = """
+            <!DOCTYPE html>
+            <html lang="de">
+            <head>
+               <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+               <style>
+                  body { background-color: #f8f9fa; font-family: Arial, sans-serif; }
+                  .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; }
+                  .card { background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 0.25rem; padding: 20px; }
+                  .card-body { padding: 20px; }
+                  .h3 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+                  .h5 { font-size: 1.25rem; }
+                  .text-gray-700 { color: #6c757d; }
+                  .btn-primary { display: inline-block; font-weight: 400; color: #fff !important; text-align: center; vertical-align: middle; cursor: pointer; background-color: #007bff; border: 1px solid #007bff; padding: 0.375rem 0.75rem; font-size: 1rem; border-radius: 0.25rem; text-decoration: none; }
+               </style>
+            </head>
+            <body>
+                <div class="container">
+                  <div class="card my-10">
+                    <div class="card-body">
+                      <h1 class="h3">Benutzerkonto entsperrt</h1>
+                      <h5 class="h5">Hallo""" + " " + user.getFirstName() +
+            """
+                !</h5>
+                <hr>
+                <div>
+                  <p class="text-gray-700">Dein Benutzerkonto wurde erfolgreich von einem Administrator entsperrt.</p>
+                  <p class="text-gray-700">Du kannst dich jetzt wieder bei deinem TicketLine-Konto anmelden und alle Funktionen nutzen.</p>
+                  <p class="text-gray-700">Um dich anzumelden, klicke bitte auf den folgenden Button:</p>
+                <hr>
+                <a class="btn btn-primary" href=\"""" + url + "\"" +
+            """
+                target="_blank" style="color: #fff !important;">Zur Anmeldeseite</a>
+                            <p class="text-gray-700">Dies ist eine automatisch generierte E-Mail – bitte antworte nicht auf diese E-Mail.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </body>
+                </html>
+                """;
+        return new MailBody(email, subject, emailTemplate);
+    }
+
 }
