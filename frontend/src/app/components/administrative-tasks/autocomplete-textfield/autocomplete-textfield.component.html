@@ -3,7 +3,9 @@
                           label="Veranstaltung"
                           [textExtraction]="textExtraction"
                           placeholder="Veranstaltung suchen und auswählen"
-                          (itemSelected)="onEventSelected($event)">
+                          (itemSelected)="onEventSelected($event)"
+                          [selectedItem]="initialEvent"
+>
 </app-generic-autocomplete>
 
 <ng-template #eventTemplate let-event>

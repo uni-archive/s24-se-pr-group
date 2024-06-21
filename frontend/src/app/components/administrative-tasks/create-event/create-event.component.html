@@ -3,24 +3,24 @@
   <div class="row">
     <div class="form-group col-12">
       <label for="title">Titel</label>
-      <input required type="text" [(ngModel)]="createDto.title" class="form-control" name="title" id="title" placeholder="Titel">
+      <input data-testid="event-title-input" required type="text" [(ngModel)]="createDto.title" class="form-control" name="title" id="title" placeholder="Titel">
     </div>
     <div class="form-group col-12 col-md-6">
       <label for="duration">Länge (in min)</label>
-      <input required type="number" min="0" [(ngModel)]="createDto.duration" class="form-control" name="duration" id="duration" placeholder="0">
+      <input data-testid="event-duration-input" required type="number" min="0" [(ngModel)]="createDto.duration" class="form-control" name="duration" id="duration" placeholder="0">
     </div>
     <div class="form-group col-12 col-md-6">
       <label for="typeselect">Typ der Veranstaltung</label>
-      <select required class="form-select" id="typeselect" aria-label="Default select example" [(ngModel)]="eventType" name="typ" #typ="ngModel">
+      <select data-testid="event-type-input" required class="form-select" id="typeselect" aria-label="Default select example" [(ngModel)]="eventType" name="typ" #typ="ngModel">
         <option *ngFor="let type of eventTypes" [ngValue]="type">{{ type }}</option>
       </select>
     </div>
     <div class="form-group col-12">
       <label for="description">Beschreibung</label>
-      <textarea required class="form-control" [(ngModel)]="createDto.description" name="description" id="description" rows="3"></textarea>
+      <textarea data-testid="event-description-input" required class="form-control" [(ngModel)]="createDto.description" name="description" id="description" rows="3"></textarea>
     </div>
     <div class="form-group col-12">
-      <button type="submit" class="btn btn-primary">Erstelle Event</button>
+      <button data-testid="event-submit" type="submit" class="btn btn-primary">Erstelle Event</button>
     </div>
   </div>
 </form>

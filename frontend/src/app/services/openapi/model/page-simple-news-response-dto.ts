@@ -15,16 +15,16 @@ import { SimpleNewsResponseDto } from './simple-news-response-dto';
 
 
 export interface PageSimpleNewsResponseDto { 
-    totalElements?: number;
     totalPages?: number;
-    first?: boolean;
-    last?: boolean;
+    totalElements?: number;
+    pageable?: PageableObject;
     size?: number;
     content?: Array<SimpleNewsResponseDto>;
     number?: number;
     sort?: Array<SortObject>;
     numberOfElements?: number;
-    pageable?: PageableObject;
+    first?: boolean;
+    last?: boolean;
     empty?: boolean;
 }
 

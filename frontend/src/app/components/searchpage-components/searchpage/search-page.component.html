@@ -8,7 +8,9 @@
             type="button">Orte
     </button>
     <button (click)="searchMode='EVENT'" class="btn btn-outline-primary {{(searchMode==='EVENT'?('active'):(''))}}"
-            type="button">Veranstaltungen
+            type="button"
+            data-testid="search-by-event"
+    >Veranstaltungen
     </button>
     <button (click)="searchMode='SHOW'" class="btn btn-outline-primary {{(searchMode==='SHOW'?('active'):(''))}}"
             type="button">Aufführungen
