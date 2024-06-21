@@ -177,7 +177,7 @@ public class UserServiceImpl implements UserService {
         ApplicationUserDto user = userDao.create(toCreate);
 
         // Send email to the user to confirm the email address
-        MailBody mailBody = generateMailBodyConfirmEmail(toCreate, emailConfirmToken.getToken());
+        MailBody mailBody = generateMailBodyActivateAccount(toCreate, emailConfirmToken.getToken());
         try {
             emailSenderService.sendHtmlMail(mailBody);
         } catch (MessagingException e) {
@@ -645,7 +645,7 @@ public class UserServiceImpl implements UserService {
         return new MailBody(email, subject, emailTemplate);
     }
 
-    private MailBody generateMailBodyConfirmEmail(ApplicationUserDto user, String token) {
+    private MailBody generateMailBodyActivateAccount(ApplicationUserDto user, String token) {
         String email = user.getEmail();
         String subject = "Konto Aktivierung";
         String url = "http://localhost:4200/#/user/activate/account?token=" + token;
