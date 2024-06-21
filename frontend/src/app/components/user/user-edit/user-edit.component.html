@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-
 <div
   class="card container-custom shadow-lg"
   [ngClass]="{ 'no-top-margin': true }"
@@ -66,6 +64,66 @@
         >
           Bitte Telefonnummer eintragen.
         </div>
+      </div>
+
+      <div class="form-group">
+        <label for="street" class="float-left">Straße:</label>
+        <input
+          type="text"
+          id="street"
+          formControlName="street"
+          class="form-control"
+          placeholder="Bitte Straße eintragen"
+        />
+        <div
+          *ngIf="
+            userForm.get('street').invalid && userForm.get('street').touched
+          "
+          class="invalid-feedback"
+        >
+          Bitte Straße eintragen.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="zip" class="float-left">PLZ:</label>
+        <input
+          type="text"
+          id="zip"
+          formControlName="zip"
+          class="form-control"
+          placeholder="Bitte Postleitzahl eintragen"
+        />
+        <div
+          *ngIf="userForm.get('zip').invalid && userForm.get('zip').touched"
+          class="invalid-feedback"
+        >
+          Bitte Postleitzahl eintragen.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="city" class="float-left">Ort:</label>
+        <input
+          type="text"
+          id="city"
+          formControlName="city"
+          class="form-control"
+          placeholder="Bitte Ort eintragen"
+        />
+        <div
+          *ngIf="userForm.get('city').invalid && userForm.get('city').touched"
+          class="invalid-feedback"
+        >
+          Bitte Ort eintragen.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <country-dropdown
+          formControlName="country"
+          [disabled]="!editMode"
+        ></country-dropdown>
       </div>
 
       <div class="d-flex justify-content-between mt-3">
