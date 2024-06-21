@@ -237,6 +237,10 @@ public class UserServiceImpl implements UserService {
             user.setPhoneNumber(userInfo.getPhoneNumber());
         }
 
+        if (userInfo.getAddress() != null) {
+            user.setAddress(userInfo.getAddress());
+        }
+
         // Validate user information
         userValidator.validateForUpdate(user);
 
@@ -267,9 +271,14 @@ public class UserServiceImpl implements UserService {
 
         // Update user information
         try {
+            if (userInfo.getAddress() != null) {
+                addressService.create(userInfo.getAddress());
+            }
             return userDao.update(user);
         } catch (EntityNotFoundException e) {
             throw new DtoNotFoundException("Could not update the user because it does not exist.");
+        } catch (ForbiddenException e) {
+            throw new ValidationException("Could not update the user because the address is invalid.");
         }
     }
 
