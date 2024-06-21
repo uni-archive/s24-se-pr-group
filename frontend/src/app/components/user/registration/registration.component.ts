@@ -86,11 +86,7 @@ export class RegistrationComponent implements AfterViewInit {
           }
         },
         error: (error) => {
-          this.messagingService.setMessage(
-            "Error registering user: " + error.error,
-            "danger"
-          );
-          console.error("Error registering user:", error);
+          this.messagingService.setMessage(error.error, "danger");
         },
       });
     }
