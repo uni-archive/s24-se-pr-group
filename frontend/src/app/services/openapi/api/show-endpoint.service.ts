@@ -19,6 +19,8 @@ import { CustomHttpParameterCodec }                          from '../encoder';
 import { Observable }                                        from 'rxjs';
 
 // @ts-ignore
+import { PageShowListResponse } from '../model/page-show-list-response';
+// @ts-ignore
 import { PageShowResponse } from '../model/page-show-response';
 // @ts-ignore
 import { ShowCreationDto } from '../model/show-creation-dto';
@@ -28,8 +30,6 @@ import { ShowHallplanResponse } from '../model/show-hallplan-response';
 import { ShowListDto } from '../model/show-list-dto';
 // @ts-ignore
 import { ShowResponse } from '../model/show-response';
-// @ts-ignore
-import { ShowSearchDto } from '../model/show-search-dto';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -385,6 +385,87 @@ export class ShowEndpointService implements ShowEndpointServiceInterface {
     }
 
     /**
+     * @param artistId 
+     * @param onlyFutureShows 
+     * @param page 
+     * @param size 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public getShowsByArtistId(artistId: number, onlyFutureShows?: boolean, page?: number, size?: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<PageShowResponse>;
+    public getShowsByArtistId(artistId: number, onlyFutureShows?: boolean, page?: number, size?: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageShowResponse>>;
+    public getShowsByArtistId(artistId: number, onlyFutureShows?: boolean, page?: number, size?: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageShowResponse>>;
+    public getShowsByArtistId(artistId: number, onlyFutureShows?: boolean, page?: number, size?: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json;charset=UTF-8', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (artistId === null || artistId === undefined) {
+            throw new Error('Required parameter artistId was null or undefined when calling getShowsByArtistId.');
+        }
+
+        let localVarQueryParameters = new HttpParams({encoder: this.encoder});
+        if (onlyFutureShows !== undefined && onlyFutureShows !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>onlyFutureShows, 'onlyFutureShows');
+        }
+        if (page !== undefined && page !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>page, 'page');
+        }
+        if (size !== undefined && size !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>size, 'size');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        let localVarHttpHeaderAcceptSelected: string | undefined = options && options.httpHeaderAccept;
+        if (localVarHttpHeaderAcceptSelected === undefined) {
+            // to determine the Accept header
+            const httpHeaderAccepts: string[] = [
+                'application/json;charset=UTF-8'
+            ];
+            localVarHttpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        }
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        let localVarHttpContext: HttpContext | undefined = options && options.context;
+        if (localVarHttpContext === undefined) {
+            localVarHttpContext = new HttpContext();
+        }
+
+        let localVarTransferCache: boolean | undefined = options && options.transferCache;
+        if (localVarTransferCache === undefined) {
+            localVarTransferCache = true;
+        }
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/api/v1/show/artist/${this.configuration.encodeParam({name: "artistId", value: artistId, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
+        return this.httpClient.request<PageShowResponse>('get', `${this.configuration.basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                params: localVarQueryParameters,
+                responseType: <any>responseType_,
+                withCredentials: this.configuration.withCredentials,
+                headers: localVarHeaders,
+                observe: observe,
+                transferCache: localVarTransferCache,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
      * @param eventid 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
@@ -448,16 +529,44 @@ export class ShowEndpointService implements ShowEndpointServiceInterface {
     }
 
     /**
-     * @param showSearchDto 
+     * @param price 
+     * @param dateTime 
+     * @param location 
+     * @param page 
+     * @param size 
+     * @param sort 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public searchShows(showSearchDto: ShowSearchDto, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<ShowListDto>>;
-    public searchShows(showSearchDto: ShowSearchDto, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<ShowListDto>>>;
-    public searchShows(showSearchDto: ShowSearchDto, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<ShowListDto>>>;
-    public searchShows(showSearchDto: ShowSearchDto, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (showSearchDto === null || showSearchDto === undefined) {
-            throw new Error('Required parameter showSearchDto was null or undefined when calling searchShows.');
+    public searchShows(price?: number, dateTime?: string, location?: number, page?: number, size?: number, sort?: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageShowListResponse>;
+    public searchShows(price?: number, dateTime?: string, location?: number, page?: number, size?: number, sort?: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageShowListResponse>>;
+    public searchShows(price?: number, dateTime?: string, location?: number, page?: number, size?: number, sort?: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageShowListResponse>>;
+    public searchShows(price?: number, dateTime?: string, location?: number, page?: number, size?: number, sort?: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+
+        let localVarQueryParameters = new HttpParams({encoder: this.encoder});
+        if (price !== undefined && price !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>price, 'price');
+        }
+        if (dateTime !== undefined && dateTime !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>dateTime, 'dateTime');
+        }
+        if (location !== undefined && location !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>location, 'location');
+        }
+        if (page !== undefined && page !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>page, 'page');
+        }
+        if (size !== undefined && size !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>size, 'size');
+        }
+        if (sort !== undefined && sort !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>sort, 'sort');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -485,15 +594,6 @@ export class ShowEndpointService implements ShowEndpointServiceInterface {
         }
 
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
-        }
-
         let responseType_: 'text' | 'json' | 'blob' = 'json';
         if (localVarHttpHeaderAcceptSelected) {
             if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
@@ -506,10 +606,10 @@ export class ShowEndpointService implements ShowEndpointServiceInterface {
         }
 
         let localVarPath = `/api/v1/show/search`;
-        return this.httpClient.request<Array<ShowListDto>>('post', `${this.configuration.basePath}${localVarPath}`,
+        return this.httpClient.request<PageShowListResponse>('get', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: showSearchDto,
+                params: localVarQueryParameters,
                 responseType: <any>responseType_,
                 withCredentials: this.configuration.withCredentials,
                 headers: localVarHeaders,

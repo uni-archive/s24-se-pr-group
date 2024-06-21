@@ -1,67 +1,75 @@
-<h2>Veranstaltungen</h2>
-<form class="search-form" #searchForm>
-  <div class="row form-group align-items-end">
+<app-paginated-list
+  [filterTemplate]="filterTemplate"
+  [resultTemplate]="resultTemplate"
+  [searchFunction]="searchEvents"
+  [filterConfig]="filterConfig"
+  [showPaginationButtons]="true"
+  [heading]="'Veranstaltungen'"
+  (onSearch)="pushQueryURL($event)"
+></app-paginated-list>
 
-    <div class="col-12 col-xl-4 mb-2">
-      <input id="textSearch" class="form-control" type="text" [(ngModel)]="searchData.textSearch" name="textSearch"
-             placeholder="text search"
-             data-testid="event-search-input"
-      >
-
+<ng-template #filterTemplate let-form="form">
+  <form [formGroup]="form" class="form-inline">
+    <div class="row align-items-center mb-2">
+      <div class="col-4 mb-2">
+        <input
+          type="text"
+          class="form-control w-100"
+          placeholder="Name"
+          formControlName="textSearch"
+          data-testid="event-search-input"
+        >
+      </div>
+      <div class="col-4 mb-2">
+        <input
+          type="number"
+          class="form-control w-100"
+          step="1"
+          min="0"
+          placeholder="60"
+          formControlName="dauer"
+        >
+      </div>
+        <div class="col-4 mb-2">
+          <select
+            id="type"
+            class="form-select w-100"
+            formControlName="typ"
+          >
+            <option [ngValue]="" selected>Alle</option>
+            <option *ngFor="let type of eventTypes" [ngValue]="type">{{ type }}</option>
+          </select>
+        </div>
     </div>
-    <div class="col-12 col-xl-4 mb-2">
-      <input id="duration" class="form-control" [(ngModel)]="searchData.dauer" type="number" step="1" name="dauer"
-             placeholder="dauer in min" min="0"
-      >
 
-    </div>
+  </form>
+</ng-template>
 
-    <div class="col-12 col-xl-4 mb-2">
-
-      <select
-        id="type"
-        class="form-select"
-        [(ngModel)]="searchData.typ"
-        name="typ"
-      >
-        <option value="" disabled selected>Event Typ wählen</option>
-        <option *ngFor="let type of eventTypes" [ngValue]="type">{{ type }}</option>
-      </select>
-
-    </div>
-  </div>
-
-</form>
-
-<div *ngIf="events" class="d-flex flex-column gap-2">
-  <div *ngIf="events.length === 0" class="alert alert-light" role="alert">
+<ng-template #resultTemplate let-items="items">
+  <div *ngIf="items.length === 0" class="alert alert-light" role="alert">
     Keine Veranstaltungen gefunden.
   </div>
-  <div *ngFor="let event of events" class="card">
-    <div class="card-body d-flex justify-content-between">
-      <div>
-        <h5 class="card-title">
-          {{ event.title }}
-        </h5>
-        <h6 class="card-subtitle mb-2 text-body-secondary description-text">
-          Beschreibung: {{ event.description }}
-        </h6>
+  <div class="d-flex flex-column gap-2">
+    <app-search-result-card data-testid="event-details-btn" *ngFor="let event of items"
+                            (click)="navigateToEvent(event.id)">
+      <div class="card-body d-flex justify-content-between">
+        <div class="w-75">
+          <h5 class="card-title">
+            {{ event.title }}
+          </h5>
+          <h6 class="card-subtitle mb-2 text-body-secondary description-text">
+            {{ event.description }}
+          </h6>
+        </div>
+        <div class="text-end">
+          <p class="card-text mb-0">
+            Dauer: {{ formatDuration(event.duration) }}
+          </p>
+          <p class="card-text">
+            Veranstaltungs-Art: {{ formatEventType(event.eventType) }}
+          </p>
+        </div>
       </div>
-      <div class="endcontainer">
-        <p class="card-text mb-0">
-          Dauer: {{ formatDuration(event.duration) }}
-        </p>
-        <p class="card-text">
-          Veranstaltungs-Art: {{ formatEventType(event.eventType) }}
-        </p>
-        <a
-          class="btn-info"
-          [href]="'/#/event/'+event.id"
-          data-testid="event-details-btn"
-        >
-          mehr Infos
-        </a>
-      </div>
-    </div>
+    </app-search-result-card>
   </div>
-</div>
+</ng-template>

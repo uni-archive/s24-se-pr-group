@@ -25,9 +25,9 @@ import { EventDto } from '../model/event-dto';
 // @ts-ignore
 import { EventResponse } from '../model/event-response';
 // @ts-ignore
-import { EventSearchDto } from '../model/event-search-dto';
-// @ts-ignore
 import { EventWithTicketCountDto } from '../model/event-with-ticket-count-dto';
+// @ts-ignore
+import { PageEventResponse } from '../model/page-event-response';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -361,16 +361,44 @@ export class EventEndpointService implements EventEndpointServiceInterface {
     }
 
     /**
-     * @param eventSearchDto 
+     * @param textSearch 
+     * @param typ 
+     * @param dauer 
+     * @param page 
+     * @param size 
+     * @param sort 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public searchEvents(eventSearchDto: EventSearchDto, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<EventDto>>;
-    public searchEvents(eventSearchDto: EventSearchDto, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<EventDto>>>;
-    public searchEvents(eventSearchDto: EventSearchDto, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<EventDto>>>;
-    public searchEvents(eventSearchDto: EventSearchDto, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (eventSearchDto === null || eventSearchDto === undefined) {
-            throw new Error('Required parameter eventSearchDto was null or undefined when calling searchEvents.');
+    public searchEvents(textSearch?: string, typ?: 'CONCERT' | 'THEATER' | 'PLAY', dauer?: number, page?: number, size?: number, sort?: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageEventResponse>;
+    public searchEvents(textSearch?: string, typ?: 'CONCERT' | 'THEATER' | 'PLAY', dauer?: number, page?: number, size?: number, sort?: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageEventResponse>>;
+    public searchEvents(textSearch?: string, typ?: 'CONCERT' | 'THEATER' | 'PLAY', dauer?: number, page?: number, size?: number, sort?: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageEventResponse>>;
+    public searchEvents(textSearch?: string, typ?: 'CONCERT' | 'THEATER' | 'PLAY', dauer?: number, page?: number, size?: number, sort?: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+
+        let localVarQueryParameters = new HttpParams({encoder: this.encoder});
+        if (textSearch !== undefined && textSearch !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>textSearch, 'textSearch');
+        }
+        if (typ !== undefined && typ !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>typ, 'typ');
+        }
+        if (dauer !== undefined && dauer !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>dauer, 'dauer');
+        }
+        if (page !== undefined && page !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>page, 'page');
+        }
+        if (size !== undefined && size !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>size, 'size');
+        }
+        if (sort !== undefined && sort !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>sort, 'sort');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -398,15 +426,6 @@ export class EventEndpointService implements EventEndpointServiceInterface {
         }
 
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
-        }
-
         let responseType_: 'text' | 'json' | 'blob' = 'json';
         if (localVarHttpHeaderAcceptSelected) {
             if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
@@ -419,10 +438,10 @@ export class EventEndpointService implements EventEndpointServiceInterface {
         }
 
         let localVarPath = `/api/v1/events/search`;
-        return this.httpClient.request<Array<EventDto>>('post', `${this.configuration.basePath}${localVarPath}`,
+        return this.httpClient.request<PageEventResponse>('get', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: eventSearchDto,
+                params: localVarQueryParameters,
                 responseType: <any>responseType_,
                 withCredentials: this.configuration.withCredentials,
                 headers: localVarHeaders,

@@ -1,18 +1,18 @@
 <div class="container">
 
   <div class="input-group justify-content-center" id="searchRadio">
-    <button (click)="searchMode='ARTIST'" class="btn btn-outline-primary {{(searchMode==='ARTIST'?('active'):(''))}}"
+    <button (click)="setSearchMode('ARTIST')" class="btn btn-outline-primary {{(searchMode==='ARTIST'?('active'):(''))}}"
             type="button">Künstler
     </button>
-    <button (click)="searchMode='LOCATION'" class="btn btn-outline-primary {{(searchMode==='LOCATION'?('active'):(''))}}"
+    <button (click)="setSearchMode('LOCATION')" class="btn btn-outline-primary {{(searchMode==='LOCATION'?('active'):(''))}}"
             type="button">Orte
     </button>
-    <button (click)="searchMode='EVENT'" class="btn btn-outline-primary {{(searchMode==='EVENT'?('active'):(''))}}"
+    <button (click)="setSearchMode('EVENT')" class="btn btn-outline-primary {{(searchMode==='EVENT'?('active'):(''))}}"
             type="button"
             data-testid="search-by-event"
     >Veranstaltungen
     </button>
-    <button (click)="searchMode='SHOW'" class="btn btn-outline-primary {{(searchMode==='SHOW'?('active'):(''))}}"
+    <button (click)="setSearchMode('SHOW')" class="btn btn-outline-primary {{(searchMode==='SHOW'?('active'):(''))}}"
             type="button">Aufführungen
     </button>
   </div>

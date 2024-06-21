@@ -21,10 +21,14 @@ import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundExcepti
 import jakarta.transaction.Transactional;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -85,7 +89,12 @@ public class ShowServiceImpl implements ShowService {
     }
 
     @Override
-    public List<ShowListDto> searchShows(ShowSearchDto searchDto) throws DtoNotFoundException {
+    public Page<ShowListDto> searchShows(ShowSearchDto searchDto) throws DtoNotFoundException {
+        if (Objects.isNull(searchDto.getPageable())) {
+            PageRequest defaultPage = PageRequest.of(0, 15, Sort.by("dateTime"));
+            searchDto.setPageable(defaultPage);
+        }
+
         try {
             return dao.searchShows(searchDto);
         } catch (EntityNotFoundException e) {
@@ -97,6 +106,12 @@ public class ShowServiceImpl implements ShowService {
     @Transactional
     public Page<ShowDto> findByLocation(Long locationId, boolean onlyFutureShows, Pageable pageable) {
         return dao.findByLocationId(locationId, pageable);
+    }
+
+    @Override
+    @Transactional
+    public Page<ShowDto> findByArtistId(Long artistId, boolean onlyFutureShows, Pageable pageable) {
+        return dao.findByArtistId(artistId, pageable);
     }
 
     @Override

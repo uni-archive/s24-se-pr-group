@@ -1,6 +1,8 @@
-import { Component, EventEmitter, Input, OnInit, Output, TemplateRef, SimpleChanges, OnChanges } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
-import { debounceTime } from 'rxjs/operators';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, TemplateRef} from '@angular/core';
+import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
+import {debounceTime} from 'rxjs/operators';
+
+type FilterConfig = { [key: string]: any }
 
 @Component({
   selector: 'app-paginated-list',
@@ -12,10 +14,11 @@ export class PaginatedListComponent implements OnInit, OnChanges {
   @Input() resultTemplate!: TemplateRef<any>;
   @Input() searchFunction!: (criteria: any, page: number, size: number) => any;
   @Input() showPaginationButtons: boolean = true;
-  @Input() filterConfig: { [key: string]: any } = {}; // Accept filter configuration with default values
+  @Input() filterConfig: FilterConfig = {}; // Accept filter configuration with default values
   @Input() createButtonEnabled: boolean = false;
   @Input() heading: string = '';
   @Input() refresh: boolean = false; // Input to trigger refresh
+  @Output() onSearch: EventEmitter<FilterConfig> = new EventEmitter<FilterConfig>();
 
   @Output() createNew = new EventEmitter<void>();
 
@@ -27,13 +30,17 @@ export class PaginatedListComponent implements OnInit, OnChanges {
   pageSize = 10;
   totalItems = 0;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder) {
+  }
 
   ngOnInit(): void {
     this.initializeFormControls();
-    this.searchForm.valueChanges.pipe(debounceTime(300)).subscribe(() => {
-      this.currentPage = 1;
-      this.searchItems();
+    this.searchForm.valueChanges.pipe(debounceTime(300)).subscribe({
+      next: newState => {
+        this.currentPage = 1;
+        this.searchItems();
+        this.onSearch.emit(newState);
+      }
     });
 
     this.searchItems();

@@ -13,8 +13,8 @@ import { HttpHeaders }                                       from '@angular/comm
 
 import { Observable }                                        from 'rxjs';
 
-import { ArtistSearchDto } from '../model/models';
-import { ArtistSearchResponse } from '../model/models';
+import { ArtistDto } from '../model/models';
+import { PageArtistSearchResponse } from '../model/models';
 
 
 import { Configuration }                                     from '../configuration';
@@ -28,8 +28,20 @@ export interface ArtistEndpointServiceInterface {
     /**
      * 
      * 
-     * @param arg0 
+     * @param artistId 
      */
-    search(arg0: ArtistSearchDto, extraHttpRequestParams?: any): Observable<Array<ArtistSearchResponse>>;
+    findById4(artistId: number, extraHttpRequestParams?: any): Observable<ArtistDto>;
+
+    /**
+     * 
+     * 
+     * @param firstname 
+     * @param lastname 
+     * @param artistName 
+     * @param page 
+     * @param size 
+     * @param sort 
+     */
+    search1(firstname?: string, lastname?: string, artistName?: string, page?: number, size?: number, sort?: string, extraHttpRequestParams?: any): Observable<PageArtistSearchResponse>;
 
 }

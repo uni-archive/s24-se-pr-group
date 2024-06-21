@@ -1,13 +1,13 @@
-import {EventResponse, EventSearchDto} from "../services/openapi";
+import {EventResponse} from "../services/openapi";
 import EventTypeEnum = EventResponse.EventTypeEnum;
 
 export class EventSearch{
-  typ: EventTypeEnum;
+  typ: EventTypeEnum | "ALL";
   dauer: number;
-  textSearch: String;
+  textSearch: string;
 
   constructor() {
-    this.typ = null;
+    this.typ = "ALL";
     this.dauer = null;
     this.textSearch = "";
   }

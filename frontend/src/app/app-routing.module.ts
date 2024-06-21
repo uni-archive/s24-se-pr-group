@@ -32,6 +32,7 @@ import { PickUpTicketsComponent } from "./components/tickets/pick-up-tickets/pic
 import { PickUpTicketShowSelectComponent } from "./components/tickets/pick-up-ticket-show-select/pick-up-ticket-show-select.component";
 import { NoAuthGuard } from "./guards/noAuth.guard";
 import { NewsCreateComponent } from "./components/news/news-create/news-create.component";
+import {ArtistDetailsComponent} from "./components/artist/artist-details/artist-details.component";
 
 const routes: Routes = [
   { path: "", component: HomeComponent },
@@ -118,6 +119,10 @@ const routes: Routes = [
   {
     path: "location/:id",
     component: LocationDetailsComponent,
+  },
+  {
+    path: "artist/:id",
+    component: ArtistDetailsComponent,
   },
   {
     path: "pickup-ticket-show-select",

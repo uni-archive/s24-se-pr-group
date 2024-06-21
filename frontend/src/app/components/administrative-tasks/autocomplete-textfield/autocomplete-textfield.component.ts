@@ -1,7 +1,9 @@
 import {Component, EventEmitter, forwardRef, Input, OnInit, Output} from '@angular/core';
-import {EventDto, EventEndpointService, LocationDto} from "../../../services/openapi";
+import {EventDto, EventEndpointService} from "../../../services/openapi";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ActivatedRoute} from "@angular/router";
+import {map} from "rxjs";
+
 @Component({
   selector: "app-autocomplete-textfield",
   templateUrl: "./autocomplete-textfield.component.html",
@@ -22,9 +24,16 @@ export class AutocompleteTextfieldComponent implements OnInit, ControlValueAcces
   constructor(
     private eventService: EventEndpointService,
     private route: ActivatedRoute,
-  ) {}
+  ) {
+  }
 
-  searchEvents = (query: string) => this.eventService.searchEvents({textSearch:query, typ:null, dauer:0});
+  searchEvents = (query: string) => {
+    return this.eventService.searchEvents(
+        query,
+        null,
+        null,
+    ).pipe(map(r => r.content));
+  }
 
   onEventSelected(event: EventDto): void {
     this.selectedEvent.emit(event);
@@ -32,12 +41,12 @@ export class AutocompleteTextfieldComponent implements OnInit, ControlValueAcces
     this.onTouched();
   }
 
-  textExtraction(item: EventDto) : string {
+  textExtraction(item: EventDto): string {
     return item.title;
   }
 
   ngOnInit(): void {
-    if(this.initialEvent) {
+    if (this.initialEvent) {
       this.writeValue(this.initialEvent);
     }
 
@@ -54,19 +63,21 @@ export class AutocompleteTextfieldComponent implements OnInit, ControlValueAcces
 
   private onChange: any = () => {
   };
+
   registerOnChange(fn: any): void {
     this.onChange = fn;
   }
 
   private onTouched: any = () => {
   };
+
   registerOnTouched(fn: any): void {
     this.onTouched = fn;
   }
 
   writeValue(obj: any): void {
     this.event = obj;
-    if(obj) {
+    if (obj) {
       this.onEventSelected(obj);
     }
   }

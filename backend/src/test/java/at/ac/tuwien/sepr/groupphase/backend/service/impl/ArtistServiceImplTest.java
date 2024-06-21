@@ -1,7 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.ArtistDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.ArtistSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.ArtistMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Artist;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.ArtistRepository;
@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
@@ -82,7 +83,7 @@ public class ArtistServiceImplTest {
             assertThat(found)
                 .hasSize(1);
 
-            var foundArtist = found.get(0);
+            var foundArtist = found.stream().findFirst().get();
 
             var expected = artistById.get(foundArtist.getId());
             assertThat(foundArtist)
@@ -108,7 +109,7 @@ public class ArtistServiceImplTest {
 
     @Test
     void searching_WithAllSearchParamsEqualToNull_returnsAllArtists() {
-        assertThat(artistService.search(new ArtistSearchDto(null, null, null)))
+        assertThat(artistService.search(new ArtistSearchDto(null, null, null, Pageable.unpaged())))
             .hasSize(generatedArtists.size())
             .containsExactlyInAnyOrder(artistById.values().toArray(ArtistDto[]::new))
             .usingRecursiveComparison();
@@ -116,7 +117,7 @@ public class ArtistServiceImplTest {
 
     @Test
     void searching_WithAllSearchParamsEmpty_returnsAllArtists() {
-        assertThat(artistService.search(new ArtistSearchDto("", "", "")))
+        assertThat(artistService.search(new ArtistSearchDto("", "", "", Pageable.unpaged())))
             .hasSize(generatedArtists.size())
             .containsExactlyInAnyOrder(artistById.values().toArray(ArtistDto[]::new))
             .usingRecursiveComparison();

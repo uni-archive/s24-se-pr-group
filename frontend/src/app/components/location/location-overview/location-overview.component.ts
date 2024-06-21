@@ -14,7 +14,7 @@ export class LocationOverviewComponent {
   }
 
   searchLocations = (criteria: any, page: number, size: number) => {
-    return this.locationService.search1(
+    return this.locationService.search(
       criteria.name,
       criteria.city,
       criteria.street,

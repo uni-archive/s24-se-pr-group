@@ -12,7 +12,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {NgForOf, NgIf} from "@angular/common";
 import {SeatEntity, SectionEntity} from "../hallplan/entities";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {HallSector} from "../../services/openapi/model/hall-sector";
+import { HallSectorDto } from "../../services/openapi";
 import {HttpStatusCode} from "@angular/common/http";
 import {forkJoin, Observable} from "rxjs";
 
@@ -37,7 +37,7 @@ export class TicketSelectComponent {
   showHallplan: ShowHallplanResponse | null = null;
   selectedSeats: HallSeat[] = [];
   selectedSectors: number[] = [];
-  visibleSectors: HallSector[] = [];
+  visibleSectors: HallSectorDto[] = [];
   sectorSeatMap: ({ [key: number]: HallSeat[] }) = {};
   selectedSectorSpots: ({ [key: string]: number }) = {};
   orderId: number | null = null;

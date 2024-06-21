@@ -1,5 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.dto;
 
+import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDateTime;
 
 public class ShowSearchDto {
@@ -10,6 +12,8 @@ public class ShowSearchDto {
     private Long eventId;
 
     private Long location;
+
+    private Pageable pageable;
 
     public ShowSearchDto() {
     }
@@ -65,5 +69,13 @@ public class ShowSearchDto {
             + ", eventId=" + eventId
             + ", location=" + location
             + '}';
+    }
+
+    public Pageable getPageable() {
+        return pageable;
+    }
+
+    public void setPageable(Pageable pageable) {
+        this.pageable = pageable;
     }
 }

@@ -56,6 +56,10 @@ import {
 } from "./components/hallplan/hallplan-autocomplete/hall-plan-autocomplete.component";
 import {HallplanComponent} from "./components/hallplan/hallplan.component";
 import {HallPlanViewerComponent} from "./components/hallplan/hallplan-viewer/hallplan-viewer.component";
+import {
+    SearchResultCardComponent
+} from "./components/searchpage-components/search-result-card/search-result-card.component";
+import {ArtistDetailsComponent} from "./components/artist/artist-details/artist-details.component";
 
 @NgModule({
   declarations: [
@@ -78,6 +82,10 @@ import {HallPlanViewerComponent} from "./components/hallplan/hallplan-viewer/hal
     LocationEditComponent,
     PaginatedListComponent,
     LocationSearchComponent,
+    ShowSearchComponent,
+    ArtistSearchComponent,
+    ArtistDetailsComponent,
+    EventSearchComponent,
     GlobalMessageComponent,
     SearchPageComponent,
     LocationDetailsComponent,
@@ -96,31 +104,30 @@ import {HallPlanViewerComponent} from "./components/hallplan/hallplan-viewer/hal
     HallPlanAutocompleteComponent,
     HallPlanViewerComponent
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    ReactiveFormsModule,
-    HttpClientModule,
-    NgbModule,
-    FormsModule,
-    AngularPhoneNumberInput,
-    PrintPurchaseInvoiceButtonComponent,
-    PrintTicketButtonComponent,
-    TicketsTableComponent,
-    NgxPaginationModule,
-    EventSearchComponent,
-    ShowSearchComponent,
-    ArtistSearchComponent,
-    TagSearchComponent,
-    NgOptimizedImage,
-    HallplanComponent,
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        ReactiveFormsModule,
+        HttpClientModule,
+        NgbModule,
+        FormsModule,
+        AngularPhoneNumberInput,
+        PrintPurchaseInvoiceButtonComponent,
+        PrintTicketButtonComponent,
+        TicketsTableComponent,
+        NgxPaginationModule,
+        TagSearchComponent,
+        NgOptimizedImage,
+        HallplanComponent,
+        SearchResultCardComponent,
+    ],
   providers: [httpInterceptorProviders],
   exports: [
     HeaderComponent,
     FooterComponent,
     LocationSearchComponent,
     LocationAutocompleteComponent,
+    PaginatedListComponent,
   ],
   bootstrap: [AppComponent],
 })

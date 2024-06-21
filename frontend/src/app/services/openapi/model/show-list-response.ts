@@ -9,14 +9,15 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { Address } from './address';
-import { Show } from './show';
+import { ArtistSearchResponse } from './artist-search-response';
 
 
-export interface Location { 
+export interface ShowListResponse { 
     id?: number;
-    name?: string;
-    address?: Address;
-    shows?: Array<Show>;
+    dateTime?: string;
+    artistList?: Array<ArtistSearchResponse>;
+    eventid?: number;
+    startingPrice?: number;
+    eventName?: string;
 }
 

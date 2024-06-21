@@ -1,16 +1,24 @@
 package at.ac.tuwien.sepr.groupphase.backend.dto;
 
-import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.EventType;
+import at.ac.tuwien.sepr.groupphase.backend.dto.EventType;
+import org.springframework.data.domain.Pageable;
 
 public class EventSearchDto {
     private long dauer; //in Minuten
     private EventType typ;
     private String textSearch;
 
+    private Pageable pageable;
+
     public EventSearchDto(long dauer, EventType typ, String textSearch) {
         this.dauer = dauer;
         this.typ = typ;
         this.textSearch = textSearch;
+    }
+
+    public EventSearchDto(long dauer, EventType typ, String textSearch, Pageable pageable) {
+        this(dauer, typ, textSearch);
+        this.pageable = pageable;
     }
 
     public EventSearchDto() {
@@ -41,5 +49,13 @@ public class EventSearchDto {
     public EventSearchDto setTextSearch(String textSearch) {
         this.textSearch = textSearch;
         return this;
+    }
+
+    public Pageable getPageable() {
+        return pageable;
+    }
+
+    public void setPageable(Pageable pageable) {
+        this.pageable = pageable;
     }
 }

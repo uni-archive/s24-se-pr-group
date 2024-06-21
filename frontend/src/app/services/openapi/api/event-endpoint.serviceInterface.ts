@@ -16,8 +16,8 @@ import { Observable }                                        from 'rxjs';
 import { EventCreationDto } from '../model/models';
 import { EventDto } from '../model/models';
 import { EventResponse } from '../model/models';
-import { EventSearchDto } from '../model/models';
 import { EventWithTicketCountDto } from '../model/models';
+import { PageEventResponse } from '../model/models';
 
 
 import { Configuration }                                     from '../configuration';
@@ -58,8 +58,13 @@ export interface EventEndpointServiceInterface {
     /**
      * 
      * 
-     * @param eventSearchDto 
+     * @param textSearch 
+     * @param typ 
+     * @param dauer 
+     * @param page 
+     * @param size 
+     * @param sort 
      */
-    searchEvents(eventSearchDto: EventSearchDto, extraHttpRequestParams?: any): Observable<Array<EventDto>>;
+    searchEvents(textSearch?: string, typ?: 'CONCERT' | 'THEATER' | 'PLAY', dauer?: number, page?: number, size?: number, sort?: string, extraHttpRequestParams?: any): Observable<PageEventResponse>;
 
 }

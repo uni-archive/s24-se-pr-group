@@ -70,27 +70,35 @@ public class ShowDao extends AbstractDao<Show, ShowDto> {
     }
 
     @Transactional
+    public Page<ShowDto> findByArtistId(Long artistId, Pageable pageable) {
+        return ((ShowRepository) repository).findByArtistId(artistId, pageable).map(mapper::toDto);
+    }
+
+
+    @Transactional
     public List<ShowDto> getAllShows() {
         return mapper.toDto(((ShowRepository) repository).getAllShows());
     }
 
     @Transactional
-    public List<ShowListDto> searchShows(ShowSearchDto searchDto) throws EntityNotFoundException {
-        var showlist = mapper.toDto(((ShowRepository) repository)
-            .findShowsBySearchDto(searchDto.getDateTime(), searchDto.getPrice(), searchDto.getEventId()));
-        LOGGER.info("SHOWLIST({})", showlist);
-        List<ShowListDto> list = new ArrayList<>();
-        for (ShowDto showDto : showlist) {
-            ShowListDto showListDto = new ShowListDto()
-                .setId(showDto.getId())
-                .setDateTime(showDto.getDateTime())
-                .setEventid(showDto.getEvent().getId())
-                .setStartingPrice(((ShowRepository) repository).getStartingPriceOfShow(showDto.getId()))
-                .setArtistList(artistMapper.toDto(artrepo.findByShowId(showDto.getId())))
-                .setEventName(eventDao.findById(showDto.getEvent().getId()).getTitle());
-            list.add(showListDto);
-        }
-        return list;
+    public Page<ShowListDto> searchShows(ShowSearchDto searchDto) throws EntityNotFoundException {
+        // LOGGER.info("SHOWLIST({})", showlist);
+        return ((ShowRepository) repository)
+            .findShowsBySearchDto(searchDto.getDateTime(), searchDto.getPrice(), searchDto.getEventId(), searchDto.getPageable())
+            .map(mapper::toDto)
+            .map(showDto -> {
+                try {
+                    return new ShowListDto()
+                        .setId(showDto.getId())
+                        .setDateTime(showDto.getDateTime())
+                        .setEventid(showDto.getEvent().getId())
+                        .setStartingPrice(((ShowRepository) repository).getStartingPriceOfShow(showDto.getId()))
+                        .setArtistList(artistMapper.toDto(artrepo.findByShowId(showDto.getId())))
+                        .setEventName(eventDao.findById(showDto.getEvent().getId()).getTitle());
+                } catch (EntityNotFoundException e) {
+                    throw new IllegalStateException("Show points to invalid event");
+                }
+            });
     }
 
     @Override

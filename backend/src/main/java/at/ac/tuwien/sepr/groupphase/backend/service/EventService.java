@@ -6,6 +6,7 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.EventWithTicketCountDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreationDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public interface EventService {
      *
      * @param searchOptions search parameters dto
      */
-    List<EventDto> searchEvents(EventSearchDto searchOptions);
+    Page<EventDto> searchEvents(EventSearchDto searchOptions);
 
     /**
      * Returns a list of all Events in the form of EventDTOs.
