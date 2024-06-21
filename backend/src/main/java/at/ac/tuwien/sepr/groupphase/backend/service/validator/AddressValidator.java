@@ -51,7 +51,7 @@ public class AddressValidator extends AbstractValidator<AddressDto> {
             addressDao.findById(addressDto.getId());
 
         } catch (EntityNotFoundException e) {
-            errors.add("Address with id " + addressDto.getId() + " does not exist");
+            errors.add("Adresse mit id " + addressDto.getId() + " existiert nicht.");
         }
         endValidation(errors);
     }
