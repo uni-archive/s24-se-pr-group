@@ -8,7 +8,7 @@
           id="editUser"
           class="list-group-item list-group-item-action"
           [ngClass]="{ active: selectedLinkId === 'editUser' }"
-          (click)="toggleRegistration('editUser')"
+          (click)="toggleView('editUser')"
         >
           Meine Daten
         </a>
@@ -16,7 +16,7 @@
           id="createUser"
           class="list-group-item list-group-item-action"
           [ngClass]="{ active: selectedLinkId === 'createUser' }"
-          (click)="toggleRegistration('createUser')"
+          (click)="toggleView('createUser')"
           *ngIf="isAdmin"
         >
           Nutzer erstellen
@@ -25,7 +25,7 @@
           id="manageUser"
           class="list-group-item list-group-item-action"
           [ngClass]="{ active: selectedLinkId === 'manageUser' }"
-          (click)="toggleRegistration('manageUser')"
+          (click)="toggleView('manageUser')"
           *ngIf="isAdmin"
         >
           Nutzer verwalten
