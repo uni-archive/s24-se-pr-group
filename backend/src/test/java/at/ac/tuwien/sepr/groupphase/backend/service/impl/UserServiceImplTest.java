@@ -669,7 +669,7 @@ class UserServiceImplTest {
         });
 
         // Assert the exception message
-        assertEquals("Dieser Link ist abgelaufen.", exception.getMessage());
+        assertEquals("Dieser Link ist abgelaufen. Bitte neu registrieren.", exception.getMessage());
 
         // Verify interactions
         verify(accountActivateTokenDao).findByToken(token);
@@ -691,7 +691,7 @@ class UserServiceImplTest {
         });
 
         // Assert the exception message
-        assertEquals("Der Link ist ungültig.", exception.getMessage());
+        assertEquals("Dieser Link ist ungültig.", exception.getMessage());
 
         // Verify interactions
         verify(accountActivateTokenDao).findByToken(token);
