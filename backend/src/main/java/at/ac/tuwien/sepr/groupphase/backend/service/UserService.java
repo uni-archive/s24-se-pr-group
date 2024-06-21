@@ -74,7 +74,7 @@ public interface UserService extends UserDetailsService {
      * @throws DtoNotFoundException if the email does not exist
      */
     ApplicationUserDto updateUserStatusByEmail(ApplicationUserDto toUpdate, String adminEmail) throws ValidationException,
-        DtoNotFoundException;
+        DtoNotFoundException, MailNotSentException;
 
     /**
      * Update the user information.
