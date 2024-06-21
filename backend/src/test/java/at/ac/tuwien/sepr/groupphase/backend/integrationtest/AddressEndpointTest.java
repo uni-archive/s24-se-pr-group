@@ -1,12 +1,5 @@
 package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 
-import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_ROLES;
-import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_USER;
-import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.DEFAULT_USER;
-import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.USER_ROLES;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 import at.ac.tuwien.sepr.groupphase.backend.config.properties.SecurityProperties;
 import at.ac.tuwien.sepr.groupphase.backend.dto.AddressDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AddressCreateRequest;
@@ -17,7 +10,6 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.LocationRepos
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +25,18 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+
+import java.util.List;
+
+import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_ROLES;
+import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.ADMIN_USER;
+import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.DEFAULT_USER;
+import static at.ac.tuwien.sepr.groupphase.backend.basetest.TestData.USER_ROLES;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -66,7 +70,7 @@ public class AddressEndpointTest {
 
     @BeforeEach
     void setUp() {
-        if(userRepository.findByEmail(DEFAULT_USER) == null) {
+        if (userRepository.findByEmail(DEFAULT_USER) == null) {
             createUser();
         }
     }
@@ -117,9 +121,9 @@ public class AddressEndpointTest {
         String responseContent = response.getContentAsString();
 
         Assertions.assertAll(
-            () -> Assertions.assertTrue(responseContent.contains("Street must not be empty")),
-            () -> Assertions.assertTrue(responseContent.contains("City must not be empty")),
-            () -> Assertions.assertTrue(responseContent.contains("Zip code must be a number"))
+            () -> Assertions.assertTrue(responseContent.contains("Straße darf nicht leer sein")),
+            () -> Assertions.assertTrue(responseContent.contains("Stadt darf nicht leer sein")),
+            () -> Assertions.assertTrue(responseContent.contains("Postleitzahl muss eine Zahl sein"))
         );
     }
 
@@ -202,6 +206,6 @@ public class AddressEndpointTest {
         MockHttpServletResponse response = mvcResult.getResponse();
         List<AddressDto> addresses = objectMapper.readValue(response.getContentAsString(), List.class);
 
-        Assertions.assertEquals(size+2, addresses.size());
+        Assertions.assertEquals(size + 2, addresses.size());
     }
 }

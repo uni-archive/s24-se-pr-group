@@ -114,7 +114,7 @@ public class LocationEndpointTest {
             () -> Assertions.assertEquals("1010", createdLocation.address().zip()),
             () -> Assertions.assertEquals("Austria", createdLocation.address().country()),
             () -> Assertions.assertNotNull(createdLocation.hallPlan())
-            );
+        );
     }
 
     @Test
@@ -251,9 +251,9 @@ public class LocationEndpointTest {
         String responseContent = response.getContentAsString();
 
         Assertions.assertAll(
-            () -> Assertions.assertTrue(responseContent.contains("Street must not be empty")),
-            () -> Assertions.assertTrue(responseContent.contains("City must not be empty")),
-            () -> Assertions.assertTrue(responseContent.contains("Zip code must be a number"))
+            () -> Assertions.assertTrue(responseContent.contains("Straße darf nicht leer sein.")),
+            () -> Assertions.assertTrue(responseContent.contains("Stadt darf nicht leer sein.")),
+            () -> Assertions.assertTrue(responseContent.contains("Postleitzahl muss eine Zahl sein."))
         );
     }
 

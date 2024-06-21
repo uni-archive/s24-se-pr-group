@@ -13,13 +13,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class AddressValidatorTest {
+class AddressValidatorTest {
 
     @Mock
     private AddressDao addressDao;
@@ -48,9 +50,9 @@ public class AddressValidatorTest {
         });
 
         List<String> expectedErrors = List.of(
-            "Street must not be empty",
-            "City must not be empty",
-            "Zip code must be a number");
+            "Straße darf nicht leer sein.",
+            "Stadt darf nicht leer sein.",
+            "Postleitzahl muss eine Zahl sein.");
 
         for (String error : expectedErrors) {
             assertTrue(exception.getMessage().contains(error));
@@ -64,7 +66,7 @@ public class AddressValidatorTest {
             addressValidator.validateForCreate(invalidAddressDto);
         });
 
-        assertTrue(exception.getMessage().contains("Zip code must not be empty"));
+        assertTrue(exception.getMessage().contains("Postleitzahl darf nicht leer sein."));
     }
 
     @Test
@@ -75,7 +77,7 @@ public class AddressValidatorTest {
             addressValidator.validateForUpdate(validAddressDto);
         });
 
-        assertTrue(exception.getMessage().contains("Address with id 1 does not exist"));
+        assertTrue(exception.getMessage().contains("Adresse mit id 1 existiert nicht."));
     }
 
     @Test
@@ -88,10 +90,10 @@ public class AddressValidatorTest {
         });
 
         List<String> expectedErrors = List.of(
-            "Street must not be empty",
-            "City must not be empty",
-            "Zip code must be a number",
-            "Address with id 2 does not exist"
+            "Straße darf nicht leer sein.",
+            "Stadt darf nicht leer sein.",
+            "Postleitzahl muss eine Zahl sein.",
+            "Adresse mit id 2 existiert nicht."
         );
 
         for (String error : expectedErrors) {
