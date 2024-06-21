@@ -11,6 +11,10 @@ public class EventWithTicketCountDto {
         this.ticketCount = ticketCount;
     }
 
+    public EventWithTicketCountDto() {
+
+    }
+
     public Long getEventId() {
         return eventId;
     }
