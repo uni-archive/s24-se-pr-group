@@ -1,75 +1,69 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
-import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from "@angular/forms";
-import { BrowserModule } from '@angular/platform-browser';
-import {EventSearch} from "../../../dtos/EventSearchDto";
-import {EventService} from "../../../services/event.service";
-import {EventDto, EventResponse} from "../../../services/openapi";
+import {Component, OnInit} from '@angular/core';
+import {EventEndpointService, EventResponse} from "../../../services/openapi";
 import {formatDuration} from "../../../../formatters/durationFormatter";
-import {NgForOf, NgIf} from "@angular/common";
-import {debounceTime, distinctUntilChanged} from "rxjs/operators";
-import {fromEvent, Observable} from "rxjs";
+import {ActivatedRoute, Router} from "@angular/router";
+
 @Component({
   selector: 'app-event-search',
   templateUrl: './event-search.component.html',
-  standalone: true,
-  imports: [
-    FormsModule,
-    NgIf,
-    NgForOf,
-    ReactiveFormsModule,
-  ],
   styleUrl: './event-search.component.scss'
 })
-export class EventSearchComponent implements OnInit, AfterViewInit {
-  public eventTypes: String[] = ["CONCERT","THEATER", "PLAY"];
-  searchData : EventSearch = new EventSearch();
-  events : EventDto[] = [];
-
-  @ViewChild('searchForm') searchForm;
-  submits: Observable<any> | null;
+export class EventSearchComponent implements OnInit {
+  public eventTypes: string[] = ["CONCERT", "THEATER", "PLAY"];
+  filterConfig = {
+    typ: null,
+    dauer: null,
+    textSearch: null,
+  };
 
   constructor(
-    private service: EventService,
+    private service: EventEndpointService,
+    private route: ActivatedRoute,
+    private router: Router,
   ) {
   }
 
-  ngOnInit() {
-    this.refreshEvents();
-  }
-
-  ngAfterViewInit() {
-    this.submits = fromEvent(this.searchForm.nativeElement, 'keydown').pipe(debounceTime(300));
-    this.submits.subscribe({
-      next: () => {
-        this.refreshEvents();
-      }
-    })
-  }
-
-
-  refreshEvents() {
-    if (this.searchData.dauer == null) {
-      this.searchData.dauer = 0;
-    }
-    this.service.getEvents(this.searchData).pipe().subscribe(
-      {
-        next:(data)=> {
-          console.log(
-            data
-          );
-          this.events = data;
-        },
-        error:(err) => {
-          //todo show to user
-          console.log(err);
-        }
-      }
+  searchEvents = (criteria: typeof this.filterConfig, page: number, size: number) => {
+    return this.service.searchEvents(
+      criteria.textSearch,
+      criteria.typ === 'Alle' ? null : criteria.typ,
+      criteria.dauer,
+      page,
+      size
     );
   }
 
-  onSubmit() {
-    console.log(this.searchData);
-    this.refreshEvents();
+  pushQueryURL(obj: any) {
+    const cfg = obj as any;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        "search-type": "EVENT",
+        "search-event-name": cfg.textSearch,
+        "search-event-duration": cfg.dauer || null,
+        "search-event-type": cfg.typ
+      },
+      queryParamsHandling: "merge",
+    });
+  }
+
+  ngOnInit() {
+    const q = this.route.snapshot.queryParams;
+    const qName = q['search-event-name'];
+    const qDur = q['search-event-duration'];
+    const qType = q['search-event-type'];
+
+    if (qName) {
+      this.filterConfig.textSearch = qName;
+    }
+
+    if (qDur) {
+      this.filterConfig.dauer = qDur;
+    }
+
+    if (qType) {
+      this.filterConfig.typ = qType;
+    }
   }
 
   formatEventType(event: EventResponse.EventTypeEnum): string {
@@ -84,6 +78,10 @@ export class EventSearchComponent implements OnInit, AfterViewInit {
   }
 
   protected readonly formatDuration = formatDuration;
+
+  navigateToEvent(eventId: number) {
+    this.router.navigate(['/event/', eventId]);
+  }
 }
 
 

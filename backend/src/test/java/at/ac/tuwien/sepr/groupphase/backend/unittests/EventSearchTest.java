@@ -58,8 +58,8 @@ public class EventSearchTest {
             //LOGGER.info("Saving: {}", event);
         }
 
-        assertEquals(1, service.searchEvents(new EventSearchDto(3,EventType.PLAY,"3")).size());
-        assertEquals(5, service.searchEvents(new EventSearchDto(10, null, "")).size());
+        assertEquals(1, service.searchEvents(new EventSearchDto(3, at.ac.tuwien.sepr.groupphase.backend.dto.EventType.PLAY,"3")).getTotalElements());
+        assertEquals(5, service.searchEvents(new EventSearchDto(10, null, "")).getTotalElements());
 
     }
 

@@ -79,7 +79,7 @@ export interface LocationEndpointServiceInterface {
      * @param sort 
      * @param withUpComingShows 
      */
-    search1(name?: string, city?: string, street?: string, postalCode?: string, country?: string, page?: number, size?: number, sort?: string, withUpComingShows?: boolean, extraHttpRequestParams?: any): Observable<PageLocationSummaryResponse>;
+    search(name?: string, city?: string, street?: string, postalCode?: string, country?: string, page?: number, size?: number, sort?: string, withUpComingShows?: boolean, extraHttpRequestParams?: any): Observable<PageLocationSummaryResponse>;
 
     /**
      * 

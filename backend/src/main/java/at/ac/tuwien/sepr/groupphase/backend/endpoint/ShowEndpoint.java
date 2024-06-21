@@ -5,6 +5,7 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.ShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowListDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ShowSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowCreationDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowListResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ShowResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.hallplan.ShowHallplanResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
@@ -19,9 +20,10 @@ import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundExcepti
 import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.invoke.MethodHandles;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -82,21 +85,59 @@ public class ShowEndpoint {
     }
 
     @PermitAll
-    @PostMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ShowListDto>> searchShows(@RequestBody ShowSearchDto searchDto) throws DtoNotFoundException {
-        var result = service.searchShows(searchDto);
-        LOGGER.info("POST: /search ({})", result);
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Page<ShowListResponse>> searchShows(
+        @RequestParam(name = "price", defaultValue = "0") Long price,
+        @RequestParam(name = "dateTime", required = false) LocalDateTime dateTime,
+        @RequestParam(name = "location", defaultValue = "0") Long locationId,
+        @RequestParam(name = "page", defaultValue = "0") Integer page,
+        @RequestParam(name = "size", defaultValue = "15") Integer size,
+        @RequestParam(name = "sort", defaultValue = "dateTime") String sort
+    ) throws DtoNotFoundException {
+        Sort sortBy = Sort.by(sort.split(",")[0]);
+        if (sort.split(",").length > 1) {
+            if (sort.split(",")[1].equals("asc")) {
+                sortBy = sortBy.ascending();
+            } else if (sort.split(",")[1].equals("desc")) {
+                sortBy = sortBy.descending();
+            }
+        }
+
+        PageRequest pageable = PageRequest.of(page, size, sortBy);
+
+        var searchDto = new ShowSearchDto();
+        searchDto.setPrice(price);
+        searchDto.setLocation(locationId);
+        searchDto.setDateTime(dateTime);
+        searchDto.setPageable(pageable);
+        searchDto.setEventId(0L);
+
+        var result = service.searchShows(searchDto)
+            .map(showMapper::toResponse);
+        // LOGGER.info("POST: /search ({})", result);
         return ResponseEntity.ok(result);
     }
 
     @PermitAll
     @GetMapping("/location/{locationId}")
     public ResponseEntity<Page<ShowResponse>> getShowByLocation(@PathVariable("locationId") Long locationId,
-        @RequestParam(value = "onlyFutureShows", required = false, defaultValue = "true") boolean onlyFutureShows,
-        @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-        @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+                                                                @RequestParam(value = "onlyFutureShows", required = false, defaultValue = "true")
+                                                                boolean onlyFutureShows,
+                                                                @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                                                @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         return ResponseEntity.ok(
             service.findByLocation(locationId, true, PageRequest.of(page, size)).map(showMapper::toResponse));
+    }
+
+    @PermitAll
+    @GetMapping("/artist/{artistId}")
+    public ResponseEntity<Page<ShowResponse>> getShowsByArtistId(@PathVariable("artistId") Long artistId,
+                                                                @RequestParam(value = "onlyFutureShows", required = false, defaultValue = "true")
+                                                                boolean onlyFutureShows,
+                                                                @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                                                @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        return ResponseEntity.ok(
+            service.findByArtistId(artistId, true, PageRequest.of(page, size)).map(showMapper::toResponse));
     }
 
     @PermitAll

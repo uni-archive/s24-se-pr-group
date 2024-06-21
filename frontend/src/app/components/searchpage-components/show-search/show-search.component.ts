@@ -1,59 +1,78 @@
 import {Component, OnInit} from "@angular/core";
-import {FormsModule} from "@angular/forms";
-import {BrowserModule} from "@angular/platform-browser";
 import {ShowSearchDto} from "../../../dtos/ShowSearchDto";
-import {DatepickerComponent} from "../datepicker/datepicker.component";
-import { ShowEndpointService, ShowListDto} from "../../../services/openapi";
+import {ArtistDto, ShowEndpointService, ShowListDto} from "../../../services/openapi";
 import {formatDuration} from "../../../../formatters/durationFormatter";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 
 @Component({
   selector: "app-show-search",
-  standalone: true,
-  imports: [FormsModule, BrowserModule, DatepickerComponent],
   templateUrl: "./show-search.component.html",
   styleUrl: "./show-search.component.scss",
 })
 export class ShowSearchComponent implements OnInit {
-  searchData: ShowSearchDto = new ShowSearchDto();
-  time: Date = null;
-  shows: ShowListDto[] = [];
+  filterConfig = {
+    dateTime: null,
+    price: null,
+    location: null,
+  }
   protected readonly formatDuration = formatDuration;
   protected readonly Date = Date;
 
-  constructor(private service: ShowEndpointService, protected router: Router) {
+  constructor(
+    private service: ShowEndpointService,
+    protected router: Router,
+    private route: ActivatedRoute,
+  ) {
   }
 
-  onSubmit() {
-    console.log(this.searchData);
-    //TODO: LOCATION IMPLEMENTATION
-    this.reloadShows();
+  searchShows = (criteria: typeof this.filterConfig, page: number, size: number) => {
+    return this.service.searchShows(
+      criteria.price * 100,
+      criteria.dateTime,
+      criteria.location,
+      page,
+      size,
+    );
   }
 
-  reloadShows() {
-    let dto: ShowSearchDto = {
-      dateTime: this.searchData.dateTime,
-      price: this.searchData.price * 100,
-      eventId: this.searchData.eventId,
-      location: null
-    ,
-    };
-    this.service.searchShows(dto).subscribe({
-      next: (data) => {
-        this.shows = data;
+  pushQueryURL(cfg: any) {
+    const obj: typeof this.filterConfig = cfg;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        "search-type": "SHOW",
+        "search-show-price": obj.price || null,
+        "search-show-date": obj.dateTime,
+        "search-show-location": obj.location || null,
       },
-      error: (err) => {
-        //TODO: INFORM USER
-        console.log(err);
-      },
-    });
+      queryParamsHandling: "merge",
+    })
+  }
+
+  navigateToTicketSelect(showId: number) {
+    this.router.navigate(['show', showId, 'ticket-select']);
   }
 
   ngOnInit() {
-    this.reloadShows();
+    const q = this.route.snapshot.queryParams;
+    const qPrice = q['search-show-price'];
+    const qDate = q['search-show-date'];
+    const qLocation = q['search-show-location'];
+
+    if (qPrice) {
+      this.filterConfig.price = qPrice;
+    }
+
+    if (qDate) {
+      this.filterConfig.dateTime = qDate;
+    }
+
+    if (qLocation) {
+      this.filterConfig.location = qLocation;
+    }
   }
 
-  artistMap(artist) {
+  artistMap(artist: ArtistDto) {
     if (artist.artistName) {
       return artist.artistName + " ";
     } else {
@@ -61,7 +80,8 @@ export class ShowSearchComponent implements OnInit {
     }
   }
 
-  formatDateStr(date: String): String {
+  formatDateStr(date: String):
+    String {
     let splitDatetime = date.split("T");
     let splitDate = splitDatetime[0].split("-");
     let splitTime = splitDatetime[1].split(":");

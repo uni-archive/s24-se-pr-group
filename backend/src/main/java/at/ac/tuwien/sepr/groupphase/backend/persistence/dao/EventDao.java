@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.persistence.dao;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.*;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.EventType;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.BaseEntityMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.EventMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.ShowMapper;
@@ -11,7 +12,9 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.EventReposito
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.lang.invoke.MethodHandles;
@@ -34,8 +37,10 @@ public class EventDao extends AbstractDao<Event, EventDto> {
     }
 
     @Transactional
-    public List<EventDto> searchEvents(EventSearchDto searchDto) {
-        return mapper.toDto(((EventRepository) repository).findBySearchDto(searchDto.getDauer() * 60, searchDto.getTyp(), searchDto.getTextSearch().toUpperCase()));
+    public Page<EventDto> searchEvents(String textSearch, long duration, EventType eventType, Pageable pageable) {
+        return ((EventRepository) repository)
+            .findBySearchDto(duration * 60, eventType, textSearch, pageable)
+            .map(mapper::toDto);
     }
 
     @Transactional

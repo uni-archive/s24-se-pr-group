@@ -38,12 +38,10 @@ model/address-response.ts
 model/application-user-dto.ts
 model/application-user-response.ts
 model/artist-dto.ts
-model/artist-search-dto.ts
 model/artist-search-response.ts
 model/event-creation-dto.ts
 model/event-dto.ts
 model/event-response.ts
-model/event-search-dto.ts
 model/event-with-ticket-count-dto.ts
 model/hall-plan-dto.ts
 model/hall-seat-response.ts
@@ -68,7 +66,10 @@ model/news-response-dto.ts
 model/order-details-response.ts
 model/order-summary-response.ts
 model/page-application-user-response.ts
+model/page-artist-search-response.ts
+model/page-event-response.ts
 model/page-location-summary-response.ts
+model/page-show-list-response.ts
 model/page-show-response.ts
 model/page-simple-news-response-dto.ts
 model/page-ticket-details-response.ts
@@ -80,8 +81,8 @@ model/show-hallplan-response.ts
 model/show-hallplan-section-response.ts
 model/show-hallplan-spot-response.ts
 model/show-list-dto.ts
+model/show-list-response.ts
 model/show-response.ts
-model/show-search-dto.ts
 model/simple-news-response-dto.ts
 model/sort-object.ts
 model/ticket-creation-request.ts

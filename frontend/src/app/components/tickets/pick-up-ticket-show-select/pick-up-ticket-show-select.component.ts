@@ -31,9 +31,13 @@ export class PickUpTicketShowSelectComponent {
       eventId: this.searchData.eventId,
       location: null
     };
-    this.service.searchShows(dto).subscribe({
+    this.service.searchShows(
+      dto.price,
+      dto.dateTime,
+      dto.location
+    ).subscribe({
       next: (data) => {
-        this.shows = data;
+        this.shows = data.content;
       },
       error: (err) => {
         //TODO: INFORM USER

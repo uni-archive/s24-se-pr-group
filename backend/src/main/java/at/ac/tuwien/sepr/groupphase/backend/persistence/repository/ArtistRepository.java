@@ -1,8 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.persistence.repository;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Artist;
-import org.h2.command.query.Select;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,11 +14,11 @@ import java.util.List;
 public interface ArtistRepository extends JpaRepository<Artist, Long> {
 
     @Query("SELECT a FROM Artist a"
-            + " WHERE (:#{#searchDto.firstName} is null OR UPPER(a.firstName) LIKE UPPER('%' || :#{#searchDto.firstName} || '%'))"
-              + " AND (:#{#searchDto.lastName} is null OR UPPER(a.lastName) LIKE UPPER('%' || :#{#searchDto.lastName} || '%'))"
-              + " AND (:#{#searchDto.artistName} is null OR UPPER(a.artistName) LIKE UPPER('%' || :#{#searchDto.artistName} || '%'))"
+            + " WHERE (:firstName is null OR UPPER(a.firstName) LIKE UPPER('%' || :firstName || '%'))"
+              + " AND (:lastName is null OR UPPER(a.lastName) LIKE UPPER('%' || :lastName || '%'))"
+              + " AND (:artistName is null OR UPPER(a.artistName) LIKE UPPER('%' || :artistName || '%'))"
         )
-    List<Artist> search(@Param("searchDto") ArtistSearchDto searchDto);
+    Page<Artist> search(@Param("firstName") String firstname, @Param("lastName") String lastname, @Param("artistName") String artistName, Pageable pageable);
 
     @Query("Select distinct a from Artist a join a.shows show where show.id = ?1")
     List<Artist> findByShowId(long showId);

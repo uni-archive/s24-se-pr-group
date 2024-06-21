@@ -10,21 +10,21 @@
  * Do not edit the class manually.
  */
 import { PageableObject } from './pageable-object';
+import { ArtistSearchResponse } from './artist-search-response';
 import { SortObject } from './sort-object';
-import { LocationDto } from './location-dto';
 
 
-export interface PageLocationDto { 
+export interface PageArtistSearchResponse { 
     totalPages?: number;
     totalElements?: number;
+    pageable?: PageableObject;
     size?: number;
-    content?: Array<LocationDto>;
+    content?: Array<ArtistSearchResponse>;
     number?: number;
     sort?: Array<SortObject>;
     numberOfElements?: number;
     first?: boolean;
     last?: boolean;
-    pageable?: PageableObject;
     empty?: boolean;
 }
 

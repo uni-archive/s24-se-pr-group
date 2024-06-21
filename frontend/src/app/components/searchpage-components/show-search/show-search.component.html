@@ -1,44 +1,67 @@
-<h2>Aufführungen</h2>
-<form class="search-form" #SearchForm="ngForm" (change)="onSubmit()">
-<div class="row form-group align-items-end">
-  <div class="col-12 col-xl-6 mb-2" >
-    <!-- <label for="preis">Preis in € (+-30%)</label> -->
-    <input id="preis" class="form-control" [(ngModel)]="searchData.price" type="number" name="preis" step="0.01" placeholder="price estimate" min="0">
+<app-paginated-list
+  [filterTemplate]="filterTemplate"
+  [resultTemplate]="resultTemplate"
+  [searchFunction]="searchShows"
+  [filterConfig]="filterConfig"
+  [showPaginationButtons]="true"
+  [heading]="'Aufführungen'"
+  (onSearch)="pushQueryURL($event)"
+></app-paginated-list>
 
-  </div>
-
-  <div class="col-12 col-xl-6 mb-2">
-    <div>
-      <!-- <label for="timeinput">Datum/Uhrzeit</label> <a data-bs-toggle="tooltip" data-bs-html="true" title="Es werden Vorführungen angezeit, die am angegebenen Tag, ab der angegebenen Uhrzeit stattfinden."><i class="bi bi-question-circle smol-questionmark"></i></a> -->
-      <input [(ngModel)]="searchData.dateTime" id="timeinput" name="time" class="form-control" type="datetime-local">
-    </div>
-  </div>
-</div>
-</form>
-
-<div *ngIf="shows" class="d-flex flex-column gap-2">
-  <div *ngIf="shows.length === 0" class="alert alert-light" role="alert">
-    Keine Veranstaltungen gefunden.
-  </div>
-  <div *ngFor="let show of shows" class="card">
-    <div class="card-body d-flex justify-content-between">
-      <div>
-        <h5 class="card-title">
-          {{show.eventName}}
-        </h5>
-        <h6 class="card-subtitle mb-2 text-body-secondary">
-          Aufführung am: {{formatDateStr(show.dateTime)}}
-        </h6>
+<ng-template #filterTemplate let-form="form">
+  <form [formGroup]="form" class="form-inline">
+    <div class="row align-items-center mb-2">
+      <div class="col-4 mb-2">
+        <input
+          id="preis"
+          class="form-control w-100"
+          type="number"
+          name="price"
+          step="0.01"
+          placeholder="50"
+          min="0"
+          formControlName="price"
+        >
       </div>
-      <div>
-        <p class="card-text mb-0 float-end">
-          Tickets ab: {{show.startingPrice/100}}€
-        </p>
-        <br>
-        <p class="card-text float-end" *ngIf="show.artistList.length < 10" >{{show.artistList.map(artistMap)}}</p>
-        <p class="card-text float-end" *ngIf="show.artistList.length >= 10" >10+ auftretende Musiker*innen</p>
+      <div class="col-4 mb-2">
+        <input
+          id="timeinput"
+          name="time"
+          class="form-control w-100"
+          type="datetime-local"
+          formControlName="dateTime"
+        >
       </div>
-      <button class="btn btn-primary" (click)="router.navigate(['show', show.id, 'ticket-select'])">Jetzt kaufen</button>
     </div>
+
+  </form>
+</ng-template>
+
+<ng-template #resultTemplate let-items="items">
+  <div *ngIf="items.length === 0" class="alert alert-light" role="alert">
+    Keine Aufführungen gefunden.
   </div>
-</div>
+  <div class="d-flex flex-column gap-2">
+    <app-search-result-card *ngFor="let show of items"
+                            (click)="navigateToTicketSelect(show.id)">
+      <div class="card-body d-flex justify-content-between">
+        <div>
+          <h5 class="card-title">
+            {{show.eventName}}
+          </h5>
+          <h6 class="card-subtitle mb-2 text-body-secondary">
+            Aufführung am: {{formatDateStr(show.dateTime)}}
+          </h6>
+        </div>
+        <div>
+          <p class="card-text mb-0 float-end">
+            Tickets ab: {{show.startingPrice/100}}€
+          </p>
+          <br>
+          <p class="card-text float-end" *ngIf="show.artistList.length < 10" >{{show.artistList.map(artistMap)}}</p>
+          <p class="card-text float-end" *ngIf="show.artistList.length >= 10" >10+ auftretende Musiker*innen</p>
+        </div>
+      </div>
+    </app-search-result-card>
+  </div>
+</ng-template>

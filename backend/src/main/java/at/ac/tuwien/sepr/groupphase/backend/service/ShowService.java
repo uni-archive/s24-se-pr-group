@@ -47,7 +47,7 @@ public interface ShowService {
      * @param searchDto contains search chriteria
      * @return list of ShowDtos
      */
-    List<ShowListDto> searchShows(ShowSearchDto searchDto) throws DtoNotFoundException;
+    Page<ShowListDto> searchShows(ShowSearchDto searchDto) throws DtoNotFoundException;
 
 
     /**
@@ -56,6 +56,13 @@ public interface ShowService {
      * @return all shows that are at the
      */
     Page<ShowDto> findByLocation(Long locationId, boolean onlyFutureShows, Pageable pageable);
+
+    /**
+     * Get all shows for a given artist.
+     *
+     * @return all shows where the artist participates
+     */
+    Page<ShowDto> findByArtistId(Long artistId, boolean onlyFutureShows, Pageable pageable);
 
     ShowDto getById(Long id) throws DtoNotFoundException;
 

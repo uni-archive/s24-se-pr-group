@@ -1,38 +1,73 @@
-<form class="search-form" #SearchForm="ngForm" (ngSubmit)="onSubmit()">
-  <div class="row form-group align-items-end">
+<app-paginated-list
+  [filterTemplate]="filterTemplate"
+  [resultTemplate]="resultTemplate"
+  [searchFunction]="searchArtists"
+  [filterConfig]="filterConfig"
+  [showPaginationButtons]="true"
+  [heading]="'Künstler'"
+  (onSearch)="pushQueryURL($event)"
+></app-paginated-list>
 
-    <div class="col-auto">
-      <label for="firstname">Vorname</label>
-      <input id="firstname" class="form-control" type="text" [(ngModel)]="firstname" name="firstname"
-             placeholder="Künstler Vorname">
+
+<ng-template #filterTemplate let-form="form">
+  <form [formGroup]="form" class="form-inline">
+    <div class="row align-items-center mb-2">
+      <div class="col-4 mb-2">
+        <input
+          id="firstname"
+          class="form-control w-100"
+          type="text"
+          name="firstname"
+          placeholder="Künstler Vorname"
+          formControlName="firstname"
+        >
+      </div>
+      <div class="col-4 mb-2">
+        <input
+          id="lastname"
+          class="form-control w-100"
+          type="text"
+          name="lastname"
+          placeholder="Künstler Nachname"
+          formControlName="lastname"
+        >
+      </div>
+      <div class="col-4 mb-2">
+        <input
+          id="artistName"
+          class="form-control w-100"
+          type="text"
+          name="artistName"
+          placeholder="Künstlername"
+          formControlName="artistName"
+        >
+      </div>
     </div>
 
-    <div class="col-auto">
-      <label for="lastname">Nachname</label>
-      <input id="lastname" class="form-control" type="text" [(ngModel)]="lastname" name="lastname"
-             placeholder="Künstler Nachname">
-    </div>
+  </form>
+</ng-template>
 
-    <div class="col-auto">
-      <label for="artistName">Künstlername</label>
-      <input id="artistName" class="form-control" type="text" [(ngModel)]="artistName" name="artistName"
-             placeholder="Künstlername">
-    </div>
 
-    <div class="col-auto">
-      <button type="submit" class="btn btn-primary">Suchen</button>
-    </div>
+<ng-template #resultTemplate let-items="items">
+  <div *ngIf="items.length === 0" class="alert alert-light" role="alert">
+    Keine Veranstaltungen gefunden.
   </div>
-</form>
+  <div class="d-flex flex-column gap-2">
+    <app-search-result-card
+      *ngFor="let artist of items"
+      (click)="navigateToArtist(artist.id)"
+    >
+      <div class="card-body d-flex justify-content-between">
+            {{formatArtistName(artist)}}
+      </div>
+    </app-search-result-card>
+  </div>
+</ng-template>
 
+<!--
 <div *ngIf="!showEvents" class="d-flex flex-column gap-2">
   <div *ngIf="foundArtists && foundArtists.length === 0" class="alert alert-light" role="alert">
     Keine Künstler*innen gefunden.
-  </div>
-  <div *ngFor="let artist of foundArtists" class="card" (click)="viewEventsForArtist(artist)">
-    <div class="card-body btn-hover" role="button">
-      {{formatArtistName(artist)}}
-    </div>
   </div>
 </div>
 
@@ -63,3 +98,4 @@
 </div>
 
 
+-->

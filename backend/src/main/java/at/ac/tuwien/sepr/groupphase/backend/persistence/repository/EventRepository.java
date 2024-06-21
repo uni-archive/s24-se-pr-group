@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.EventWithTicketCountProjection;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Event;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.EventType;
 import org.h2.command.query.Select;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,8 +19,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("Select e from Event e "
         + "where ((e.duration < (?1 * 1.3) and e.duration > (?1 * 0.7)) or (?1 = 0))"
         + "and ((e.eventType = ?2) or (?2 is null))"
-        + "and ((UPPER(e.title) like %?3%) or (UPPER(e.description) like %?3%) or (?3 = '')) ")
-    List<Event> findBySearchDto(long duration, EventType type, String textSearch);
+        + "and ((UPPER(e.title) like '%' || UPPER(?3) || '%') or (UPPER(e.description) like '%' || UPPER(?3) || '%') or (?3 = '') or (?3 is null)) ")
+    Page<Event> findBySearchDto(long duration, EventType type, String textSearch, Pageable pageable);
 
     @Query("Select e from Event e")
     List<Event> getAllEvents();

@@ -13,12 +13,12 @@ import { HttpHeaders }                                       from '@angular/comm
 
 import { Observable }                                        from 'rxjs';
 
+import { PageShowListResponse } from '../model/models';
 import { PageShowResponse } from '../model/models';
 import { ShowCreationDto } from '../model/models';
 import { ShowHallplanResponse } from '../model/models';
 import { ShowListDto } from '../model/models';
 import { ShowResponse } from '../model/models';
-import { ShowSearchDto } from '../model/models';
 
 
 import { Configuration }                                     from '../configuration';
@@ -63,6 +63,16 @@ export interface ShowEndpointServiceInterface {
     /**
      * 
      * 
+     * @param artistId 
+     * @param onlyFutureShows 
+     * @param page 
+     * @param size 
+     */
+    getShowsByArtistId(artistId: number, onlyFutureShows?: boolean, page?: number, size?: number, extraHttpRequestParams?: any): Observable<PageShowResponse>;
+
+    /**
+     * 
+     * 
      * @param eventid 
      */
     getShowsByEventId(eventid: number, extraHttpRequestParams?: any): Observable<Array<ShowListDto>>;
@@ -70,8 +80,13 @@ export interface ShowEndpointServiceInterface {
     /**
      * 
      * 
-     * @param showSearchDto 
+     * @param price 
+     * @param dateTime 
+     * @param location 
+     * @param page 
+     * @param size 
+     * @param sort 
      */
-    searchShows(showSearchDto: ShowSearchDto, extraHttpRequestParams?: any): Observable<Array<ShowListDto>>;
+    searchShows(price?: number, dateTime?: string, location?: number, page?: number, size?: number, sort?: string, extraHttpRequestParams?: any): Observable<PageShowListResponse>;
 
 }

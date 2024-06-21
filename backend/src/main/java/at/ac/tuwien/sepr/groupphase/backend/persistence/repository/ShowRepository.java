@@ -22,13 +22,16 @@ public interface ShowRepository extends JpaRepository<Show, Long> {
     @EntityGraph(attributePaths = {"artists", "event"})
     Page<Show> findByLocationId(Long locationId, Pageable pageable);
 
+    @Query("SELECT a.shows FROM Artist a WHERE a.id = :artistId")
+    Page<Show> findByArtistId(@Param("artistId") Long artistId, Pageable pageable);
+
     @Query("Select s from Show s join HallSectorShow h on (s.id = h.show.id) "
         + "where ((CAST(s.dateTime as date) = CAST(?1 as date) "
         + "and s.dateTime>?1) OR ?1 is null) "
         + "and ((s.event.id = ?3) or (?3 = 0 )) "
         + "group by s.id "
         + "having (min(h.price) < (?2 * 1.3) and min(h.price) > (?2 * 0.7)) OR ?2 = 0")
-    List<Show> findShowsBySearchDto(LocalDateTime dateTime, Long maxPrice, Long eventId);
+    Page<Show> findShowsBySearchDto(LocalDateTime dateTime, Long maxPrice, Long eventId, Pageable pageable);
 
     @Query("Select coalesce(MIN(h.price), 0) from Show s join HallSectorShow h on (s.id = h.show.id)"
         +   "where s.id = ?1 "
