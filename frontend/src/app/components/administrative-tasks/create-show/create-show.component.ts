@@ -1,24 +1,26 @@
-import { Component } from "@angular/core";
+import {Component, OnInit} from "@angular/core";
 import {
   ArtistDto,
   ArtistEndpointService,
   EventDto,
   EventEndpointService,
   HallSectorEndpointService,
+  LocationDto,
+  LocationEndpointService,
   ShowCreationDto,
   ShowEndpointService,
-  LocationDto,
 } from "../../../services/openapi";
-import { Artist } from "src/app/services/openapi/model/artist";
-import { MessagingService } from "../../../services/messaging.service";
-import { ShowCreateDto } from "../../../dtos/ShowCreateDto";
+import {MessagingService} from "../../../services/messaging.service";
+import {ActivatedRoute, Router} from "@angular/router";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 
 @Component({
   selector: "app-create-show",
   templateUrl: "./create-show.component.html",
   styleUrl: "./create-show.component.scss",
 })
-export class CreateShowComponent {
+export class CreateShowComponent implements OnInit {
+  createForm: FormGroup;
   createDto: ShowCreationDto = {
     dateTime: null,
     event: null,
@@ -28,14 +30,27 @@ export class CreateShowComponent {
   };
   artistList: ArtistDto[] = [];
   location: LocationDto | null = null;
+  event: EventDto | null = null;
 
   constructor(
     private showService: ShowEndpointService,
     private hallSectorService: HallSectorEndpointService,
+    private locationService: LocationEndpointService,
     private eventService: EventEndpointService,
     private artistService: ArtistEndpointService,
+    private router: Router,
+    private route: ActivatedRoute,
+    private fb: FormBuilder,
     private messagingService: MessagingService
-  ) {}
+  ) {
+    this.createForm = this.fb.group({
+      location: ['', Validators.required],
+      event: ['', Validators.required],
+    });
+  }
+
+  ngOnInit(): void {
+  }
 
   onArtistsChosen(artists: ArtistDto) {
     console.log("Chose artist" + artists.artistName);
@@ -54,7 +69,7 @@ export class CreateShowComponent {
 
   onArtistChange(search: string) {
     if (search !== null) {
-      this.artistService.search({ artistName: search , firstName:"", lastName: ""}).subscribe({
+      this.artistService.search({artistName: search, firstName: "", lastName: ""}).subscribe({
         next: (data) => {
           console.log(data);
           this.artistList = data.filter((artist) => {
@@ -111,16 +126,33 @@ export class CreateShowComponent {
   }
 
   handleLocationSelected(location: LocationDto): void {
-    this.hallSectorService.getShowByLocation1(location.id).subscribe({
+    this.hallSectorService.getShowByLocation1(location.hallPlan.id).subscribe({
       next: (value) => {
         //this.priceList = new Array<number>(value.length);
-        console.log(value);
         value.forEach((val) =>
-          this.createDto.sectorShowList.push({ sectorDto: val, price: null })
+          this.createDto.sectorShowList.push({sectorDto: val, price: null})
         );
       },
       error: (err) => console.log(err),
     });
     this.createDto.location = location;
+  }
+
+  redirectToCreateLocation(): void {
+    this.router.navigate(['locations/create'], {
+      queryParams: {
+        redirect: "showcreation"
+      },
+      queryParamsHandling: "merge"
+    })
+  }
+
+  redirectToCreateEvent(): void {
+    this.router.navigate(['eventcreation'], {
+      queryParams: {
+        redirect: "showcreation"
+      },
+      queryParamsHandling: "merge"
+    })
   }
 }

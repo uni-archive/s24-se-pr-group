@@ -57,7 +57,7 @@ public class ShowServiceImpl implements ShowService {
                         .setPrice(sector.getPrice() * 100))
                 )
             );
-            return "\"Vorführung erfolreich erstellt.\"";
+            return "\"Vorführung erfolgreich erstellt.\"";
         } catch (Exception ex) {
             LOGGER.error("ERROR occurred: {}", ex.getMessage(), ex);
             return "\"Erstellung gescheitert.\"";

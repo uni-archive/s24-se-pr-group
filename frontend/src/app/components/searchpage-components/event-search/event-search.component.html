@@ -1,22 +1,29 @@
 <h2>Veranstaltungen</h2>
-<form class="search-form" #SearchForm="ngForm" (change)="onSubmit()">
+<form class="search-form" #searchForm>
   <div class="row form-group align-items-end">
 
     <div class="col-12 col-xl-4 mb-2">
       <input id="textSearch" class="form-control" type="text" [(ngModel)]="searchData.textSearch" name="textSearch"
-             placeholder="text search">
+             placeholder="text search"
+             data-testid="event-search-input"
+      >
 
     </div>
     <div class="col-12 col-xl-4 mb-2">
       <input id="duration" class="form-control" [(ngModel)]="searchData.dauer" type="number" step="1" name="dauer"
-             placeholder="dauer in min" min="0">
+             placeholder="dauer in min" min="0"
+      >
 
     </div>
 
     <div class="col-12 col-xl-4 mb-2">
 
-      <select id="type" class="form-select" [(ngModel)]="searchData.typ" name="typ"
-              #typ=ngModel>
+      <select
+        id="type"
+        class="form-select"
+        [(ngModel)]="searchData.typ"
+        name="typ"
+      >
         <option value="" disabled selected>Event Typ wählen</option>
         <option *ngFor="let type of eventTypes" [ngValue]="type">{{ type }}</option>
       </select>
@@ -47,7 +54,11 @@
         <p class="card-text">
           Veranstaltungs-Art: {{ formatEventType(event.eventType) }}
         </p>
-        <a class="btn-info" [href]="'/#/event/'+event.id">
+        <a
+          class="btn-info"
+          [href]="'/#/event/'+event.id"
+          data-testid="event-details-btn"
+        >
           mehr Infos
         </a>
       </div>

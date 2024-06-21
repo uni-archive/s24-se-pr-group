@@ -1,11 +1,13 @@
-import {Component, OnInit} from '@angular/core';
-import {FormsModule} from "@angular/forms";
+import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import { BrowserModule } from '@angular/platform-browser';
 import {EventSearch} from "../../../dtos/EventSearchDto";
 import {EventService} from "../../../services/event.service";
 import {EventDto, EventResponse} from "../../../services/openapi";
 import {formatDuration} from "../../../../formatters/durationFormatter";
 import {NgForOf, NgIf} from "@angular/common";
+import {debounceTime, distinctUntilChanged} from "rxjs/operators";
+import {fromEvent, Observable} from "rxjs";
 @Component({
   selector: 'app-event-search',
   templateUrl: './event-search.component.html',
@@ -14,20 +16,34 @@ import {NgForOf, NgIf} from "@angular/common";
     FormsModule,
     NgIf,
     NgForOf,
+    ReactiveFormsModule,
   ],
   styleUrl: './event-search.component.scss'
 })
-export class EventSearchComponent implements OnInit{
+export class EventSearchComponent implements OnInit, AfterViewInit {
   public eventTypes: String[] = ["CONCERT","THEATER", "PLAY"];
   searchData : EventSearch = new EventSearch();
   events : EventDto[] = [];
 
-  constructor(private service: EventService) {
+  @ViewChild('searchForm') searchForm;
+  submits: Observable<any> | null;
 
+  constructor(
+    private service: EventService,
+  ) {
   }
 
   ngOnInit() {
     this.refreshEvents();
+  }
+
+  ngAfterViewInit() {
+    this.submits = fromEvent(this.searchForm.nativeElement, 'keydown').pipe(debounceTime(300));
+    this.submits.subscribe({
+      next: () => {
+        this.refreshEvents();
+      }
+    })
   }
 
 

@@ -9,6 +9,7 @@
         formControlName="name"
         class="form-control"
         placeholder="Name der Location"
+        data-testid="location-name-input"
       />
       <div *ngIf="createForm.get('name').invalid && createForm.get('name').touched" class="invalid-feedback">
         Bitte geben Sie einen Namen ein.
@@ -22,6 +23,7 @@
         formControlName="street"
         class="form-control"
         placeholder="Straße"
+        data-testid="location-street-input"
       />
       <div *ngIf="createForm.get('street').invalid && createForm.get('street').touched" class="invalid-feedback">
         Bitte geben Sie eine Straße ein.
@@ -35,6 +37,7 @@
         formControlName="zip"
         class="form-control"
         placeholder="PLZ"
+        data-testid="location-zip-input"
       />
       <div *ngIf="createForm.get('zip').invalid && createForm.get('zip').touched" class="invalid-feedback">
         Bitte geben Sie eine PLZ ein.
@@ -48,25 +51,34 @@
         formControlName="city"
         class="form-control"
         placeholder="Stadt"
+        data-testid="location-city-input"
       />
       <div *ngIf="createForm.get('city').invalid && createForm.get('city').touched" class="invalid-feedback">
         Bitte geben Sie eine Stadt ein.
       </div>
     </div>
     <div class="form-group col-12">
-      <country-dropdown formControlName="country"></country-dropdown>
+      <country-dropdown formControlName="country"
+                        data-testid="location-country-input"
+      ></country-dropdown>
       <div *ngIf="createForm.get('country').invalid && createForm.get('country').touched" class="invalid-feedback">
         Bitte wählen Sie ein Land aus.
       </div>
     </div>
   </div>
-  <app-hallplan-autocomplete class="form-group col-12" formControlName="hallPlan" (selectedHallPlan)="onHallPlanSelected($event)" (resetHallPlan)="onHallPlanSelected(null)"></app-hallplan-autocomplete>
+  <app-hallplan-autocomplete
+    class="form-group col-12"
+    formControlName="hallPlan"
+    (selectedHallPlan)="onHallPlanSelected($event)"
+    (resetHallPlan)="onHallPlanSelected(null)"
+    data-testid="location-hallplan-input"
+  ></app-hallplan-autocomplete>
   <div *ngIf="createForm.get('hallPlan').invalid && createForm.get('hallPlan').touched" class="invalid-feedback">
     Bitte wählen Sie einen Hallenplan aus.
   </div>
   <div class="row">
     <div class="form-group">
-      <button type="submit" class="btn btn-primary" [disabled]="!createForm.valid">Erstellen</button>
+      <button data-testid="location-submit" type="submit" class="btn btn-primary" [disabled]="!createForm.valid">Erstellen</button>
     </div>
   </div>
 

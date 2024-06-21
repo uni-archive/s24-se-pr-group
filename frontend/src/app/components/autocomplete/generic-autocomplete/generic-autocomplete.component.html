@@ -25,6 +25,7 @@
     <ng-container *ngIf="filteredItems$ | async as items">
       <li *ngFor="let item of items"
           class="list-group-item list-group-item-action"
+          data-testid="autocomplete-item"
           (click)="selectItem(item)">
         <ng-template [ngTemplateOutlet]="displayTemplate" [ngTemplateOutletContext]="{ $implicit: item }"></ng-template>
       </li>

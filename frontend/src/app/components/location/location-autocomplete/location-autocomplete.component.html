@@ -1,8 +1,10 @@
 <app-generic-autocomplete [searchFunction]="searchLocations"
                           [displayTemplate]="locationTemplate"
-                          label="Location"
-                          placeholder="Search and select a location"
-                          (itemSelected)="onLocationSelected($event)">
+                          label="Veranstaltungsort"
+                          placeholder="Veranstaltungsort suchen und auswählen"
+                          (itemSelected)="onLocationSelected($event)"
+                          [selectedItem]="initialLocation"
+>
 </app-generic-autocomplete>
 
 <ng-template #locationTemplate let-location>
