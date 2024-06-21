@@ -215,7 +215,6 @@ class UserServiceImplTest {
         String adminEmail = "admin@example.com";
 
         // Mocking the behavior of userValidator and userDao
-        doNothing().when(userValidator).validateForUpdate(userToUpdate);
         doNothing().when(userValidator).validateForUpdateStatus(userToUpdate.getEmail(), adminEmail);
         when(userDao.findByEmail(userToUpdate.getEmail())).thenReturn(userToUpdate);
 
