@@ -193,6 +193,8 @@ export class UserEditComponent implements OnInit, OnChanges {
         next: (response) => {
           this.messagingService.setMessage(response.message, "success");
           this.isLoading = false;
+          this.authService.logoutUser();
+          this.router.navigate(["/login"]);
         },
         error: (error) => {
           this.messagingService.setMessage(error.error.message, "danger");
