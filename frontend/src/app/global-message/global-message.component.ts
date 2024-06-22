@@ -9,15 +9,24 @@ import { MessagingService } from '../services/messaging.service';
 export class GlobalMessageComponent implements OnInit {
   messages: { id: number, text: string, type: string }[] = [];
   detailedMessage: string = '';
+  messageDisplayDuration: number = 15000; // Duration in milliseconds
 
   constructor(private messageService: MessagingService) {}
 
   ngOnInit() {
     this.messageService.getMessage().subscribe((message) => {
       if (message) {
-        this.messages.unshift({ id: new Date().getTime(), text: message.text, type: message.type });
+        const newMessage = { id: new Date().getTime(), text: message.text, type: message.type };
+        this.messages.unshift(newMessage);
+        this.setAutoClose(newMessage.id);
       }
     });
+  }
+
+  setAutoClose(messageId: number) {
+    setTimeout(() => {
+      this.closeMessage(messageId);
+    }, this.messageDisplayDuration);
   }
 
   closeMessage(id: number) {

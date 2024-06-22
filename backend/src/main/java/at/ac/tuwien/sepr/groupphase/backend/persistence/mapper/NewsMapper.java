@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
-@Mapper(componentModel = "spring", uses = EventMapper.class, implementationName = "backendNewsMapperImpl")
+@Mapper(componentModel = "spring", uses = EventMapper.class)
 public interface NewsMapper extends BaseEntityMapper<News, NewsDto> {
 
     @Mapping(source = "event", target = "eventDto")

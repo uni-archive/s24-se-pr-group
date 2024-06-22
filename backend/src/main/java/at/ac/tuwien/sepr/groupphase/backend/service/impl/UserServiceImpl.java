@@ -121,18 +121,7 @@ public class UserServiceImpl implements UserService {
     public String
     login(String email, String password) throws UserLockedException {
         try {
-            Integer recentLoginAttempts = loginAttemptCache.get(email, () -> 1);
-            if (recentLoginAttempts > 5) {
-                ApplicationUserDto byEmail = userDao.findByEmail(email);
-                if (byEmail != null) {
-                    byEmail.setAccountLocked(true);
-                    userDao.update(byEmail);
-                    userUnlockSchedulingService.scheduleUnlockUser(byEmail.getEmail());
-                }
-                throw new UserLockedException(
-                    ACCOUNT_LOCKED);
-            }
-            loginAttemptCache.put(email, recentLoginAttempts + 1);
+            checkBruteForceGuard(email);
         } catch (ExecutionException e) {
             throw new BadCredentialsException(
                 ACCOUNT_LOCKED);
@@ -145,13 +134,9 @@ public class UserServiceImpl implements UserService {
                 throw new BadCredentialsException("Bitte aktiviere dein Konto zuvor.");
             }
             UserDetails userDetails = getUserDetailsForUser(applicationUserDto);
-            if (userDetails != null
-                && userDetails.isAccountNonExpired()
-                && userDetails.isAccountNonLocked()
-                && userDetails.isCredentialsNonExpired()
-                && passwordEncoder.matches(password.concat(applicationUserDto.getSalt()),
-                userDetails.getPassword())
+            if (isValidLogin(password, userDetails, applicationUserDto)
             ) {
+                loginAttemptCache.put(email, 1);
                 List<String> roles = userDetails.getAuthorities()
                     .stream()
                     .map(GrantedAuthority::getAuthority)
@@ -162,6 +147,31 @@ public class UserServiceImpl implements UserService {
             throw new BadCredentialsException(INCORRECT_USERNAME_OR_PASSWORD);
         }
         throw new BadCredentialsException(INCORRECT_USERNAME_OR_PASSWORD);
+    }
+
+    private void checkBruteForceGuard(String email)
+        throws ExecutionException, EntityNotFoundException, SchedulerException, UserLockedException {
+        Integer recentLoginAttempts = loginAttemptCache.get(email, () -> 1);
+        if (recentLoginAttempts > 5) {
+            ApplicationUserDto byEmail = userDao.findByEmail(email);
+            if (byEmail != null) {
+                byEmail.setAccountLocked(true);
+                userDao.update(byEmail);
+                userUnlockSchedulingService.scheduleUnlockUser(byEmail.getEmail());
+            }
+            throw new UserLockedException(
+                ACCOUNT_LOCKED);
+        }
+        loginAttemptCache.put(email, recentLoginAttempts + 1);
+    }
+
+    private boolean isValidLogin(String password, UserDetails userDetails, ApplicationUserDto applicationUserDto) {
+        return userDetails != null
+            && userDetails.isAccountNonExpired()
+            && userDetails.isAccountNonLocked()
+            && userDetails.isCredentialsNonExpired()
+            && passwordEncoder.matches(password.concat(applicationUserDto.getSalt()),
+            userDetails.getPassword());
     }
 
     public ApplicationUserDto createUser(ApplicationUserDto toCreate) throws ValidationException, ForbiddenException, MailNotSentException {

@@ -21,7 +21,7 @@ public class HallSector extends AbstractEntity {
     @Column(name = "COLOR")
     private String color;
 
-    @Column(name = "FRONTEND_COORDINATES")
+    @Column(name = "FRONTEND_COORDINATES", length = 8096)
     private String frontendCoordinates;
 
     @OneToMany(mappedBy = "sector")

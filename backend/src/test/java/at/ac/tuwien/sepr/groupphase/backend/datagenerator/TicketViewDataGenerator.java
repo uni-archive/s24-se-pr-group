@@ -52,6 +52,7 @@ import static at.ac.tuwien.sepr.groupphase.backend.datagenerator.DataGeneratorUt
 import static at.ac.tuwien.sepr.groupphase.backend.datagenerator.DataGeneratorUtils.fakeManyShows;
 import static at.ac.tuwien.sepr.groupphase.backend.datagenerator.DataGeneratorUtils.fakeManyTickets;
 import static at.ac.tuwien.sepr.groupphase.backend.datagenerator.DataGeneratorUtils.fakeUser;
+import static at.ac.tuwien.sepr.groupphase.backend.datagenerator.DataGeneratorUtils.randomChoice;
 
 @Profile("generateData")
 @Component
@@ -115,6 +116,9 @@ public class TicketViewDataGenerator {
         var sectorShows = fakeManyHallSectorShows(shows, sectors, sectorShowsChosenMap, SECTORS_SHOWS_COUNT);
         var tickets = fakeManyTickets(hallSpots, sectorShowsChosenMap, TICKETS_COUNT);
         var order = fakeManyOrders(tickets, List.of(customer), 1).get(0);
+        for (Ticket ticket : tickets) {
+            ticket.setOrder(order);
+        }
         var invoice1 = new Invoice(
             order,
             LocalDateTime.of(2024, 1, 2, 3, 4, 5),

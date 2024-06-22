@@ -137,7 +137,7 @@ public class LocationEndpoint {
     @GetMapping(value = "/name/{name}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<LocationDto>> findByName(@PathVariable(name = "name") String name) {
         LocationSearch locationSearchRequest = new LocationSearch(name, new AddressSearch("", "", "", ""), false,
-            PageRequest.of(0, Integer.MAX_VALUE));
+            PageRequest.of(0, 10));
         return new ResponseEntity<>(locationService.search(locationSearchRequest).stream().toList(), HttpStatus.OK);
     }
 

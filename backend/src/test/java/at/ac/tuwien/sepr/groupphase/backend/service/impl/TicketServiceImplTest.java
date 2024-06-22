@@ -184,22 +184,6 @@ public class TicketServiceImplTest implements TestData {
         sectorShow.setPrice(50);
         hallSectorShowRepository.save(sectorShow);
 
-        testTicketValidReserved = new Ticket();
-        testTicketValidReserved.setHash("hash");
-        testTicketValidReserved.setReserved(true);
-        testTicketValidReserved.setValid(true);
-        testTicketValidReserved.setHallSpot(hallSpot1);
-        testTicketValidReserved.setShow(show);
-        ticketRepository.save(testTicketValidReserved);
-
-        testTicketInvalidReserved = new Ticket();
-        testTicketInvalidReserved.setHash("hash");
-        testTicketInvalidReserved.setReserved(true);
-        testTicketInvalidReserved.setValid(false);
-        testTicketInvalidReserved.setHallSpot(hallSpot2);
-        testTicketInvalidReserved.setShow(show);
-        ticketRepository.save(testTicketInvalidReserved);
-
         var user = aUserEntity();
         user.setEmail("foobar@test.com");
         userRepository.save(user);
@@ -211,6 +195,24 @@ public class TicketServiceImplTest implements TestData {
         order.setCustomer(user);
         orderRepository.save(order);
         orderId = order.getId();
+
+        testTicketValidReserved = new Ticket();
+        testTicketValidReserved.setHash("hash");
+        testTicketValidReserved.setReserved(true);
+        testTicketValidReserved.setValid(true);
+        testTicketValidReserved.setHallSpot(hallSpot1);
+        testTicketValidReserved.setShow(show);
+        testTicketValidReserved.setOrder(order);
+        ticketRepository.save(testTicketValidReserved);
+
+        testTicketInvalidReserved = new Ticket();
+        testTicketInvalidReserved.setHash("hash");
+        testTicketInvalidReserved.setReserved(true);
+        testTicketInvalidReserved.setValid(false);
+        testTicketInvalidReserved.setHallSpot(hallSpot2);
+        testTicketInvalidReserved.setShow(show);
+        testTicketInvalidReserved.setOrder(order);
+        ticketRepository.save(testTicketInvalidReserved);
 
         testTicketValidNonReserved = new Ticket();
         testTicketValidNonReserved.setHash("hash");
@@ -227,6 +229,7 @@ public class TicketServiceImplTest implements TestData {
         testTicketInvalidNonReserved.setValid(false);
         testTicketInvalidNonReserved.setHallSpot(hallSpot4);
         testTicketInvalidNonReserved.setShow(show);
+        testTicketInvalidNonReserved.setOrder(order);
         ticketRepository.save(testTicketInvalidNonReserved);
 
         if (userRepository.findByEmail(ADMIN_USER) == null) {
