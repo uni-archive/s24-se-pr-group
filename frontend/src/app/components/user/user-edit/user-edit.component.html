@@ -159,6 +159,7 @@
             type="button"
             class="btn btn-primary mx-1"
             (click)="changePassword()"
+            [disabled]="isLoading"
           >
             Passwort ändern
           </button>

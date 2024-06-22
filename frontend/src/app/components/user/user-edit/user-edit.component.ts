@@ -22,6 +22,7 @@ import {
   styleUrls: ["./user-edit.component.scss"],
 })
 export class UserEditComponent implements OnInit, OnChanges {
+  isLoading = false;
   @Input() user: ApplicationUserResponse = {
     id: 0,
     email: "",
@@ -185,14 +186,17 @@ export class UserEditComponent implements OnInit, OnChanges {
   }
 
   changePassword() {
+    this.isLoading = true;
     this.userEndpointService
       .sendEmailForPasswordChange(this.user.email)
       .subscribe({
         next: (response) => {
           this.messagingService.setMessage(response.message, "success");
+          this.isLoading = false;
         },
         error: (error) => {
           this.messagingService.setMessage(error.error.message, "danger");
+          this.isLoading = false;
         },
       });
   }
