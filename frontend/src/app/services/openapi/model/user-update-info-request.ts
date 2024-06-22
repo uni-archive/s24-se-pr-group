@@ -9,11 +9,13 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { AddressDto } from './address-dto';
 
 
 export interface UserUpdateInfoRequest { 
     id?: number;
     email?: string;
     phoneNumber?: string;
+    address?: AddressDto;
 }
 
