@@ -32,7 +32,8 @@ import { PickUpTicketsComponent } from "./components/tickets/pick-up-tickets/pic
 import { PickUpTicketShowSelectComponent } from "./components/tickets/pick-up-ticket-show-select/pick-up-ticket-show-select.component";
 import { NoAuthGuard } from "./guards/noAuth.guard";
 import { NewsCreateComponent } from "./components/news/news-create/news-create.component";
-import {ArtistDetailsComponent} from "./components/artist/artist-details/artist-details.component";
+import { ArtistDetailsComponent } from "./components/artist/artist-details/artist-details.component";
+import { UpdateEmailComponent } from "./components/user/user-edit/update-email/update-email.component";
 
 const routes: Routes = [
   { path: "", component: HomeComponent },
@@ -42,9 +43,13 @@ const routes: Routes = [
     canActivate: mapToCanActivate([NoAuthGuard]),
     component: LoginComponent,
   },
-  {path: 'news', component: NewsComponent},
-  {path: 'news-detail/:id', component: NewsDetailComponent},
-  {path: 'news-create', canActivate: [AuthGuard], component: NewsCreateComponent},
+  { path: "news", component: NewsComponent },
+  { path: "news-detail/:id", component: NewsDetailComponent },
+  {
+    path: "news-create",
+    canActivate: [AuthGuard],
+    component: NewsCreateComponent,
+  },
   {
     path: "my",
     canActivate: mapToCanActivate([AuthGuard]),
@@ -86,6 +91,10 @@ const routes: Routes = [
       {
         path: "activate/account",
         component: ActivateAccountComponent,
+      },
+      {
+        path: "update/email",
+        component: UpdateEmailComponent,
       },
     ],
   },
