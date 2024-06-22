@@ -167,17 +167,31 @@ public class UserServiceImpl implements UserService {
     public ApplicationUserDto createUser(ApplicationUserDto toCreate) throws ValidationException, ForbiddenException, MailNotSentException {
         LOGGER.debug("Create user");
         userValidator.validateForCreate(toCreate);
-        // Create a token for email confirmation, throws ValidationException if a token already exists
-        AccountActivateTokenDto emailConfirmToken = createAndSaveEmailConfirmToken(toCreate.getEmail());
+
 
         AddressDto addressDto = addressService.create(toCreate.getAddress());
         toCreate.setAddress(addressDto);
         toCreate.setSalt(SecurityUtil.generateSalt(32));
         toCreate.setPassword(passwordEncoder.encode(toCreate.getPassword() + toCreate.getSalt()));
-        ApplicationUserDto user = userDao.create(toCreate);
+        ApplicationUserDto user = userDao.findByEmail(toCreate.getEmail());
+        if (user != null) {
+            try {
+                toCreate.setId(user.getId());
+                user = userDao.update(toCreate);
+                // Invalidate old tokens for the current email
+
+            } catch (EntityNotFoundException e) {
+                throw new ValidationException("Fehler beim Erstellen des Benutzers.");
+            }
+        } else {
+            user = userDao.create(toCreate);
+        }
+
+        // Create a token for email confirmation
+        AccountActivateTokenDto accountActivateToken = createAndSaveAccountActivateToken(toCreate.getEmail());
 
         // Send email to the user to confirm the email address
-        MailBody mailBody = generateMailBodyActivateAccount(toCreate, emailConfirmToken.getToken());
+        MailBody mailBody = generateMailBodyActivateAccount(toCreate, accountActivateToken.getToken());
         try {
             emailSenderService.sendHtmlMail(mailBody);
         } catch (MessagingException e) {
@@ -237,6 +251,10 @@ public class UserServiceImpl implements UserService {
             user.setPhoneNumber(userInfo.getPhoneNumber());
         }
 
+        if (userInfo.getAddress() != null) {
+            user.setAddress(userInfo.getAddress());
+        }
+
         // Validate user information
         userValidator.validateForUpdate(user);
 
@@ -267,9 +285,14 @@ public class UserServiceImpl implements UserService {
 
         // Update user information
         try {
+            if (userInfo.getAddress() != null) {
+                addressService.create(userInfo.getAddress());
+            }
             return userDao.update(user);
         } catch (EntityNotFoundException e) {
             throw new DtoNotFoundException("Could not update the user because it does not exist.");
+        } catch (ForbiddenException e) {
+            throw new ValidationException("Could not update the user because the address is invalid.");
         }
     }
 
@@ -453,7 +476,7 @@ public class UserServiceImpl implements UserService {
         return newPasswordTokenDao.create(newPasswordToken);
     }
 
-    private AccountActivateTokenDto createAndSaveEmailConfirmToken(String email) throws ValidationException {
+    private AccountActivateTokenDto createAndSaveAccountActivateToken(String email) {
         String token = UUID.randomUUID().toString();
         LocalDateTime expiryDate = LocalDateTime.now().plusMinutes(MAX_EXPIRATION_TIME);
 
@@ -462,9 +485,7 @@ public class UserServiceImpl implements UserService {
         emailConfirmToken.setEmail(email);
         emailConfirmToken.setExpiryDate(expiryDate);
 
-        if (!accountActivateTokenDao.findByEmail(email).isEmpty()) {
-            throw new ValidationException("Es wurde bereits eine Bestätigungsmail an diese E-Mail-Adresse gesendet.");
-        }
+        invalidateAccountActivateTokens(email);
 
         return accountActivateTokenDao.create(emailConfirmToken);
     }
@@ -476,6 +497,17 @@ public class UserServiceImpl implements UserService {
                 newPasswordTokenDao.update(token);  // Save the updated token
             } catch (EntityNotFoundException e) {
                 LOGGER.warn("Could not update the password reset token because it does not exist.", e);
+            }
+        });
+    }
+
+    private void invalidateAccountActivateTokens(String email) {
+        accountActivateTokenDao.findByEmail(email).forEach(token -> {
+            token.setExpiryDate(LocalDateTime.now().minusMinutes(1));
+            try {
+                accountActivateTokenDao.update(token);  // Save the updated token
+            } catch (EntityNotFoundException e) {
+                LOGGER.warn("Could not update the account activate token because it does not exist.", e);
             }
         });
     }

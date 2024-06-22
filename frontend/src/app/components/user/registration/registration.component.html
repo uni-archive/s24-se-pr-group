@@ -127,16 +127,13 @@
 
       <div class="form-group">
         <label for="phoneNumber" class="float-left">Telefonnummer:</label>
-        <angular-phone-number-input
+        <input
+          type="text"
           id="phoneNumber"
           formControlName="phoneNumber"
-          [defaultCountry]="'AT'"
-          [preferredCountries]="['AT', 'DE', 'CH']"
-          [error]="
-            registrationForm.get('phoneNumber')?.touched &&
-            registrationForm.get('phoneNumber')?.invalid
-          "
-        ></angular-phone-number-input>
+          class="form-control"
+          placeholder="z.B.: +436601234567"
+        />
         <div
           *ngIf="
             registrationForm.get('phoneNumber').invalid &&
@@ -144,7 +141,7 @@
           "
           class="invalid-feedback"
         >
-          Bitte geben Sie eine gültige Telefonnummer ein.
+          Bitte gültige Telefonnummer eintragen.
         </div>
       </div>
 
@@ -203,7 +200,7 @@
       </div>
 
       <div class="form-group">
-        <label for="city" class="float-left">Ort:</label>
+        <label for="city" class="float-left">Stadt:</label>
         <input
           type="text"
           id="city"

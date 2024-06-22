@@ -55,7 +55,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -115,27 +114,6 @@ class UserServiceImplTest {
         verify(addressService).create(user.getAddress());
         assertNotNull(userDto.getValue().getSalt());
         assertNotNull(userDto.getValue().getPassword());
-    }
-
-    @Test
-    void createUserShouldThrowValidationExceptionWhenEmailConfirmationTokenExists() throws Exception {
-        // Arrange
-        ApplicationUserDto userToCreate = ApplicationUserSupplier.anAdminUser();
-        String email = userToCreate.getEmail();
-
-        when(accountActivateTokenDao.findByEmail(email)).thenReturn(Collections.singletonList(new AccountActivateTokenDto()));
-
-        // Act & Assert
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            userService.createUser(userToCreate);
-        });
-
-        assertEquals("Es wurde bereits eine Bestätigungsmail an diese E-Mail-Adresse gesendet.", exception.getMessage());
-
-        // Verify that no further interactions occurred after the exception
-        verify(userValidator).validateForCreate(userToCreate);
-        verify(accountActivateTokenDao).findByEmail(email);
-        verifyNoMoreInteractions(userValidator, addressService, passwordEncoder, emailSenderService, userDao, accountActivateTokenDao);
     }
 
     @Test

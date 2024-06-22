@@ -45,9 +45,9 @@ public class UserDataGenerator {
     }
 
     private void generatePredefinedUsers() {
-        ADMIN_USER.setAddress(new Address("Admin Test street", "1234", "Test city", "Test country"));
-        CUSTOMER_USER.setAddress(new Address("Test street", "1234", "Test city", "Test country"));
-        SUPER_ADMIN_USER.setAddress(new Address("Test street", "1234", "Test city", "Test country"));
+        ADMIN_USER.setAddress(new Address("Admin Test street", "1234", "Test city", "Austria"));
+        CUSTOMER_USER.setAddress(new Address("Test street", "1234", "Test city", "Austria"));
+        SUPER_ADMIN_USER.setAddress(new Address("Test street", "1234", "Test city", "Austria"));
         addressRepository.save(ADMIN_USER.getAddress());
         addressRepository.save(CUSTOMER_USER.getAddress());
         addressRepository.save(SUPER_ADMIN_USER.getAddress());

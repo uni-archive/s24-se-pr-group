@@ -1,8 +1,12 @@
-<label for="country">Country:</label>
+<label for="country">Land:</label>
 <select
   id="country"
   class="form-control"
   (change)="onCountryChange($event)"
-  [ngModel]="selectedCountry">
-  <option *ngFor="let country of countries" [value]="country.name">{{ country.name }}</option>
+  [ngModel]="selectedCountry"
+  [disabled]="disabled"
+>
+  <option *ngFor="let country of countries" [value]="country.name">
+    {{ country.name }}
+  </option>
 </select>

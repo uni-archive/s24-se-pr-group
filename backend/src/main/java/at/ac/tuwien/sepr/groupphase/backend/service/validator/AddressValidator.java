@@ -22,18 +22,22 @@ public class AddressValidator extends AbstractValidator<AddressDto> {
         List<String> errors = new ArrayList<>();
 
         if (addressDto.getStreet() == null || addressDto.getStreet().isEmpty()) {
-            errors.add("Street must not be empty");
+            errors.add("Straße darf nicht leer sein.");
+        } else if (addressDto.getStreet().length() > 255) {
+            errors.add("Straße darf nicht länger als 255 Zeichen sein.");
         }
         if (addressDto.getCity() == null || addressDto.getCity().isEmpty()) {
-            errors.add("City must not be empty");
+            errors.add("Stadt darf nicht leer sein.");
+        } else if (addressDto.getCity().length() > 255) {
+            errors.add("Stadt darf nicht länger als 255 Zeichen sein.");
         }
         if (addressDto.getZip() == null || addressDto.getZip().isEmpty()) {
-            errors.add("Zip code must not be empty");
+            errors.add("Postleitzahl darf nicht leer sein.");
         } else {
             try {
                 Integer.parseInt(addressDto.getZip());
             } catch (NumberFormatException e) {
-                errors.add("Zip code must be a number");
+                errors.add("Postleitzahl muss eine Zahl sein.");
             }
         }
         return errors;
@@ -47,7 +51,7 @@ public class AddressValidator extends AbstractValidator<AddressDto> {
             addressDao.findById(addressDto.getId());
 
         } catch (EntityNotFoundException e) {
-            errors.add("Address with id " + addressDto.getId() + " does not exist");
+            errors.add("Adresse mit id " + addressDto.getId() + " existiert nicht.");
         }
         endValidation(errors);
     }

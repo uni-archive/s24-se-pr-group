@@ -348,7 +348,7 @@ class UserEndpointTest {
 
         UserUpdateInfoRequest updateRequest = new UserUpdateInfoRequest(
             user.getId(), null,
-            "+431234567890"
+            "+431234567890", null
         );
 
         // Act
@@ -442,7 +442,7 @@ class UserEndpointTest {
         ApplicationUser savedUser = userRepository.save(user);
 
         UserUpdateInfoRequest updateRequest = new UserUpdateInfoRequest(
-            savedUser.getId(), null, "+431234567890"
+            savedUser.getId(), null, "+431234567890", null
         );
 
         // Act
@@ -480,7 +480,7 @@ class UserEndpointTest {
         Assertions.assertNotNull(userRepository.findById(savedUser.getId()).orElse(null));
 
         UserUpdateInfoRequest updateRequest = new UserUpdateInfoRequest(
-            savedUser.getId(), null, "+431234567890"
+            savedUser.getId(), null, "+431234567890", null
         );
 
         // Act
@@ -507,7 +507,7 @@ class UserEndpointTest {
     @WithMockUser(roles = "USER", username = "user@email.com")
     void updateUserInfoShouldThrowNotFoundException() throws Exception {
         UserUpdateInfoRequest updateRequest = new UserUpdateInfoRequest(
-            -123L, null, "+431234567890"
+            -123L, null, "+431234567890", null
         );
 
         MvcResult mvcResult = mockMvc.perform(put(TestData.USER_BASE_URI + "/update/user")
@@ -535,7 +535,7 @@ class UserEndpointTest {
         ApplicationUser savedUser = userRepository.save(user);
 
         UserUpdateInfoRequest updateRequest = new UserUpdateInfoRequest(
-            savedUser.getId(), "user24@email.com", "+431234567890"
+            savedUser.getId(), "user24@email.com", "+431234567890", null
         );
 
         // Act & Assert
@@ -559,7 +559,7 @@ class UserEndpointTest {
         ApplicationUser savedUser = userRepository.save(user);
 
         UserUpdateInfoRequest updateRequest = new UserUpdateInfoRequest(
-            savedUser.getId(), null, "1234567890"
+            savedUser.getId(), null, "1234567890", null
         );
 
         // Act

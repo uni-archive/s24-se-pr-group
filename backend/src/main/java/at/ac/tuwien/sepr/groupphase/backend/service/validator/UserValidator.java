@@ -32,7 +32,9 @@ public class UserValidator extends AbstractValidator<ApplicationUserDto> {
         }
         List<String> errors = validateBaseCases(objectToCreate);
         if (Objects.nonNull(objectToCreate.getEmail()) && userDao.findByEmail(objectToCreate.getEmail()) != null) {
-            errors.add("Email already in use");
+            if (userDao.findByEmail(objectToCreate.getEmail()).getAccountActivated()) {
+                errors.add("Email existiert bereits");
+            }
         }
         endValidation(errors);
     }
@@ -145,6 +147,9 @@ public class UserValidator extends AbstractValidator<ApplicationUserDto> {
             try {
                 PhoneNumber number = numberUtil.parse(phoneNumber, null);
                 if (!numberUtil.isValidNumber(number)) {
+                    errors.add("Telefonnummer ist ungültig");
+                }
+                if (phoneNumber.startsWith("++")) {
                     errors.add("Telefonnummer ist ungültig");
                 }
             } catch (NumberParseException e) {
