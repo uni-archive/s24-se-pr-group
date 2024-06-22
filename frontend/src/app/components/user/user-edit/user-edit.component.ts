@@ -149,6 +149,7 @@ export class UserEditComponent implements OnInit, OnChanges {
         );
         this.user = user;
         if (this.user.email !== this.userForm.value.email) {
+          this.authService.logoutUser();
           this.messagingService.setMessage(
             "Bestätige bitte deine neue E-Mail-Adresse.",
             "success"
