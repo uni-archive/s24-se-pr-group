@@ -26,7 +26,7 @@
       <div class="card-body">
         <div class="section-group" *ngFor="let sector of visibleSectors">
           <h5 class="card-title">{{sector.name}}</h5>
-          <p class="card-text">{{sector.price}}€ pro Platz</p>
+          <p class="card-text">{{formatPrice(sector.price)}}€ pro Platz</p>
           <div *ngIf="! sector.isStandingOnly">
             <div class="w-100 input-group mt-1" *ngFor="let seat of sectorSeatMap[sector.id]">
               <input class="form-control" readonly [value]="'Platz-Nr. ' + seat.id">

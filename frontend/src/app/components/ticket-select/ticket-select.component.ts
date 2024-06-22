@@ -15,6 +15,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import { HallSectorDto } from "../../services/openapi";
 import {HttpStatusCode} from "@angular/common/http";
 import {forkJoin, Observable} from "rxjs";
+import {formatPrice} from "../../../formatters/currencyFormatter";
 
 @Component({
   selector: 'app-ticket-select',
@@ -219,4 +220,5 @@ export class TicketSelectComponent {
 
 
   protected readonly JSON = JSON;
+  protected readonly formatPrice = formatPrice;
 }

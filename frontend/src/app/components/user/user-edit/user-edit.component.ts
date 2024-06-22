@@ -176,6 +176,8 @@ export class UserEditComponent implements OnInit, OnChanges {
     if (this.editMode) {
       this.userForm.enable();
       this.userForm.get("id").disable(); // Keep id disabled
+      this.userForm.get("firstName").disable(); // Keep id disabled
+      this.userForm.get("familyName").disable(); // Keep id disabled
     } else {
       this.userForm.disable();
     }

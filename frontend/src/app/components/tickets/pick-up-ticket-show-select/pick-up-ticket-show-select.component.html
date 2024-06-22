@@ -1,12 +1,16 @@
 <form class="search-form" #SearchForm="ngForm" (ngSubmit)="onSubmit()">
   <div class="row form-group align-items-end">
-    <div class="col-auto">
-      <div>
-        <label for="timeinput">Datum/Uhrzeit</label> <a data-bs-toggle="tooltip" data-bs-html="true" title="Es werden Vorführungen angezeit, die am angegebenen Tag, ab der angegebenen Uhrzeit stattfinden."><i class="bi bi-question-circle smol-questionmark"></i></a>
-        <input [(ngModel)]="searchData.dateTime" id="timeinput" name="time" class="form-control" type="datetime-local">
-      </div>
+    <div class="col-5">
+      <label for="timeinput">Datum/Uhrzeit</label> <a data-bs-toggle="tooltip" data-bs-html="true"
+                                                      title="Es werden Vorführungen angezeit, die am angegebenen Tag, ab der angegebenen Uhrzeit stattfinden."><i
+      class="bi bi-question-circle smol-questionmark"></i></a>
+      <input [(ngModel)]="searchData.dateTime" id="timeinput" name="time" class="form-control" type="datetime-local">
     </div>
-    <div class="col-auto" >
+    <div class="col-5">
+
+      <app-location-autocomplete (selectedLocation)="setLocation($event)" name="location"></app-location-autocomplete>
+    </div>
+    <div class="col-2">
       <button type="submit" class="btn btn-primary">Suchen</button>
     </div>
   </div>
@@ -20,15 +24,15 @@
     <div class="card-body d-flex justify-content-between">
       <div>
         <h5 class="card-title">
-          {{show.eventName}}
+          {{ show.eventName }}
         </h5>
         <h6 class="card-subtitle mb-2 text-body-secondary">
-          Aufführung am: {{formatDateStr(show.dateTime)}}
+          Aufführung am: {{ formatDateStr(show.dateTime) }}
         </h6>
       </div>
       <div>
-        <p class="card-text float-end" *ngIf="show.artistList.length < 10" >{{show.artistList.map(artistMap)}}</p>
-        <p class="card-text float-end" *ngIf="show.artistList.length >= 10" >10+ auftretende Musiker*innen</p>
+        <p class="card-text float-end" *ngIf="show.artistList.length < 10">{{ show.artistList.map(artistMap) }}</p>
+        <p class="card-text float-end" *ngIf="show.artistList.length >= 10">10+ auftretende Musiker*innen</p>
       </div>
     </div>
   </div>

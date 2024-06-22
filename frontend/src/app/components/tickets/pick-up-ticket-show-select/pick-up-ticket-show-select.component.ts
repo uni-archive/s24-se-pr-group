@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {ShowSearchDto} from "../../../dtos/ShowSearchDto";
-import {ShowEndpointService, ShowListDto} from "../../../services/openapi";
+import {LocationDto, ShowEndpointService, ShowListDto} from "../../../services/openapi";
 import {Router} from "@angular/router";
-import { formatDuration } from 'src/formatters/durationFormatter';
+import {formatDuration} from 'src/formatters/durationFormatter';
+import {MessagingService} from "../../../services/messaging.service";
 
 @Component({
   selector: 'app-pick-up-ticket-show-select',
@@ -14,13 +15,13 @@ export class PickUpTicketShowSelectComponent {
   searchData: ShowSearchDto = new ShowSearchDto();
   time: Date = null;
   shows: ShowListDto[] = [];
+  location: LocationDto = null;
 
-  constructor(private service: ShowEndpointService, private router: Router) {
+  constructor(private service: ShowEndpointService, private router: Router, private messageService: MessagingService) {
   }
 
   onSubmit() {
     console.log(this.searchData);
-    //TODO: LOCATION IMPLEMENTATION
     this.reloadShows();
   }
 
@@ -29,7 +30,7 @@ export class PickUpTicketShowSelectComponent {
       dateTime: this.searchData.dateTime,
       price: this.searchData.price * 100,
       eventId: this.searchData.eventId,
-      location: null
+      location: this.location?.id
     };
     this.service.searchShows(
       dto.price,
@@ -40,8 +41,7 @@ export class PickUpTicketShowSelectComponent {
         this.shows = data.content;
       },
       error: (err) => {
-        //TODO: INFORM USER
-        console.log(err);
+        this.messageService.setMessage("Error while loading shows", "danger");
       }
     });
   }
@@ -70,5 +70,9 @@ export class PickUpTicketShowSelectComponent {
 
   navigateToPickup(id: number) {
     this.router.navigate(['tickets/pickup', id]);
+  }
+
+  setLocation($event: LocationDto) {
+    this.location = $event;
   }
 }

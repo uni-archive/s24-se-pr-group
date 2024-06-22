@@ -149,7 +149,7 @@ public class AuthenticationEndpointTest {
         Trigger actual = triggers.get(0);
         assertThat(actual.getNextFireTime().before(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))).isTrue();
         assertThat(actual.getNextFireTime()
-            .after(Date.from(Instant.now().plus(1, ChronoUnit.HOURS).minus(2, ChronoUnit.SECONDS)))).isTrue();
+            .after(Date.from(Instant.now().plus(15, ChronoUnit.MINUTES).minus(2, ChronoUnit.SECONDS)))).isTrue();
 
         TriggerKey triggerKey = new TriggerKey("unlockUserTrigger-testemail@email.com", "userTriggers");
         Trigger newTrigger = TriggerBuilder.newTrigger().withIdentity(triggerKey).startAt(Date.from(Instant.now()))

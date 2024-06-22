@@ -82,13 +82,12 @@ context("authentication (user-story 2.1.2)", () => {
             cy.loginUser(admin.username, admin.password);
             cy.contains("Erstelle Veranstaltung");
             cy.contains("Erstelle Vorführung");
+            cy.contains("Erstelle Saalplan");
             cy.contains("Aufführungsorte");
 
             cy.visit('/#/user/home');
-
             cy.contains("Nutzer erstellen");
             cy.contains("Nutzer verwalten");
-            cy.contains("Saalplan erstellen");
         });
     })
 })

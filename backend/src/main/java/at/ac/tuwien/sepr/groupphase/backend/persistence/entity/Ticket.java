@@ -30,7 +30,7 @@ public class Ticket extends AbstractEntity {
     private Show show;
 
     @ManyToOne
-    @JoinColumn(name = "ORDER_ID")
+    @JoinColumn(name = "ORDER_ID", nullable = false)
     private Order order;
 
     public Ticket() {

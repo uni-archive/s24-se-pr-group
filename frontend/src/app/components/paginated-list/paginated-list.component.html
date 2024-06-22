@@ -1,8 +1,8 @@
-<div class="container mt-3">
+<div class="container container-custom mt-5 p-3 rounded">
   <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
   <div *ngIf="!error">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h2>{{heading}}</h2>
+      <h1 class="h1 mb-3 text-center">{{heading}}</h1>
       <button *ngIf="createButtonEnabled" class="btn btn-primary" (click)="createNew.emit()">
         <i class="bi bi-plus-circle"></i> Erstellen
       </button>

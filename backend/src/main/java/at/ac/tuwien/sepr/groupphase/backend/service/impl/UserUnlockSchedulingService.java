@@ -39,7 +39,7 @@ public class UserUnlockSchedulingService {
 
         Trigger trigger = TriggerBuilder.newTrigger()
             .withIdentity("unlockUserTrigger-" + username, "userTriggers")
-            .startAt(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
+            .startAt(Date.from(Instant.now().plus(15, ChronoUnit.MINUTES)))
             .forJob(jobDetail)
             .withSchedule(SimpleScheduleBuilder.simpleSchedule().withMisfireHandlingInstructionFireNow())
             .build();

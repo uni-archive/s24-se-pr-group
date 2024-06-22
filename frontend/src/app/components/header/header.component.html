@@ -30,20 +30,23 @@
         <a class="nav-link" *ngIf="authService.isLoggedIn()" routerLink="/my/orders" routerLinkActive="active">Meine
           Bestellungen</a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" *ngIf="authService.isLoggedIn() && authService.getUserRole()==='ADMIN'"
-           routerLink="/eventcreation" routerLinkActive="active">Erstelle Veranstaltung</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" *ngIf="authService.isLoggedIn() && authService.getUserRole()==='ADMIN'"
-           routerLink="/showcreation" routerLinkActive="active">Erstelle Vorführung</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" *ngIf="authService.isLoggedIn() && authService.getUserRole()==='ADMIN'" routerLink="/news-create" routerLinkActive="active">Erstelle News</a>
-      </li>
-      <li class="nav-item">
-      <a class="nav-link" *ngIf="authService.isLoggedIn() && authService.getUserRole()==='ADMIN'"
-           routerLink="/locations" routerLinkActive="active">Aufführungsorte</a>
+      <li class="nav-item dropdown" *ngIf="authService.isLoggedIn() && authService.getUserRole()==='ADMIN'">
+        <a class="dropdown-toggle nav-link" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+          Verwalten ...
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="manageDropdown">
+          <a class="dropdown-item" routerLink="/locations" routerLinkActive="active">Aufführungsorte</a>
+          <a class="dropdown-item" routerLink="/eventcreation" routerLinkActive="active">Erstelle Veranstaltung</a>
+          <a class="dropdown-item" routerLink="/showcreation" routerLinkActive="active">Erstelle Vorführung</a>
+          <a class="dropdown-item" routerLink="/news-create" routerLinkActive="active">Erstelle News</a>
+          <a
+            class="dropdown-item"
+            routerLink="/hallplan/create"
+            routerLinkActive="active"
+          >
+            Erstelle Saalplan
+          </a>
+        </ul>
       </li>
       <li>
         <a class="nav-link" *ngIf="authService.isLoggedIn() && authService.getUserRole()==='ADMIN'" routerLink="/pickup-ticket-show-select" routerLinkActive="active">Ticketabholung</a>
