@@ -45,7 +45,15 @@ public class NewsServiceImpl implements NewsService {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication != null ? authentication.getName() : null;
-        ApplicationUserDto userDto = username != null ? userDao.findByEmail(username) : null;
+        ApplicationUserDto userDto = null;
+
+        if (username != null) {
+            try {
+                userDto = userDao.findByEmail(username);
+            } catch (RuntimeException e) {
+                throw new DtoNotFoundException("User not found");
+            }
+        }
 
         NewsDto newsDto;
         try {
@@ -98,7 +106,13 @@ public class NewsServiceImpl implements NewsService {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        ApplicationUserDto userDto = userDao.findByEmail(username);
+
+        ApplicationUserDto userDto;
+        try {
+            userDto = userDao.findByEmail(username);
+        } catch (RuntimeException e) {
+            throw new DtoNotFoundException("User not found");
+        }
 
         try {
             return newsDao.findUnseenNewsByUser(userDto.getId(), pageable);
@@ -106,4 +120,5 @@ public class NewsServiceImpl implements NewsService {
             throw new DtoNotFoundException(e);
         }
     }
+
 }
