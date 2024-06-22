@@ -4,7 +4,6 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.EventDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.NewsDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.EventRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
@@ -25,10 +24,8 @@ public class NewsValidator {
     private static final int MAX_HEIGHT = 1000;
     private static final long MAX_FILE_SIZE = 10 * 1024 * 1024;
 
-    @Autowired
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
 
-    @Autowired
     public NewsValidator(EventRepository eventRepository) {
         this.eventRepository = eventRepository;
     }
