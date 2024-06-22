@@ -15,16 +15,16 @@ import { SortObject } from './sort-object';
 
 
 export interface PageArtistSearchResponse { 
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
     first?: boolean;
     last?: boolean;
     size?: number;
     content?: Array<ArtistSearchResponse>;
     number?: number;
     sort?: Array<SortObject>;
-    numberOfElements?: number;
     pageable?: PageableObject;
+    numberOfElements?: number;
     empty?: boolean;
 }
 
