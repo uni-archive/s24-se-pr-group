@@ -15,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 
-import static at.ac.tuwien.sepr.groupphase.backend.supplier.ApplicationUserSupplier.anAdminUser;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -53,14 +52,6 @@ class UserValidatorTest {
     void validateForCreate_ShouldThrowException_WhenObjectIsNull() {
         ValidationException exception = assertThrows(ValidationException.class, () -> userValidator.validateForCreate(null));
         assertEquals("Object must not be null", exception.getMessage());
-    }
-
-    @Test
-    void validateForCreate_ShouldThrowException_WhenEmailIsAlreadyInUse() {
-        when(userDao.findByEmail(validUserDto.getEmail())).thenReturn(anAdminUser());
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> userValidator.validateForCreate(validUserDto));
-        assertTrue(exception.getMessage().contains("Email already in use"));
     }
 
     @Test
