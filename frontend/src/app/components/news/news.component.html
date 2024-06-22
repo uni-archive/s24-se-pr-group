@@ -10,15 +10,6 @@
         </button>
     </div>
     <h1 *ngIf="!authService.isLoggedIn()">News</h1>
-    <div class="toast-container">
-        <ngb-toast *ngIf="error" header="Fehler!" [autohide]="false" class="error-toast">
-            {{ errorMessage }}
-            <button type="button" class="close" (click)="vanishError()" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </ngb-toast>
-    </div>
-
     <div class="row">
         <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 p-2" *ngFor="let news of getNews()">
             <div class="card h-100" [routerLink]="['/news-detail', news.id]">
