@@ -132,6 +132,7 @@
             type="button"
             class="btn btn-primary mx-1"
             [disabled]="!userForm.valid"
+            [disabled]="isLoading"
             (click)="saveUserDetails()"
             *ngIf="editMode"
           >
@@ -142,6 +143,7 @@
             class="btn btn-primary mx-1"
             (click)="toggleEditMode()"
             *ngIf="!editMode"
+            [disabled]="isLoading"
           >
             <i class="bi bi-pencil"></i>
             Bearbeiten
@@ -151,6 +153,7 @@
             type="button"
             class="btn btn-primary mx-1"
             (click)="toggleEditMode()"
+            [disabled]="isLoading"
           >
             Abbrechen
           </button>
@@ -171,6 +174,7 @@
           data-bs-target="#delete-confirm"
           data-bs-toggle="modal"
           [disabled]="editMode"
+          [disabled]="isLoading"
         >
           <i class="bi bi-trash"></i>
           Konto löschen

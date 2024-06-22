@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
+import { AuthService } from "src/app/services/auth.service";
 import { MessagingService } from "src/app/services/messaging.service";
 import { UserEndpointService } from "src/app/services/openapi";
 import { matchPasswords } from "src/validators/passwordRepeatValidator";
@@ -11,6 +12,7 @@ import { matchPasswords } from "src/validators/passwordRepeatValidator";
   styleUrl: "./reset-password.component.scss",
 })
 export class ResetPasswordComponent {
+  isLoading = false;
   token: string | null = null;
   restPasswordForm: FormGroup;
 
@@ -18,7 +20,9 @@ export class ResetPasswordComponent {
     private formBuilder: FormBuilder,
     private userEndpointService: UserEndpointService,
     private route: ActivatedRoute,
-    private messagingService: MessagingService
+    private messagingService: MessagingService,
+    private authService: AuthService,
+    private router: Router
   ) {
     this.restPasswordForm = this.formBuilder.group(
       {
@@ -35,6 +39,8 @@ export class ResetPasswordComponent {
       return;
     }
 
+    this.isLoading = true;
+
     // Handle form submission here
     this.token = this.route.snapshot.queryParamMap.get("token");
     const newPassword = this.restPasswordForm.get("password").value;
@@ -43,9 +49,15 @@ export class ResetPasswordComponent {
       .subscribe({
         next: (response) => {
           this.messagingService.setMessage(response.message, "success");
+          if (this.authService.isLoggedIn()) {
+            this.authService.logoutUser();
+          }
+          this.router.navigate(["/login"]);
+          this.isLoading = false;
         },
         error: (error) => {
           this.messagingService.setMessage(error.error, "danger");
+          this.isLoading = false;
         },
       });
   }

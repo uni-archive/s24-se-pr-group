@@ -9,6 +9,7 @@ import { UserEndpointService } from "src/app/services/openapi";
   styleUrl: "./activate-account.component.scss",
 })
 export class ActivateAccountComponent {
+  isLoading = false;
   token: string | null = null;
   constructor(
     private userEndpointService: UserEndpointService,
@@ -18,6 +19,7 @@ export class ActivateAccountComponent {
   ) {}
 
   activateAccount() {
+    this.isLoading = true;
     this.token = this.route.snapshot.queryParamMap.get("token");
     if (this.token == null || this.token == "") {
       this.messagingService.setMessage(
@@ -30,9 +32,11 @@ export class ActivateAccountComponent {
       next: (response) => {
         this.messagingService.setMessage(response.message, "success");
         this.router.navigate(["/login"]);
+        this.isLoading = false;
       },
       error: (error) => {
         this.messagingService.setMessage(error.error, "danger");
+        this.isLoading = false;
       },
     });
   }

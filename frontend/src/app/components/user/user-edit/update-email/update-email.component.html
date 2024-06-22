@@ -10,9 +10,13 @@
           Wenn du deine E-Mail-Adresse ändern möchtest, klicke bitte auf die
           Schaltfläche unten:
         </p>
-        <a class="btn btn-primary" (click)="changeEmailAddress()"
-          >E-Mail-Adresse ändern</a
+        <button
+          class="btn btn-primary"
+          (click)="changeEmailAddress()"
+          [disabled]="isLoading"
         >
+          E-Mail-Adresse ändern
+        </button>
       </div>
     </div>
   </body>

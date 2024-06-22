@@ -10,9 +10,13 @@
           Vielen Dank für deine Registrierung! Um dein Konto zu aktivieren,
           klicke bitte auf die Schaltfläche unten.
         </p>
-        <a class="btn btn-primary" (click)="activateAccount()"
-          >Konto aktivieren</a
+        <button
+          class="btn btn-primary"
+          (click)="activateAccount()"
+          [disabled]="isLoading"
         >
+          Konto aktivieren
+        </button>
       </div>
     </div>
   </body>
