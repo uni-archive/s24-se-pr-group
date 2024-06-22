@@ -149,11 +149,18 @@ public class UserEndpoint {
     @GetMapping("/update/user/email")
     public ResponseEntity<?> updateUserEmailWithValidToken(@RequestParam("token") String token) {
         LOGGER.info("Update user email with token: {}", token);
-        if (userService.updateUserEmailWithValidToken(token) != null) {
-            return ResponseEntity.ok("Deine E-Mail-Adresse wurde erfolgreich geändert. Bitte melde dich mit deinen "
-                + "neuen Zugangsdaten an.");
+        Map<String, String> response = new HashMap<>();
+        try {
+            if (userService.updateUserEmailWithValidToken(token) != null) {
+                response.put(RESPONSE_KEY, "Deine E-Mail-Adresse wurde erfolgreich geändert. Bitte melde dich mit deinen "
+                    + "neuen Zugangsdaten an.");
+            } else {
+                throw new ValidationException("Es ist ein Fehler aufgetreten. Bitte versuche es erneut.");
+            }
+        } catch (at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException e) {
+            throw new ValidationException(e.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Dieser Link ist nicht gültig.");
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PermitAll

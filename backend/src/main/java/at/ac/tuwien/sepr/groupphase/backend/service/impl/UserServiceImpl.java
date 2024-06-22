@@ -278,7 +278,7 @@ public class UserServiceImpl implements UserService {
                 // Do nothing
             }
             if (userByEmail != null) {
-                throw new ValidationException("The new email address is already in use.");
+                throw new ValidationException("Die neue E-Mail-Adresse existiert bereits.");
             }
 
             // Create a token for email change
@@ -319,22 +319,32 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ApplicationUserDto updateUserEmailWithValidToken(String token) {
+    public ApplicationUserDto updateUserEmailWithValidToken(String token) throws ValidationException {
         EmailChangeTokenDto emailChangeToken = emailChangeTokenDao.findByToken(token);
-        if (emailChangeToken != null && emailChangeToken.getExpiryDate().isAfter(LocalDateTime.now())) {
-            ApplicationUserDto user = userDao.findByEmail(emailChangeToken.getCurrentEmail());
-            user.setEmail(emailChangeToken.getNewEmail());
-            ApplicationUserDto updatedUser = null;
-            try {
-                updatedUser = userDao.update(user);
-            } catch (EntityNotFoundException e) {
-                LOGGER.error("Could not update the user with the email address {} because it does not exist.",
-                    emailChangeToken.getCurrentEmail());
-            }
-            invalidateOldTokens(emailChangeToken.getCurrentEmail());
-            return updatedUser;
+
+        if (emailChangeToken == null) {
+            throw new ValidationException("Der Link ist ungültig.");
         }
-        return null;
+
+        if (emailChangeToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new ValidationException("Dieser Link ist abgelaufen.");
+        }
+
+        ApplicationUserDto user = userDao.findByEmail(emailChangeToken.getNewEmail());
+        if (user != null) {
+            throw new ValidationException("Email Adresse existiert bereits.");
+        }
+        user = userDao.findByEmail(emailChangeToken.getCurrentEmail());
+        user.setEmail(emailChangeToken.getNewEmail());
+        ApplicationUserDto updatedUser = null;
+        try {
+            updatedUser = userDao.update(user);
+        } catch (EntityNotFoundException e) {
+            LOGGER.error("Could not update the user with the email address {} because it does not exist.",
+                emailChangeToken.getCurrentEmail());
+        }
+        invalidateEmailChangeTokens(emailChangeToken.getCurrentEmail());
+        return updatedUser;
     }
 
     @Override
@@ -442,12 +452,17 @@ public class UserServiceImpl implements UserService {
 
         try {
             userDao.deleteById(id);
+
         } catch (EntityNotFoundException e) {
             throw new DtoNotFoundException(e.getMessage());
         }
 
-        MailBody mailBody = generateMailBodyAccountDelete(user);
+        // invalidate all tokens for the user
+        invalidateEmailChangeTokens(user.getEmail());
+        invalidateNewPasswordTokens(user.getEmail());
+        invalidateAccountActivateTokens(user.getEmail());
 
+        MailBody mailBody = generateMailBodyAccountDelete(user);
         try {
             emailSenderService.sendHtmlMail(mailBody);
         } catch (MessagingException e) {
@@ -455,7 +470,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private EmailChangeTokenDto createAndSaveEmailChangeToken(String newEmail, String currentEmail) throws DtoNotFoundException {
+    private EmailChangeTokenDto createAndSaveEmailChangeToken(String newEmail, String currentEmail) {
         String token = UUID.randomUUID().toString();
         LocalDateTime expiryDate = LocalDateTime.now().plusMinutes(10);
 
@@ -466,7 +481,7 @@ public class UserServiceImpl implements UserService {
         emailChangeToken.setExpiryDate(expiryDate);
 
         // Invalidate old tokens for the current email
-        invalidateOldTokens(currentEmail);
+        invalidateEmailChangeTokens(currentEmail);
 
         return emailChangeTokenDao.create(emailChangeToken);
     }
@@ -522,7 +537,7 @@ public class UserServiceImpl implements UserService {
         });
     }
 
-    private void invalidateOldTokens(String currentEmail) {
+    private void invalidateEmailChangeTokens(String currentEmail) {
         emailChangeTokenDao.findByCurrentEmail(currentEmail).forEach(token -> {
             token.setExpiryDate(LocalDateTime.now().minusMinutes(1));
             try {
@@ -533,61 +548,60 @@ public class UserServiceImpl implements UserService {
         });
     }
 
-
     private MailBody generateMailBodyChangeEmail(ApplicationUserDto userInfo, ApplicationUserDto user, String token) {
         String email = userInfo.getEmail();
         String subject = "Ihre E-Mail Adresse wurde geändert.";
-        String url = "http://localhost:8080/api/v1/users/update/user/email?token=" + token;
+        String url = "http://localhost:4200/#/user/update/email?token=" + token;
 
-        StringBuilder emailTemplate = new StringBuilder();
-        emailTemplate.append("<!DOCTYPE html>\n")
-            .append("<html lang=\"de\">\n")
-            .append("<head>\n")
-            .append("   <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n")
-            .append("   <style>\n")
-            .append("      body { background-color: #f8f9fa; font-family: Arial, sans-serif; }\n")
-            .append("      .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; }\n")
-            .append(
-                "      .card { background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 0.25rem; padding: 20px; }\n")
-            .append("      .card-body { padding: 20px; }\n")
-            .append("      .h3 { font-size: 1.75rem; margin-bottom: 0.5rem; }\n")
-            .append("      .h5 { font-size: 1.25rem; }\n")
-            .append("      .text-gray-700 { color: #6c757d; }\n")
-            .append(
-                "      .btn-primary { display: inline-block; font-weight: 400; color: #fff !important; text-align: center; vertical-align: middle; cursor: pointer; background-color: #007bff; border: 1px solid #007bff; padding: 0.375rem 0.75rem; font-size: 1rem; border-radius: 0.25rem; text-decoration: none; }\n")
-            .append("   </style>\n")
-            .append("</head>\n")
-            .append("<body>\n")
-            .append("    <div class=\"container\">\n")
-            .append("      <div class=\"card my-10\">\n")
-            .append("        <div class=\"card-body\">\n")
-            .append("          <h1 class=\"h3\">Bestätigung E-Mail Änderung</h1>\n")
-            .append("          <h5 class=\"h5\">Hallo ").append(user.getFirstName()).append("!</h5>\n")
-            .append("          <hr>\n")
-            .append("          <div>\n")
-            .append("            <p class=\"text-gray-700\">Wir möchten bestätigen, dass du ")
-            .append(userInfo.getEmail())
-            .append(" als deine E-Mail für TicketLine bevorzugst.</p>\n")
-            .append(
-                "            <p class=\"text-gray-700\">Falls du deine E-Mail-Adresse nicht ändern und weiterhin die ")
-            .append("aktuelle E-Mail-Adresse ").append(user.getEmail())
-            .append(" verwenden möchtest, ignoriere einfach diese E-Mail.</p>\n")
-            .append("            <p class=\"text-gray-700\">Bis du diese Änderung bestätigst, musst du deine aktuelle ")
-            .append("E-Mail-Adresse verwenden, um dich bei TicketLine anzumelden.</p>\n")
-            .append("          <hr>\n")
-            .append("          <a class=\"btn btn-primary\" href=\"").append(url)
-            .append("\" target=\"_blank\" style=\"color: #fff !important;\">E-Mail Adresse bestätigen</a>\n")
-            .append("            <p class=\"text-gray-700\">Dieser Link ist für die nächsten 10 Minuten gültig.</p>\n")
-            .append(
-                "            <p class=\"text-gray-700\">Dies ist eine automatisch generierte E-Mail – bitte antworte nicht auf diese E-Mail.</p>\n")
-            .append("          </div>\n")
-            .append("        </div>\n")
-            .append("      </div>\n")
-            .append("    </div>\n")
-            .append("  </body>\n")
-            .append("</html>");
-
-        return new MailBody(email, subject, emailTemplate.toString());
+        String emailTemplate = """
+            <!DOCTYPE html>
+            <html lang="de">
+            <head>
+               <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+               <style>
+                  body { background-color: #f8f9fa; font-family: Arial, sans-serif; }
+                  .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; }
+                  .card { background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 0.25rem; padding: 20px; }
+                  .card-body { padding: 20px; }
+                  .h3 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+                  .h5 { font-size: 1.25rem; }
+                  .text-gray-700 { color: #6c757d; }
+                  .btn-primary { display: inline-block; font-weight: 400; color: #fff !important; text-align: center; vertical-align: middle; cursor: pointer; background-color: #007bff; border: 1px solid #007bff; padding: 0.375rem 0.75rem; font-size: 1rem; border-radius: 0.25rem; text-decoration: none; }
+               </style>
+            </head>
+            <body>
+                <div class="container">
+                  <div class="card my-10">
+                    <div class="card-body">
+                      <h1 class="h3">Bestätigung E-Mail Änderung</h1>
+                      <h5 class="h5">Hallo""" + " " + user.getFirstName() +
+            """
+                !</h5>
+                <hr>
+                <div>
+                  <p class="text-gray-700">Wir haben deine Anfrage zur Änderung deiner E-Mail Adresse zu""" + " " + userInfo.getEmail() + " " +
+            """
+                erhalten.</p>
+                <p class="text-gray-700">Falls du deine E-Mail-Adresse nicht ändern und weiterhin die aktuelle E-Mail-Adresse""" + " " + user.getEmail() + " " +
+            """
+                  verwenden möchtest, ignoriere einfach diese E-Mail.</p>
+                  <p class="text-gray-700">Bis du diese Änderung bestätigst, musst du deine aktuelle E-Mail-Adresse verwenden, um dich bei TicketLine anzumelden.</p>
+                <hr>
+                <a class="btn btn-primary" href=\"""" + url + "\"" +
+            """
+                "target="_blank" style="color: #fff !important;">E-Mail Adresse bestätigen</a>
+                      <p class="text-gray-700">Dieser Link ist für die nächsten""" + " " + MAX_EXPIRATION_TIME + " " +
+            """
+                          Minuten gültig.</p>
+                          <p class="text-gray-700">Dies ist eine automatisch generierte E-Mail – bitte antworte nicht auf diese E-Mail.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </body>
+                </html>
+                """;
+        return new MailBody(email, subject, emailTemplate);
     }
 
     private MailBody generateMailBodyResetPassword(ApplicationUserDto user, String token) {
@@ -674,7 +688,7 @@ public class UserServiceImpl implements UserService {
                 <hr>
                 <div>
                   <p class="text-gray-700">Wir haben eine Anfrage erhalten, dass du dein Passwort für dein TicketLine-Konto ändern möchtest.</p>
-                  <p class="text-gray-700">Falls diese Aktion nicht von dir gestartet wurde, kontaktiere uns. Falls schon, folge der weiteren Beschreibung um dein Passwort zu ändern.</p>
+                  <p class="text-gray-700">Falls diese Aktion nicht von dir gestartet wurde, kontaktiere uns unter folgender E-Mail: ***REMOVED***@gmail.com. Falls schon, folge der weiteren Beschreibung um dein Passwort zu ändern.</p>
                   <p class="text-gray-700">Um dein Passwort zu ändern, klicke bitte auf den folgenden Button:</p>
                 <hr>
                 <a class="btn btn-primary" href=\"""" + url + "\"" +

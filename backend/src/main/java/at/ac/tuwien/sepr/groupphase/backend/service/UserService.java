@@ -102,8 +102,9 @@ public interface UserService extends UserDetailsService {
      *
      * @param token the token
      * @return the updated user
+     * @throws ValidationException if the token is invalid, or the token is expired
      */
-    ApplicationUserDto updateUserEmailWithValidToken(String token);
+    ApplicationUserDto updateUserEmailWithValidToken(String token) throws ValidationException;
 
     /**
      * Send an email to the user with a link to reset the password.
