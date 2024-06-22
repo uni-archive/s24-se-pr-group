@@ -91,7 +91,7 @@ public class ShowDataGenerator {
 
             List<HallSector> sectors = location.getHallPlan().getSectors().stream().distinct().toList();
             for (HallSector sector : sectors) {
-                var hss = new HallSectorShow(show, sector, random.nextInt(50, 1000));
+                var hss = new HallSectorShow(show, sector, random.nextInt(500, 100000));
                 hallSectorShowRepository.save(hss);
             }
         }
