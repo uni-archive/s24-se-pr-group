@@ -9,15 +9,20 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { SortObject } from './sort-object';
 
 
-export interface PageableObject { 
-    offset?: number;
-    sort?: Array<SortObject>;
-    paged?: boolean;
-    unpaged?: boolean;
-    pageNumber?: number;
-    pageSize?: number;
+export interface EventSearchDto { 
+    dauer?: number;
+    typ?: EventSearchDto.TypEnum;
+    textSearch?: string;
 }
+export namespace EventSearchDto {
+    export type TypEnum = 'CONCERT' | 'THEATER' | 'PLAY';
+    export const TypEnum = {
+        Concert: 'CONCERT' as TypEnum,
+        Theater: 'THEATER' as TypEnum,
+        Play: 'PLAY' as TypEnum
+    };
+}
+
 

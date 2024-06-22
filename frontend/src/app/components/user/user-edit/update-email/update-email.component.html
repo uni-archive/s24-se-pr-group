@@ -3,19 +3,19 @@
   <body>
     <div class="card text-center container-custom mt-5 shadow-lg">
       <div class="card-header">
-        <h3 class="mb-0">Konto aktivieren</h3>
+        <h3 class="mb-0">E-Mail Änderung</h3>
       </div>
       <div class="card-body">
-        <p>
-          Vielen Dank für deine Registrierung! Um dein Konto zu aktivieren,
-          klicke bitte auf die Schaltfläche unten.
+        <p class="mt-3">
+          Wenn du deine E-Mail-Adresse ändern möchtest, klicke bitte auf die
+          Schaltfläche unten:
         </p>
         <button
           class="btn btn-primary"
-          (click)="activateAccount()"
+          (click)="changeEmailAddress()"
           [disabled]="isLoading"
         >
-          Konto aktivieren
+          E-Mail-Adresse ändern
         </button>
       </div>
     </div>

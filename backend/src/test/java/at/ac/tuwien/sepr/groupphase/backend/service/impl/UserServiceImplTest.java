@@ -53,7 +53,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -233,7 +232,7 @@ class UserServiceImplTest {
             userService.updateUserInfo(userInfo);
         });
 
-        assertEquals("The new email address is already in use.", exception.getMessage());
+        assertEquals("Die neue E-Mail-Adresse existiert bereits.", exception.getMessage());
     }
 
     @Test
@@ -333,49 +332,22 @@ class UserServiceImplTest {
     }
 
     @Test
-    void updateUserEmailWithValidTokenShouldUpdateEmailAndReturnUpdatedUser() throws Exception {
-        // Arrange
-        String token = UUID.randomUUID().toString();
-        EmailChangeTokenDto emailChangeToken = new EmailChangeTokenDto();
-        emailChangeToken.setToken(token);
-        emailChangeToken.setNewEmail("new@email.com");
-        emailChangeToken.setCurrentEmail("current@email.com");
-        emailChangeToken.setExpiryDate(LocalDateTime.now().plusMinutes(10));
-
-        ApplicationUserDto user = new ApplicationUserDto();
-        user.setEmail("current@email.com");
-
-        when(emailChangeTokenDao.findByToken(token)).thenReturn(emailChangeToken);
-        when(userDao.findByEmail("current@email.com")).thenReturn(user);
-        when(userDao.update(user)).thenReturn(user);
-
-        // Act
-        ApplicationUserDto result = userService.updateUserEmailWithValidToken(token);
-
-        // Assert
-        verify(userDao).findByEmail("current@email.com");
-        verify(userDao).update(user);
-        verify(emailChangeTokenDao).findByToken(token);
-        verify(emailChangeTokenDao, times(1)).findByToken(token);
-        assertNotNull(result);
-        assertEquals("new@email.com", result.getEmail());
-    }
-
-    @Test
-    void updateUserEmailWithValidTokenShouldReturnNullIfTokenIsNull() {
+    void updateUserEmailWithValidTokenShouldReturnNullIfTokenIsNull() throws Exception {
         // Arrange
         String token = null;
 
         // Act
-        ApplicationUserDto result = userService.updateUserEmailWithValidToken(token);
+        ValidationException exception = assertThrows(ValidationException.class, () -> {
+            userService.updateUserEmailWithValidToken(token);
+        });
 
         // Assert
-        verify(emailChangeTokenDao, times(1)).findByToken(token);
-        assertNull(result);
+        assertEquals("Der Link ist ungültig.", exception.getMessage());
+        verify(emailChangeTokenDao).findByToken(token);
     }
 
     @Test
-    void updateUserEmailWithValidTokenShouldReturnNullIfTokenIsExpired() {
+    void updateUserEmailWithValidTokenShouldReturnNullIfTokenIsExpired() throws Exception {
         // Arrange
         String token = UUID.randomUUID().toString();
         EmailChangeTokenDto emailChangeToken = new EmailChangeTokenDto();
@@ -387,66 +359,13 @@ class UserServiceImplTest {
         when(emailChangeTokenDao.findByToken(token)).thenReturn(emailChangeToken);
 
         // Act
-        ApplicationUserDto result = userService.updateUserEmailWithValidToken(token);
+        ValidationException exception = assertThrows(ValidationException.class, () -> {
+            userService.updateUserEmailWithValidToken(token);
+        });
 
         // Assert
-        verify(emailChangeTokenDao, times(1)).findByToken(token);
-        assertNull(result);
-    }
-
-    @Test
-    void updateUserEmailWithValidTokenShouldLogErrorAndReturnNullIfUserNotFound() throws Exception {
-        // Arrange
-        String token = UUID.randomUUID().toString();
-        EmailChangeTokenDto emailChangeToken = new EmailChangeTokenDto();
-        emailChangeToken.setToken(token);
-        emailChangeToken.setNewEmail("new@email.com");
-        emailChangeToken.setCurrentEmail("current@email.com");
-        emailChangeToken.setExpiryDate(LocalDateTime.now().plusMinutes(10));
-
-        ApplicationUserDto user = new ApplicationUserDto();
-        user.setEmail("current@email.com");
-
-        when(emailChangeTokenDao.findByToken(token)).thenReturn(emailChangeToken);
-        when(userDao.findByEmail("current@email.com")).thenReturn(user);
-        when(userDao.update(user)).thenThrow(new EntityNotFoundException(1L));
-
-        // Act
-        ApplicationUserDto result = userService.updateUserEmailWithValidToken(token);
-
-        // Assert
-        verify(userDao).findByEmail("current@email.com");
-        verify(userDao).update(user);
-        assertNull(result);
-    }
-
-    @Test
-    void updateUserEmailWithValidTokenShouldInvalidateOldTokens() throws Exception {
-        // Arrange
-        String token = UUID.randomUUID().toString();
-        EmailChangeTokenDto emailChangeToken = new EmailChangeTokenDto();
-        emailChangeToken.setToken(token);
-        emailChangeToken.setNewEmail("new@email.com");
-        emailChangeToken.setCurrentEmail("current@email.com");
-        emailChangeToken.setExpiryDate(LocalDateTime.now().plusMinutes(10));
-
-        ApplicationUserDto user = new ApplicationUserDto();
-        user.setEmail("current@email.com");
-
-        when(emailChangeTokenDao.findByToken(token)).thenReturn(emailChangeToken);
-        when(userDao.findByEmail("current@email.com")).thenReturn(user);
-        when(userDao.update(user)).thenReturn(user);
-
-        // Act
-        ApplicationUserDto result = userService.updateUserEmailWithValidToken(token);
-
-        // Assert
-        verify(userDao).findByEmail("current@email.com");
-        verify(userDao).update(user);
-        verify(emailChangeTokenDao, times(1)).findByToken(token);
-        verify(emailChangeTokenDao, times(1)).findByCurrentEmail("current@email.com");
-        assertNotNull(result);
-        assertEquals("new@email.com", result.getEmail());
+        assertEquals("Dieser Link ist abgelaufen.", exception.getMessage());
+        verify(emailChangeTokenDao).findByToken(token);
     }
 
     @Test

@@ -29,15 +29,16 @@ export class AuthInterceptor implements HttpInterceptor {
     const showLocationUri = this.globals.backendUri + "/show/location/";
     const byArtistUri = this.globals.backendUri + "/events/by-artist/";
     const showEventUri = this.globals.backendUri + "/show/event/";
+    const updateEmailUri = this.globals.backendUri + "/users/update/user/email";
     const updatePassword =
       this.globals.backendUri + "/users/user/password/update";
     const sendResetPasswordEmail =
       this.globals.backendUri + "/users/user/password/reset";
     const activateAccountUri =
       this.globals.backendUri + "/users/user/activate/account";
-    const newsUri = this.globals.backendUri + '/news/all';
-    const newsDetailUri = this.globals.backendUri + '/news/detail/';
-    const top10Uri = this.globals.backendUri + '/events/top10';
+    const newsUri = this.globals.backendUri + "/news/all";
+    const newsDetailUri = this.globals.backendUri + "/news/detail/";
+    const top10Uri = this.globals.backendUri + "/events/top10";
     let allowedUriStarts = [
       locationUri,
       showLocationUri,
@@ -47,12 +48,13 @@ export class AuthInterceptor implements HttpInterceptor {
       eventsSearchUri,
       byArtistUri,
       showEventUri,
+      updateEmailUri,
       updatePassword,
       sendResetPasswordEmail,
       activateAccountUri,
       newsUri,
       newsDetailUri,
-      top10Uri
+      top10Uri,
     ];
 
     console.log("Intercepted request: " + req.url);

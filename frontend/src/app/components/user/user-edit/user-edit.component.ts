@@ -22,6 +22,7 @@ import {
   styleUrls: ["./user-edit.component.scss"],
 })
 export class UserEditComponent implements OnInit, OnChanges {
+  isLoading = false;
   @Input() user: ApplicationUserResponse = {
     id: 0,
     email: "",
@@ -129,42 +130,47 @@ export class UserEditComponent implements OnInit, OnChanges {
     }
   }
 
-  async saveUserDetails() {
+  saveUserDetails() {
     if (this.userForm.valid) {
-      try {
-        const newData: UserUpdateInfoRequest = {
-          id: this.user.id,
-          email: this.userForm.value.email,
-          phoneNumber: this.userForm.value.phoneNumber,
-          address: {
-            id: this.user.address.id,
-            street: this.userForm.value.street,
-            zip: this.userForm.value.zip,
-            city: this.userForm.value.city,
-            country: this.userForm.value.country,
-          },
-        };
-        const user = await firstValueFrom(
-          this.userEndpointService.updateUserInfo(newData)
-        );
-        this.user = user;
-        if (this.user.email !== this.userForm.value.email) {
-          this.messagingService.setMessage(
-            "Bestätige bitte deine neue E-Mail-Adresse.",
-            "success"
-          );
-        } else {
-          this.messagingService.setMessage(
-            "Benutzer erfolgreich aktualisiert.",
-            "success"
-          );
-        }
-        this.updateFormValues();
-        this.editMode = false;
-        this.userForm.disable(); // Disable the form after saving
-      } catch (error) {
-        this.messagingService.setMessage(error.error, "danger");
-      }
+      this.isLoading = true;
+      const newData: UserUpdateInfoRequest = {
+        id: this.user.id,
+        email: this.userForm.value.email,
+        phoneNumber: this.userForm.value.phoneNumber,
+        address: {
+          id: this.user.address.id,
+          street: this.userForm.value.street,
+          zip: this.userForm.value.zip,
+          city: this.userForm.value.city,
+          country: this.userForm.value.country,
+        },
+      };
+
+      this.userEndpointService.updateUserInfo(newData).subscribe({
+        next: (user) => {
+          this.user = user;
+          if (this.user.email !== this.userForm.value.email) {
+            this.authService.logoutUser();
+            this.messagingService.setMessage(
+              "Bestätige bitte deine neue E-Mail-Adresse.",
+              "success"
+            );
+          } else {
+            this.messagingService.setMessage(
+              "Benutzer erfolgreich aktualisiert.",
+              "success"
+            );
+          }
+          this.updateFormValues();
+          this.userForm.disable(); // Disable the form after saving
+          this.editMode = false;
+          this.isLoading = false;
+        },
+        error: (error) => {
+          this.messagingService.setMessage(error.error, "danger");
+          this.isLoading = false;
+        },
+      });
     }
   }
 
@@ -184,14 +190,19 @@ export class UserEditComponent implements OnInit, OnChanges {
   }
 
   changePassword() {
+    this.isLoading = true;
     this.userEndpointService
       .sendEmailForPasswordChange(this.user.email)
       .subscribe({
         next: (response) => {
           this.messagingService.setMessage(response.message, "success");
+          this.isLoading = false;
+          this.authService.logoutUser();
+          this.router.navigate(["/login"]);
         },
         error: (error) => {
           this.messagingService.setMessage(error.error.message, "danger");
+          this.isLoading = false;
         },
       });
   }

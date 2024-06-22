@@ -375,12 +375,12 @@ class UserEndpointTest {
         // Act
         MvcResult mvcResult = mockMvc.perform(get(TestData.USER_BASE_URI + "/update/user/email")
                 .param("token", invalidToken))
-            .andExpect(status().isBadRequest())
+            .andExpect(status().isUnprocessableEntity())
             .andReturn();
 
         // Assert
         MockHttpServletResponse response = mvcResult.getResponse();
-        assertEquals("Dieser Link ist nicht gültig.", response.getContentAsString());
+        assertEquals("Der Link ist ungültig.", response.getContentAsString());
     }
 
     @Test
@@ -599,17 +599,21 @@ class UserEndpointTest {
 
         // Act
         MvcResult mvcResult = mockMvc.perform(get("/api/v1/users/update/user/email")
-                .param("token", "validToken"))
+                .param("token", "validToken")
+                .characterEncoding(StandardCharsets.UTF_8.name())) // Ensure UTF-8 encoding
             .andExpect(status().isOk())
             .andReturn();
 
         // Assert
         MockHttpServletResponse response = mvcResult.getResponse();
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name()); // Ensure UTF-8 encoding
         String responseBody = response.getContentAsString();
+        Map<String, String> expectedResponse = new HashMap<>();
+        expectedResponse.put("message", "Deine E-Mail-Adresse wurde erfolgreich geändert. Bitte melde dich mit deinen neuen Zugangsdaten an.");
 
         Assertions.assertAll(
             () -> assertEquals(200, response.getStatus()),
-            () -> assertTrue(responseBody.contains("Deine E-Mail-Adresse wurde erfolgreich geändert. Bitte melde dich mit deinen neuen Zugangsdaten an."))
+            () -> assertEquals(objectMapper.writeValueAsString(expectedResponse), responseBody)
         );
 
         ApplicationUser updatedUser = userRepository.findByEmail("new@email.com");

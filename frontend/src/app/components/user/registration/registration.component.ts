@@ -16,6 +16,7 @@ import { EventService } from "../../../services/event.service";
   styleUrls: ["./registration.component.scss"],
 })
 export class RegistrationComponent implements AfterViewInit {
+  isLoading = false;
   @Input() noTopMargin: boolean = false;
   @Input() isAdminFlag: boolean = false;
   registrationForm: FormGroup;
@@ -56,6 +57,7 @@ export class RegistrationComponent implements AfterViewInit {
 
   onSubmit(): void {
     if (this.registrationForm.valid) {
+      this.isLoading = true;
       const newUser: UserCreateRequest = {
         email: this.registrationForm.value.email,
         password: this.registrationForm.value.password,
@@ -84,9 +86,11 @@ export class RegistrationComponent implements AfterViewInit {
           } else {
             this.registrationForm.reset();
           }
+          this.isLoading = false;
         },
         error: (error) => {
           this.messagingService.setMessage(error.error, "danger");
+          this.isLoading = false;
         },
       });
     }

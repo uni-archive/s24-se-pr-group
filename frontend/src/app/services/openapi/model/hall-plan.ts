@@ -9,15 +9,13 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { SortObject } from './sort-object';
+import { HallSector } from './hall-sector';
 
 
-export interface PageableObject { 
-    offset?: number;
-    sort?: Array<SortObject>;
-    paged?: boolean;
-    unpaged?: boolean;
-    pageNumber?: number;
-    pageSize?: number;
+export interface HallPlan { 
+    id?: number;
+    name?: string;
+    backgroundImage?: string;
+    sectors?: Array<HallSector>;
 }
 

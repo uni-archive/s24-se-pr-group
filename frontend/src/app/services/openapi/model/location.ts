@@ -9,15 +9,14 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { SortObject } from './sort-object';
+import { Address } from './address';
+import { Show } from './show';
 
 
-export interface PageableObject { 
-    offset?: number;
-    sort?: Array<SortObject>;
-    paged?: boolean;
-    unpaged?: boolean;
-    pageNumber?: number;
-    pageSize?: number;
+export interface Location { 
+    id?: number;
+    name?: string;
+    address?: Address;
+    shows?: Array<Show>;
 }
 

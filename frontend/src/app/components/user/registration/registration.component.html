@@ -227,6 +227,7 @@
         type="submit"
         class="btn btn-primary btn-block"
         [disabled]="!registrationForm.valid"
+        [disabled]="isLoading"
       >
         Registrieren
       </button>
