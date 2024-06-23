@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.HallSectorShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.SectorTicketAddToOrderDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketAddToOrderDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
@@ -40,7 +41,7 @@ public interface TicketService {
      *
      * @param ticket The ticket to load the additional information into.
      */
-    void loadSectorShowForTicket(TicketDetailsDto ticket);
+    HallSectorShowDto loadSectorShowForTicket(TicketDetailsDto ticket);
 
 
     /**

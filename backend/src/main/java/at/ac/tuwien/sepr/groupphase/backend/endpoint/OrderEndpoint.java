@@ -2,7 +2,9 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.config.SecurityPropertiesConfig.Auth;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.HallSpotDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.OrderDetailsResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.OrderSummaryResponse;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
@@ -10,6 +12,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.OrderResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.util.Authority.Code;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.OrderService;
+import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
@@ -20,6 +23,8 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,11 +38,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.invoke.MethodHandles;
-import java.util.List;
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -50,8 +56,7 @@ public class OrderEndpoint {
     private final UserService userService;
     private final Auth auth;
 
-    public OrderEndpoint(OrderService orderService, OrderResponseMapper orderMapper, UserService userService,
-                         Auth auth) {
+    public OrderEndpoint(OrderService orderService, OrderResponseMapper orderMapper, UserService userService, Auth auth) {
         this.orderService = orderService;
         this.orderMapper = orderMapper;
         this.userService = userService;
@@ -67,7 +72,8 @@ public class OrderEndpoint {
             var username = authentication.getPrincipal().toString();
             var user = userService.findApplicationUserByEmail(username);
 
-            order = orderMapper.toResponse(orderService.findById(id, user));
+            var orderDetails = orderService.findById(id, user);
+            order = orderMapper.toResponse(orderDetails);
         } catch (DtoNotFoundException e) {
             throw new NotFoundException(e);
         } catch (ValidationException e) {
@@ -78,12 +84,15 @@ public class OrderEndpoint {
 
     @Secured(Code.USER)
     @GetMapping(path = "/myorders", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<OrderSummaryResponse>> findForUser() throws DtoNotFoundException {
+    public ResponseEntity<Page<OrderSummaryResponse>> findForUser(
+        @RequestParam(name = "page", defaultValue = "0") Integer page,
+        @RequestParam(name = "size", defaultValue = "15") Integer size
+    ) throws DtoNotFoundException {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         var username = authentication.getPrincipal().toString();
         var user = userService.findApplicationUserByEmail(username);
-        var res = orderService.findForUser(user.getId());
-        return ResponseEntity.ok(orderMapper.toSummaryResponse(res));
+        var res = orderService.findForUserPaged(user.getId(), PageRequest.of(page, size));
+        return ResponseEntity.ok(res.map(orderMapper::toSummaryResponse));
     }
 
     @Secured(Code.USER)

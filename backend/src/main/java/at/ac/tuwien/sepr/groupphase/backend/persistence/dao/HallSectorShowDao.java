@@ -25,7 +25,7 @@ public class HallSectorShowDao extends AbstractDao<HallSectorShow, HallSectorSho
     @Transactional
     public HallSectorShowDto findByShowIdAndSectorId(long showId, long hallSectorId) throws EntityNotFoundException {
         var opt = ((HallSectorShowRepository) repository).findByShowIdAndSectorId(showId, hallSectorId);
-        var found = opt.orElseThrow(() -> new EntityNotFoundException(showId)); // TODO: need more params
-        return mapper.toDto(found);
+        // var found = opt.orElseThrow(() -> new EntityNotFoundException(showId)); // TODO: need more params
+        return mapper.toDto(opt.getFirst());
     }
 }

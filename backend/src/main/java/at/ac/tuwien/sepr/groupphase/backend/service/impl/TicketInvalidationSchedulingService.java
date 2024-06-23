@@ -4,8 +4,8 @@ import static at.ac.tuwien.sepr.groupphase.backend.service.job.InvalidateReserva
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.OrderDao;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.OrderService;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.job.InvalidateReservationJob;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -30,11 +30,11 @@ public class TicketInvalidationSchedulingService {
     protected static final int DEFAULT_RESERVATION_PERIOD = 30;
 
     private final SchedulerFactoryBean schedulerFactoryBean;
-    private final OrderDao orderDao;
+    private final OrderService orderService;
 
-    public TicketInvalidationSchedulingService(SchedulerFactoryBean schedulerFactoryBean, OrderDao orderDao) {
+    public TicketInvalidationSchedulingService(SchedulerFactoryBean schedulerFactoryBean, OrderService orderService) {
         this.schedulerFactoryBean = schedulerFactoryBean;
-        this.orderDao = orderDao;
+        this.orderService = orderService;
     }
 
     private void scheduleReservationInvalidationJob(String reservationId, Date executionTime) throws SchedulerException {
@@ -76,8 +76,8 @@ public class TicketInvalidationSchedulingService {
             Date.from(Instant.now().plus(DEFAULT_RESERVATION_PERIOD, ChronoUnit.MINUTES)));
         OrderDetailsDto byId = null;
         try {
-            byId = orderDao.findById(ticketDetailsDto.getOrder().getId());
-        } catch (EntityNotFoundException e) {
+            byId = orderService.findByIdForJobRefresh(ticketDetailsDto.getOrder().getId());
+        } catch (DtoNotFoundException e) {
             throw new IllegalStateException("Could not find order for ticket", e);
         }
         for (TicketDetailsDto ticket : byId.getTickets()) {

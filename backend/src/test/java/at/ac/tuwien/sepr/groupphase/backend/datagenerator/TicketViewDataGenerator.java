@@ -100,6 +100,8 @@ public class TicketViewDataGenerator {
     @Autowired
     private ArtistRepository artistRepository;
     @Autowired
+    private UserDataGenerator userDataGenerator;
+    @Autowired
     private LocalContainerEntityManagerFactoryBean entityManagerFactory;
 
     @PostConstruct

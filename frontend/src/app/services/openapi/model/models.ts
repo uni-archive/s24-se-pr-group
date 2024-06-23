@@ -34,6 +34,7 @@ export * from './page-application-user-response';
 export * from './page-artist-search-response';
 export * from './page-event-response';
 export * from './page-location-summary-response';
+export * from './page-order-summary-response';
 export * from './page-show-list-response';
 export * from './page-show-response';
 export * from './page-simple-news-response-dto';

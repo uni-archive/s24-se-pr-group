@@ -64,7 +64,7 @@ export class RegistrationComponent implements AfterViewInit {
         firstName: this.registrationForm.value.firstName,
         familyName: this.registrationForm.value.familyName,
         phoneNumber: this.registrationForm.value.phoneNumber,
-        isAdmin: this.isAdminFlag,
+        isAdmin: this.registrationForm.value.isAdmin,
         addressCreateRequest: {
           street: this.registrationForm.value.street,
           city: this.registrationForm.value.city,

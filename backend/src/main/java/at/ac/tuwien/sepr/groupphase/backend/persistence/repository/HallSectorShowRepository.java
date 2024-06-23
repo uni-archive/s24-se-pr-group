@@ -2,6 +2,8 @@ package at.ac.tuwien.sepr.groupphase.backend.persistence.repository;
 
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSectorShow;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -25,5 +27,6 @@ public interface HallSectorShowRepository extends JpaRepository<HallSectorShow, 
      * @return {@link HallSectorShow}
      *
      */
-    Optional<HallSectorShow> findByShowIdAndSectorId(long showId, long hallSectorId);
+    @Query("SELECT hss FROM HallSectorShow hss INNER JOIN hss.show s INNER JOIN hss.sector sec WHERE s.id = :showId AND sec.id = :hallSectorId")
+    List<HallSectorShow> findByShowIdAndSectorId(@Param("showId") long showId, @Param("hallSectorId") long hallSectorId);
 }

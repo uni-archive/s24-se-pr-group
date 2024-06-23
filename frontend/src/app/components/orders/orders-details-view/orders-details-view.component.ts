@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {OrderDetailsResponse, OrderEndpointService, TicketDetailsResponse} from "../../../services/openapi";
 import {ActivatedRoute, Router} from "@angular/router";
 import {MessagingService} from "../../../services/messaging.service";
@@ -25,6 +25,10 @@ import {HttpStatusCode} from "@angular/common/http";
   styleUrl: './orders-details-view.component.scss'
 })
 export class OrdersDetailsViewComponent implements OnInit {
+
+  @ViewChild("ticketsTableComponent") ticketsTableComponent: TicketsTableComponent;
+
+
   order: OrderDetailsResponse;
   loading: boolean = true;
   loadTickets: Subject<TicketDetailsResponse[]> = new Subject<TicketDetailsResponse[]>();
@@ -41,7 +45,7 @@ export class OrdersDetailsViewComponent implements OnInit {
     this.loadOrder()
   }
 
-  private loadOrder(): void {
+  loadOrder(): void {
     const orderId = parseInt(this.route.snapshot.paramMap.get("id"));
     if (isNaN(orderId)) {
       this.messagingService.setMessage("Es wurde eine ungültige Bestellungs-Nr. angegeben.", 'danger');
@@ -50,7 +54,11 @@ export class OrdersDetailsViewComponent implements OnInit {
     this.orderService.findById1(orderId).subscribe({
       next: order => {
         this.order = order;
-        this.loadTickets.next(order.tickets);
+        console.log("start refreshing...");
+        if(this.ticketsTableComponent) {
+          this.ticketsTableComponent.refreshTicketsSorting(this.order.tickets);
+        }
+        console.log("end refreshing...");
       },
       error: err => {
         this.messagingService.setMessage("Die Bestellung konnte nicht geladen werden.", 'danger');
@@ -64,7 +72,7 @@ export class OrdersDetailsViewComponent implements OnInit {
       .subscribe({
         next: () => {
           this.messagingService.setMessage("Ihre Bestellung wurde erfolgreich storniert.");
-          this.loadOrder();
+          window.location.reload();
         },
         error: err => {
           if(err.status === HttpStatusCode.UnprocessableEntity) {
@@ -73,7 +81,7 @@ export class OrdersDetailsViewComponent implements OnInit {
             this.messagingService.setMessage("Konnte die Bestellung nicht stornieren. Bitte versuchen Sie es später erneut.", 'danger');
           }
         }
-      })
+      });
   }
 
   printPurchaseReceipt(): void {

@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {DatePipe, NgForOf, NgIf} from "@angular/common";
 import {AuthService} from "../../../services/auth.service";
 import {OrderEndpointService, TicketDetailsResponse, TicketEndpointService} from "../../../services/openapi";
@@ -36,7 +36,9 @@ type TicketLoader = Observable<TicketDetailsResponse[]>;
   styleUrl: './tickets-table.component.scss'
 })
 export class TicketsTableComponent implements OnInit {
-  @Input({ required: true }) ticketLoader: TicketLoader;
+  @Input({ required: true }) tickets: TicketDetailsResponse[] = [];
+  @Output("ticketsChanged") ticketsChanged = new EventEmitter();
+  isCancelled = false;
 
   constructor(
     private ticketService: TicketEndpointService,
@@ -45,7 +47,7 @@ export class TicketsTableComponent implements OnInit {
   ) {
   }
 
-  protected tickets: TicketDetailsResponse[] = [];
+  // protected tickets: TicketDetailsResponse[] = [];
   protected ticketsFiltered: TicketDetailsResponse[] = [];
   protected ticketsPaged: TicketDetailsResponse[] = [];
 
@@ -60,24 +62,41 @@ export class TicketsTableComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.loadTickets();
+    this.refreshTicketsSorting(this.tickets);
+    this.isCancelled = this.tickets[0].order.invoices.filter(i => i.invoiceType === 'CANCELLATION').length > 0;
   }
-  private loadTickets(): void {
+
+  /*loadTickets(): void {
     this.ticketLoader
       .subscribe({
         next: ts => {
-          this.tickets = this.sortTicketsByDateDesc(ts);
-          this.ticketsFiltered = this.tickets;
-          this.updateFilter();
+          this.setTickets(ts);
         },
         error: err => {
           this.messagingService.setMessage("Ihre Tickets konnten nicht geladen werden. Bitte versuchen Sie es später erneut.", 'danger');
         }
       });
+  }*/
+
+  public refreshTicketsSorting(ts: TicketDetailsResponse[]): void {
+    console.log("setting...");
+    // this.tickets = this.sortTicketsByDateDesc(ts);
+    this.ticketsFiltered = this.sortTicketsByDateDesc(ts);
+    this.updateFilter();
   }
 
   protected printTicketPDF(ticket: TicketDetailsResponse): void {
     this.pdfService.createTicketPDF(ticket);
+  }
+
+  ticketStateText(ticket: TicketDetailsResponse): string {
+    if(this.isCancelled) {
+      return "Storniert";
+    } else if (ticket.reserved) {
+      return "Reserviert";
+    } else {
+      return "Gekauft";
+    }
   }
 
   private sortTicketsByDateDesc(tickets: TicketDetailsResponse[]): TicketDetailsResponse[] {
@@ -147,7 +166,10 @@ export class TicketsTableComponent implements OnInit {
     this.ticketService.cancelReservedTicket(ticketId)
       .subscribe({
         next: () => {
-          this.loadTickets();
+          // this.loadTickets();
+          this.ticketsChanged.emit();
+          this.tickets = this.tickets.filter(t => t.id !== ticketId);
+          this.refreshTicketsSorting(this.tickets);
           this.messagingService.setMessage("Ihre Ticket-Reservierung wurde erfolgreich storniert.");
         },
         error: err => {

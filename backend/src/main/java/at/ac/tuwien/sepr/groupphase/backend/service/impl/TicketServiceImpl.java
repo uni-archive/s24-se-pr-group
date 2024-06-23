@@ -1,9 +1,9 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.HallSectorShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.HallSpotDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
-import at.ac.tuwien.sepr.groupphase.backend.dto.OrderSummaryDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.SectorTicketAddToOrderDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketAddToOrderDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
@@ -16,6 +16,7 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.TicketDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.security.HashUtil;
 import at.ac.tuwien.sepr.groupphase.backend.service.HallSectorShowService;
+import at.ac.tuwien.sepr.groupphase.backend.service.OrderService;
 import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ForbiddenException;
@@ -24,6 +25,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.validator.TicketValidator;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,18 +49,21 @@ public class TicketServiceImpl implements TicketService {
 
     private final HallSectorShowService hallSectorShowService;
     private final OrderDao orderDao;
+
+    private final OrderService orderService;
     private final TicketInvalidationSchedulingService ticketInvalidationSchedulingService;
     private final HallSectorDao hallSectorDao;
 
     public TicketServiceImpl(TicketDao ticketDao, HallSpotDao hallSpotDao, ShowDao showDao,
                              TicketValidator ticketValidator, HallSectorShowService hallSectorShowService, OrderDao orderDao,
-                             TicketInvalidationSchedulingService ticketInvalidationSchedulingService, HallSectorDao hallSectorDao) {
+                             @Lazy OrderService orderService, TicketInvalidationSchedulingService ticketInvalidationSchedulingService, HallSectorDao hallSectorDao) {
         this.ticketDao = ticketDao;
         this.hallSpotDao = hallSpotDao;
         this.showDao = showDao;
         this.ticketValidator = ticketValidator;
         this.hallSectorShowService = hallSectorShowService;
         this.orderDao = orderDao;
+        this.orderService = orderService;
         this.ticketInvalidationSchedulingService = ticketInvalidationSchedulingService;
         this.hallSectorDao = hallSectorDao;
     }
@@ -67,7 +72,8 @@ public class TicketServiceImpl implements TicketService {
     public TicketDetailsDto findById(long id) throws DtoNotFoundException {
         try {
             var ticket = ticketDao.findById(id);
-            loadSectorShowForTicket(ticket);
+            var sectorShow = loadSectorShowForTicket(ticket);
+            ticket.getHallSpot().getSector().setHallSectorShow(sectorShow);
             return ticket;
         } catch (EntityNotFoundException e) {
             throw new DtoNotFoundException(e);
@@ -77,18 +83,20 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public List<TicketDetailsDto> findForUserById(long userId) {
         var tickets = ticketDao.findByUserId(userId);
-        tickets.forEach(this::loadSectorShowForTicket);
+        for (var ticket : tickets) {
+            ticket.getHallSpot().getSector().setHallSectorShow(loadSectorShowForTicket(ticket));
+        }
         return tickets;
     }
 
-    public void loadSectorShowForTicket(TicketDetailsDto ticket) {
+    @Override
+    public HallSectorShowDto loadSectorShowForTicket(TicketDetailsDto ticket) {
         try {
             // handle cyclic dependencies between sectors and shows that apply to each ticket
-            var sectorShow = hallSectorShowService.findByShowIdAndHallSectorId(
+            return hallSectorShowService.findByShowIdAndHallSectorId(
                 ticket.getShow().getId(),
                 ticket.getHallSpot().getSector().getId()
             );
-            ticket.getHallSpot().getSector().setHallSectorShow(sectorShow);
         } catch (EntityNotFoundException ex) {
             // invalid state
             throw new IllegalStateException("A ticket must be assigned to a hall-sector-show.");
@@ -148,16 +156,18 @@ public class TicketServiceImpl implements TicketService {
         }
         List<HallSpotDto> availableSpots;
         try {
-             availableSpots = ticketDao.findFreeSpotForSector(ticket.showId(), ticket.sectorId());
-             if (availableSpots.isEmpty()) {
-                 throw new ValidationException("No free spots available for sector");
-             }
+            availableSpots = ticketDao.findFreeSpotForSector(ticket.showId(), ticket.sectorId());
+            if (availableSpots.isEmpty()) {
+                throw new ValidationException("No free spots available for sector");
+            }
         } catch (EntityNotFoundException e) {
             throw new ValidationException("No free spots available for sector");
         }
 
         var random = new Random();
-        TicketAddToOrderDto ticketAddToOrderDto = new TicketAddToOrderDto(availableSpots.get(random.nextInt(availableSpots.size())).getId(), ticket.orderId(), ticket.showId(), ticket.reservationOnly());
+        TicketAddToOrderDto ticketAddToOrderDto =
+            new TicketAddToOrderDto(availableSpots.get(random.nextInt(availableSpots.size())).getId(), ticket.orderId(), ticket.showId(),
+                ticket.reservationOnly());
 
         TicketDetailsDto ticketDetailsDto = createTicket(ticketAddToOrderDto);
         try {
@@ -228,7 +238,7 @@ public class TicketServiceImpl implements TicketService {
         }
 
         try {
-            var order = orderDao.findById(ticket.getOrder().getId());
+            var order = orderService.findByIdForJobRefresh(ticket.getOrder().getId());
             if (!order.getCustomer().getId().equals(user.getId())) {
                 throw new ForbiddenException();
             }
@@ -236,7 +246,7 @@ public class TicketServiceImpl implements TicketService {
             ticketValidator.validateForChangeTicketReserved(ticketId, order);
 
             ticketDao.changeTicketReserved(ticketId, setReserved);
-        } catch (EntityNotFoundException e) {
+        } catch (DtoNotFoundException e) {
             throw new IllegalStateException("Ticket has invalid order id");
         }
     }
@@ -261,7 +271,9 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public List<TicketDetailsDto> findForShowById(long showId) {
         var tickets = ticketDao.findForShowById(showId);
-        tickets.forEach(this::loadSectorShowForTicket);
+        for (var ticket : tickets) {
+            ticket.getHallSpot().getSector().setHallSectorShow(loadSectorShowForTicket(ticket));
+        }
         return tickets;
     }
 

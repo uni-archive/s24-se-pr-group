@@ -64,3 +64,11 @@ strong {
   text-align: center;
   white-space: nowrap;
 }
+
+z-index-high{
+  z-index: 1000;
+}
+
+z-index-low{
+  z-index: -1;
+}

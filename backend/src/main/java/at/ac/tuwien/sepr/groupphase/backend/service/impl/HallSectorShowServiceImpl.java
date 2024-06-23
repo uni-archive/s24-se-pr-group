@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.HallSectorShowDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.HallSectorShowDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.HallSectorShowService;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class HallSectorShowServiceImpl implements HallSectorShowService {
 
     @Override
     public HallSectorShowDto findByShowIdAndHallSectorId(long showId, long hallSectorId) throws EntityNotFoundException {
-        LOGGER.debug("Get info for sector-show pairing. Show-ID: {}, Hall-Sector-ID: {}", showId, hallSectorId);
+        LOGGER.trace("Get info for sector-show pairing. Show-ID: {}, Hall-Sector-ID: {}", showId, hallSectorId);
         return hallSectorShowDao.findByShowIdAndSectorId(showId, hallSectorId);
     }
 }

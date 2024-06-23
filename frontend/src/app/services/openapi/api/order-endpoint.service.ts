@@ -21,7 +21,7 @@ import { Observable }                                        from 'rxjs';
 // @ts-ignore
 import { OrderDetailsResponse } from '../model/order-details-response';
 // @ts-ignore
-import { OrderSummaryResponse } from '../model/order-summary-response';
+import { PageOrderSummaryResponse } from '../model/page-order-summary-response';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -282,13 +282,25 @@ export class OrderEndpointService implements OrderEndpointServiceInterface {
     }
 
     /**
+     * @param page 
+     * @param size 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public findForUser1(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<OrderSummaryResponse>>;
-    public findForUser1(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<OrderSummaryResponse>>>;
-    public findForUser1(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<OrderSummaryResponse>>>;
-    public findForUser1(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public findForUser1(page?: number, size?: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageOrderSummaryResponse>;
+    public findForUser1(page?: number, size?: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageOrderSummaryResponse>>;
+    public findForUser1(page?: number, size?: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageOrderSummaryResponse>>;
+    public findForUser1(page?: number, size?: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+
+        let localVarQueryParameters = new HttpParams({encoder: this.encoder});
+        if (page !== undefined && page !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>page, 'page');
+        }
+        if (size !== undefined && size !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>size, 'size');
+        }
 
         let localVarHeaders = this.defaultHeaders;
 
@@ -327,9 +339,10 @@ export class OrderEndpointService implements OrderEndpointServiceInterface {
         }
 
         let localVarPath = `/api/v1/orders/myorders`;
-        return this.httpClient.request<Array<OrderSummaryResponse>>('get', `${this.configuration.basePath}${localVarPath}`,
+        return this.httpClient.request<PageOrderSummaryResponse>('get', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
+                params: localVarQueryParameters,
                 responseType: <any>responseType_,
                 withCredentials: this.configuration.withCredentials,
                 headers: localVarHeaders,

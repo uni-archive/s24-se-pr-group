@@ -6,16 +6,16 @@
       <th scope="col">Bestell-Datum</th>
       <th scope="col">Anzahl Tickets</th>
       <th scope="col">Preis</th>
-      <th scope="col">Storniert?</th>
+      <th scope="col">Storniert</th>
       <th scope="col">Aktionen</th>
     </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let order of ordersPaged">
+    <tr *ngFor="let order of orderPage?.content">
       <th scope="row" [attr.data-testid]="'order-id-' + order.id">{{order.id}}</th>
       <td>{{formatDate(order.dateTime)}}</td>
       <td>{{order.ticketCount}}</td>
-      <td>{{formatPrice(order.totalPrice)}}</td>
+      <td>{{formatPriceView(order)}}</td>
       <td>
         {{isCancelled(order) ? "Ja" : "Nein"}}
         <div class="btn-group" *ngIf="isCancelled(order)">
@@ -45,13 +45,15 @@
   </table>
 </div>
 
-<div class="d-flex flex-row justify-content-end">
+<div class="d-flex flex-row justify-content-end"
+     *ngIf="orderPage"
+>
     <ngb-pagination
-      [collectionSize]="this.ordersFiltered.length"
-      [(page)]="page"
+      [collectionSize]="orderPage.totalElements"
+      [page]="orderPage.number + 1"
       [boundaryLinks]="true"
-      [pageSize]="10"
-      (pageChange)="updatePaging()"
+      [pageSize]="orderPage.size"
+      (pageChange)="updatePaging($event)"
     >
       <ng-template ngbPaginationPages let-page let-pages="pages">
         <li class="ngb-custom-pages-item">
