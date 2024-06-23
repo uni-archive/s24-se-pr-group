@@ -178,7 +178,7 @@ public class HallPlanGeneratorUtil {
         return "{\"x\":" + point.getX() + ",\"y\":" + point.getY() + "}";
     }
 
-    private String loadImage(String path) {
+    public String loadImage(String path) {
         String content = "error while loading hallplan image";
         try {
             content = new String(Files.readAllBytes(Paths.get(path)));
