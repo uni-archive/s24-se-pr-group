@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -46,7 +47,7 @@ public class LocationDataGenerator {
     private void generateData() throws ForbiddenException, ValidationException {
         Faker faker = new Faker();
         Random random = new Random();
-        List<HallPlan> all = hallPlanRepository.findAll();
+        List<HallPlan> all = hallPlanRepository.findHallPlansByNameContainingIgnoreCase("open air", Pageable.unpaged());
         for (int i = 1; i <= dataGenerationConfig.locationAmount; i++) {
             log.info("Generating location " + i + "/" + dataGenerationConfig.locationAmount);
             Address address = new Address();

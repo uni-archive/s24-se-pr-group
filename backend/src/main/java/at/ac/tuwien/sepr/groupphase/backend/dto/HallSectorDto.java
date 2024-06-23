@@ -100,7 +100,9 @@ public class HallSectorDto implements AbstractDto {
     }
 
     public HallSectorDto withoutSeats() {
-        return new HallSectorDto(id, hallPlan, name, frontendCoordinates, null, hallSectorShow);
+        var hallSector = new HallSectorDto(id, hallPlan, name, frontendCoordinates, null, hallSectorShow);
+        hallSector.setColor(color);
+        return hallSector;
     }
 
     public class HallSectorDtoBuilder {
