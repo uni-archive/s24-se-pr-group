@@ -6,7 +6,9 @@ import java.util.List;
 public record OrderSummaryResponse(
     Long id,
     int ticketCount,
-    long totalPrice,
+    long totalPriceNonReserved,
+    long totalPriceReserved,
+    long totalPriceOpenReserved,
     List<InvoiceResponse> invoices,
 
     LocalDateTime dateTime

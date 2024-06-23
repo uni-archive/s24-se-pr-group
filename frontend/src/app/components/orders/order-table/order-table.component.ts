@@ -7,7 +7,7 @@ import {FormsModule} from "@angular/forms";
 import {NgbPagination, NgbPaginationPages} from "@ng-bootstrap/ng-bootstrap";
 import {
   OrderEndpointService,
-  OrderSummaryResponse
+  OrderSummaryResponse, PageOrderSummaryResponse
 } from "../../../services/openapi";
 import {PdfService} from "../../../services/pdf.service";
 import {MessagingService} from "../../../services/messaging.service";
@@ -42,11 +42,9 @@ export class OrderTableComponent implements OnInit {
   ) {
   }
 
-  protected orders: OrderSummaryResponse[] = [];
-  protected ordersFiltered: OrderSummaryResponse[] = [];
-  protected ordersPaged: OrderSummaryResponse[] = [];
+  orderPage: PageOrderSummaryResponse | null;
 
-  protected page: number = 0;
+  protected page: number = 1;
   private readonly defaultPageSize = 10;
 
 
@@ -54,15 +52,14 @@ export class OrderTableComponent implements OnInit {
     this.loadOrders();
   }
   private loadOrders(): void {
-    this.orderService.findForUser1()
+    this.orderService.findForUser1(this.page - 1, this.defaultPageSize)
       .subscribe({
         next: os => {
-          this.orders = this.sortOrdersByDateDesc(os);
-          this.ordersFiltered = this.orders;
-          this.updateFilter();
+          // this.orders = this.sortOrdersByDateDesc(os);
+          this.orderPage = os;
         },
         error: err => {
-          console.log(err)
+          console.log(err);
           this.messagingService.setMessage("Ihre Tickets konnten nicht geladen werden. Bitte versuchen Sie es später erneut. ", 'danger');
         }
       });
@@ -70,10 +67,6 @@ export class OrderTableComponent implements OnInit {
 
   isCancelled(order: OrderSummaryResponse): boolean {
     return order.invoices.length > 1;
-  }
-
-  protected printTicketPDF(ticket: OrderSummaryResponse): void {
-    this.pdfService.createTicketPDF(ticket);
   }
 
   private sortOrdersByDateDesc(orders: OrderSummaryResponse[]): OrderSummaryResponse[] {
@@ -84,21 +77,26 @@ export class OrderTableComponent implements OnInit {
     });
   }
 
-  protected updateFilter(): void {
-    this.ordersFiltered = this.orders;
-    this.updatePaging();
-  }
 
-  protected updatePaging(): void {
-    const origin = this.page - 1
-    const size = this.defaultPageSize;
-    this.ordersPaged = this.ordersFiltered
-      .slice(origin * size, (origin + 1) * size);
+  protected updatePaging(page: number): void {
+    this.page = page;
+    this.loadOrders();
   }
 
   selectPage(page: string) {
-    this.page = parseInt(page, 10) || 1;
-    this.updatePaging();
+    this.updatePaging(parseInt(page, 10) || 1);
+  }
+
+  formatPriceView(order: OrderSummaryResponse): string {
+    const totalVal = order.totalPriceReserved + order.totalPriceNonReserved;
+    const total = formatPrice(order.totalPriceReserved + order.totalPriceNonReserved);
+    if(order.totalPriceOpenReserved === 0) {
+      return total;
+    } else if (totalVal === order.totalPriceOpenReserved) {
+      return `${total} (alle offen)`;
+    } else {
+      return `${total} (davon ${formatPrice(order.totalPriceOpenReserved)} offen)`;
+    }
   }
 
   formatInput(input: HTMLInputElement) {

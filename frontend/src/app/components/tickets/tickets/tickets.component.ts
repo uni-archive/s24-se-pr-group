@@ -18,15 +18,23 @@ import {TicketDetailsResponse, TicketEndpointService} from "../../../services/op
 })
 export class TicketsComponent implements OnInit {
 
+  tickets: TicketDetailsResponse[] = [];
+
   constructor(
     private ticketService: TicketEndpointService
   ) {
   }
 
   ngOnInit(): void {
+    this.loadTickets();
   }
 
-  loadTickets(): Observable<TicketDetailsResponse[]> {
-    return this.ticketService.findForUser();
+  loadTickets(): void {
+    this.ticketService.findForUser()
+      .subscribe({
+        next: ts => {
+          this.tickets = ts;
+        }
+      })
   }
 }

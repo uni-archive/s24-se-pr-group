@@ -143,7 +143,7 @@ export class UserCheckoutComponent implements OnInit {
 
 
   purchaseOrder(): void {
-    if (this.creditCardForm.valid) {
+    if (this.total(this.order.tickets) === 0 || this.creditCardForm.valid) {
       this.orderService.purchaseOrder(this.order.id).subscribe({
         next: () => {
           this.messagingService.setMessage("Die Bestellung war erfolgreich!");
@@ -154,6 +154,14 @@ export class UserCheckoutComponent implements OnInit {
           console.log(err);
         }
       });
+    }
+  }
+
+  purchaseOrderText(): string {
+    if(this.total(this.order.tickets) === 0) {
+      return "Reservieren!";
+    } else {
+      return "Bestellen!";
     }
   }
 

@@ -6,6 +6,9 @@ import at.ac.tuwien.sepr.groupphase.backend.dto.OrderSummaryDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 
 /**
@@ -18,10 +21,21 @@ public interface OrderService {
      *
      * @param id The order-id
      * @return {@link OrderDetailsDto}
-     * @throws EntityNotFoundException if no order with this id exists.
-     * @throws ValidationException     if the customer of the found order does not match with the provided user.
+     * @throws DtoNotFoundException if no order with this id exists.
+     * @throws ValidationException  if the customer of the found order does not match with the provided user.
      */
     OrderDetailsDto findById(long id, ApplicationUserDto user) throws DtoNotFoundException, ValidationException;
+
+    /**
+     * Same as findById but doesn't check for user-access AND DOES NOT LOAD HALLSECTORSHOW
+     * SHOULD ONLY BE USED FOR THE JOB-REFRESH WHEN ADDING A TICKET
+     * USE {@link #findById(long, ApplicationUserDto)} INSTEAD FOR OTHER USE-CASES
+     *
+     * @param id The order-id
+     * @return {@link OrderDetailsDto}
+     * @throws DtoNotFoundException if no order with this id exists.
+     */
+    OrderDetailsDto findByIdForJobRefresh(long id) throws DtoNotFoundException;
 
 
     /**
@@ -32,6 +46,8 @@ public interface OrderService {
      */
     List<OrderSummaryDto> findForUser(long userId);
 
+
+    Page<OrderSummaryDto> findForUserPaged(long userId, Pageable pageable);
 
     /**
      * Cancels an order. This creates a cancellation-invoice and invalidates all tickets that are associated with this
@@ -57,8 +73,8 @@ public interface OrderService {
      *
      * @param id   the id of the order.
      * @param user the user who wants to purchase their order.
-     * @throws DtoNotFoundException    if no order with the given ID was found.
-     * @throws ValidationException     if the user is not permitted to purchase the given order.
+     * @throws DtoNotFoundException if no order with the given ID was found.
+     * @throws ValidationException  if the user is not permitted to purchase the given order.
      */
     void purchaseOrder(long id, ApplicationUserDto user) throws DtoNotFoundException, ValidationException;
 }

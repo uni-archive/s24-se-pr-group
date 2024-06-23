@@ -1,9 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.dto;
 
-import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallPlan;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.HallSeat;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.util.List;
@@ -86,9 +83,8 @@ public class HallSectorDto implements AbstractDto {
         return this;
     }
 
-    public HallSectorDto setHallSectorShow(HallSectorShowDto hallSectorShow) {
+    public void setHallSectorShow(HallSectorShowDto hallSectorShow) {
         this.hallSectorShow = hallSectorShow;
-        return this;
     }
 
     public HallSectorDto(Long id, HallPlanDto hallPlan, String name, String frontendCoordinates, List<HallSpotDto> seats, HallSectorShowDto hallSectorShow) {

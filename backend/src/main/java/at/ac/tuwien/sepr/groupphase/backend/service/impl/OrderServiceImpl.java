@@ -3,6 +3,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.dto.OrderSummaryDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.TicketDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.OrderDao;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.InvoiceService;
@@ -14,6 +15,9 @@ import at.ac.tuwien.sepr.groupphase.backend.service.validator.OrderValidator;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +37,9 @@ public class OrderServiceImpl implements OrderService {
 
     private final InvoiceService invoiceService;
 
-    public OrderServiceImpl(OrderDao orderDao, OrderValidator orderValidator, TicketService ticketService,
+    public OrderServiceImpl(OrderDao orderDao,
+                            OrderValidator orderValidator,
+                            @Lazy TicketService ticketService,
                             InvoiceService invoiceService) {
         this.orderDao = orderDao;
         this.orderValidator = orderValidator;
@@ -57,7 +63,26 @@ public class OrderServiceImpl implements OrderService {
         addInvoicesToOrder(found);
 
         // add sectorShowInfo to each ticket
-        found.getTickets().forEach(ticketService::loadSectorShowForTicket);
+        for (TicketDetailsDto t : found.getTickets()) {
+            t.setOrder(found);
+            var secShow = ticketService.loadSectorShowForTicket(t);
+            t.getHallSpot().getSector().setHallSectorShow(secShow);
+        }
+        return found;
+    }
+
+    @Override
+    @Transactional
+    public OrderDetailsDto findByIdForJobRefresh(long id) throws DtoNotFoundException {
+        LOGGER.trace("Get order details unchecked. Order-ID: {}", id);
+        OrderDetailsDto found = null;
+        try {
+            found = orderDao.findById(id);
+        } catch (EntityNotFoundException e) {
+            throw new DtoNotFoundException(e);
+        }
+
+        addInvoicesToOrder(found);
         return found;
     }
 
@@ -66,6 +91,15 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderSummaryDto> findForUser(long userId) {
         LOGGER.trace("Get all orders for user. User-ID: {}", userId);
         var orders = orderDao.findForUser(userId);
+        orders.forEach(this::addInvoicesToOrder);
+        return orders;
+    }
+
+    @Override
+    @Transactional
+    public Page<OrderSummaryDto> findForUserPaged(long userId, Pageable pageable) {
+        LOGGER.trace("Get all orders for user. User-ID: {}", userId);
+        var orders = orderDao.findForUserPaged(userId, pageable);
         orders.forEach(this::addInvoicesToOrder);
         return orders;
     }
