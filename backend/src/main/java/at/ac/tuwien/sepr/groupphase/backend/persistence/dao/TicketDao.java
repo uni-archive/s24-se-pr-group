@@ -48,7 +48,7 @@ public class TicketDao extends AbstractDao<Ticket, TicketDetailsDto> {
     @Transactional
     public List<TicketDetailsDto> findForShowById(long userId) {
         var tickets = ((TicketRepository) repository).findTicketsByShowId(userId);
-        return mapper.toDto(tickets);
+        return ((TicketMapper) mapper).toDto(tickets);
     }
 
     @Transactional

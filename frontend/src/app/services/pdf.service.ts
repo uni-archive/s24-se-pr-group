@@ -148,9 +148,6 @@ export class PdfService {
         {
           text: event.title,
         },
-        {
-          text: event.description,
-        },
       ]
     };
   }
@@ -211,7 +208,7 @@ export class PdfService {
         {
           qr: `${ticket.id}:${ticket.hash}`,
         },
-        { text: `${ticket.hash}`, fontSize: this.smallFontSize }
+        { text: `${ticket.hash}`, fontSize: this.smallFontSize * 0.5 }
       ],
       alignment: "center",
       marginTop: 50,
