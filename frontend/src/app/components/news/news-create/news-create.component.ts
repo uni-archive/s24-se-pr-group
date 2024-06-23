@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {EventDto, NewsEndpointService, NewsRequestDto} from '../../../services/openapi';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {MessagingService} from "src/app/services/messaging.service";
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-news-create',
@@ -10,8 +11,6 @@ import {MessagingService} from "src/app/services/messaging.service";
 })
 export class NewsCreateComponent implements OnInit {
     errorMessage = '';
-    success = false;
-
     submitted = false;
     newsForm: FormGroup;
     selectedFile: File | null = null;
@@ -20,7 +19,8 @@ export class NewsCreateComponent implements OnInit {
     constructor(
         private formBuilder: FormBuilder,
         private newsService: NewsEndpointService,
-        private messagingService: MessagingService
+        private messagingService: MessagingService,
+        private router: Router
     ) {
     }
 
@@ -74,15 +74,11 @@ export class NewsCreateComponent implements OnInit {
         this.newsService.create(this.selectedFile, newsData).subscribe({
             next: () => {
                 this.messagingService.setMessage('Die News wurde erfolgreich gespeichert.', "success");
-                this.success = true;
                 this.resetForm();
-                setTimeout(() => {
-                    this.success = false;
-                }, 5000);
+                this.router.navigate(['/news']);
             },
             error: error => {
                 this.defaultServiceErrorHandling(error);
-                this.success = false;
             }
         });
     }
