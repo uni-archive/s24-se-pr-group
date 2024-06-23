@@ -6,6 +6,8 @@ import at.ac.tuwien.sepr.groupphase.backend.persistence.mapper.HallSectorMapper;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallSectorRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.HallSpotRepository;
 import java.util.List;
+
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 
 import jakarta.transaction.Transactional;
