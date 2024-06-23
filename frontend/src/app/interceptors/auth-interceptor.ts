@@ -1,17 +1,13 @@
-import { Injectable } from "@angular/core";
-import {
-  HttpEvent,
-  HttpHandler,
-  HttpInterceptor,
-  HttpRequest,
-} from "@angular/common/http";
-import { AuthService } from "../services/auth.service";
-import { Observable } from "rxjs";
-import { Globals } from "../global/globals";
+import {Injectable} from "@angular/core";
+import {HttpEvent, HttpHandler, HttpInterceptor, HttpRequest,} from "@angular/common/http";
+import {AuthService} from "../services/auth.service";
+import {Observable} from "rxjs";
+import {Globals} from "../global/globals";
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  constructor(private authService: AuthService, private globals: Globals) {}
+  constructor(private authService: AuthService, private globals: Globals) {
+  }
 
   intercept(
     req: HttpRequest<any>,
@@ -60,9 +56,9 @@ export class AuthInterceptor implements HttpInterceptor {
     console.log("Intercepted request: " + req.url);
     // Do not intercept authentication requests
     if (
-      allowedUris.includes(req.url) ||
-      (allowedUriStarts.some((uri) => req.url.startsWith(uri)) &&
-        !this.authService.isLoggedIn())
+      (allowedUris.includes(req.url) ||
+        allowedUriStarts.some((uri) => req.url.startsWith(uri))) &&
+      !this.authService.isLoggedIn()
     ) {
       console.log("Request is allowed");
       return next.handle(req);

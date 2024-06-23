@@ -2,13 +2,13 @@
   <div class="row justify-content-center">
     <div class="col-lg-11">
       <div class="mb-3 mt-3">
-        <div class="d-flex justify-content-between align-items-center position-relative">
-          <div class="text-left">
-            <div class="col-lg-11 mb-3">
-              <button (click)="goBack()" class="btn btn-primary">Zurück</button>
-            </div>
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="text-left z-index-high">
+            <button (click)="goBack()" class="btn btn-primary">Zurück</button>
           </div>
-          <h2 class="h2 mb-3 text-center position-absolute w-100 title-centered">{{ news.title }}</h2>
+          <div class="flex-grow-1 text-center z-index-low">
+            <h2 class="h2 mb-3">{{ news.title }}</h2>
+          </div>
           <div class="text-right">
             <p class="text-muted mb-0">Veröffentlicht am:</p>
             <p class="text-muted">{{ news.publishedAt | date: 'dd.MM.yyyy' }}
@@ -47,10 +47,10 @@
       <div *ngIf="news.eventDto" class="card mb-3 event-card-color hover-card"
            (click)="navigateToEvent(news.eventDto.id)">
         <div class="card-body">
-          <h4 class="card-title">Suche Tickets für: {{
+          <h4 class="card-title">Suche Tickets für {{
               news.eventDto.eventType === 'THEATER' ? 'Theaterstück' : news.eventDto.eventType === 'CONCERT' ? 'Konzert'
                 : 'Kinofilm'
-            }} {{ news.eventDto.title }}</h4>
+            }}: {{ news.eventDto.title }}</h4>
         </div>
       </div>
     </div>

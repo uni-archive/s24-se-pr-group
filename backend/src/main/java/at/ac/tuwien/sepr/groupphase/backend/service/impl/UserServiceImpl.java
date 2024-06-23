@@ -170,6 +170,8 @@ public class UserServiceImpl implements UserService {
             && userDetails.isAccountNonExpired()
             && userDetails.isAccountNonLocked()
             && userDetails.isCredentialsNonExpired()
+            && applicationUserDto.getAccountActivated()
+            && !applicationUserDto.isAccountLocked()
             && passwordEncoder.matches(password.concat(applicationUserDto.getSalt()),
             userDetails.getPassword());
     }
