@@ -14,7 +14,7 @@ import { HttpHeaders }                                       from '@angular/comm
 import { Observable }                                        from 'rxjs';
 
 import { OrderDetailsResponse } from '../model/models';
-import { OrderSummaryResponse } from '../model/models';
+import { PageOrderSummaryResponse } from '../model/models';
 
 
 import { Configuration }                                     from '../configuration';
@@ -48,8 +48,10 @@ export interface OrderEndpointServiceInterface {
     /**
      * 
      * 
+     * @param page 
+     * @param size 
      */
-    findForUser1(extraHttpRequestParams?: any): Observable<Array<OrderSummaryResponse>>;
+    findForUser1(page?: number, size?: number, extraHttpRequestParams?: any): Observable<PageOrderSummaryResponse>;
 
     /**
      * 

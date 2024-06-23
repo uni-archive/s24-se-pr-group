@@ -69,6 +69,7 @@ model/page-application-user-response.ts
 model/page-artist-search-response.ts
 model/page-event-response.ts
 model/page-location-summary-response.ts
+model/page-order-summary-response.ts
 model/page-show-list-response.ts
 model/page-show-response.ts
 model/page-simple-news-response-dto.ts

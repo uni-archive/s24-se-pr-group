@@ -17,6 +17,7 @@ export class ConfirmCancelOrderDialogComponent implements OnInit {
 
   orderPrice(): number {
     return this.order.tickets
+      .filter(t => !t.reserved)
       .map(t => t.hallSpot.sector.hallSectorShow.price)
       .reduce((p1, p2) => p1 + p2, 0);
   }

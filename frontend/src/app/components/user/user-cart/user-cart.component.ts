@@ -43,7 +43,7 @@ export class UserCartComponent implements OnInit {
 
   changeTicketReserved(ticketId: number, setReserved: boolean): void {
     const ticket = this.order.tickets.find(t => t.id === ticketId);
-    if(ticket.reserved === setReserved) {
+    if (ticket.reserved === setReserved) {
       return;
     }
 
@@ -77,7 +77,7 @@ export class UserCartComponent implements OnInit {
   getSubtotalForEvent(eventId: number): string {
     const ticketsForEvent = this.ticketsBySectorsByEvent.get(eventId);
     let sum = 0;
-    for(const tickets of ticketsForEvent.values()) {
+    for (const tickets of ticketsForEvent.values()) {
       sum += tickets
         .filter(t => !t.reserved)
         .map(t => t.hallSpot.sector.hallSectorShow.price)
@@ -86,16 +86,27 @@ export class UserCartComponent implements OnInit {
     return formatPrice(sum);
   }
 
-  getTotalPrice(): string {
-    const total = this.order.tickets
+  getTotalPriceVal(): number {
+    return this.order.tickets
       .filter(t => !t.reserved)
       .map(t => t.hallSpot.sector.hallSectorShow.price)
       .reduce((p1, p2) => p1 + p2, 0);
-    return formatPrice(total);
+  }
+
+  getTotalPrice(): string {
+    return formatPrice(this.getTotalPriceVal());
   }
 
   gotoCheckout(): void {
     this.router.navigate(["/user/cart/checkout"]);
+  }
+
+  gotoCheckoutText(): string {
+    if (this.getTotalPriceVal() === 0) {
+      return "Jetzt reservieren";
+    } else {
+      return "Jetzt zahlen";
+    }
   }
 
   loadOrder(): void {
@@ -107,7 +118,7 @@ export class UserCartComponent implements OnInit {
         this.ticketsBySectorsByEvent = this.createEventToTicketMap();
       },
       error: err => {
-        if(err.status === HttpStatusCode.BadRequest) {
+        if (err.status === HttpStatusCode.BadRequest) {
           this.orderService.createOrder().subscribe({
             next: order => {
               this.order = order;

@@ -64,9 +64,9 @@
 
     <hr class="mb-4">
 
-
-    <h4 class="mb-3">Zahlungsinformationen</h4>
-    <form [formGroup]="creditCardForm" class="row">
+    <div *ngIf="this.total(order.tickets) > 0">
+      <h4 class="mb-3">Zahlungsinformationen</h4>
+      <form [formGroup]="creditCardForm" class="row">
       <div class="form-group col-6 mb-3">
         <label class="form-label" for="cc-name">Karteninhaber</label>
         <input
@@ -134,10 +134,10 @@
 
       </div>
       <hr class="mb-4">
-
-      <div class="d-flex justify-content-end mt-3">
-        <button [disabled]="!creditCardForm.valid" class="btn btn-primary btn w-25" type="submit" (click)="purchaseOrder()">Bestellen!</button>
-      </div>
     </form>
+    </div>
+    <div class="d-flex justify-content-end mt-3">
+      <button [disabled]="this.total(order.tickets) > 0 && !creditCardForm.valid" class="btn btn-primary btn w-25" type="button" (click)="purchaseOrder()">{{purchaseOrderText()}}</button>
+    </div>
   </div>
 </div>

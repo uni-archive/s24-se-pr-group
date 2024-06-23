@@ -49,6 +49,7 @@ import java.util.List;
 import static at.ac.tuwien.sepr.groupphase.backend.supplier.ApplicationUserSupplier.aCustomerUser;
 import static java.util.function.Predicate.not;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith({MockitoExtension.class})
@@ -57,7 +58,6 @@ import static org.mockito.Mockito.verify;
 public class OrderServiceImplTest {
 
     private static ApplicationUser testCustomer;
-    private static Order testOrder;
     private static List<Ticket> testTickets;
     private static Ticket reservedTicket;
     private static Ticket ticketToBuy;
@@ -207,7 +207,6 @@ public class OrderServiceImplTest {
         t5.setValid(false);
         t5.setHallSpot(hallSpot5);
         t5.setShow(show);
-        t5.setOrder(testOrder);
 
         var t6 = new Ticket();
         t6.setHash("hash");
@@ -215,7 +214,6 @@ public class OrderServiceImplTest {
         t6.setValid(false);
         t6.setHallSpot(hallSpot6);
         t6.setShow(show);
-        t6.setOrder(testOrder);
 
         testTickets = List.of(t1, t2, t3, t4);
         ticketToBuy = t5;
@@ -328,7 +326,7 @@ public class OrderServiceImplTest {
         assertThat(cancelOrder)
             .isNotNull();
 
-        assertThat(cancelOrder.getTotalPrice()).isEqualTo(200);
+        assertThat(cancelOrder.getTotalPriceNonReserved()).isEqualTo(100);
         assertThat(cancelOrder.getTicketCount()).isEqualTo(4);
 
         var expectedInvoiceIds = testCancelInvoices.stream().map(Invoice::getId).toArray(Long[]::new);
@@ -408,7 +406,71 @@ public class OrderServiceImplTest {
             .toList();
 
         assertThat(found.getTickets())
-            .filteredOn(x->!reservedTickets.contains(x.getId()))
+            .filteredOn(x -> !reservedTickets.contains(x.getId()))
             .allMatch(TicketDetailsDto::isValid);
     }
+
+    @Test
+    void finding_OrderSummaries_For_aUser_Computes_TicketCount_And_TotalPrice_Correctly() throws ValidationException, DtoNotFoundException {
+        var orderSummaries = orderService.findForUser(testCustomer.getId());
+        assertThat(orderSummaries)
+            .isNotNull()
+            .hasSize(2);
+
+        var testPurchaseOrderSummary = orderSummaries.stream().filter(o -> o.getId().equals(testPurchaseOrder.getId())).findFirst().get();
+        var testCancelOrderSummary = orderSummaries.stream().filter(o -> o.getId().equals(testCancelOrder.getId())).findFirst().get();
+
+        assertAll(
+            () -> assertThat(testPurchaseOrderSummary.getTicketCount()).isEqualTo(3),
+            () -> assertThat(testPurchaseOrderSummary.getTotalPriceNonReserved()).isEqualTo(100),
+            () -> assertThat(testPurchaseOrderSummary.getTotalPriceReserved()).isEqualTo(200),
+
+            () -> assertThat(testCancelOrderSummary.getTicketCount()).isEqualTo(4),
+            () -> assertThat(testCancelOrderSummary.getTotalPriceNonReserved()).isEqualTo(2 * 50),
+            () -> assertThat(testCancelOrderSummary.getTotalPriceReserved()).isEqualTo(2 * 50)
+        );
+
+        var c = new ApplicationUserDto();
+        c.setId(testCustomer.getId());
+        var purchaseOrderDetails = orderService.findById(testPurchaseOrder.getId(), c);
+
+        assertThat(testPurchaseOrderSummary.getTotalPriceReserved())
+            .isEqualTo(purchaseOrderDetails
+                .getTickets()
+                .stream()
+                .filter(TicketDetailsDto::isReserved)
+                .mapToLong(t -> t.getHallSpot().getSector().getHallSectorShow().getPrice())
+                .sum()
+            );
+
+        assertThat(testPurchaseOrderSummary.getTotalPriceNonReserved())
+            .isEqualTo(purchaseOrderDetails
+                .getTickets()
+                .stream()
+                .filter(not(TicketDetailsDto::isReserved))
+                .mapToLong(t -> t.getHallSpot().getSector().getHallSectorShow().getPrice())
+                .sum()
+            );
+
+        var cancelOrderDetails = orderService.findById(testCancelOrder.getId(), c);
+
+        assertThat(testCancelOrderSummary.getTotalPriceReserved())
+            .isEqualTo(cancelOrderDetails
+                .getTickets()
+                .stream()
+                .filter(TicketDetailsDto::isReserved)
+                .mapToLong(t -> t.getHallSpot().getSector().getHallSectorShow().getPrice())
+                .sum()
+            );
+
+        assertThat(testCancelOrderSummary.getTotalPriceNonReserved())
+            .isEqualTo(cancelOrderDetails
+                .getTickets()
+                .stream()
+                .filter(not(TicketDetailsDto::isReserved))
+                .mapToLong(t -> t.getHallSpot().getSector().getHallSectorShow().getPrice())
+                .sum()
+            );
+    }
+
 }

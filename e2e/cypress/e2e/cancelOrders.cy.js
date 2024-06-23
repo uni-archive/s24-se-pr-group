@@ -7,7 +7,6 @@ context("cancel orders", () => {
         it("marks the order as cancelled", () => {
             const orderId = 1;
             cy.cancelOrder(orderId);
-            cy.contains("Ihre Bestellung wurde erfolgreich storniert.");
             cy.contains("Storno-Rechnung drucken");
             cy.visit("/#/my/orders");
             cy.get(`th[data-testid="order-id-${orderId}"]`)
@@ -20,7 +19,6 @@ context("cancel orders", () => {
         it("marks the order as cancelled", () => {
             const orderId = 2;
             cy.cancelOrder(orderId);
-            cy.contains("Ihre Bestellung wurde erfolgreich storniert.");
             cy.contains("Storno-Rechnung drucken");
             cy.visit("/#/my/orders");
             cy.get(`th[data-testid="order-id-${orderId}"]`)

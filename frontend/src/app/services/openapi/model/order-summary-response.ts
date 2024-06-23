@@ -15,7 +15,9 @@ import { InvoiceResponse } from './invoice-response';
 export interface OrderSummaryResponse { 
     id?: number;
     ticketCount?: number;
-    totalPrice?: number;
+    totalPriceNonReserved?: number;
+    totalPriceReserved?: number;
+    totalPriceOpenReserved?: number;
     invoices?: Array<InvoiceResponse>;
     dateTime?: string;
 }

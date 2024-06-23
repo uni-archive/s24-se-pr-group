@@ -6,7 +6,9 @@ import java.util.List;
 public class OrderSummaryDto implements AbstractDto {
     private Long id;
     private int ticketCount;
-    private long totalPrice;
+    private long totalPriceNonReserved;
+    private long totalPriceReserved;
+    private long totalPriceOpenReserved;
     private List<InvoiceDto> invoices;
 
     private LocalDateTime dateTime;
@@ -28,12 +30,12 @@ public class OrderSummaryDto implements AbstractDto {
         this.ticketCount = ticketCount;
     }
 
-    public long getTotalPrice() {
-        return totalPrice;
+    public long getTotalPriceNonReserved() {
+        return totalPriceNonReserved;
     }
 
-    public void setTotalPrice(long totalPrice) {
-        this.totalPrice = totalPrice;
+    public void setTotalPriceNonReserved(long totalPriceNonReserved) {
+        this.totalPriceNonReserved = totalPriceNonReserved;
     }
 
     public List<InvoiceDto> getInvoices() {
@@ -52,9 +54,27 @@ public class OrderSummaryDto implements AbstractDto {
         this.dateTime = dateTime;
     }
 
+    public long getTotalPriceReserved() {
+        return totalPriceReserved;
+    }
+
+    public void setTotalPriceReserved(long totalPriceReserved) {
+        this.totalPriceReserved = totalPriceReserved;
+    }
+
+    public long getTotalPriceOpenReserved() {
+        return totalPriceOpenReserved;
+    }
+
+    public void setTotalPriceOpenReserved(long totalPriceOpenReserved) {
+        this.totalPriceOpenReserved = totalPriceOpenReserved;
+    }
+
     public static class OrderSummaryDtoBuilder {
         private int ticketCount;
-        private long totalPrice;
+        private long totalPriceNonReserved;
+        private long totalPriceReserved;
+        private long totalPriceOpenReserved;
         private List<InvoiceDto> invoices;
 
         private LocalDateTime dateTime;
@@ -64,8 +84,18 @@ public class OrderSummaryDto implements AbstractDto {
             return this;
         }
 
-        public OrderSummaryDtoBuilder withTotalPrice(int totalPrice) {
-            this.totalPrice = totalPrice;
+        public OrderSummaryDtoBuilder withTotalPriceNonReserved(int totalPriceNonReserved) {
+            this.totalPriceNonReserved = totalPriceNonReserved;
+            return this;
+        }
+
+        public OrderSummaryDtoBuilder withTotalPriceReserved(int totalPriceReserved) {
+            this.totalPriceReserved = totalPriceReserved;
+            return this;
+        }
+
+        public OrderSummaryDtoBuilder withTotalPriceOpenReserved(int totalPriceOpenReserved) {
+            this.totalPriceOpenReserved = totalPriceOpenReserved;
             return this;
         }
 
@@ -82,7 +112,9 @@ public class OrderSummaryDto implements AbstractDto {
         public OrderSummaryDto build() {
             var orderSummaryDto = new OrderSummaryDto();
             orderSummaryDto.setTicketCount(ticketCount);
-            orderSummaryDto.setTotalPrice(totalPrice);
+            orderSummaryDto.setTotalPriceNonReserved(totalPriceNonReserved);
+            orderSummaryDto.setTotalPriceReserved(totalPriceReserved);
+            orderSummaryDto.setTotalPriceOpenReserved(totalPriceOpenReserved);
             orderSummaryDto.setInvoices(invoices);
             orderSummaryDto.setDateTime(dateTime);
             return orderSummaryDto;

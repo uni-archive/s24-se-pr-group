@@ -398,9 +398,12 @@ export class PdfService {
   }
 
   private calculateOrderTotalPrice(order: OrderDetailsResponse): number {
-    return order.tickets
+    const res = order.tickets
+      .filter(t => !t.reserved)
       .map(t => t.hallSpot.sector.hallSectorShow.price)
-      .reduce((a, b) => a + b);
+      .reduce((a, b) => a + b, 0);
+    console.log(order.tickets, res);
+    return res;
   }
 
   private ticketPriceBeforeTaxValueField(order: OrderDetailsResponse): Content {

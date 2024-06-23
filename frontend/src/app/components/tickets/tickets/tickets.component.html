@@ -1,4 +1,4 @@
 <div class="jumbotron mt-5">
   <h1 class="display-4">Meine Tickets</h1>
-  <app-tickets-table [ticketLoader]="loadTickets()"/>
+  <app-tickets-table [tickets]="tickets" (ticketsChanged)="loadTickets()"/>
 </div>

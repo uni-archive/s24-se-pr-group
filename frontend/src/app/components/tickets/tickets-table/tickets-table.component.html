@@ -46,7 +46,7 @@
       <th scope="col">Aufführungs-Datum</th>
       <th scope="col">Gekauft / Reserviert</th>
       <th scope="col">Preis</th>
-      <th scope="col">Aktionen</th>
+      <th *ngIf="!isCancelled" scope="col">Aktionen</th>
     </tr>
     </thead>
     <tbody>
@@ -54,9 +54,9 @@
       <th scope="row">{{ticket.id}}</th>
       <td>{{ticket.show.event.title}}</td>
       <td>{{ticket.show.dateTime | date}}</td>
-      <td>{{ticket.reserved ? "Reserviert" : "Gekauft" }}</td>
+      <td>{{ticketStateText(ticket)}}</td>
       <td>{{formatPrice(ticket?.hallSpot?.sector?.hallSectorShow?.price)}}</td>
-      <td>
+      <td *ngIf="!isCancelled">
         <div class="btn-group">
           <a class="btn btn-sm responsive-info-button"
              (click)="this.printTicketPDF(ticket)"
