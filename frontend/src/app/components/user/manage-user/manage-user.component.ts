@@ -11,6 +11,7 @@ import {
   styleUrls: ["./manage-user.component.scss"],
 })
 export class ManageUserComponent {
+  isLoading: boolean = false;
   filterConfig = {
     firstName: "",
     familyName: "",
@@ -42,10 +43,12 @@ export class ManageUserComponent {
   }
 
   updateLockStatus(user: ApplicationUserDto, status: boolean) {
+    this.isLoading = true;
     this.userEndpointService.getUser().subscribe({
       next: (currentUser) => {
         if (currentUser == null) {
           console.error("Keine Benutzer geladen.");
+          this.isLoading = false;
           return;
         }
 
@@ -56,6 +59,7 @@ export class ManageUserComponent {
               "Dieser Benutzer kann nicht gesperrt werden.",
               "warning"
             );
+            this.isLoading = false;
             return;
           }
 
@@ -71,28 +75,39 @@ export class ManageUserComponent {
                     user.accountLocked ? "gesperrt" : "entsperrt"
                   }.`
                 );
+                this.isLoading = false;
               },
-              error: (error) =>
-                console.error("Fehler beim Laden der Benutzer:", error),
+              error: (error) => {
+                console.error("Fehler beim Laden der Benutzer:", error);
+                this.isLoading = false;
+              },
             });
         } else {
           this.messagingService.setMessage(
             "Aktualisierung des eigenen Benutzers kann nicht durchgeführt werden.",
             "danger"
           );
+          this.isLoading = false;
         }
       },
-      error: (error) =>
-        console.error("Fehler beim Laden des Benutzers:", error),
+      error: (error) => {
+        console.error("Fehler beim Laden des Benutzers:", error);
+        this.isLoading = false;
+      },
     });
   }
 
   resetPassword(user: ApplicationUserDto) {
+    this.isLoading = true;
     this.userEndpointService.sendEmailForPasswordReset(user.email).subscribe({
       next: (response) => {
         this.messagingService.setMessage(response.message, "success");
+        this.isLoading = false;
       },
-      error: (error) => console.error("Fehler beim Laden der Benutzer:", error),
+      error: (error) => {
+        console.error("Fehler beim Laden der Benutzer:", error);
+        this.isLoading = false;
+      },
     });
   }
 }
