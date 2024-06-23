@@ -38,7 +38,6 @@ type TicketLoader = Observable<TicketDetailsResponse[]>;
 export class TicketsTableComponent implements OnInit {
   @Input({ required: true }) tickets: TicketDetailsResponse[] = [];
   @Output("ticketsChanged") ticketsChanged = new EventEmitter();
-  isCancelled = false;
 
   constructor(
     private ticketService: TicketEndpointService,
@@ -62,8 +61,8 @@ export class TicketsTableComponent implements OnInit {
 
 
   ngOnInit(): void {
+    console.log(this.tickets);
     this.refreshTicketsSorting(this.tickets);
-    this.isCancelled = this.tickets[0].order.invoices.filter(i => i.invoiceType === 'CANCELLATION').length > 0;
   }
 
   /*loadTickets(): void {
@@ -78,6 +77,10 @@ export class TicketsTableComponent implements OnInit {
       });
   }*/
 
+  isCancelled(ticket: TicketDetailsResponse): boolean {
+    return ticket.order.invoices.filter(i => i.invoiceType === 'CANCELLATION').length > 0
+  }
+
   public refreshTicketsSorting(ts: TicketDetailsResponse[]): void {
     console.log("setting...");
     // this.tickets = this.sortTicketsByDateDesc(ts);
@@ -90,7 +93,7 @@ export class TicketsTableComponent implements OnInit {
   }
 
   ticketStateText(ticket: TicketDetailsResponse): string {
-    if(this.isCancelled) {
+    if(this.isCancelled(ticket)) {
       return "Storniert";
     } else if (ticket.reserved) {
       return "Reserviert";

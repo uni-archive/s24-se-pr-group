@@ -1,4 +1,4 @@
 <div class="jumbotron mt-5">
   <h1 class="display-4">Meine Tickets</h1>
-  <app-tickets-table [tickets]="tickets" (ticketsChanged)="loadTickets()"/>
+  <app-tickets-table *ngIf="tickets.length > 0" [tickets]="tickets" (ticketsChanged)="loadTickets()"/>
 </div>

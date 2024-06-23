@@ -5,13 +5,15 @@ import {
 } from "../../print-purchase-invoice-button/print-purchase-invoice-button.component";
 import {Observable} from "rxjs";
 import {TicketDetailsResponse, TicketEndpointService} from "../../../services/openapi";
+import {NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-tickets',
   standalone: true,
   imports: [
     TicketsTableComponent,
-    PrintPurchaseInvoiceButtonComponent
+    PrintPurchaseInvoiceButtonComponent,
+    NgIf
   ],
   templateUrl: './tickets.component.html',
   styleUrl: './tickets.component.scss'
