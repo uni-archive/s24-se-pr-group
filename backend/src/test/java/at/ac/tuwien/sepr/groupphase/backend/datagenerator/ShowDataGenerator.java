@@ -64,9 +64,9 @@ public class ShowDataGenerator {
     @PostConstruct
     protected void generateData() throws ForbiddenException, ValidationException {
         Random random = new Random();
-        List<Artist> allArtists = artistRepository.findAll(); // Assuming you have a method to fetch all artists
-        List<Event> allEvents = eventRepository.findAll(); // Assuming you have a method to fetch all events
-        List<Location> allLocations = locationRepository.findAllWithHallplan(); // Assuming you have a method to fetch all locations
+        List<Artist> allArtists = artistRepository.findAll();
+        List<Event> allEvents = eventRepository.findAll();
+        List<Location> allLocations = locationRepository.findAllWithHallplan();
 
         for (int i = 1; i <= dataGenerationConfig.showAmount; i++) {
             log.info("Generating show " + i + " of " + dataGenerationConfig.showAmount);
