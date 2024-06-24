@@ -4,6 +4,7 @@
                           placeholder="Veranstaltungsort suchen und auswählen"
                           (itemSelected)="onLocationSelected($event)"
                           [selectedItem]="initialLocation"
+                          [clearEvent]="clearEvent"
 >
 </app-generic-autocomplete>
 

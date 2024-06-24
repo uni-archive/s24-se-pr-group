@@ -1,6 +1,6 @@
-import {Component, EventEmitter, forwardRef, Input, OnInit, Output, TemplateRef} from '@angular/core';
+import {Component, EventEmitter, forwardRef, Input, OnDestroy, OnInit, Output, TemplateRef} from '@angular/core';
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR} from '@angular/forms';
-import {Observable, of} from 'rxjs';
+import {Observable, of, Subscription} from 'rxjs';
 import {debounceTime, distinctUntilChanged, switchMap} from 'rxjs/operators';
 
 @Component({
@@ -13,7 +13,7 @@ import {debounceTime, distinctUntilChanged, switchMap} from 'rxjs/operators';
     multi: true
   }]
 })
-export class GenericAutocompleteComponent<T> implements OnInit, ControlValueAccessor {
+export class GenericAutocompleteComponent<T> implements OnInit, ControlValueAccessor, OnDestroy {
   @Input() searchFunction!: (query: string) => Observable<T[]>;
   @Input() displayTemplate!: TemplateRef<any>;
   @Input() placeholder: string = 'Search and select an item';
@@ -21,12 +21,15 @@ export class GenericAutocompleteComponent<T> implements OnInit, ControlValueAcce
   @Input() textExtraction: (item: T) => string = null;
   @Input() selectedItem: T | null = null;
 
+  @Input() clearEvent: Observable<void> | null;
+
   @Output() itemSelected = new EventEmitter<T>();
   @Output() itemReset = new EventEmitter<void>();
 
   searchForm: FormGroup;
   filteredItems$: Observable<T[]>;
   showSuggestions: boolean = false;
+  clearEventSub: Subscription;
 
   private onChange: any = () => {
   };
@@ -40,6 +43,7 @@ export class GenericAutocompleteComponent<T> implements OnInit, ControlValueAcce
   }
 
   ngOnInit(): void {
+    this.clearEventSub = this.clearEvent?.subscribe(()=>this.resetSelection());
     this.filteredItems$ = this.searchForm.get('search')!.valueChanges.pipe(
       debounceTime(300),
       distinctUntilChanged(),
@@ -51,6 +55,11 @@ export class GenericAutocompleteComponent<T> implements OnInit, ControlValueAcce
       this.searchForm.get('search')!.setValue(this.getItemDisplayName(this.selectedItem), {emitEvent: false});
     }
   }
+
+  ngOnDestroy() {
+    this.clearEventSub?.unsubscribe();
+  }
+
 
   ngOnChanges(): void {
     if (this.selectedItem) {
@@ -67,6 +76,9 @@ export class GenericAutocompleteComponent<T> implements OnInit, ControlValueAcce
   }
 
   resetSelection(): void {
+    console.log("RESETTING SELECTION!!");
+    this.selectedItem = null;
+    this.itemSelected.emit(null);
     this.searchForm.get('search')!.setValue('', {emitEvent: false});
     this.itemReset.emit();
     this.showSuggestions = false;

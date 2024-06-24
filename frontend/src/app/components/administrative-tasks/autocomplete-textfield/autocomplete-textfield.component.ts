@@ -2,7 +2,7 @@ import {Component, EventEmitter, forwardRef, Input, OnInit, Output} from '@angul
 import {EventDto, EventEndpointService} from "../../../services/openapi";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ActivatedRoute} from "@angular/router";
-import {map} from "rxjs";
+import {map, Observable} from "rxjs";
 
 @Component({
   selector: "app-autocomplete-textfield",
@@ -17,7 +17,7 @@ import {map} from "rxjs";
 export class AutocompleteTextfieldComponent implements OnInit, ControlValueAccessor {
 
   @Output() selectedEvent = new EventEmitter<EventDto>();
-
+  @Input() clearEvent: Observable<void> | null;
   @Input() initialEvent: EventDto | null;
   event: EventDto | null = null;
 
@@ -46,6 +46,7 @@ export class AutocompleteTextfieldComponent implements OnInit, ControlValueAcces
   }
 
   ngOnInit(): void {
+    //this.clearEvent?.subscribe(()=>console.log("OBSERVABLE TRIGGERED!!!!!"));
     if (this.initialEvent) {
       this.writeValue(this.initialEvent);
     }
