@@ -15,8 +15,9 @@ import { SortObject } from './sort-object';
 
 
 export interface PageOrderSummaryResponse { 
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
+    pageable?: PageableObject;
     size?: number;
     content?: Array<OrderSummaryResponse>;
     number?: number;
@@ -24,7 +25,6 @@ export interface PageOrderSummaryResponse {
     first?: boolean;
     last?: boolean;
     numberOfElements?: number;
-    pageable?: PageableObject;
     empty?: boolean;
 }
 

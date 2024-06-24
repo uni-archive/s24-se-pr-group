@@ -2,6 +2,7 @@ import {Component, EventEmitter, forwardRef, Input, OnInit, Output} from '@angul
 import {LocationDto, LocationEndpointService} from '../../../services/openapi';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ActivatedRoute} from "@angular/router";
+import {Observable} from "rxjs";
 
 @Component({
   selector: 'app-location-autocomplete',
@@ -16,6 +17,7 @@ import {ActivatedRoute} from "@angular/router";
 export class LocationAutocompleteComponent implements OnInit, ControlValueAccessor {
   @Output() selectedLocation = new EventEmitter<LocationDto>();
   @Input() initialLocation: LocationDto | null;
+  @Input() clearEvent: Observable<void> | null;
 
   location: LocationDto | null = null;
 

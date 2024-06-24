@@ -27,6 +27,7 @@
           data-testid="search-event-input"
           formControlName="event"
           (selectedEvent)="onEventSelected($event)"
+          [clearEvent]="clearEvent.asObservable()"
         >
         </app-autocomplete-textfield>
       </div>
@@ -35,6 +36,7 @@
           data-testid="search-location-input"
           formControlName="location"
           (selectedLocation)="handleLocationSelected($event)"
+          [clearEvent]="clearEvent.asObservable()"
         >
         </app-location-autocomplete>
       </div>

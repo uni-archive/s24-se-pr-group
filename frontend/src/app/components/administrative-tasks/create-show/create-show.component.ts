@@ -13,6 +13,7 @@ import {
 import {MessagingService} from "../../../services/messaging.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {Subject} from "rxjs";
 
 @Component({
     selector: "app-create-show",
@@ -31,6 +32,7 @@ export class CreateShowComponent implements OnInit {
     artistList: ArtistDto[] = [];
     location: LocationDto | null = null;
     event: EventDto | null = null;
+    clearEvent: Subject<void> = new Subject<void>();
 
     constructor(
         private showService: ShowEndpointService,
@@ -50,21 +52,26 @@ export class CreateShowComponent implements OnInit {
     }
 
     ngOnInit(): void {
+      const success = this.route.snapshot.queryParams['success'];
+      if (success) {
+        //this.messagingService.setMessage(success.value);
+        console.log(success);
+      }
     }
 
     onArtistsChosen(artists: ArtistDto) {
-        console.log("Chose artist" + artists.artistName);
+        //console.log("Chose artist" + artists.artistName);
         this.createDto.artistList.push(artists);
-        console.log(this.createDto.artistList);
+        //console.log(this.createDto.artistList);
     }
 
     onArtistRemoved(artist: ArtistDto) {
-        console.log(artist);
-        console.log(this.createDto.artistList);
+        //console.log(artist);
+        //console.log(this.createDto.artistList);
         this.createDto.artistList = this.createDto.artistList.filter(
             (art) => art.id !== artist.id
         );
-        console.log(this.createDto.artistList);
+        //console.log(this.createDto.artistList);
     }
 
     onArtistChange(search: string) {
@@ -75,7 +82,7 @@ export class CreateShowComponent implements OnInit {
                 search)
                 .subscribe({
                     next: (data) => {
-                        console.log(data);
+                        //console.log(data);
                         this.artistList = data.content.filter((artist) => {
                             let ret = true;
                             this.createDto.artistList.forEach((art) => {
@@ -98,7 +105,7 @@ export class CreateShowComponent implements OnInit {
     }
 
     onSubmit() {
-        console.log(this.createDto);
+        //console.log(this.createDto);
         if (
             this.createDto.location !== null &&
             this.createDto.artistList.length !== 0 &&
@@ -107,10 +114,17 @@ export class CreateShowComponent implements OnInit {
         ) {
             this.showService.createShow(this.createDto).subscribe({
                 next: (value) => {
-                    //this.createDto = {dateTime: null, eventDto: null, artists: [], locationDto: null};
-                    //this.artistList = [];
+                    //this.createDto = {dateTime: null, event: null, artistList: [], location: null, sectorShowList: []};
+                    this.artistList.forEach(artist => this.onArtistRemoved(artist));
+                    this.createDto.dateTime = null;
                     //this.priceList = [];
                     //this.sectorList = [];
+                  //console.log("SENDING CLEAR EVENT!");
+                  this.clearEvent.next();
+                  this.router.navigate(
+                    ['.'],
+                    { relativeTo: this.route, queryParams: { } }
+                  );
 
                     this.messagingService.setMessage(value);
 
@@ -130,6 +144,11 @@ export class CreateShowComponent implements OnInit {
     }
 
     handleLocationSelected(location: LocationDto): void {
+      if (location == null) {
+        this.createDto.location = null;
+        this.createDto.sectorShowList = [];
+        return;
+      }
         this.hallSectorService.getShowByLocation1(location.hallPlan.id).subscribe({
             next: (value) => {
                 //this.priceList = new Array<number>(value.length);

@@ -15,8 +15,9 @@ import { TicketDetailsResponse } from './ticket-details-response';
 
 
 export interface PageTicketDetailsResponse { 
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
+    pageable?: PageableObject;
     size?: number;
     content?: Array<TicketDetailsResponse>;
     number?: number;
@@ -24,7 +25,6 @@ export interface PageTicketDetailsResponse {
     first?: boolean;
     last?: boolean;
     numberOfElements?: number;
-    pageable?: PageableObject;
     empty?: boolean;
 }
 
