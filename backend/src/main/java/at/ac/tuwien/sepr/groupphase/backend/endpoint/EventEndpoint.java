@@ -10,6 +10,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.EventResponseMapper;
 import at.ac.tuwien.sepr.groupphase.backend.service.EventService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,9 +37,9 @@ public class EventEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private EventService service;
+    private final EventService service;
 
-    private EventResponseMapper mapper;
+    private final EventResponseMapper mapper;
 
     public EventEndpoint(EventService service, EventResponseMapper mapper) {
         this.service = service;
@@ -99,7 +100,9 @@ public class EventEndpoint {
 
     @PermitAll
     @GetMapping("/top10")
+    @Operation(summary = "Get Top 10 Events")
     public ResponseEntity<List<EventWithTicketCountDto>> getTop10EventsWithMostTickets() {
+        LOGGER.info("GET /api/v1/event/top10");
         List<EventWithTicketCountDto> events = service.getTop10EventsWithMostTickets();
         return ResponseEntity.ok(events);
     }

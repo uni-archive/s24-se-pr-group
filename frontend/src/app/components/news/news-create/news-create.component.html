@@ -111,18 +111,4 @@
             </form>
         </div>
     </div>
-    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1200;">
-        <ngb-toast *ngIf="error" header="Fehler!" [autohide]="false" class="bg-danger text-white">
-            {{ errorMessage }}
-            <button type="button" class="close" (click)="vanishError()" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </ngb-toast>
-        <ngb-toast *ngIf="success" header="Erfolg!" [autohide]="true" [delay]="5000" class="bg-success text-white">
-            {{ successMessage }}
-            <button type="button" class="close" (click)="vanishSuccess()" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </ngb-toast>
-    </div>
 </div>

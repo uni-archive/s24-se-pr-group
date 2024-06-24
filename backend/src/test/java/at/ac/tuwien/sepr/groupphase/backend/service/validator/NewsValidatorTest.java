@@ -1,145 +1,142 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.validator;
 
-import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.News;
+import at.ac.tuwien.sepr.groupphase.backend.dto.EventDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.NewsDto;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.EventRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.sql.Blob;
-import java.sql.SQLException;
-import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 public class NewsValidatorTest {
-/*
+
     private NewsValidator newsValidator;
-    private News validNews;
+    private EventRepository eventRepository;
 
     @BeforeEach
-    public void setUp() throws IOException, SQLException {
-        newsValidator = new NewsValidator();
-
-        validNews = new News();
-        validNews.setTitle("Valid Title");
-        validNews.setSummary("Valid Summary");
-        validNews.setText("Valid text");
-        validNews.setPublishedAt(LocalDateTime.now());
-
-        BufferedImage image = new BufferedImage(500, 500, BufferedImage.TYPE_INT_RGB);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(image, "jpg", baos);
-        byte[] imageBytes = baos.toByteArray();
-        Blob blob = new javax.sql.rowset.serial.SerialBlob(imageBytes);
-
-        validNews.setImage(blob);
+    public void setup() {
+        eventRepository = Mockito.mock(EventRepository.class);
+        newsValidator = new NewsValidator(eventRepository);
     }
 
     @Test
-    public void validateForValidNewsShouldNotThrowException() {
-        assertDoesNotThrow(() -> newsValidator.validateForPublish(validNews));
+    public void testValidateForPublish_ValidData() throws ValidationException, IOException {
+        NewsDto newsDto = createValidNewsDto();
+        when(eventRepository.existsById(newsDto.getEventDto().getId())).thenReturn(true);
+        newsValidator.validateForPublish(newsDto);
     }
 
     @Test
-    public void validateForTitleTooShortIsInvalid() {
-        validNews.setTitle("A");
-        ValidationException exception = assertThrows(ValidationException.class, () -> newsValidator.validateForPublish(validNews));
-        assertTrue(exception.getMessage().contains("Title must be between 3 and 100 characters long"));
+    public void testValidateForPublish_TitleTooShort() throws IOException {
+        NewsDto newsDto = createValidNewsDto();
+        newsDto.setTitle("A");
+        assertThrows(ValidationException.class, () -> newsValidator.validateForPublish(newsDto));
     }
 
     @Test
-    public void validateForTitleTooLongIsInvalid() {
-        validNews.setTitle("A".repeat(101));
-        ValidationException exception = assertThrows(ValidationException.class, () -> newsValidator.validateForPublish(validNews));
-        assertTrue(exception.getMessage().contains("Title must be between 3 and 100 characters long"));
+    public void testValidateForPublish_TitleTooLong() throws IOException {
+        NewsDto newsDto = createValidNewsDto();
+        newsDto.setTitle("A".repeat(101));
+        assertThrows(ValidationException.class, () -> newsValidator.validateForPublish(newsDto));
     }
 
     @Test
-    public void validateForSummaryTooShortIsInvalid() {
-        validNews.setSummary("s");
-        ValidationException exception = assertThrows(ValidationException.class, () -> newsValidator.validateForPublish(validNews));
-        assertTrue(exception.getMessage().contains("Summary must be between 3 and 500 characters long"));
+    public void testValidateForPublish_SummaryTooShort() throws IOException {
+        NewsDto newsDto = createValidNewsDto();
+        newsDto.setSummary("A");
+        assertThrows(ValidationException.class, () -> newsValidator.validateForPublish(newsDto));
     }
 
     @Test
-    public void validateForSummaryTooLongIsInvalid() {
-        validNews.setSummary("A".repeat(501));
-        ValidationException exception = assertThrows(ValidationException.class, () -> newsValidator.validateForPublish(validNews));
-        assertTrue(exception.getMessage().contains("Summary must be between 3 and 500 characters long"));
+    public void testValidateForPublish_SummaryTooLong() throws IOException {
+        NewsDto newsDto = createValidNewsDto();
+        newsDto.setSummary("A".repeat(501));
+        assertThrows(ValidationException.class, () -> newsValidator.validateForPublish(newsDto));
     }
 
     @Test
-    public void validateForTextTooShortIsInvalid() {
-        validNews.setText("A");
-        ValidationException exception = assertThrows(ValidationException.class, () -> newsValidator.validateForPublish(validNews));
-        assertTrue(exception.getMessage().contains("Text must be between 3 and 10000 characters long"));
+    public void testValidateForPublish_TextTooShort() throws IOException {
+        NewsDto newsDto = createValidNewsDto();
+        newsDto.setText("A");
+        assertThrows(ValidationException.class, () -> newsValidator.validateForPublish(newsDto));
     }
 
     @Test
-    public void validateForTextTooLongIsInvalid() {
-        validNews.setText("A".repeat(10001));
-        ValidationException exception = assertThrows(ValidationException.class, () -> newsValidator.validateForPublish(validNews));
-        assertTrue(exception.getMessage().contains("Text must be between 3 and 10000 characters long"));
+    public void testValidateForPublish_TextTooLong() throws IOException {
+        NewsDto newsDto = createValidNewsDto();
+        newsDto.setText("A".repeat(10001));
+        assertThrows(ValidationException.class, () -> newsValidator.validateForPublish(newsDto));
     }
 
     @Test
-    public void validateForImageNullThrowsException() {
-        validNews.setImage(null);
-        ValidationException exception = assertThrows(ValidationException.class, () -> newsValidator.validateForPublish(validNews));
-        assertTrue(exception.getMessage().contains("An image must be provided"));
+    public void testValidateForPublish_NoImage() throws IOException {
+        NewsDto newsDto = createValidNewsDto();
+        newsDto.setImage(null);
+        assertThrows(ValidationException.class, () -> newsValidator.validateForPublish(newsDto));
     }
 
     @Test
-    public void validateForImageTooLargeThrowsException() throws SQLException {
-        byte[] largeImageBytes = new byte[11 * 1024 * 1024];
-        Blob largeBlob = new javax.sql.rowset.serial.SerialBlob(largeImageBytes);
-        validNews.setImage(largeBlob);
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> newsValidator.validateForPublish(validNews));
-        assertTrue(exception.getMessage().contains("Image file size must not exceed 10 MB"));
+    public void testValidateForPublish_InvalidImage() throws IOException {
+        NewsDto newsDto = createValidNewsDto();
+        newsDto.setImage(new byte[]{1, 2, 3});
+        assertThrows(ValidationException.class, () -> newsValidator.validateForPublish(newsDto));
     }
 
     @Test
-    public void validateForImageWidthTooSmallThrowsException() throws IOException, SQLException {
-        BufferedImage smallWidthImage = new BufferedImage(199, 500, BufferedImage.TYPE_INT_RGB);
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        ImageIO.write(smallWidthImage, "jpg", stream);
-        byte[] imageBytes = stream.toByteArray();
-        Blob blob = new javax.sql.rowset.serial.SerialBlob(imageBytes);
-        validNews.setImage(blob);
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> newsValidator.validateForPublish(validNews));
-        assertTrue(exception.getMessage().contains("Image width must be between 200 and 1000 pixels"));
+    public void testValidateForPublish_ImageTooLarge() throws IOException {
+        NewsDto newsDto = createValidNewsDto();
+        newsDto.setImage(new byte[10 * 1024 * 1024 + 1]); // 10 MB + 1 Byte
+        assertThrows(ValidationException.class, () -> newsValidator.validateForPublish(newsDto));
     }
 
     @Test
-    public void validateForImageHeightTooSmallThrowsException() throws IOException, SQLException {
-        BufferedImage smallHeightImage = new BufferedImage(500, 199, BufferedImage.TYPE_INT_RGB);
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        ImageIO.write(smallHeightImage, "jpg", stream);
-        byte[] imageBytes = stream.toByteArray();
-        Blob blob = new javax.sql.rowset.serial.SerialBlob(imageBytes);
-        validNews.setImage(blob);
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> newsValidator.validateForPublish(validNews));
-        assertTrue(exception.getMessage().contains("Image height must be between 200 and 1000 pixels"));
+    public void testValidateForPublish_ImageTooSmall() throws IOException {
+        NewsDto newsDto = createValidNewsDto();
+        BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+        newsDto.setImage(imageToByteArray(image));
+        assertThrows(ValidationException.class, () -> newsValidator.validateForPublish(newsDto));
     }
 
     @Test
-    public void validateForImageWidthTooLargeThrowsException() throws IOException, SQLException {
-        BufferedImage largeWidthImage = new BufferedImage(1001, 500, BufferedImage.TYPE_INT_RGB);
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        ImageIO.write(largeWidthImage, "jpg", stream);
-        byte[] imageBytes = stream.toByteArray();
-        Blob blob = new javax.sql.rowset.serial.SerialBlob(imageBytes);
-        validNews.setImage(blob);
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> newsValidator.validateForPublish(validNews));
-        assertTrue(exception.getMessage().contains("Image width must be between 200 and 1000 pixels"));
+    public void testValidateForPublish_NoEvent() throws IOException {
+        NewsDto newsDto = createValidNewsDto();
+        newsDto.setEventDto(null);
+        assertThrows(ValidationException.class, () -> newsValidator.validateForPublish(newsDto));
     }
-*/
- }
+
+    @Test
+    public void testValidateForPublish_EventNotExists() throws IOException {
+        NewsDto newsDto = createValidNewsDto();
+        when(eventRepository.existsById(newsDto.getEventDto().getId())).thenReturn(false);
+        assertThrows(ValidationException.class, () -> newsValidator.validateForPublish(newsDto));
+    }
+
+    private NewsDto createValidNewsDto() throws IOException {
+        NewsDto newsDto = new NewsDto();
+        newsDto.setTitle("Valid Title");
+        newsDto.setSummary("Valid Summary");
+        newsDto.setText("Valid Text");
+        newsDto.setImage(createValidImage());
+        newsDto.setEventDto(new EventDto().setId(1L));
+        return newsDto;
+    }
+
+    private byte[] createValidImage() throws IOException {
+        BufferedImage bufferedImage = new BufferedImage(800, 600, BufferedImage.TYPE_INT_RGB);
+        return imageToByteArray(bufferedImage);
+    }
+
+    private byte[] imageToByteArray(BufferedImage image) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ImageIO.write(image, "jpg", byteArrayOutputStream);
+        return byteArrayOutputStream.toByteArray();
+    }
+}

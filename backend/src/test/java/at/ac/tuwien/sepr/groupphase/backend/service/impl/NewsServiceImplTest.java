@@ -1,30 +1,40 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.exception.NotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.News;
-import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.NewsRepository;
+import at.ac.tuwien.sepr.groupphase.backend.dto.ApplicationUserDto;
+import at.ac.tuwien.sepr.groupphase.backend.dto.NewsDto;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.NewsDao;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.dao.UserDao;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.exception.EntityNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.DtoNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validator.NewsValidator;
-
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class NewsServiceImplTest {
+@ExtendWith(MockitoExtension.class)
+class NewsServiceImplTest {
 
     @Mock
-    private NewsRepository newsRepository;
+    private NewsDao newsDao;
+
+    @Mock
+    private UserDao userDao;
 
     @Mock
     private NewsValidator newsValidator;
@@ -32,60 +42,114 @@ public class NewsServiceImplTest {
     @InjectMocks
     private NewsServiceImpl newsService;
 
+    @Mock
+    private Authentication authentication;
+
+    @Mock
+    private SecurityContext securityContext;
+
     @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-    }
-
-   /* @Test
-    public void validateForFindAllShouldReturnAllNewsOrderedByPublishedAtDesc() {
-
-        News news1 = new News();
-        news1.setPublishedAt(LocalDateTime.now().minusDays(1));
-        News news2 = new News();
-        news2.setPublishedAt(LocalDateTime.now());
-
-        when(newsRepository.findAllByOrderByPublishedAtDesc()).thenReturn(Arrays.asList(news2, news1));
-
-        List<News> newsList = newsService.findAll();
-
-        assertEquals(2, newsList.size());
-        assertEquals(news2, newsList.get(0));
-        assertEquals(news1, newsList.get(1));
+    void setUp() {
+        SecurityContextHolder.setContext(securityContext);
     }
 
     @Test
-    public void validateForFindOneShouldReturnNews() {
+    void getNewsById_ShouldReturnNews_WhenNewsExists() throws DtoNotFoundException, EntityNotFoundException {
+        Long newsId = 1L;
+        String username = "user@example.com";
+        ApplicationUserDto userDto = new ApplicationUserDto();
+        userDto.setEmail(username);
+        NewsDto newsDto = new NewsDto();
+        newsDto.setId(newsId);
 
-        Long id = -1L;
-        News news = new News();
-        news.setId(id);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn(username);
+        when(userDao.findByEmail(username)).thenReturn(userDto);
+        when(newsDao.findById(newsId)).thenReturn(newsDto);
 
-        when(newsRepository.findById(id)).thenReturn(Optional.of(news));
+        NewsDto result = newsService.getNewsById(newsId);
 
-        News foundNews = newsService.findOne(id);
-
-        assertEquals(news, foundNews);
+        assertNotNull(result);
+        assertEquals(newsId, result.getId());
     }
 
     @Test
-    public void validateForFindOneShouldThrowNotFoundExceptionIfNewsDoesNotExist() {
+    void getNewsById_ShouldThrowDtoNotFoundException_WhenNewsDoesNotExist() throws EntityNotFoundException {
+        Long newsId = 1L;
+        when(newsDao.findById(newsId)).thenThrow(new EntityNotFoundException(newsId));
 
-        Long id = -1L;
-
-        when(newsRepository.findById(id)).thenReturn(Optional.empty());
-
-        assertThrows(NotFoundException.class, () -> newsService.findOne(id));
+        assertThrows(DtoNotFoundException.class, () -> newsService.getNewsById(newsId));
     }
 
     @Test
-    public void validateForPublishNewsShouldThrowValidationExceptionForInvalidNews() throws ValidationException {
+    void createNews_ShouldCreateNews_WhenValid() throws ValidationException {
+        NewsDto newsDto = new NewsDto();
+        newsDto.setTitle("Valid Title");
+        newsDto.setSummary("Valid Summary");
+        newsDto.setText("Valid Text");
 
-        News news = new News();
+        doNothing().when(newsValidator).validateForPublish(newsDto);
 
-        doThrow(new ValidationException("Validation failed")).when(newsValidator).validateForPublish(news);
+        newsService.createNews(newsDto);
 
-        assertThrows(ValidationException.class, () -> newsService.publishNews(news));
+        verify(newsValidator).validateForPublish(newsDto);
+        verify(newsDao).create(newsDto);
     }
-*/
+
+    @Test
+    void createNews_ShouldThrowValidationException_WhenInvalid() throws ValidationException {
+        NewsDto newsDto = new NewsDto();
+        doThrow(new ValidationException("Invalid news")).when(newsValidator).validateForPublish(newsDto);
+
+        assertThrows(ValidationException.class, () -> newsService.createNews(newsDto));
+    }
+
+    @Test
+    void getAllNews_ShouldReturnAllNews() {
+        Pageable pageable = PageRequest.of(0, 10);
+        NewsDto newsDto = new NewsDto();
+        Page<NewsDto> newsPage = new PageImpl<>(List.of(newsDto));
+
+        when(newsDao.findAllByOrderByPublishedAtDesc(pageable)).thenReturn(newsPage);
+
+        Page<NewsDto> result = newsService.getAllNews(pageable);
+
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        assertEquals(newsDto, result.getContent().getFirst());
+    }
+
+    @Test
+    void getUnseenNews_ShouldReturnUnseenNewsForUser() throws DtoNotFoundException, EntityNotFoundException {
+        Pageable pageable = PageRequest.of(0, 10);
+        String username = "user@example.com";
+        ApplicationUserDto userDto = new ApplicationUserDto();
+        userDto.setId(1L);
+        userDto.setEmail(username);
+        NewsDto newsDto = new NewsDto();
+        Page<NewsDto> newsPage = new PageImpl<>(List.of(newsDto));
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn(username);
+        when(userDao.findByEmail(username)).thenReturn(userDto);
+        when(newsDao.findUnseenNewsByUser(userDto.getId(), pageable)).thenReturn(newsPage);
+
+        Page<NewsDto> result = newsService.getUnseenNews(pageable);
+
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        assertEquals(newsDto, result.getContent().getFirst());
+    }
+
+    @Test
+    void getUnseenNews_ShouldThrowDtoNotFoundException_WhenUserNotFound() {
+        Pageable pageable = PageRequest.of(0, 10);
+        String username = "user@example.com";
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn(username);
+        when(userDao.findByEmail(username)).thenThrow(new RuntimeException("User not found"));
+
+        assertThrows(DtoNotFoundException.class, () -> newsService.getUnseenNews(pageable));
+    }
 }

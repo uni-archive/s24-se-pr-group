@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {SimpleNewsResponseDto, NewsEndpointService} from "../../services/openapi";
 import {AuthService} from '../../services/auth.service';
+import {MessagingService} from "src/app/services/messaging.service";
 
 @Component({
     selector: 'app-news',
@@ -8,7 +9,6 @@ import {AuthService} from '../../services/auth.service';
     styleUrls: ['./news.component.scss']
 })
 export class NewsComponent implements OnInit {
-    error = false;
     errorMessage = '';
     news: SimpleNewsResponseDto[] = [];
     newsMode: 'ALL' | 'UNREAD' = 'ALL';
@@ -18,6 +18,7 @@ export class NewsComponent implements OnInit {
 
     constructor(
         private newsService: NewsEndpointService,
+        private messagingService: MessagingService,
         public authService: AuthService
     ) {
     }
@@ -34,10 +35,6 @@ export class NewsComponent implements OnInit {
 
     getNews(): SimpleNewsResponseDto[] {
         return this.news;
-    }
-
-    vanishError() {
-        this.error = false;
     }
 
     loadNews() {
@@ -75,7 +72,6 @@ export class NewsComponent implements OnInit {
 
     private defaultServiceErrorHandling(error: any) {
         console.log(error);
-        this.error = true;
         if (error.error && error.error.detail) {
             this.errorMessage = error.error.detail;
         } else if (error.error && error.error.message) {
@@ -87,6 +83,7 @@ export class NewsComponent implements OnInit {
         } else {
             this.errorMessage = 'Ein unbekannter Fehler ist aufgetreten.';
         }
+        this.messagingService.setMessage(this.errorMessage, "danger");
     }
 
     onPageChange(page: number) {

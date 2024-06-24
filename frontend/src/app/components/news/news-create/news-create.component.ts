@@ -1,6 +1,8 @@
 import {Component, OnInit} from '@angular/core';
-import {EventDto, NewsEndpointService, NewsRequestDto, NewsResponseDto} from '../../../services/openapi';
+import {EventDto, NewsEndpointService, NewsRequestDto} from '../../../services/openapi';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {MessagingService} from "src/app/services/messaging.service";
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-news-create',
@@ -8,11 +10,7 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
     styleUrls: ['./news-create.component.scss']
 })
 export class NewsCreateComponent implements OnInit {
-    error = false;
     errorMessage = '';
-    success = false;
-    successMessage = '';
-
     submitted = false;
     newsForm: FormGroup;
     selectedFile: File | null = null;
@@ -20,7 +18,9 @@ export class NewsCreateComponent implements OnInit {
 
     constructor(
         private formBuilder: FormBuilder,
-        private newsService: NewsEndpointService
+        private newsService: NewsEndpointService,
+        private messagingService: MessagingService,
+        private router: Router
     ) {
     }
 
@@ -52,7 +52,6 @@ export class NewsCreateComponent implements OnInit {
             this.newsForm.patchValue({image: null});
             this.selectedFile = null;
             this.errorMessage = 'Nur Bilddateien sind erlaubt.';
-            this.error = true;
         }
     }
 
@@ -74,16 +73,12 @@ export class NewsCreateComponent implements OnInit {
         };
         this.newsService.create(this.selectedFile, newsData).subscribe({
             next: () => {
-                this.successMessage = 'Die News wurde erfolgreich gespeichert.';
-                this.success = true;
+                this.messagingService.setMessage('Die News wurde erfolgreich gespeichert.', "success");
                 this.resetForm();
-                setTimeout(() => {
-                    this.success = false;
-                }, 5000);
+                this.router.navigate(['/news']);
             },
             error: error => {
                 this.defaultServiceErrorHandling(error);
-                this.success = false;
             }
         });
     }
@@ -106,17 +101,8 @@ export class NewsCreateComponent implements OnInit {
         }
     }
 
-    vanishError(): void {
-        this.error = false;
-    }
-
-    vanishSuccess(): void {
-        this.success = false;
-    }
-
     private defaultServiceErrorHandling(error: any): void {
         console.log(error);
-        this.error = true;
         if (error.error && error.error.detail) {
             this.errorMessage = error.error.detail;
         } else if (error.error && error.error.message) {
@@ -128,5 +114,6 @@ export class NewsCreateComponent implements OnInit {
         } else {
             this.errorMessage = 'Ein unbekannter Fehler ist aufgetreten.';
         }
+        this.messagingService.setMessage(this.errorMessage, "danger");
     }
 }
