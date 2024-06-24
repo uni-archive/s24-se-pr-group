@@ -49,8 +49,6 @@ public class NewsDataGenerator {
     @PostConstruct
     private void generateNews() throws IOException {
 
-        EventType[] eventTypes = EventType.values();
-
 
         Event event1 = new Event();
         event1.setTitle("Furiosa: A Mad Max Saga");
@@ -76,8 +74,6 @@ public class NewsDataGenerator {
         event3.setDuration(7200L);
 
         eventRepository.save(event3);
-
-
 
 
 

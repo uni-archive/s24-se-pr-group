@@ -1,11 +1,15 @@
 package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Event;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Order;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Show;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.entity.Ticket;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.EventRepository;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.OrderRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.ShowRepository;
 import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.TicketRepository;
+import at.ac.tuwien.sepr.groupphase.backend.persistence.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,6 +47,10 @@ public class EventEndpointTest {
 
     @Autowired
     private TicketRepository ticketRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private OrderRepository orderRepository;
 
     @BeforeEach
     public void setup() {
@@ -61,9 +69,19 @@ public class EventEndpointTest {
             show.setDateTime(LocalDateTime.now().minusDays(10 - i));
             showRepository.save(show);
 
+            ApplicationUser applicationUser = new ApplicationUser();
+            applicationUser.setEmail("test" + i + "@test.com");
+            userRepository.save(applicationUser);
+
+            Order order = new Order();
+            order.setCustomer(applicationUser);
+            order.setDateTime(LocalDateTime.now().minusDays(10 - i));
+            order = orderRepository.save(order);
+
             for (int j = 0; j < (i <= 2 ? 1 : i * 2); j++) {
                 Ticket ticket = new Ticket();
                 ticket.setShow(show);
+                ticket.setOrder(order);
                 ticketRepository.save(ticket);
             }
         }
