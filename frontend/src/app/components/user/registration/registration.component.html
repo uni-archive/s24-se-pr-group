@@ -226,8 +226,7 @@
       <button
         type="submit"
         class="btn btn-primary btn-block"
-        [disabled]="!registrationForm.valid"
-        [disabled]="isLoading"
+        [disabled]="!registrationForm.valid || isLoading"
       >
         Registrieren
       </button>

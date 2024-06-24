@@ -1,14 +1,11 @@
-import { AfterViewInit, Component, Input } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import {
-  UserCreateRequest,
-  UserEndpointService,
-} from "../../../services/openapi";
-import { AuthService } from "../../../services/auth.service";
-import { Router } from "@angular/router";
-import { matchPasswords } from "../../../../validators/passwordRepeatValidator";
-import { MessagingService } from "../../../services/messaging.service";
-import { EventService } from "../../../services/event.service";
+import {AfterViewInit, Component, Input} from "@angular/core";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {UserCreateRequest, UserEndpointService,} from "../../../services/openapi";
+import {AuthService} from "../../../services/auth.service";
+import {Router} from "@angular/router";
+import {matchPasswords} from "../../../../validators/passwordRepeatValidator";
+import {MessagingService} from "../../../services/messaging.service";
+import {EventService} from "../../../services/event.service";
 
 @Component({
   selector: "app-registration",
@@ -43,7 +40,7 @@ export class RegistrationComponent implements AfterViewInit {
         country: ["Austria", Validators.required],
         isAdmin: [false],
       },
-      { validators: matchPasswords }
+      {validators: matchPasswords}
     );
   }
 
@@ -81,10 +78,12 @@ export class RegistrationComponent implements AfterViewInit {
           this.eventService.emitRegistrationSuccess(); // Emit event here
           if (!this.isAdminFlag) {
             this.router.navigate(["/login"], {
-              queryParams: { username: newUser.email },
+              queryParams: {username: newUser.email},
             });
           } else {
             this.registrationForm.reset();
+            this.registrationForm.get("country")?.setValue("Austria");
+            this.registrationForm.get("isAdmin")?.setValue(false);
           }
           this.isLoading = false;
         },
